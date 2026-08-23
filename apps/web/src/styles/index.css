@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+:root {
+  color: #172033;
+  background: #f5f8f8;
+  font-family:
+    Inter,
+    'Noto Sans Thai',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+a {
+  outline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 3px solid #14b8a6;
+}

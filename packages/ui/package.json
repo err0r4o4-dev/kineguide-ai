@@ -1,0 +1,7 @@
+{
+  "name": "@kineguide/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reserved workspace for proven, reusable KineGuide UI primitives",
+  "files": ["README.md", "DESIGN_TOKENS.md"]
+}

@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.23.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @kineguide/web lint
+      - run: pnpm --filter @kineguide/web format:check
+      - run: pnpm --filter @kineguide/web typecheck
+      - run: pnpm --filter @kineguide/web test
+      - run: pnpm --filter @kineguide/web build
+        env:
+          VITE_API_BASE_URL: /api/v1
+
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api-go
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: services/api-go/go.mod
+          cache-dependency-path: services/api-go/go.sum
+      - run: go mod download
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+      - run: go vet ./...
+      - run: go test -race ./...
+      - run: go build ./cmd/server
+
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/ai-python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: services/ai-python/pyproject.toml
+      - run: python -m pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy app
+      - run: pytest
+      - run: python -c "from app.main import app; assert app.openapi()['info']['version'] == '0.1.0'"
+
+  repository:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.23.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm openapi:lint
+      - run: docker compose config --quiet
+      - name: Reject committed environment and sensitive artifact files
+        shell: bash
+        run: |
+          forbidden=$(git ls-files | grep -E '(^|/)\.env($|\.)|(^|/)(uploads|recordings|research/models)/' | grep -v '\.env\.example$' || true)
+          test -z "$forbidden" || { echo "Forbidden tracked files:"; echo "$forbidden"; exit 1; }

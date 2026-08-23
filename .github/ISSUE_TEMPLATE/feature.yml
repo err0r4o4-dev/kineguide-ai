@@ -1,0 +1,35 @@
+name: Feature
+description: Propose a focused, testable KineGuide AI feature
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the user or developer problem without including health information.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome
+      description: Define observable acceptance criteria.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Web, Go API, Python AI, Pose, Database, Infrastructure, Documentation]
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety checklist
+      options:
+        - label: This issue contains no personal or health information.
+          required: true
+        - label: Clinical, privacy, and security review needs are identified.
+          required: true

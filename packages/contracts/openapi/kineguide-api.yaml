@@ -1,0 +1,150 @@
+openapi: 3.1.0
+info:
+  title: KineGuide AI Main API
+  version: 0.1.0
+  description: |
+    Initial system endpoints for KineGuide AI. This contract contains no patient,
+    diagnostic, safety-decision, or rehabilitation-plan operations.
+security: []
+servers:
+  - url: http://localhost:8080
+    description: Direct local development
+tags:
+  - name: System
+    description: Public liveness, readiness, and dependency-state operations.
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      tags: [System]
+      summary: Check Go API liveness
+      responses:
+        "200":
+          description: The process is alive.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        default:
+          description: A consistent unexpected-error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ready:
+    get:
+      operationId: getReadiness
+      tags: [System]
+      summary: Check Go API and dependency readiness
+      responses:
+        "200":
+          description: PostgreSQL and Python AI are available.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemStatusResponse"
+        "503":
+          description: At least one dependency is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemStatusResponse"
+  /api/v1/health:
+    get:
+      operationId: getVersionedHealth
+      tags: [System]
+      summary: Check versioned Go API liveness
+      responses:
+        "200":
+          description: The process is alive.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/v1/system/status:
+    get:
+      operationId: getSystemStatus
+      tags: [System]
+      summary: Get individual service states
+      responses:
+        "200":
+          description: Current dependency states; status may be degraded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemStatusResponse"
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required: [status, service, version]
+      properties:
+        status:
+          type: string
+          const: ok
+        service:
+          type: string
+          const: api-go
+        version:
+          type: string
+          examples: [0.1.0]
+    DependencyStatus:
+      type: object
+      additionalProperties: false
+      required: [name, status, latency_ms]
+      properties:
+        name:
+          type: string
+          examples: [postgres]
+        status:
+          type: string
+          enum: [ok, unavailable]
+        latency_ms:
+          type: integer
+          minimum: 0
+    SystemStatusResponse:
+      type: object
+      additionalProperties: false
+      required: [status, service, version, dependencies]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        service:
+          type: string
+          const: api-go
+        version:
+          type: string
+          examples: [0.1.0]
+        dependencies:
+          type: object
+          additionalProperties: false
+          required: [postgres, ai_python]
+          properties:
+            postgres:
+              $ref: "#/components/schemas/DependencyStatus"
+            ai_python:
+              $ref: "#/components/schemas/DependencyStatus"
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, details, request_id]
+          properties:
+            code:
+              type: string
+              examples: [SERVICE_UNAVAILABLE]
+            message:
+              type: string
+              examples: [The requested service is temporarily unavailable.]
+            details:
+              type: [object, "null"]
+              additionalProperties: true
+            request_id:
+              type: string
+              examples: [example-request-id]

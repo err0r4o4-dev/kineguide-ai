@@ -1,0 +1,18 @@
+{
+	auto_https off
+}
+
+:80 {
+	encode zstd gzip
+
+	@api path /api/*
+	reverse_proxy @api api-go:8080
+
+	@docs path /docs*
+	reverse_proxy @docs api-go:8080
+
+	@openapi path /openapi*
+	reverse_proxy @openapi api-go:8080
+
+	reverse_proxy web:80
+}

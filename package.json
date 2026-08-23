@@ -1,0 +1,19 @@
+{
+  "name": "kineguide-ai",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.23.0",
+  "devDependencies": {
+    "@redocly/cli": "^2.0.8"
+  },
+  "scripts": {
+    "build": "corepack pnpm --filter @kineguide/web build",
+    "dev": "corepack pnpm --filter @kineguide/web dev",
+    "format": "corepack pnpm --filter @kineguide/web format",
+    "format:check": "corepack pnpm --filter @kineguide/web format:check",
+    "lint": "corepack pnpm --filter @kineguide/web lint && corepack pnpm openapi:lint",
+    "openapi:lint": "redocly lint packages/contracts/openapi/kineguide-api.yaml",
+    "test": "corepack pnpm --filter @kineguide/web test",
+    "typecheck": "corepack pnpm --filter @kineguide/web typecheck"
+  }
+}
