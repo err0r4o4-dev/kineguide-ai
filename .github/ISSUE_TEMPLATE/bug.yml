@@ -1,7 +1,7 @@
 name: Bug
 description: Report a reproducible problem without sensitive data
 title: "[Bug]: "
-labels: [bug]
+labels: ["type: bug"]
 body:
   - type: textarea
     id: description

@@ -2,23 +2,42 @@
 
 <!-- Explain the user or developer outcome. -->
 
-## Related issue
+## Related Issue
 
 Closes #
 
+## Type of Change
+
+- [ ] Feature
+- [ ] Bug fix
+- [ ] Refactor
+- [ ] Documentation
+- [ ] Test
+- [ ] Infrastructure
+
+## Affected Areas
+
+- [ ] Frontend
+- [ ] Go API
+- [ ] Python AI
+- [ ] Database
+- [ ] Pose detection
+- [ ] Infrastructure
+
 ## Verification
 
-- [ ] Lint and formatting checks pass
-- [ ] Type checks pass
-- [ ] Relevant tests pass
-- [ ] Production build succeeds
-- [ ] No secrets, health data, datasets, recordings, or model artifacts are included
-- [ ] Privacy, accessibility, and medical-safety implications were considered
+- [ ] Formatting passes
+- [ ] Linting passes
+- [ ] Type checking passes
+- [ ] Tests pass
+- [ ] Build passes
+- [ ] No secrets are included
+- [ ] Documentation is updated
 
-## Screenshots or API examples
+## Screenshots or API Examples
 
 <!-- Include only synthetic, non-sensitive examples when useful. -->
 
-## Reviewer notes
+## Risks and Limitations
 
-<!-- Call out migrations, contract changes, risks, and follow-up work. -->
+<!-- Call out migrations, contract changes, privacy/clinical risks, and follow-up work. -->

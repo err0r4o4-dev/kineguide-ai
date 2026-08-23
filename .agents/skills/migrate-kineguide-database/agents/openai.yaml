@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migrate KineGuide Database"
+  short_description: "Design reversible privacy-aware PostgreSQL changes"
+  default_prompt: "Use $migrate-kineguide-database to add a safe reversible KineGuide database change."

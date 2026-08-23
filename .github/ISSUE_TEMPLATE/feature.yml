@@ -1,7 +1,7 @@
 name: Feature
 description: Propose a focused, testable KineGuide AI feature
 title: "[Feature]: "
-labels: [enhancement]
+labels: ["type: feature"]
 body:
   - type: textarea
     id: problem
@@ -21,7 +21,8 @@ body:
     id: area
     attributes:
       label: Area
-      options: [Web, Go API, Python AI, Pose, Database, Infrastructure, Documentation]
+      options:
+        [Web, Go API, Python AI, Pose, Database, Infrastructure, Documentation]
     validations:
       required: true
   - type: checkboxes
