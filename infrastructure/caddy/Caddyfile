@@ -14,5 +14,5 @@
 	@openapi path /openapi*
 	reverse_proxy @openapi api-go:8080
 
-	reverse_proxy web:80
+	reverse_proxy web:8080
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement KineGuide Visual Reference"
+  short_description: "Translate approved visual references into React UI"
+  default_prompt: "Use $implement-kineguide-visual-reference to implement this visual reference in KineGuide AI."

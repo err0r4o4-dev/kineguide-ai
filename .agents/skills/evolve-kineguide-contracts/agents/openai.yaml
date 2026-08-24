@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evolve KineGuide Contracts"
+  short_description: "Keep OpenAPI clients and implementations synchronized"
+  default_prompt: "Use $evolve-kineguide-contracts to evolve an API contract across consumers and providers."

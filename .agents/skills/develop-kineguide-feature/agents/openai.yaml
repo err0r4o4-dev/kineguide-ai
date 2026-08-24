@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop KineGuide Feature"
+  short_description: "Deliver safe vertical slices across the monorepo"
+  default_prompt: "Use $develop-kineguide-feature to implement a focused KineGuide AI feature end to end."

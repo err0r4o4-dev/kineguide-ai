@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit KineGuide Web"
+  short_description: "Audit web UX accessibility privacy and performance"
+  default_prompt: "Use $audit-kineguide-web to audit this KineGuide AI web experience."

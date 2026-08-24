@@ -14,6 +14,20 @@ test('shows the Thai system status shell', async ({ page }) => {
       }
     })
   )
-  await page.goto('/')
+  await page.goto('/status')
   await expect(page.getByRole('heading', { name: 'สถานะระบบ' })).toBeVisible()
+})
+
+test('landing page explains privacy before authentication', async ({
+  page
+}) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'สำรวจการเคลื่อนไหว'
+  )
+  await expect(page.getByText(/ไม่อัปโหลดรูปหรือวิดีโอ/)).toBeVisible()
+  await expect(page.getByRole('link', { name: 'เริ่มใช้งาน' })).toHaveAttribute(
+    'href',
+    '/register'
+  )
 })

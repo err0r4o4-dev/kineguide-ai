@@ -44,7 +44,7 @@ Implemented:
 - Thai-first responsive React/PWA application shell with English localization foundation
 - System status page with loading, success, degraded, and failure states
 - Typed web-to-Go health client
-- Go health, readiness, dependency-status, OpenAPI, and Swagger endpoints
+- Go health, readiness, dependency-status, OpenAPI, and Scalar API Reference endpoints
 - PostgreSQL and Python AI readiness probes
 - Internal FastAPI service with a deterministic disabled provider
 - Minimal reversible PostgreSQL metadata migration and synthetic seed
@@ -52,14 +52,17 @@ Implemented:
 - Dockerfiles, Compose, Caddy routing, CI, issue forms, and pull-request template
 - Repository-wide agent guidance, scoped rules, and project-local skills
 - Unit tests, static checks, dependency locks, and security-oriented Git exclusions
+- Email/password authentication with short-lived JWT access tokens and rotating HttpOnly refresh cookies
+- Versioned consent records, bounded structured assessment answers, and account deletion
+- Reviewed-as-pending movement-demo catalogue and user-owned activity session summaries
+- Responsive product routes from landing through dashboard, camera setup, live manual session, history, and progress
+- Browser camera lifecycle with explicit permission and cleanup; raw media remains on-device
 
 Not implemented yet:
 
-- Authentication or authorization flows
-- Patient profiles, consent records, or clinical assessments
 - Red-flag screening rules
 - Rehabilitation plan or exercise generation
-- MediaPipe pose inference and camera calibration
+- MediaPipe pose inference, automated repetition counting, or form scoring
 - Real LLM provider integration
 - Production deployment or regulatory certification
 
@@ -170,7 +173,7 @@ See [architecture overview](docs/architecture/overview.md) and [service boundari
 - go-playground/validator
 - golang-jwt/jwt/v5 and Argon2id
 - Testify and `net/http/httptest`
-- OpenAPI 3.1 and Swagger UI
+- OpenAPI 3.1 and Scalar API Reference
 
 ### Python AI Service
 
@@ -360,7 +363,7 @@ Service-specific examples are located at `apps/web/.env.example`, `services/api-
 | `GET /api/v1/health`        | Versioned health response                  |
 | `GET /api/v1/system/status` | Individual dependency states               |
 | `GET /openapi.json`         | OpenAPI schema                             |
-| `GET /docs`                 | Swagger UI                                 |
+| `GET /docs`                 | Scalar API Reference                       |
 
 ### Python AI Service
 
@@ -559,7 +562,8 @@ This repository does not claim HIPAA, GDPR, PDPA, medical-device, or other regul
 
 ## Known limitations
 
-- No authentication, patient domain, clinical rule engine, rehabilitation-plan workflow, or pose model exists yet.
+- No clinician portal, clinical rule engine, rehabilitation-plan prescription workflow, or approved pose model exists yet.
+- Movement demos remain clearly marked as pending clinical review and do not contain dosage, angle thresholds, or correctness scores.
 - The AI provider is disabled and cannot generate medical advice.
 - Browser-camera behavior is a planned boundary, not a completed feature.
 - Production hosting, backups, monitoring, incident response, and regulatory review are not configured.
