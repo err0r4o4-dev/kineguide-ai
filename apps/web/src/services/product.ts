@@ -1,0 +1,181 @@
+import { http } from './http'
+
+export interface User {
+  id: string
+  email: string
+  display_name: string
+  created_at: string
+}
+
+export interface AuthResponse {
+  access_token: string
+  expires_in: number
+  user: User
+}
+
+export interface Consent {
+  id: string
+  policy_version: string
+  camera_processing: boolean
+  session_summary_storage: boolean
+  research_use: boolean
+  accepted_at: string
+  revoked_at: string | null
+}
+
+export interface Assessment {
+  id: string
+  concern_area: string
+  duration_band: string
+  daily_impact: string
+  goal: string
+  status: 'captured_not_evaluated'
+  created_at: string
+  retention_until: string
+}
+
+export interface Exercise {
+  slug: string
+  title_th: string
+  title_en: string
+  category: 'lower_body' | 'upper_body'
+  review_status: 'pending_clinical_review'
+}
+
+export interface ExerciseSession {
+  id: string
+  exercise_slug: string
+  status: 'active' | 'completed' | 'stopped'
+  camera_used: boolean
+  manual_repetitions: number
+  elapsed_seconds: number
+  started_at: string
+  completed_at: string | null
+  retention_until: string
+}
+
+export interface Dashboard {
+  completed_sessions: number
+  current_streak: number
+  total_seconds: number
+  recent_sessions: ExerciseSession[]
+}
+
+export async function registerAccount(input: {
+  email: string
+  password: string
+  display_name: string
+}) {
+  const response = await http.post<AuthResponse>('/auth/register', input)
+  return response.data
+}
+
+export async function loginAccount(input: { email: string; password: string }) {
+  const response = await http.post<AuthResponse>('/auth/login', input)
+  return response.data
+}
+
+export async function refreshAccount() {
+  const response = await http.post<AuthResponse>('/auth/refresh')
+  return response.data
+}
+
+export async function logoutAccount() {
+  await http.post('/auth/logout')
+}
+
+export async function deleteAccount() {
+  await http.delete('/me')
+}
+
+export async function getConsent(signal?: AbortSignal) {
+  const response = await http.get<{ consent: Consent | null }>(
+    '/consents/current',
+    { signal }
+  )
+  return response.data.consent
+}
+
+export async function saveConsent(input: {
+  camera_processing: boolean
+  session_summary_storage: boolean
+  research_use: boolean
+}) {
+  const response = await http.post<Consent>('/consents', input)
+  return response.data
+}
+
+export async function revokeConsent() {
+  await http.delete('/consents/current')
+}
+
+export async function getLatestAssessment(signal?: AbortSignal) {
+  const response = await http.get<{ assessment: Assessment | null }>(
+    '/assessments/latest',
+    { signal }
+  )
+  return response.data.assessment
+}
+
+export async function saveAssessment(
+  input: Pick<
+    Assessment,
+    'concern_area' | 'duration_band' | 'daily_impact' | 'goal'
+  >
+) {
+  const response = await http.post<Assessment>('/assessments', input)
+  return response.data
+}
+
+export async function getExercises(signal?: AbortSignal) {
+  const response = await http.get<{ exercises: Exercise[] }>('/exercises', {
+    signal
+  })
+  return response.data.exercises
+}
+
+export async function getExercise(slug: string, signal?: AbortSignal) {
+  const response = await http.get<Exercise>(`/exercises/${slug}`, { signal })
+  return response.data
+}
+
+export async function getDashboard(signal?: AbortSignal) {
+  const response = await http.get<Dashboard>('/dashboard', { signal })
+  return response.data
+}
+
+export async function getSessions(signal?: AbortSignal) {
+  const response = await http.get<{ sessions: ExerciseSession[] }>(
+    '/sessions',
+    {
+      signal
+    }
+  )
+  return response.data.sessions
+}
+
+export async function getSession(id: string, signal?: AbortSignal) {
+  const response = await http.get<ExerciseSession>(`/sessions/${id}`, {
+    signal
+  })
+  return response.data
+}
+
+export async function createSession(input: {
+  exercise_slug: string
+  camera_used: boolean
+}) {
+  const response = await http.post<ExerciseSession>('/sessions', input)
+  return response.data
+}
+
+export async function updateSession(
+  id: string,
+  input: Pick<
+    ExerciseSession,
+    'status' | 'manual_repetitions' | 'elapsed_seconds'
+  >
+) {
+  const response = await http.patch<ExerciseSession>(`/sessions/${id}`, input)
+  return response.data
+}

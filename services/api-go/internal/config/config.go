@@ -19,6 +19,10 @@ type Config struct {
 	CORSAllowedOrigins []string      `validate:"min=1,dive,required"`
 	RequestTimeout     time.Duration `validate:"gt=0"`
 	ShutdownTimeout    time.Duration `validate:"gt=0"`
+	JWTSecret          string        `validate:"required,min=32"`
+	JWTIssuer          string        `validate:"required"`
+	AccessTokenTTL     time.Duration `validate:"gt=0"`
+	RefreshTokenTTL    time.Duration `validate:"gt=0"`
 }
 
 func Load() (Config, error) {
@@ -40,6 +44,10 @@ func Load() (Config, error) {
 		CORSAllowedOrigins: splitCSV(envOr("CORS_ALLOWED_ORIGINS", "http://localhost:5173")),
 		RequestTimeout:     requestTimeout,
 		ShutdownTimeout:    shutdownTimeout,
+		JWTSecret:          envOr("JWT_SECRET", "development-only-secret-change-me-32-chars"),
+		JWTIssuer:          envOr("JWT_ISSUER", "kineguide-api"),
+		AccessTokenTTL:     15 * time.Minute,
+		RefreshTokenTTL:    7 * 24 * time.Hour,
 	}
 	return cfg, cfg.Validate()
 }
@@ -47,6 +55,9 @@ func Load() (Config, error) {
 func (c Config) Validate() error {
 	if err := validator.New().Struct(c); err != nil {
 		return fmt.Errorf("validate configuration: %w", err)
+	}
+	if c.Environment == "production" && c.JWTSecret == "development-only-secret-change-me-32-chars" {
+		return fmt.Errorf("JWT_SECRET must be replaced in production")
 	}
 	for label, value := range map[string]string{"DATABASE_URL": c.DatabaseURL, "AI_SERVICE_URL": c.AIServiceURL} {
 		parsed, err := url.ParseRequestURI(value)

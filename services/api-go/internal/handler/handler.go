@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	_ "embed"
 	"log/slog"
 	"net/http"
 	"time"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	appmiddleware "github.com/kineguide-ai/kineguide-ai/services/api-go/internal/middleware"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/product"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/security"
 )
 
 type Pinger interface {
@@ -19,6 +22,8 @@ type Pinger interface {
 type Dependencies struct {
 	Database Pinger
 	AI       Pinger
+	Store    product.Store
+	Signer   *security.TokenSigner
 }
 
 type HealthResponse struct {
@@ -62,6 +67,7 @@ func NewRouter(cfg config.Config, dependencies Dependencies, logger *slog.Logger
 	router.GET("/api/v1/system/status", systemStatusHandler(cfg.Version, dependencies))
 	router.GET("/openapi.json", openAPIHandler)
 	router.GET("/docs", docsHandler)
+	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer)
 	return router
 }
 
@@ -124,13 +130,5 @@ const swaggerHTML = `<!doctype html><html><head><meta charset="utf-8"><title>Kin
 <body><div id="swagger-ui"></div><script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
 <script>SwaggerUIBundle({url:'/openapi.json',dom_id:'#swagger-ui',deepLinking:true});</script></body></html>`
 
-const openAPIDocument = `{
-  "openapi": "3.1.0",
-  "info": {"title": "KineGuide AI Main API", "version": "0.1.0"},
-  "paths": {
-    "/health": {"get": {"responses": {"200": {"description": "Service is alive"}}}},
-    "/ready": {"get": {"responses": {"200": {"description": "Dependencies are ready"}, "503": {"description": "A dependency is unavailable"}}}},
-    "/api/v1/health": {"get": {"responses": {"200": {"description": "Versioned service health"}}}},
-    "/api/v1/system/status": {"get": {"responses": {"200": {"description": "Individual dependency states"}}}}
-  }
-}`
+//go:embed openapi.json
+var openAPIDocument string

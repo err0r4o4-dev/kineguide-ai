@@ -13,6 +13,8 @@ import (
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/database"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/handler"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/repository"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/security"
 )
 
 func main() {
@@ -38,10 +40,16 @@ func main() {
 		logger.Error("configure AI client", "error", err)
 		os.Exit(1)
 	}
+	tokenSigner, err := security.NewTokenSigner(cfg.JWTSecret, cfg.JWTIssuer)
+	if err != nil {
+		logger.Error("configure token signer", "error", err)
+		os.Exit(1)
+	}
+	store := repository.NewPostgres(pool)
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient}, logger),
+		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, Store: store, Signer: tokenSigner}, logger),
 		ReadHeaderTimeout: cfg.RequestTimeout,
 		ReadTimeout:       cfg.RequestTimeout,
 		WriteTimeout:      cfg.RequestTimeout,

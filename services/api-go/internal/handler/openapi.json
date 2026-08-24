@@ -1,0 +1,1378 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "KineGuide AI Main API",
+    "version": "0.2.0",
+    "description": "Public Go API for the privacy-preserving KineGuide educational prototype. Raw camera frames, images, and video are explicitly excluded from every request."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Direct local development"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "System",
+      "description": "Liveness and dependency readiness."
+    },
+    {
+      "name": "Authentication",
+      "description": "Account sessions and user ownership."
+    },
+    {
+      "name": "Consent",
+      "description": "Versioned consent records and withdrawal."
+    },
+    {
+      "name": "Assessment",
+      "description": "Bounded structured answers without clinical interpretation."
+    },
+    {
+      "name": "Exercises",
+      "description": "Non-prescriptive movement demos pending clinical review."
+    },
+    {
+      "name": "Sessions",
+      "description": "Minimal user-owned activity summaries."
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": [
+          "System"
+        ],
+        "summary": "Check Go API liveness",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Health"
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "getReadiness",
+        "tags": [
+          "System"
+        ],
+        "summary": "Check dependency readiness",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SystemStatus"
+          },
+          "503": {
+            "$ref": "#/components/responses/SystemStatus"
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "getVersionedHealth",
+        "tags": [
+          "System"
+        ],
+        "summary": "Check versioned Go API liveness",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Health"
+          }
+        }
+      }
+    },
+    "/api/v1/system/status": {
+      "get": {
+        "operationId": "getSystemStatus",
+        "tags": [
+          "System"
+        ],
+        "summary": "Get individual dependency states",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SystemStatus"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "registerAccount",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Create an account and refresh session",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created; rotating refresh token is set as an HttpOnly cookie.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Sign in with email and password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in; rotating refresh token is set as an HttpOnly cookie.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "operationId": "refreshSession",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Rotate a refresh token and issue a new access token",
+        "security": [
+          {
+            "refreshCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access token refreshed and refresh cookie rotated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Revoke the refresh session",
+        "security": [
+          {
+            "refreshCookie": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Refresh session revoked."
+          }
+        }
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "operationId": "getCurrentUser",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get the authenticated account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCurrentUser",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Delete the account and all consent, assessment, token, and session records",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Account and owned records deleted."
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/consents/current": {
+      "get": {
+        "operationId": "getCurrentConsent",
+        "tags": [
+          "Consent"
+        ],
+        "summary": "Get the latest consent record",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest consent or null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "consent"
+                  ],
+                  "properties": {
+                    "consent": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/Consent"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "revokeCurrentConsent",
+        "tags": [
+          "Consent"
+        ],
+        "summary": "Withdraw active consent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Active consent records revoked."
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/consents": {
+      "post": {
+        "operationId": "recordConsent",
+        "tags": [
+          "Consent"
+        ],
+        "summary": "Record versioned consent choices",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Consent recorded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consent"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/assessments/latest": {
+      "get": {
+        "operationId": "getLatestAssessment",
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get the latest structured assessment",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest structured assessment or null; this is not a diagnosis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "assessment"
+                  ],
+                  "properties": {
+                    "assessment": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/Assessment"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/assessments": {
+      "post": {
+        "operationId": "saveAssessment",
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Save structured assessment answers",
+        "description": "Stores bounded structured answers without clinical interpretation or free text.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Structured answers captured without evaluation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/exercises": {
+      "get": {
+        "operationId": "listMovementDemos",
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "List movement demos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Non-prescriptive movement demos pending clinical review.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "exercises"
+                  ],
+                  "properties": {
+                    "exercises": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Exercise"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/exercises/{slug}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ExerciseSlug"
+        }
+      ],
+      "get": {
+        "operationId": "getMovementDemo",
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Get movement demo metadata",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movement demo metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard": {
+      "get": {
+        "operationId": "getDashboard",
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Get a self-recorded activity dashboard",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Self-recorded activity summary; it is not a recovery score.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/sessions": {
+      "get": {
+        "operationId": "listSessions",
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "List owned session summaries",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owned session summaries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "sessions"
+                  ],
+                  "properties": {
+                    "sessions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Session"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createSession",
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Start a session summary",
+        "description": "Starts a summary record. Raw camera media is not accepted.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/SessionID"
+        }
+      ],
+      "get": {
+        "operationId": "getSession",
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Get an owned session summary",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owned session summary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateSession",
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Update an owned session summary",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session summary updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "refreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "kg_refresh"
+      }
+    },
+    "parameters": {
+      "ExerciseSlug": {
+        "name": "slug",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 80
+        }
+      },
+      "SessionID": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "responses": {
+      "Health": {
+        "description": "Process is alive.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/HealthResponse"
+            }
+          }
+        }
+      },
+      "SystemStatus": {
+        "description": "Current dependency states.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SystemStatusResponse"
+            }
+          }
+        }
+      },
+      "Error": {
+        "description": "Safe error envelope.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "service",
+          "version"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok"
+          },
+          "service": {
+            "type": "string",
+            "const": "api-go"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "DependencyStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "status",
+          "latency_ms"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "latency_ms": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "SystemStatusResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "service",
+          "version",
+          "dependencies"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded"
+            ]
+          },
+          "service": {
+            "type": "string",
+            "const": "api-go"
+          },
+          "version": {
+            "type": "string"
+          },
+          "dependencies": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "postgres",
+              "ai_python"
+            ],
+            "properties": {
+              "postgres": {
+                "$ref": "#/components/schemas/DependencyStatus"
+              },
+              "ai_python": {
+                "$ref": "#/components/schemas/DependencyStatus"
+              }
+            }
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "password",
+          "display_name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 128,
+            "writeOnly": true
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "writeOnly": true
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "access_token",
+          "expires_in",
+          "user"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Access-token lifetime in seconds."
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "ConsentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "camera_processing",
+          "session_summary_storage",
+          "research_use"
+        ],
+        "properties": {
+          "camera_processing": {
+            "type": "boolean"
+          },
+          "session_summary_storage": {
+            "type": "boolean"
+          },
+          "research_use": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Consent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "policy_version",
+          "camera_processing",
+          "session_summary_storage",
+          "research_use",
+          "accepted_at",
+          "revoked_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policy_version": {
+            "type": "string"
+          },
+          "camera_processing": {
+            "type": "boolean"
+          },
+          "session_summary_storage": {
+            "type": "boolean"
+          },
+          "research_use": {
+            "type": "boolean"
+          },
+          "accepted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "revoked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AssessmentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "concern_area",
+          "duration_band",
+          "daily_impact",
+          "goal"
+        ],
+        "properties": {
+          "concern_area": {
+            "type": "string",
+            "enum": [
+              "lower_back",
+              "knee",
+              "shoulder",
+              "general_mobility",
+              "prefer_not_to_say"
+            ]
+          },
+          "duration_band": {
+            "type": "string",
+            "enum": [
+              "lt_week",
+              "one_to_four_weeks",
+              "gt_four_weeks",
+              "unsure"
+            ]
+          },
+          "daily_impact": {
+            "type": "string",
+            "enum": [
+              "none",
+              "some",
+              "much",
+              "prefer_not_to_say"
+            ]
+          },
+          "goal": {
+            "type": "string",
+            "enum": [
+              "understand",
+              "camera_demo",
+              "track_activity"
+            ]
+          }
+        }
+      },
+      "Assessment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "concern_area",
+          "duration_band",
+          "daily_impact",
+          "goal",
+          "status",
+          "created_at",
+          "retention_until"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "concern_area": {
+            "type": "string",
+            "enum": [
+              "lower_back",
+              "knee",
+              "shoulder",
+              "general_mobility",
+              "prefer_not_to_say"
+            ]
+          },
+          "duration_band": {
+            "type": "string",
+            "enum": [
+              "lt_week",
+              "one_to_four_weeks",
+              "gt_four_weeks",
+              "unsure"
+            ]
+          },
+          "daily_impact": {
+            "type": "string",
+            "enum": [
+              "none",
+              "some",
+              "much",
+              "prefer_not_to_say"
+            ]
+          },
+          "goal": {
+            "type": "string",
+            "enum": [
+              "understand",
+              "camera_demo",
+              "track_activity"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "const": "captured_not_evaluated"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "retention_until": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Exercise": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "slug",
+          "title_th",
+          "title_en",
+          "category",
+          "review_status"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "title_th": {
+            "type": "string"
+          },
+          "title_en": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "lower_body",
+              "upper_body"
+            ]
+          },
+          "review_status": {
+            "type": "string",
+            "const": "pending_clinical_review"
+          }
+        }
+      },
+      "CreateSessionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "exercise_slug",
+          "camera_used"
+        ],
+        "properties": {
+          "exercise_slug": {
+            "type": "string"
+          },
+          "camera_used": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateSessionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "manual_repetitions",
+          "elapsed_seconds"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "stopped"
+            ]
+          },
+          "manual_repetitions": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "elapsed_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "exercise_slug",
+          "camera_used",
+          "status",
+          "manual_repetitions",
+          "elapsed_seconds",
+          "started_at",
+          "completed_at",
+          "retention_until"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_slug": {
+            "type": "string"
+          },
+          "camera_used": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "stopped"
+            ]
+          },
+          "manual_repetitions": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "elapsed_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "retention_until": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Dashboard": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "completed_sessions",
+          "current_streak",
+          "total_seconds",
+          "recent_sessions"
+        ],
+        "properties": {
+          "completed_sessions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "current_streak": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Sum of self-recorded session time in seconds."
+          },
+          "recent_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Session"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message",
+              "details",
+              "request_id"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true
+              },
+              "request_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
