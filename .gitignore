@@ -29,3 +29,8 @@ research/datasets/*
 research/models/
 uploads/
 recordings/
+
+# Local AI agent configuration
+.agent/
+.agents/
+AGENTS.md

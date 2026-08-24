@@ -144,10 +144,7 @@ See [architecture overview](docs/architecture/overview.md) and [service boundari
 ├── infrastructure/
 │   ├── caddy/
 │   └── docker/
-├── .agent/rules/                    # Scoped agent rules
-├── .agents/skills/                  # Repository-local Codex skills
 ├── .github/                         # CI and collaboration templates
-├── AGENTS.md                        # Repository-wide agent instructions
 ├── docker-compose.yml
 ├── Makefile
 └── README.md
@@ -515,47 +512,7 @@ Update documentation in the same change when modifying:
 - database migrations or planned entities;
 - privacy, consent, retention, or clinical boundaries;
 - developer commands or CI behavior.
-
-## AI-agent workflow
-
-Repository-wide instructions are in [AGENTS.md](AGENTS.md).
-
-Scoped rules:
-
-```text
-.agent/rules/
-├── context.md
-├── web.md
-├── go-api.md
-├── python-ai.md
-├── api-contracts.md
-├── database.md
-├── healthcare-safety.md
-├── privacy-security.md
-├── infrastructure.md
-├── diagnostics.md
-├── testing-quality.md
-└── git-workflow.md
-```
-
-Repository-local skills:
-
-```text
-.agents/skills/
-├── develop-kineguide-feature/
-├── build-kineguide-web/
-├── build-kineguide-go-api/
-├── build-kineguide-ai-service/
-├── evolve-kineguide-contracts/
-├── migrate-kineguide-database/
-├── review-kineguide-clinical-safety/
-├── protect-kineguide-data/
-├── operate-kineguide-infrastructure/
-└── diagnose-kineguide-system/
-```
-
-Agents must load the smallest matching skill set, preserve service boundaries, and report real verification evidence.
-
+- 
 ## Git workflow
 
 ```text

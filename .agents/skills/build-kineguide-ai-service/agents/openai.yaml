@@ -1,4 +1,0 @@
-interface:
-  display_name: "Build KineGuide AI Service"
-  short_description: "Build bounded Python AI text-processing features"
-  default_prompt: "Use $build-kineguide-ai-service to implement a safe Python AI service change."
