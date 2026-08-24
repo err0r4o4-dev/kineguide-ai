@@ -1,4 +1,0 @@
-interface:
-  display_name: "Diagnose KineGuide System"
-  short_description: "Diagnose failures across web API AI and database"
-  default_prompt: "Use $diagnose-kineguide-system to reproduce and diagnose this KineGuide system failure."

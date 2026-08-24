@@ -1,4 +1,0 @@
-interface:
-  display_name: "Review Clinical Safety"
-  short_description: "Review medical boundaries and clinical safety risks"
-  default_prompt: "Use $review-kineguide-clinical-safety to review this change for clinical safety risks."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Protect KineGuide Data"
-  short_description: "Review privacy security and sensitive-data handling"
-  default_prompt: "Use $protect-kineguide-data to review data handling and security for this KineGuide change."

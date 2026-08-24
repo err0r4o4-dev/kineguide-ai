@@ -1,4 +1,0 @@
-interface:
-  display_name: "Build KineGuide Web"
-  short_description: "Build accessible Thai-first React and PWA features"
-  default_prompt: "Use $build-kineguide-web to build or update a KineGuide AI web feature."

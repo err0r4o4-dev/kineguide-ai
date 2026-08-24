@@ -1,4 +1,0 @@
-interface:
-  display_name: "Operate KineGuide Infrastructure"
-  short_description: "Maintain Docker Caddy CI and local environments"
-  default_prompt: "Use $operate-kineguide-infrastructure to change or verify KineGuide development infrastructure."
