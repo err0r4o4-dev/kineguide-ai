@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test KineGuide Web"
+  short_description: "Test React behavior accessibility and browser flows"
+  default_prompt: "Use $test-kineguide-web to add or improve tests for this KineGuide AI web behavior."

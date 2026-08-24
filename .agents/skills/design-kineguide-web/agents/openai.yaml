@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design KineGuide Web"
+  short_description: "Design safe accessible Thai-first healthcare interfaces"
+  default_prompt: "Use $design-kineguide-web to design or redesign this KineGuide AI interface."

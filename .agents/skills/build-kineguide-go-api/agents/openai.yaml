@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build KineGuide Go API"
+  short_description: "Build reliable Go APIs and PostgreSQL boundaries"
+  default_prompt: "Use $build-kineguide-go-api to implement a KineGuide AI Go API change."
