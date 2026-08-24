@@ -44,7 +44,7 @@ Implemented:
 - Thai-first responsive React/PWA application shell with English localization foundation
 - System status page with loading, success, degraded, and failure states
 - Typed web-to-Go health client
-- Go health, readiness, dependency-status, OpenAPI, and Swagger endpoints
+- Go health, readiness, dependency-status, OpenAPI, and Scalar API Reference endpoints
 - PostgreSQL and Python AI readiness probes
 - Internal FastAPI service with a deterministic disabled provider
 - Minimal reversible PostgreSQL metadata migration and synthetic seed
@@ -173,7 +173,7 @@ See [architecture overview](docs/architecture/overview.md) and [service boundari
 - go-playground/validator
 - golang-jwt/jwt/v5 and Argon2id
 - Testify and `net/http/httptest`
-- OpenAPI 3.1 and Swagger UI
+- OpenAPI 3.1 and Scalar API Reference
 
 ### Python AI Service
 
@@ -363,7 +363,7 @@ Service-specific examples are located at `apps/web/.env.example`, `services/api-
 | `GET /api/v1/health`        | Versioned health response                  |
 | `GET /api/v1/system/status` | Individual dependency states               |
 | `GET /openapi.json`         | OpenAPI schema                             |
-| `GET /docs`                 | Swagger UI                                 |
+| `GET /docs`                 | Scalar API Reference                       |
 
 ### Python AI Service
 

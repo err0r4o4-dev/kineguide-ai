@@ -62,3 +62,16 @@ func TestOpenAPI(t *testing.T) {
 	require.Equal(t, http.StatusOK, response.Code)
 	assert.JSONEq(t, openAPIDocument, response.Body.String())
 }
+
+func TestDocsUsesScalarAPIReference(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/docs", nil)
+	response := httptest.NewRecorder()
+	testRouter(Dependencies{}).ServeHTTP(response, request)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, "text/html; charset=utf-8", response.Header().Get("Content-Type"))
+	assert.Contains(t, response.Body.String(), "<title>KineGuide AI API Reference</title>")
+	assert.Contains(t, response.Body.String(), `id="api-reference"`)
+	assert.Contains(t, response.Body.String(), `data-url="/openapi.json"`)
+	assert.NotContains(t, response.Body.String(), "swagger-ui-dist")
+}
