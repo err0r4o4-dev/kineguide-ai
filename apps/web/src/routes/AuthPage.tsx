@@ -90,17 +90,17 @@ export function AuthPage() {
 
   return (
     <main className="grid min-h-screen place-items-center bg-[#f8f7ff] p-4">
-      <div className="w-full max-w-5xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/50 lg:grid lg:grid-cols-2">
-        <section className="relative isolate hidden min-h-[680px] flex-col justify-between overflow-hidden p-10 text-white lg:flex">
+      <div className="w-full max-w-5xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/50 lg:grid lg:h-[760px] lg:grid-cols-2">
+        <section className="relative isolate hidden h-full flex-col justify-between overflow-hidden p-10 text-white lg:flex">
           <img
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 -z-20 size-full object-cover object-[58%_center]"
-            src="/auth-illustration.png"
+            className="absolute inset-0 -z-20 size-full object-cover object-[42%_center]"
+            src="/auth-illustration.jpg"
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,118,110,0.08)_20%,rgba(15,118,110,0.9)_82%,rgba(15,118,110,0.96)_100%)]"
+            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,118,110,0.08)_20%,rgba(15,118,110,0.76)_60%,rgba(15,118,110,0.96)_80%,#0f766e_100%)]"
           />
           <Brand inverted />
           <div className="max-w-md pb-2">
@@ -110,7 +110,7 @@ export function AuthPage() {
             </p>
           </div>
         </section>
-        <section className="p-6 sm:p-10 lg:p-14">
+        <section className="p-6 sm:p-10 lg:overflow-y-auto lg:p-14">
           <div className="flex items-center justify-between lg:justify-end">
             <span className="lg:hidden">
               <Brand compact />

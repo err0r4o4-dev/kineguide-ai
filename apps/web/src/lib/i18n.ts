@@ -44,7 +44,8 @@ const th = {
   landing: {
     features: 'คุณสมบัติ',
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
-    title: 'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่เคารพความเป็นส่วนตัว',
+    title:
+      'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์ บันทึกกิจกรรมแบบย่อ และติดตามความสม่ำเสมอ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มใช้งาน',
@@ -331,7 +332,8 @@ const en: typeof th = {
   landing: {
     features: 'Features',
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
-    title: 'Explore movement with confidence and privacy-respecting support',
+    title:
+      'Explore movement confidently with support that values your privacy',
     subtitle:
       'Try an on-device camera flow, save minimal activity summaries, and track consistency without uploading photos or video.',
     start: 'Get started',

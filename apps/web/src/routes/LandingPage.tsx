@@ -32,12 +32,12 @@ export function LandingPage() {
     <div className="min-h-screen bg-[#fbfaff]">
       <PublicHeader />
       <main>
-        <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
+        <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:py-20">
           <div>
             <p className="font-semibold text-teal-700">
               {t('landing.eyebrow')}
             </p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-slate-950 sm:text-[2.5rem] lg:text-6xl">
               {t('landing.title')}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">

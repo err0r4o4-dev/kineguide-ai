@@ -15,7 +15,7 @@ export function PublicHeader() {
             {t('landing.features')}
           </a>
           <LanguageButton />
-          <Link className="kg-button-primary px-4 py-2" to="/login">
+          <Link className="kg-button-primary h-11 px-4" to="/login">
             {t('auth.signIn')}
           </Link>
         </nav>
