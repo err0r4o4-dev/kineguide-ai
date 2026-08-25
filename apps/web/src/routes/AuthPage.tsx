@@ -68,11 +68,21 @@ export function AuthPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-[#f8f7ff] p-4">
       <div className="w-full max-w-5xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/50 lg:grid lg:grid-cols-2">
-        <section className="hidden min-h-[680px] flex-col justify-between bg-[radial-gradient(circle_at_50%_25%,#5eead4,transparent_24%),linear-gradient(145deg,#0f766e,#134e4a)] p-10 text-white lg:flex">
-          <Brand />
-          <div>
-            <h2 className="text-4xl font-bold">KineGuide AI</h2>
-            <p className="mt-4 max-w-md text-lg leading-8 text-teal-50">
+        <section className="relative isolate hidden min-h-[680px] flex-col justify-between overflow-hidden p-10 text-white lg:flex">
+          <img
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 size-full object-cover object-[58%_center]"
+            src="/auth-illustration.png"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,118,110,0.08)_20%,rgba(15,118,110,0.9)_82%,rgba(15,118,110,0.96)_100%)]"
+          />
+          <Brand inverted />
+          <div className="max-w-md pb-2">
+            <h2 className="text-4xl font-bold tracking-tight">KineGuide AI</h2>
+            <p className="mt-4 text-lg leading-8 text-white/90">
               {t('landing.subtitle')}
             </p>
           </div>
