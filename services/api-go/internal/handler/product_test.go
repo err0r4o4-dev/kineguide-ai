@@ -36,14 +36,14 @@ func (s *registrationStore) DeleteUser(context.Context, string) error { return n
 
 func TestRegisterCreatesShortLivedAccessAndHTTPOnlyRefreshSession(t *testing.T) {
 	store := &registrationStore{}
-	signer, err := security.NewTokenSigner("test-secret-with-at-least-thirty-two-characters", "kineguide-test")
+	signer, err := security.NewTokenSigner("test-secret-with-at-least-thirty-two-characters")
 	require.NoError(t, err)
 	cfg := config.Config{
 		Environment: "test", Version: "0.2.0", Port: "8080",
 		DatabaseURL: "postgres://localhost/test", AIServiceURL: "http://localhost:8001",
 		CORSAllowedOrigins: []string{"http://localhost:5173"}, RequestTimeout: time.Second,
 		ShutdownTimeout: time.Second, JWTSecret: "test-secret-with-at-least-thirty-two-characters",
-		JWTIssuer: "kineguide-test", AccessTokenTTL: 15 * time.Minute, RefreshTokenTTL: 24 * time.Hour,
+		AccessTokenTTL: 15 * time.Minute, RefreshTokenTTL: 24 * time.Hour,
 	}
 	router := NewRouter(cfg, Dependencies{Store: store, Signer: signer}, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/register", strings.NewReader(`{"email":"demo@example.com","password":"long-demo-password","display_name":"Demo User"}`))
@@ -61,7 +61,7 @@ func TestRegisterCreatesShortLivedAccessAndHTTPOnlyRefreshSession(t *testing.T) 
 
 func TestProtectedRouteDeniesMissingAccessToken(t *testing.T) {
 	store := &registrationStore{}
-	signer, err := security.NewTokenSigner("test-secret-with-at-least-thirty-two-characters", "kineguide-test")
+	signer, err := security.NewTokenSigner("test-secret-with-at-least-thirty-two-characters")
 	require.NoError(t, err)
 	cfg := config.Config{Environment: "test", Version: "0.2.0", RequestTimeout: time.Second, ShutdownTimeout: time.Second, AccessTokenTTL: time.Minute, RefreshTokenTTL: time.Hour}
 	router := NewRouter(cfg, Dependencies{Store: store, Signer: signer}, slog.New(slog.NewTextHandler(io.Discard, nil)))

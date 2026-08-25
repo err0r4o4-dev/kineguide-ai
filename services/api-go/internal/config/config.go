@@ -20,7 +20,6 @@ type Config struct {
 	RequestTimeout     time.Duration `validate:"gt=0"`
 	ShutdownTimeout    time.Duration `validate:"gt=0"`
 	JWTSecret          string        `validate:"required,min=32"`
-	JWTIssuer          string        `validate:"required"`
 	AccessTokenTTL     time.Duration `validate:"gt=0"`
 	RefreshTokenTTL    time.Duration `validate:"gt=0"`
 }
@@ -45,7 +44,6 @@ func Load() (Config, error) {
 		RequestTimeout:     requestTimeout,
 		ShutdownTimeout:    shutdownTimeout,
 		JWTSecret:          envOr("JWT_SECRET", "development-only-secret-change-me-32-chars"),
-		JWTIssuer:          envOr("JWT_ISSUER", "kineguide-api"),
 		AccessTokenTTL:     15 * time.Minute,
 		RefreshTokenTTL:    7 * 24 * time.Hour,
 	}

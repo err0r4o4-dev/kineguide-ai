@@ -12,19 +12,17 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+const tokenIssuer = "kineguide-api"
+
 type TokenSigner struct {
 	secret []byte
-	issuer string
 }
 
-func NewTokenSigner(secret, issuer string) (*TokenSigner, error) {
+func NewTokenSigner(secret string) (*TokenSigner, error) {
 	if len(secret) < 32 {
 		return nil, errors.New("JWT secret must contain at least 32 characters")
 	}
-	if issuer == "" {
-		return nil, errors.New("JWT issuer is required")
-	}
-	return &TokenSigner{secret: []byte(secret), issuer: issuer}, nil
+	return &TokenSigner{secret: []byte(secret)}, nil
 }
 
 func (s *TokenSigner) Sign(subject, tokenType string, ttl time.Duration) (string, error) {
@@ -35,7 +33,7 @@ func (s *TokenSigner) Sign(subject, tokenType string, ttl time.Duration) (string
 	claims := Claims{
 		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer: s.issuer, Subject: subject,
+			Issuer: tokenIssuer, Subject: subject,
 			IssuedAt: jwt.NewNumericDate(now), ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),
 		},
 	}
@@ -48,7 +46,7 @@ func (s *TokenSigner) Parse(encoded string) (*Claims, error) {
 			return nil, errors.New("unexpected signing method")
 		}
 		return s.secret, nil
-	}, jwt.WithIssuer(s.issuer), jwt.WithExpirationRequired())
+	}, jwt.WithIssuer(tokenIssuer), jwt.WithExpirationRequired())
 	if err != nil {
 		return nil, err
 	}

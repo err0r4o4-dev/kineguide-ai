@@ -26,7 +26,7 @@ func TestValidateRejectsDevelopmentJWTSecretInProduction(t *testing.T) {
 		DatabaseURL: "postgres://localhost/test", AIServiceURL: "http://localhost:8001",
 		CORSAllowedOrigins: []string{"https://example.com"}, RequestTimeout: time.Second,
 		ShutdownTimeout: time.Second, JWTSecret: "development-only-secret-change-me-32-chars",
-		JWTIssuer: "kineguide-api", AccessTokenTTL: time.Minute, RefreshTokenTTL: time.Hour,
+		AccessTokenTTL: time.Minute, RefreshTokenTTL: time.Hour,
 	}
 
 	require.ErrorContains(t, cfg.Validate(), "JWT_SECRET must be replaced")

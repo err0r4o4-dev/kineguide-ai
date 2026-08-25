@@ -57,7 +57,6 @@ services:
       REQUEST_TIMEOUT: 10s
       SHUTDOWN_TIMEOUT: 10s
       JWT_SECRET: ${JWT_SECRET:-development-only-secret-change-me-32-chars}
-      JWT_ISSUER: ${JWT_ISSUER:-kineguide-api}
     ports:
       - "${API_PORT:-8080}:8080"
     networks: [app-internal]

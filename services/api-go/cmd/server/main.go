@@ -40,7 +40,7 @@ func main() {
 		logger.Error("configure AI client", "error", err)
 		os.Exit(1)
 	}
-	tokenSigner, err := security.NewTokenSigner(cfg.JWTSecret, cfg.JWTIssuer)
+	tokenSigner, err := security.NewTokenSigner(cfg.JWTSecret)
 	if err != nil {
 		logger.Error("configure token signer", "error", err)
 		os.Exit(1)
