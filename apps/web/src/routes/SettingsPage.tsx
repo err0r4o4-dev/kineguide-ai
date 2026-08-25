@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { DatabaseZap, Link2, ShieldOff, Trash2 } from 'lucide-react'
+import { DatabaseZap, Languages, Link2, ShieldOff, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
+import { LanguageButton } from '@/components/LanguageButton'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import {
@@ -90,6 +91,20 @@ export function SettingsPage() {
         </h1>
       </header>
       <section className="mt-7 grid gap-5 lg:grid-cols-2">
+        <article className="kg-card p-6 lg:col-span-2">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Languages aria-hidden="true" className="text-teal-700" />
+              <h2 className="mt-4 text-xl font-bold">
+                {t('settings.language')}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                {t('settings.languageBody')}
+              </p>
+            </div>
+            <LanguageButton variant="segmented" />
+          </div>
+        </article>
         <article className="kg-card p-6 lg:col-span-2">
           <Link2 aria-hidden="true" className="text-teal-700" />
           <h2 className="mt-4 text-xl font-bold">

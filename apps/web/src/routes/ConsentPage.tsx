@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import { Brand } from '@/components/Brand'
+import { LanguageButton } from '@/components/LanguageButton'
 import { saveConsent } from '@/services/product'
 
 export function ConsentPage() {
@@ -50,7 +51,10 @@ export function ConsentPage() {
   ]
   return (
     <main className="min-h-screen bg-[#f8f7ff] px-4 py-8">
-      <div className="mx-auto max-w-3xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/40 sm:p-10">
+      <div className="relative mx-auto max-w-3xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/40 sm:p-10">
+        <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+          <LanguageButton variant="segmented" />
+        </div>
         <div className="text-center">
           <Brand compact />
           <h1 className="mt-6 text-3xl font-bold text-teal-800">
