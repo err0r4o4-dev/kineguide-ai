@@ -1,19 +1,37 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { DatabaseZap, ShieldOff, Trash2 } from 'lucide-react'
+import { isAxiosError } from 'axios'
+import { DatabaseZap, Link2, ShieldOff, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { useAuth } from '@/features/auth/AuthContext'
-import { deleteAccount, getConsent, revokeConsent } from '@/services/product'
+import { ProviderIcon } from '@/features/auth/ProviderIcon'
+import {
+  deleteAccount,
+  deleteAuthIdentity,
+  getAuthIdentities,
+  getConsent,
+  getOAuthProviders,
+  revokeConsent,
+  startAuthIdentityLink,
+  type OAuthProvider
+} from '@/services/product'
 
 export function SettingsPage() {
   const { t } = useTranslation()
   const auth = useAuth()
   const navigate = useNavigate()
+  const [search] = useSearchParams()
   const client = useQueryClient()
-  const [message, setMessage] = useState('')
+  const linkedProvider = search.get('linked')
+  const [message, setMessage] = useState(
+    linkedProvider
+      ? t('settings.connectDone', { provider: providerLabel(linkedProvider) })
+      : ''
+  )
+  const [identityError, setIdentityError] = useState('')
   const consent = useQuery({
     queryKey: ['consent'],
     queryFn: ({ signal }) => getConsent(signal)
@@ -23,6 +41,39 @@ export function SettingsPage() {
     onSuccess: async () => {
       setMessage(t('settings.revokeDone'))
       await client.invalidateQueries({ queryKey: ['consent'] })
+    }
+  })
+  const providers = useQuery({
+    queryKey: ['auth-providers'],
+    queryFn: getOAuthProviders,
+    staleTime: 5 * 60_000
+  })
+  const identities = useQuery({
+    queryKey: ['auth-identities'],
+    queryFn: ({ signal }) => getAuthIdentities(signal)
+  })
+  const connect = useMutation({
+    mutationFn: startAuthIdentityLink,
+    onMutate: () => setIdentityError(''),
+    onSuccess: (authorizationURL) => window.location.assign(authorizationURL),
+    onError: () => setIdentityError(t('settings.identityFailed'))
+  })
+  const disconnect = useMutation({
+    mutationFn: deleteAuthIdentity,
+    onMutate: () => setIdentityError(''),
+    onSuccess: async () => {
+      setMessage(t('settings.disconnectDone'))
+      await client.invalidateQueries({ queryKey: ['auth-identities'] })
+    },
+    onError: (error) => {
+      const code = isAxiosError(error) ? error.response?.data?.error?.code : ''
+      setIdentityError(
+        t(
+          code === 'LAST_LOGIN_METHOD'
+            ? 'settings.lastLoginMethod'
+            : 'settings.identityFailed'
+        )
+      )
     }
   })
   const remove = async () => {
@@ -39,6 +90,68 @@ export function SettingsPage() {
         </h1>
       </header>
       <section className="mt-7 grid gap-5 lg:grid-cols-2">
+        <article className="kg-card p-6 lg:col-span-2">
+          <Link2 aria-hidden="true" className="text-teal-700" />
+          <h2 className="mt-4 text-xl font-bold">
+            {t('settings.connectedAccounts')}
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            {t('settings.connectedAccountsBody')}
+          </p>
+          {(providers.isLoading || identities.isLoading) && <QueryLoading />}
+          {(providers.isError || identities.isError) && (
+            <QueryError
+              retry={() => {
+                void providers.refetch()
+                void identities.refetch()
+              }}
+            />
+          )}
+          {providers.data && identities.data && (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {providers.data.providers
+                .filter(({ enabled }) => enabled)
+                .map(({ provider }) => {
+                  const connected = identities.data.some(
+                    (identity) => identity.provider === provider
+                  )
+                  return (
+                    <div
+                      className="flex min-h-16 items-center justify-between gap-3 rounded-xl border border-slate-200 p-3"
+                      key={provider}
+                    >
+                      <span className="flex items-center gap-3 font-semibold">
+                        <ProviderIcon provider={provider} />
+                        {providerLabel(provider)}
+                      </span>
+                      <button
+                        className="kg-button-secondary px-3 py-2 text-sm"
+                        disabled={connect.isPending || disconnect.isPending}
+                        onClick={() =>
+                          connected
+                            ? disconnect.mutate(provider)
+                            : connect.mutate(provider)
+                        }
+                        type="button"
+                      >
+                        {t(
+                          connected
+                            ? 'settings.disconnect'
+                            : 'settings.connect',
+                          { provider: providerLabel(provider) }
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
+            </div>
+          )}
+          {identityError && (
+            <p className="kg-alert-danger mt-4" role="alert">
+              {identityError}
+            </p>
+          )}
+        </article>
         <article className="kg-card p-6">
           <ShieldOff aria-hidden="true" className="text-teal-700" />
           <h2 className="mt-4 text-xl font-bold">{t('settings.consent')}</h2>
@@ -103,4 +216,8 @@ export function SettingsPage() {
       )}
     </div>
   )
+}
+
+function providerLabel(provider: string | OAuthProvider) {
+  return provider === 'google' ? 'Google' : 'Facebook'
 }

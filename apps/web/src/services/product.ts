@@ -13,6 +13,18 @@ export interface AuthResponse {
   user: User
 }
 
+export type OAuthProvider = 'google' | 'facebook'
+
+export interface OAuthProviderAvailability {
+  provider: OAuthProvider
+  enabled: boolean
+}
+
+export interface AuthIdentity {
+  provider: OAuthProvider
+  created_at: string
+}
+
 export interface Consent {
   id: string
   policy_version: string
@@ -82,6 +94,36 @@ export async function refreshAccount() {
 
 export async function logoutAccount() {
   await http.post('/auth/logout')
+}
+
+export async function getOAuthProviders() {
+  const response = await http.get<{
+    providers: OAuthProviderAvailability[]
+  }>('/auth/providers')
+  return response.data
+}
+
+export function getOAuthLoginURL(provider: OAuthProvider) {
+  return `${http.defaults.baseURL?.replace(/\/$/, '') ?? '/v1'}/auth/oauth/${provider}/start`
+}
+
+export async function getAuthIdentities(signal?: AbortSignal) {
+  const response = await http.get<{ identities: AuthIdentity[] }>(
+    '/me/auth-identities',
+    { signal }
+  )
+  return response.data.identities
+}
+
+export async function startAuthIdentityLink(provider: OAuthProvider) {
+  const response = await http.post<{ authorization_url: string }>(
+    `/me/auth-identities/${provider}/start`
+  )
+  return response.data.authorization_url
+}
+
+export async function deleteAuthIdentity(provider: OAuthProvider) {
+  await http.delete(`/me/auth-identities/${provider}`)
 }
 
 export async function deleteAccount() {

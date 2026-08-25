@@ -78,6 +78,11 @@ type RefreshToken struct {
 	ExpiresAt time.Time
 }
 
+type AuthIdentity struct {
+	Provider  string    `json:"provider"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type Dashboard struct {
 	CompletedSessions int       `json:"completed_sessions"`
 	CurrentStreak     int       `json:"current_streak"`

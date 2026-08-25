@@ -57,6 +57,13 @@ services:
       REQUEST_TIMEOUT: 10s
       SHUTDOWN_TIMEOUT: 10s
       JWT_SECRET: ${JWT_SECRET:-development-only-secret-change-me-32-chars}
+      OAUTH_WEB_REDIRECT_URL: ${OAUTH_WEB_REDIRECT_URL:-http://localhost:5173/auth/callback}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+      GOOGLE_OAUTH_REDIRECT_URL: ${GOOGLE_OAUTH_REDIRECT_URL:-http://localhost:8080/v1/auth/oauth/google/callback}
+      FACEBOOK_OAUTH_CLIENT_ID: ${FACEBOOK_OAUTH_CLIENT_ID:-}
+      FACEBOOK_OAUTH_CLIENT_SECRET: ${FACEBOOK_OAUTH_CLIENT_SECRET:-}
+      FACEBOOK_OAUTH_REDIRECT_URL: ${FACEBOOK_OAUTH_REDIRECT_URL:-http://localhost:8080/v1/auth/oauth/facebook/callback}
     ports:
       - "${API_PORT:-8080}:8080"
     networks: [app-internal]

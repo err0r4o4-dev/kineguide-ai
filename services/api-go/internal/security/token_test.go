@@ -49,3 +49,20 @@ func TestTokenSignerRejectsDifferentIssuer(t *testing.T) {
 	_, err = signer.Parse(encoded)
 	require.Error(t, err)
 }
+
+func TestOAuthStateRoundTripPreservesBoundFlowValues(t *testing.T) {
+	signer, err := NewTokenSigner(testJWTSecret)
+	require.NoError(t, err)
+
+	encoded, err := signer.SignOAuthState("google", "state", "nonce", "verifier", "link", "user-id", time.Minute)
+	require.NoError(t, err)
+
+	claims, err := signer.ParseOAuthState(encoded)
+	require.NoError(t, err)
+	require.Equal(t, "google", claims.Provider)
+	require.Equal(t, "state", claims.State)
+	require.Equal(t, "nonce", claims.Nonce)
+	require.Equal(t, "verifier", claims.CodeVerifier)
+	require.Equal(t, "link", claims.Mode)
+	require.Equal(t, "user-id", claims.UserID)
+}

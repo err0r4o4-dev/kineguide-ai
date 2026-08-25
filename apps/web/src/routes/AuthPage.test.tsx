@@ -1,0 +1,58 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
+import { vi } from 'vitest'
+
+import { AuthContext, type AuthContextValue } from '@/features/auth/AuthContext'
+import '@/lib/i18n'
+import * as product from '@/services/product'
+import { AuthPage } from './AuthPage'
+
+vi.mock('@/services/product', async () => {
+  const actual = await vi.importActual<typeof product>('@/services/product')
+  return {
+    ...actual,
+    getOAuthProviders: vi.fn()
+  }
+})
+
+const auth: AuthContextValue = {
+  user: null,
+  ready: true,
+  login: vi.fn(),
+  register: vi.fn(),
+  logout: vi.fn(),
+  clearSession: vi.fn()
+}
+
+describe('AuthPage social sign in', () => {
+  it('shows accessible Google and Facebook buttons when configured', async () => {
+    vi.mocked(product.getOAuthProviders).mockResolvedValue({
+      providers: [
+        { provider: 'google', enabled: true },
+        { provider: 'facebook', enabled: true }
+      ]
+    })
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    })
+
+    render(
+      <QueryClientProvider client={client}>
+        <AuthContext.Provider value={auth}>
+          <MemoryRouter initialEntries={['/login']}>
+            <AuthPage />
+          </MemoryRouter>
+        </AuthContext.Provider>
+      </QueryClientProvider>
+    )
+
+    expect(
+      await screen.findByRole('button', { name: 'เข้าสู่ระบบด้วย Google' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'เข้าสู่ระบบด้วย Facebook' })
+    ).toBeInTheDocument()
+    expect(screen.getByText('หรือ')).toBeInTheDocument()
+  })
+})

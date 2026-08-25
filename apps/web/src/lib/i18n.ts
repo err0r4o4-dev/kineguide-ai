@@ -75,6 +75,18 @@ const th = {
     passwordHint: 'อย่างน้อย 12 ตัวอักษร',
     invalid: 'ไม่สามารถเข้าสู่ระบบได้ โปรดตรวจสอบข้อมูล',
     createFailed: 'ไม่สามารถสร้างบัญชีได้',
+    or: 'หรือ',
+    google: 'เข้าสู่ระบบด้วย Google',
+    facebook: 'เข้าสู่ระบบด้วย Facebook',
+    socialLoading: 'กำลังไปยังหน้าลงชื่อเข้าใช้…',
+    socialFailed: 'ไม่สามารถเข้าสู่ระบบด้วยบัญชีภายนอกได้ กรุณาลองอีกครั้ง',
+    socialCancelled: 'ยกเลิกการเข้าสู่ระบบแล้ว',
+    socialEmailRequired:
+      'บัญชีนี้ไม่ได้ให้อีเมลที่จำเป็น กรุณาใช้วิธีเข้าสู่ระบบอื่น',
+    linkRequired:
+      'อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านแล้วเชื่อมบัญชีจากหน้าตั้งค่า',
+    callbackTitle: 'กำลังตรวจสอบการเข้าสู่ระบบ',
+    backToLogin: 'กลับไปหน้าเข้าสู่ระบบ',
     secure: 'Refresh token เก็บใน HttpOnly cookie และไม่ถูกอ่านโดย JavaScript'
   },
   consent: {
@@ -237,7 +249,17 @@ const th = {
     deleted: 'ลบบัญชีแล้ว',
     retention:
       'คำตอบแบบประเมินและ session summary ตั้ง retention ไว้ 365 วัน และสามารถลบก่อนกำหนดด้วยการลบบัญชี',
-    revokeDone: 'ถอน consent แล้ว'
+    revokeDone: 'ถอน consent แล้ว',
+    connectedAccounts: 'บัญชีที่เชื่อมต่อ',
+    connectedAccountsBody:
+      'เชื่อม Google หรือ Facebook เพื่อใช้เป็นวิธีเข้าสู่ระบบ โดยระบบไม่เก็บ token ของผู้ให้บริการ',
+    connect: 'เชื่อม {{provider}}',
+    disconnect: 'ยกเลิกการเชื่อม {{provider}}',
+    connected: 'เชื่อมแล้ว',
+    connectDone: 'เชื่อมบัญชี {{provider}} แล้ว',
+    disconnectDone: 'ยกเลิกการเชื่อมบัญชีแล้ว',
+    identityFailed: 'ไม่สามารถเปลี่ยนบัญชีที่เชื่อมต่อได้',
+    lastLoginMethod: 'ต้องมีวิธีเข้าสู่ระบบอื่นก่อนยกเลิกการเชื่อมบัญชีนี้'
   },
   help: {
     title: 'ช่วยเหลือ',
@@ -341,6 +363,18 @@ const en: typeof th = {
     passwordHint: 'At least 12 characters',
     invalid: 'Unable to sign in. Check your information.',
     createFailed: 'Unable to create the account.',
+    or: 'OR',
+    google: 'Sign in with Google',
+    facebook: 'Sign in with Facebook',
+    socialLoading: 'Opening the sign-in provider…',
+    socialFailed: 'Unable to sign in with the external account. Try again.',
+    socialCancelled: 'Social sign-in was cancelled.',
+    socialEmailRequired:
+      'This account did not provide the required email. Use another sign-in method.',
+    linkRequired:
+      'An account already uses this email. Sign in with your password and connect the account from settings.',
+    callbackTitle: 'Checking your sign-in',
+    backToLogin: 'Back to sign in',
     secure:
       'The refresh token is stored in an HttpOnly cookie and cannot be read by JavaScript.'
   },
@@ -502,7 +536,18 @@ const en: typeof th = {
     deleted: 'Account deleted',
     retention:
       'Assessment answers and session summaries have a 365-day retention target and can be removed earlier by deleting the account.',
-    revokeDone: 'Consent withdrawn'
+    revokeDone: 'Consent withdrawn',
+    connectedAccounts: 'Connected accounts',
+    connectedAccountsBody:
+      'Connect Google or Facebook as a sign-in method. Provider tokens are not stored.',
+    connect: 'Connect {{provider}}',
+    disconnect: 'Disconnect {{provider}}',
+    connected: 'Connected',
+    connectDone: '{{provider}} account connected',
+    disconnectDone: 'Account disconnected',
+    identityFailed: 'Unable to change the connected account.',
+    lastLoginMethod:
+      'Add another sign-in method before disconnecting this account.'
   },
   help: {
     title: 'Help',

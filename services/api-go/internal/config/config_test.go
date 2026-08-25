@@ -48,6 +48,22 @@ func TestValidateRejectsTwentyNineCharacterJWTSecretInProduction(t *testing.T) {
 	require.ErrorContains(t, cfg.Validate(), "at least 32 characters in production")
 }
 
+func TestValidateRejectsPartialOAuthCredentials(t *testing.T) {
+	cfg := validConfigForTest()
+	cfg.GoogleOAuth = OAuthProviderConfig{ClientID: "client-only", RedirectURL: "http://localhost/callback"}
+
+	require.ErrorContains(t, cfg.Validate(), "configured together")
+}
+
+func TestValidateRequiresHTTPSOAuthURLsInProduction(t *testing.T) {
+	cfg := validConfigForTest()
+	cfg.Environment = "production"
+	cfg.JWTSecret = "production-secret-with-at-least-thirty-two-characters"
+	cfg.OAuthWebRedirectURL = "http://example.com/auth/callback"
+
+	require.ErrorContains(t, cfg.Validate(), "must use HTTPS")
+}
+
 func validConfigForTest() Config {
 	return Config{
 		Environment: "development", Version: "0.2.0", Port: "8080",
@@ -55,5 +71,6 @@ func validConfigForTest() Config {
 		CORSAllowedOrigins: []string{"http://localhost:5173"}, RequestTimeout: time.Second,
 		ShutdownTimeout: time.Second, JWTSecret: "test-secret-with-at-least-thirty-two-characters",
 		AccessTokenTTL: time.Minute, RefreshTokenTTL: time.Hour,
+		OAuthWebRedirectURL: "http://localhost:5173/auth/callback",
 	}
 }

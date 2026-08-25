@@ -13,6 +13,7 @@ import (
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/database"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/handler"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/oauthprovider"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/repository"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/security"
 )
@@ -46,10 +47,22 @@ func main() {
 		os.Exit(1)
 	}
 	store := repository.NewPostgres(pool)
+	providerHTTPClient := &http.Client{Timeout: cfg.RequestTimeout}
+	oauthProviders := make(map[string]oauthprovider.Provider)
+	if cfg.GoogleOAuth.Enabled() {
+		oauthProviders[oauthprovider.Google] = oauthprovider.NewGoogle(
+			cfg.GoogleOAuth.ClientID, cfg.GoogleOAuth.ClientSecret, cfg.GoogleOAuth.RedirectURL, providerHTTPClient,
+		)
+	}
+	if cfg.FacebookOAuth.Enabled() {
+		oauthProviders[oauthprovider.Facebook] = oauthprovider.NewFacebook(
+			cfg.FacebookOAuth.ClientID, cfg.FacebookOAuth.ClientSecret, cfg.FacebookOAuth.RedirectURL, providerHTTPClient,
+		)
+	}
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, Store: store, Signer: tokenSigner}, logger),
+		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, Store: store, Signer: tokenSigner, OAuthProviders: oauthProviders}, logger),
 		ReadHeaderTimeout: cfg.RequestTimeout,
 		ReadTimeout:       cfg.RequestTimeout,
 		WriteTimeout:      cfg.RequestTimeout,

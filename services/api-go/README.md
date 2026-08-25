@@ -7,3 +7,5 @@ Run `go mod download`, `go run ./cmd/server`, and `go test ./...` from this dire
 Endpoints: `GET /health`, `GET /ready`, `GET /v1/health`, `GET /v1/system/status`, `GET /openapi.json`, and `GET /docs`.
 
 The `internal/security` package provides Argon2id password hashing and short-lived JWT access tokens. Product handlers use rotating opaque refresh tokens stored as hashes in PostgreSQL and delivered to the browser as HttpOnly cookies. Every consent, assessment, and session query is scoped to the authenticated user.
+
+Social sign-in is disabled unless the matching client ID and client secret are configured. Register the exact Google and Facebook callback URLs from `.env.example` with each provider. Provider credentials remain server-side; provider access and refresh tokens are never persisted.

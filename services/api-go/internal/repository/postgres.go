@@ -28,10 +28,36 @@ func (p *Postgres) CreateUser(ctx context.Context, email, passwordHash, displayN
 	return user, mapError(err)
 }
 
+func (p *Postgres) CreateOAuthUser(ctx context.Context, email, displayName, provider, subject string) (product.User, error) {
+	tx, err := p.pool.Begin(ctx)
+	if err != nil {
+		return product.User{}, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+	var user product.User
+	err = tx.QueryRow(ctx, `
+		INSERT INTO users (email, password_hash, display_name)
+		VALUES ($1, NULL, $2)
+		RETURNING id::text, email, display_name, COALESCE(password_hash, ''), created_at`, email, displayName).
+		Scan(&user.ID, &user.Email, &user.DisplayName, &user.PasswordHash, &user.CreatedAt)
+	if err != nil {
+		return product.User{}, mapError(err)
+	}
+	if _, err = tx.Exec(ctx, `
+		INSERT INTO auth_identities (user_id, provider, provider_subject)
+		VALUES ($1, $2, $3)`, user.ID, provider, subject); err != nil {
+		return product.User{}, mapError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return product.User{}, err
+	}
+	return user, nil
+}
+
 func (p *Postgres) UserByEmail(ctx context.Context, email string) (product.User, error) {
 	var user product.User
 	err := p.pool.QueryRow(ctx, `
-		SELECT id::text, email, display_name, password_hash, created_at
+		SELECT id::text, email, display_name, COALESCE(password_hash, ''), created_at
 		FROM users WHERE email = $1`, email).
 		Scan(&user.ID, &user.Email, &user.DisplayName, &user.PasswordHash, &user.CreatedAt)
 	return user, mapError(err)
@@ -40,10 +66,74 @@ func (p *Postgres) UserByEmail(ctx context.Context, email string) (product.User,
 func (p *Postgres) UserByID(ctx context.Context, userID string) (product.User, error) {
 	var user product.User
 	err := p.pool.QueryRow(ctx, `
-		SELECT id::text, email, display_name, password_hash, created_at
+		SELECT id::text, email, display_name, COALESCE(password_hash, ''), created_at
 		FROM users WHERE id = $1`, userID).
 		Scan(&user.ID, &user.Email, &user.DisplayName, &user.PasswordHash, &user.CreatedAt)
 	return user, mapError(err)
+}
+
+func (p *Postgres) UserByAuthIdentity(ctx context.Context, provider, subject string) (product.User, error) {
+	var user product.User
+	err := p.pool.QueryRow(ctx, `
+		SELECT u.id::text, u.email, u.display_name, COALESCE(u.password_hash, ''), u.created_at
+		FROM users u
+		JOIN auth_identities i ON i.user_id = u.id
+		WHERE i.provider = $1 AND i.provider_subject = $2`, provider, subject).
+		Scan(&user.ID, &user.Email, &user.DisplayName, &user.PasswordHash, &user.CreatedAt)
+	return user, mapError(err)
+}
+
+func (p *Postgres) LinkAuthIdentity(ctx context.Context, userID, provider, subject string) error {
+	_, err := p.pool.Exec(ctx, `
+		INSERT INTO auth_identities (user_id, provider, provider_subject)
+		VALUES ($1, $2, $3)`, userID, provider, subject)
+	return mapError(err)
+}
+
+func (p *Postgres) ListAuthIdentities(ctx context.Context, userID string) ([]product.AuthIdentity, error) {
+	rows, err := p.pool.Query(ctx, `
+		SELECT provider, created_at FROM auth_identities
+		WHERE user_id = $1 ORDER BY provider`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	identities := make([]product.AuthIdentity, 0)
+	for rows.Next() {
+		var identity product.AuthIdentity
+		if err := rows.Scan(&identity.Provider, &identity.CreatedAt); err != nil {
+			return nil, err
+		}
+		identities = append(identities, identity)
+	}
+	return identities, rows.Err()
+}
+
+func (p *Postgres) DeleteAuthIdentity(ctx context.Context, userID, provider string) error {
+	tx, err := p.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+	var hasPassword bool
+	var identityCount int
+	if err := tx.QueryRow(ctx, `
+		SELECT password_hash IS NOT NULL,
+		       (SELECT count(*) FROM auth_identities WHERE user_id = users.id)
+		FROM users WHERE id = $1 FOR UPDATE`, userID).Scan(&hasPassword, &identityCount); err != nil {
+		return mapError(err)
+	}
+	if !hasPassword && identityCount <= 1 {
+		return product.ErrLastLoginMethod
+	}
+	command, err := tx.Exec(ctx, `DELETE FROM auth_identities WHERE user_id = $1 AND provider = $2`, userID, provider)
+	if err != nil {
+		return err
+	}
+	if command.RowsAffected() == 0 {
+		return product.ErrNotFound
+	}
+	return tx.Commit(ctx)
 }
 
 func (p *Postgres) DeleteUser(ctx context.Context, userID string) error {

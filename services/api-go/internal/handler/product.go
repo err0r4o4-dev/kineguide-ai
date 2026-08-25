@@ -15,6 +15,7 @@ import (
 
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	appmiddleware "github.com/kineguide-ai/kineguide-ai/services/api-go/internal/middleware"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/oauthprovider"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/product"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/security"
 )
@@ -22,9 +23,10 @@ import (
 const userIDKey = "authenticated_user_id"
 
 type productAPI struct {
-	cfg    config.Config
-	store  product.Store
-	signer *security.TokenSigner
+	cfg       config.Config
+	store     product.Store
+	signer    *security.TokenSigner
+	providers map[string]oauthprovider.Provider
 }
 
 type authResponse struct {
@@ -33,22 +35,28 @@ type authResponse struct {
 	User        product.User `json:"user"`
 }
 
-func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner) {
+func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider) {
 	if store == nil || signer == nil {
 		return
 	}
-	api := &productAPI{cfg: cfg, store: store, signer: signer}
+	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers}
 	v1 := router.Group(apiV1Prefix)
 	auth := v1.Group("/auth")
 	auth.POST("/register", api.register)
 	auth.POST("/login", api.login)
 	auth.POST("/refresh", api.refresh)
 	auth.POST("/logout", api.logout)
+	auth.GET("/providers", api.oauthProviders)
+	auth.GET("/oauth/:provider/start", api.oauthStart)
+	auth.GET("/oauth/:provider/callback", api.oauthCallback)
 
 	secured := v1.Group("")
 	secured.Use(api.requireAccessToken())
 	secured.GET("/me", api.me)
 	secured.DELETE("/me", api.deleteMe)
+	secured.GET("/me/auth-identities", api.listAuthIdentities)
+	secured.POST("/me/auth-identities/:provider/start", api.oauthLinkStart)
+	secured.DELETE("/me/auth-identities/:provider", api.deleteAuthIdentity)
 	secured.GET("/consents/current", api.currentConsent)
 	secured.POST("/consents", api.saveConsent)
 	secured.DELETE("/consents/current", api.revokeConsent)

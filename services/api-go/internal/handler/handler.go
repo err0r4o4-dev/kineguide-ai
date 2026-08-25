@@ -11,6 +11,7 @@ import (
 
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	appmiddleware "github.com/kineguide-ai/kineguide-ai/services/api-go/internal/middleware"
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/oauthprovider"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/product"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/security"
 )
@@ -22,10 +23,11 @@ type Pinger interface {
 }
 
 type Dependencies struct {
-	Database Pinger
-	AI       Pinger
-	Store    product.Store
-	Signer   *security.TokenSigner
+	Database       Pinger
+	AI             Pinger
+	Store          product.Store
+	Signer         *security.TokenSigner
+	OAuthProviders map[string]oauthprovider.Provider
 }
 
 type HealthResponse struct {
@@ -69,7 +71,7 @@ func NewRouter(cfg config.Config, dependencies Dependencies, logger *slog.Logger
 	router.GET(apiV1Prefix+"/system/status", systemStatusHandler(cfg.Version, dependencies))
 	router.GET("/openapi.json", openAPIHandler)
 	router.GET("/docs", docsHandler)
-	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer)
+	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders)
 	return router
 }
 
