@@ -48,8 +48,9 @@ export function AppShell() {
         <div className="flex items-center gap-2">
           <LanguageButton />
           <button
+            aria-controls="app-navigation"
             aria-expanded={open}
-            aria-label={t('nav.menu')}
+            aria-label={t(open ? 'nav.closeMenu' : 'nav.menu')}
             className="kg-icon-button"
             onClick={() => setOpen((value) => !value)}
             type="button"
@@ -69,9 +70,20 @@ export function AppShell() {
       )}
 
       <aside
+        id="app-navigation"
         className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col overflow-y-auto border-r border-slate-200 bg-white p-5 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <Brand />
+        <div className="flex items-start justify-between gap-3">
+          <Brand />
+          <button
+            aria-label={t('nav.closeMenu')}
+            className="kg-icon-button shrink-0 lg:hidden"
+            onClick={() => setOpen(false)}
+            type="button"
+          >
+            <X aria-hidden="true" />
+          </button>
+        </div>
         <nav aria-label={t('nav.main')} className="mt-10 space-y-1">
           {links.map(({ to, key, icon: Icon, end }) => (
             <NavLink

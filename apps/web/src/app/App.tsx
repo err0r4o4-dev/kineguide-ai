@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router'
 import { AppShell } from '@/components/layout/AppShell'
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
 import { AuthProvider } from '@/features/auth/AuthProvider'
+import { ConsentRoute } from '@/features/auth/ConsentRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { NotFoundPage } from '@/routes/NotFoundPage'
 
@@ -113,22 +114,30 @@ const router = createBrowserRouter([
     children: [
       { path: '/consent', element: <ConsentPage /> },
       {
-        path: '/app',
-        element: <AppShell />,
+        element: <ConsentRoute />,
         children: [
-          { index: true, element: <DashboardPage /> },
-          { path: 'assessment', element: <AssessmentPage /> },
-          { path: 'plan', element: <PlanPage /> },
-          { path: 'exercises', element: <ExerciseLibraryPage /> },
-          { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
-          { path: 'exercises/:slug/setup', element: <CameraSetupPage /> },
-          { path: 'sessions/:id/live', element: <LiveSessionPage /> },
-          { path: 'sessions/:id/summary', element: <SessionSummaryPage /> },
-          { path: 'history', element: <HistoryPage /> },
-          { path: 'progress', element: <ProgressPage /> },
-          { path: 'profile', element: <ProfilePage /> },
-          { path: 'settings', element: <SettingsPage /> },
-          { path: 'help', element: <HelpPage /> }
+          {
+            path: '/app',
+            element: <AppShell />,
+            children: [
+              { index: true, element: <DashboardPage /> },
+              { path: 'assessment', element: <AssessmentPage /> },
+              { path: 'plan', element: <PlanPage /> },
+              { path: 'exercises', element: <ExerciseLibraryPage /> },
+              { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
+              { path: 'exercises/:slug/setup', element: <CameraSetupPage /> },
+              { path: 'sessions/:id/live', element: <LiveSessionPage /> },
+              {
+                path: 'sessions/:id/summary',
+                element: <SessionSummaryPage />
+              },
+              { path: 'history', element: <HistoryPage /> },
+              { path: 'progress', element: <ProgressPage /> },
+              { path: 'profile', element: <ProfilePage /> },
+              { path: 'settings', element: <SettingsPage /> },
+              { path: 'help', element: <HelpPage /> }
+            ]
+          }
         ]
       }
     ]

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -19,10 +20,15 @@ describe('ConsentPage language selector', () => {
 
   it('changes all consent copy to English without resetting selected consent', async () => {
     const user = userEvent.setup()
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    })
     render(
-      <MemoryRouter>
-        <ConsentPage />
-      </MemoryRouter>
+      <QueryClientProvider client={client}>
+        <MemoryRouter>
+          <ConsentPage />
+        </MemoryRouter>
+      </QueryClientProvider>
     )
 
     const requiredConsent = screen.getByRole('checkbox', {

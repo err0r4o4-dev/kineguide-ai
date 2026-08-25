@@ -12,19 +12,24 @@ import { LanguageButton } from '@/components/LanguageButton'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import {
-  getConsent,
   getOAuthLoginURL,
   getOAuthProviders,
   type OAuthProvider
 } from '@/services/product'
 
-const schema = z.object({
-  display_name: z.string().trim().min(2).max(80).optional(),
-  email: z.string().trim().email().max(254),
-  password: z.string().min(12).max(128)
-})
+function createSchema(requiresDisplayName: boolean) {
+  return z.object({
+    display_name: z
+      .string()
+      .trim()
+      .max(80)
+      .refine((value) => !requiresDisplayName || value.length >= 2),
+    email: z.string().trim().email().max(254),
+    password: z.string().min(12).max(128)
+  })
+}
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof createSchema>>
 
 export function AuthPage() {
   const { t } = useTranslation()
@@ -42,7 +47,7 @@ export function AuthPage() {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createSchema(isRegister)),
     defaultValues: { display_name: '', email: '', password: '' }
   })
   const providers = useQuery({
@@ -63,7 +68,7 @@ export function AuthPage() {
       if (isRegister) {
         await auth.register({
           ...values,
-          display_name: values.display_name ?? ''
+          display_name: values.display_name
         })
       } else {
         await auth.login({ email: values.email, password: values.password })
@@ -71,10 +76,7 @@ export function AuthPage() {
       if (isRegister) {
         navigate('/consent', { replace: true })
       } else {
-        const consent = await getConsent().catch(() => null)
-        navigate(consent && !consent.revoked_at ? '/app' : '/consent', {
-          replace: true
-        })
+        navigate(requestedAppPath(location.state), { replace: true })
       }
     } catch {
       submissionInFlight.current = false
@@ -246,4 +248,17 @@ export function AuthPage() {
       </div>
     </main>
   )
+}
+
+function requestedAppPath(state: unknown) {
+  if (
+    typeof state === 'object' &&
+    state !== null &&
+    'from' in state &&
+    typeof state.from === 'string' &&
+    (state.from === '/app' || state.from.startsWith('/app/'))
+  ) {
+    return state.from
+  }
+  return '/app'
 }
