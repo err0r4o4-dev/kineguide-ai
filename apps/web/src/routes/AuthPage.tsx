@@ -95,12 +95,12 @@ export function AuthPage() {
           <img
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 -z-20 size-full object-cover object-[58%_center]"
-            src="/auth-illustration.png"
+            className="absolute inset-0 -z-20 size-full object-cover object-[42%_center]"
+            src="/auth-illustration.jpg"
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,118,110,0.08)_20%,rgba(15,118,110,0.9)_82%,rgba(15,118,110,0.96)_100%)]"
+            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,118,110,0.08)_20%,rgba(15,118,110,0.76)_60%,rgba(15,118,110,0.96)_80%,#0f766e_100%)]"
           />
           <Brand inverted />
           <div className="max-w-md pb-2">
