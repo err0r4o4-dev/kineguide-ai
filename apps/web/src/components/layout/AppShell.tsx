@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  CalendarDays,
   CircleHelp,
   ClipboardList,
   Dumbbell,
@@ -22,6 +23,7 @@ import { useAuth } from '@/features/auth/AuthContext'
 const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
   { to: '/app/assessment', key: 'assessment', icon: ClipboardList, end: false },
+  { to: '/app/plan', key: 'plan', icon: CalendarDays, end: false },
   { to: '/app/exercises', key: 'exercises', icon: Dumbbell, end: false },
   { to: '/app/history', key: 'history', icon: History, end: false },
   { to: '/app/progress', key: 'progress', icon: BarChart3, end: false },
@@ -67,7 +69,7 @@ export function AppShell() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col border-r border-slate-200 bg-white p-5 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col overflow-y-auto border-r border-slate-200 bg-white p-5 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <Brand />
         <nav aria-label={t('nav.main')} className="mt-10 space-y-1">

@@ -34,6 +34,7 @@ const th = {
     closeMenu: 'ปิดเมนู',
     home: 'หน้าหลัก',
     assessment: 'ประเมินอาการ',
+    plan: 'แผนกิจกรรม',
     exercises: 'ท่าฝึกสาธิต',
     history: 'ประวัติ',
     progress: 'ความก้าวหน้า',
@@ -108,15 +109,28 @@ const th = {
     failed: 'ไม่สามารถบันทึก consent ได้'
   },
   assessment: {
-    title: 'เล่าอาการของคุณให้เราฟังแบบมีโครงสร้าง',
+    title: 'เล่าอาการของคุณให้เราฟัง',
     subtitle:
       'คำตอบนี้ใช้จัดระเบียบข้อมูลเท่านั้น ระบบไม่วินิจฉัยหรือคัดกรองความเสี่ยง',
     progress: 'ขั้นตอน {{current}} จาก {{total}}',
+    reviewProgress: 'พร้อมตรวจทานคำตอบ',
+    start: 'เริ่มประเมิน',
+    summary: 'สรุปผล',
+    conversation: 'บทสนทนาแบบประเมิน',
+    welcome:
+      'ขอบคุณที่ให้ข้อมูล เพื่อจัดระเบียบคำตอบเบื้องต้น ขอถามเพิ่มเติมเล็กน้อยครับ',
     area: 'บริเวณที่คุณต้องการบันทึก',
     duration: 'เป็นมานานเท่าใด',
     impact: 'มีผลต่อกิจวัตรมากเพียงใด',
     goal: 'คุณต้องการใช้ระบบเพื่ออะไร',
     submit: 'บันทึกข้อมูล',
+    sendAnswer: 'ส่งคำตอบ',
+    reviewAnswers: 'ตรวจทานคำตอบ',
+    reviewTitle: 'ตรวจทานคำตอบของคุณ',
+    reviewBody:
+      'ตรวจสอบข้อมูลก่อนบันทึก คำตอบเหล่านี้จะไม่ถูกใช้เพื่อวินิจฉัยหรือสร้างแผนรักษา',
+    edit: 'แก้ไข',
+    saveAndViewPlan: 'บันทึกและดูแผน',
     areas: {
       lower_back: 'หลังส่วนล่าง',
       knee: 'เข่า',
@@ -145,6 +159,32 @@ const th = {
       'หากมีอาการรุนแรง ฉุกเฉิน หรือกังวลต่อความปลอดภัย ให้หยุดใช้งานและติดต่อบริการฉุกเฉินหรือผู้เชี่ยวชาญในพื้นที่',
     saved: 'บันทึกข้อมูลแล้ว โดยยังไม่มีการประเมินหรือคำแนะนำทางคลินิก',
     failed: 'ไม่สามารถบันทึกแบบประเมินได้'
+  },
+  plan: {
+    title: 'แผนกิจกรรมสาธิต 7 วัน',
+    subtitle:
+      'ตารางสำหรับทดลอง flow ของระบบเท่านั้น ไม่ใช่โปรแกรมกายภาพบำบัดหรือคำแนะนำการรักษา',
+    pendingReview: 'รอการทบทวนทางคลินิก',
+    notPersonalized: 'ไม่ได้ปรับตามอาการของคุณ',
+    details: 'ดูรายละเอียด',
+    start: 'เริ่มกิจกรรม',
+    goalTitle: 'เป้าหมายของตารางสาธิต',
+    goalBody:
+      'ช่วยให้คุณสำรวจคลังท่า การตั้งค่ากล้อง และการบันทึก session โดยไม่มีการตัดสินความเหมาะสมหรือความถูกต้องของท่า',
+    duration: 'ระยะเวลา',
+    durationValue: '7 วัน',
+    basis: 'หลักการจัดรายการ',
+    basisValue: 'หมุนเวียนรายการสาธิตแบบคงที่',
+    cautionTitle: 'ข้อควรทราบ',
+    cautionOne: 'รายการนี้ไม่ใช้คำตอบแบบประเมินในการเลือกกิจกรรม',
+    cautionTwo: 'ระบบยังไม่มีเกณฑ์ทางคลินิกหรือคะแนนความถูกต้องของท่า',
+    day: 'วันที่ {{day}}',
+    activitiesForDay: 'กิจกรรมสาธิตสำหรับวันที่ {{day}}',
+    camera: 'ทดลองกล้องในอุปกรณ์',
+    viewExercise: 'ดูรายละเอียดกิจกรรม',
+    startExercise: 'ตั้งค่ากล้อง',
+    saved: 'บันทึกแบบประเมินแล้ว',
+    empty: 'ยังไม่มีรายการสาธิตสำหรับวันนี้'
   },
   dashboard: {
     hello: 'สวัสดี {{name}}',
@@ -322,6 +362,7 @@ const en: typeof th = {
     closeMenu: 'Close menu',
     home: 'Home',
     assessment: 'Assessment',
+    plan: 'Activity plan',
     exercises: 'Movement demos',
     history: 'History',
     progress: 'Progress',
@@ -398,15 +439,28 @@ const en: typeof th = {
     failed: 'Unable to save consent.'
   },
   assessment: {
-    title: 'Describe your concern in a structured form',
+    title: 'Tell us about your concern',
     subtitle:
       'Answers organize information only. The system does not diagnose or screen risk.',
     progress: 'Step {{current}} of {{total}}',
+    reviewProgress: 'Ready to review answers',
+    start: 'Start assessment',
+    summary: 'Summary',
+    conversation: 'Assessment conversation',
+    welcome:
+      'Thank you for sharing. To organize your answers, we have a few short questions.',
     area: 'Area you want to record',
     duration: 'How long has this been present?',
     impact: 'How much does it affect daily activity?',
     goal: 'What do you want to use the system for?',
     submit: 'Save information',
+    sendAnswer: 'Send answer',
+    reviewAnswers: 'Review answers',
+    reviewTitle: 'Review your answers',
+    reviewBody:
+      'Check the information before saving. These answers are not used to diagnose or create a treatment plan.',
+    edit: 'Edit',
+    saveAndViewPlan: 'Save and view plan',
     areas: {
       lower_back: 'Lower back',
       knee: 'Knee',
@@ -435,6 +489,33 @@ const en: typeof th = {
       'For severe, urgent, or safety concerns, stop and contact local emergency services or a qualified professional.',
     saved: 'Saved without clinical evaluation or guidance.',
     failed: 'Unable to save the assessment.'
+  },
+  plan: {
+    title: '7-day demo activity plan',
+    subtitle:
+      'A schedule for exploring the product flow only. It is not a physiotherapy program or treatment guidance.',
+    pendingReview: 'Clinical review pending',
+    notPersonalized: 'Not personalized to your symptoms',
+    details: 'View details',
+    start: 'Start activity',
+    goalTitle: 'Demo schedule goal',
+    goalBody:
+      'Explore the movement library, camera setup, and session recording without judging suitability or movement correctness.',
+    duration: 'Duration',
+    durationValue: '7 days',
+    basis: 'Selection basis',
+    basisValue: 'Fixed demo rotation',
+    cautionTitle: 'Important information',
+    cautionOne: 'Assessment answers are not used to select these activities.',
+    cautionTwo:
+      'No approved clinical thresholds or movement-correctness score is available.',
+    day: 'Day {{day}}',
+    activitiesForDay: 'Demo activities for day {{day}}',
+    camera: 'Try the on-device camera',
+    viewExercise: 'View activity details',
+    startExercise: 'Set up camera',
+    saved: 'Assessment saved',
+    empty: 'No demo activities are available for this day.'
   },
   dashboard: {
     hello: 'Hello {{name}}',

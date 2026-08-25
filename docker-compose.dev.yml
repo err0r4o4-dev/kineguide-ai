@@ -1,0 +1,40 @@
+services:
+  ai-python:
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8001"
+      - --reload
+    environment:
+      WATCHFILES_FORCE_POLLING: "true"
+    volumes:
+      - ./services/ai-python/app:/app/app:ro
+
+  api-go:
+    build:
+      context: .
+      dockerfile: services/api-go/Dockerfile.dev
+    mem_limit: 768m
+    volumes:
+      - ./services/api-go:/workspace/services/api-go:ro
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    environment:
+      CHOKIDAR_INTERVAL: "500"
+      CHOKIDAR_USEPOLLING: "true"
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/v1}
+    mem_limit: 512m
+    volumes:
+      - ./apps/web/src:/workspace/apps/web/src:ro
+      - ./apps/web/public:/workspace/apps/web/public:ro
+      - ./apps/web/index.html:/workspace/apps/web/index.html:ro
+      - ./apps/web/vite.config.ts:/workspace/apps/web/vite.config.ts:ro
+      - ./apps/web/tsconfig.app.json:/workspace/apps/web/tsconfig.app.json:ro
+      - ./apps/web/tsconfig.json:/workspace/apps/web/tsconfig.json:ro
+      - ./apps/web/tsconfig.node.json:/workspace/apps/web/tsconfig.node.json:ro

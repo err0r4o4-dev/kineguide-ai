@@ -17,7 +17,8 @@ export default defineConfig({
       manifest: {
         name: 'KineGuide AI',
         short_name: 'KineGuide',
-        description: 'Personalized recovery, guided by AI.',
+        description:
+          'Privacy-aware physiotherapy support and movement demo prototype.',
         lang: 'th',
         start_url: '/',
         display: 'standalone',

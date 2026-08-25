@@ -20,12 +20,17 @@ When instructions conflict, preserve the safer medical, privacy, security, and d
 
 ## Before changing anything
 
-1. Inspect `git status --short --branch`, the affected files, and nearby tests.
-2. Read the matching rule and skill listed below.
-3. Identify the user-visible outcome, affected services, data sensitivity, and clinical-safety impact.
-4. For multi-step work, maintain a task plan. Do not create disposable planning files for trivial work.
-5. Define a verification signal before implementation. For bug fixes and behavior changes, prefer a failing test at the real failure seam before the fix.
-6. Preserve unrelated user changes and never use destructive Git commands.
+1. At the start of every requested repository change, inspect `git status --short --branch` and check whether a root `TODO.md` already exists.
+2. Before modifying project files, create or safely update the root `TODO.md` with a concrete checklist for the current task. Do this for small changes as well as large features and refactors.
+3. Never overwrite an existing `TODO.md`. Preserve unrelated content and add a clearly scoped section for the current task.
+4. Read the affected files, nearby tests, matching rule, and matching skill listed below.
+5. Identify the user-visible outcome, affected services, data sensitivity, clinical-safety impact, and verification signal. Record the relevant work and verification steps in `TODO.md` before implementation.
+6. For a feature, bug fix, refactor, or other behavior change, list test design and test implementation before production implementation. Prefer a failing test at the real behavior or failure seam, then implement the smallest change that makes it pass. Documentation-only or metadata-only changes still require an appropriate verification item but do not require artificial unit tests.
+7. Work from the first unchecked `- [ ]` item in the current task section. Complete one coherent item, change it to `- [x]`, save `TODO.md`, and repeat until the checklist is complete.
+8. Preserve unrelated user changes and never use destructive Git commands.
+9. After all implementation and verification items pass, remove the temporary task section. Delete `TODO.md` only if the agent created it for the task and no pre-existing or unrelated content remains. Never delete tests created for the completed work.
+
+If the task is blocked or verification fails, do not mark the affected item complete and do not remove its checklist. Record the concise blocker or failed command under that item for the next turn or human reviewer.
 
 ## Non-negotiable architecture
 
@@ -267,3 +272,4 @@ Never report a check as passed unless it actually completed successfully.
 - No secret, sensitive data, generated artifact, or unrelated change is staged.
 - Medical, privacy, security, accessibility, and operational implications are reported.
 - Temporary processes, debug instrumentation, and project containers are stopped.
+- The current task checklist is fully checked, and its temporary `TODO.md` section or agent-created file is removed only after successful completion.

@@ -60,6 +60,44 @@ test('new user completes consent and structured onboarding', async ({
       })
       return
     }
+    if (url.endsWith('/activity-plan')) {
+      const exercises = [
+        {
+          slug: 'sit-to-stand-demo',
+          title_th: 'สาธิตการลุกนั่งจากเก้าอี้',
+          title_en: 'Sit-to-stand movement demo',
+          category: 'lower_body',
+          review_status: 'pending_clinical_review'
+        },
+        {
+          slug: 'seated-knee-demo',
+          title_th: 'สาธิตการเหยียดเข่าขณะนั่ง',
+          title_en: 'Seated knee movement demo',
+          category: 'lower_body',
+          review_status: 'pending_clinical_review'
+        },
+        {
+          slug: 'shoulder-movement-demo',
+          title_th: 'สาธิตการเคลื่อนไหวหัวไหล่',
+          title_en: 'Shoulder movement demo',
+          category: 'upper_body',
+          review_status: 'pending_clinical_review'
+        }
+      ]
+      await route.fulfill({
+        json: {
+          plan_type: 'demo_exploration',
+          review_status: 'pending_clinical_review',
+          personalized: false,
+          duration_days: 7,
+          days: Array.from({ length: 7 }, (_, index) => ({
+            day: index + 1,
+            exercises
+          }))
+        }
+      })
+      return
+    }
     if (url.endsWith('/dashboard')) {
       await route.fulfill({
         json: {
@@ -90,16 +128,32 @@ test('new user completes consent and structured onboarding', async ({
   await page.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' }).click()
 
   await page.getByLabel('ไม่ประสงค์ระบุ').first().check()
-  await page.getByRole('button', { name: 'ดำเนินการต่อ' }).click()
+  await page.getByRole('button', { name: 'ส่งคำตอบ' }).click()
   await page.getByLabel('ไม่แน่ใจ').check()
-  await page.getByRole('button', { name: 'ดำเนินการต่อ' }).click()
+  await page.getByRole('button', { name: 'ส่งคำตอบ' }).click()
   await page.getByLabel('ไม่ประสงค์ระบุ').check()
-  await page.getByRole('button', { name: 'ดำเนินการต่อ' }).click()
+  await page.getByRole('button', { name: 'ส่งคำตอบ' }).click()
   await page.getByLabel('ทดลองกล้องและการเคลื่อนไหว').check()
-  await page.getByRole('button', { name: 'บันทึกข้อมูล' }).click()
+  await page.getByRole('button', { name: 'ตรวจทานคำตอบ' }).click()
+  await page.getByRole('button', { name: 'บันทึกและดูแผน' }).click()
 
   await expect(
-    page.getByRole('heading', { name: 'สวัสดี ผู้ใช้ทดสอบ' })
+    page.getByRole('heading', { name: 'แผนกิจกรรมสาธิต 7 วัน' })
   ).toBeVisible()
-  await expect(page.getByText(/ไม่ใช่ผลการประเมินการฟื้นตัว/)).toBeVisible()
+  await expect(page.getByText('ไม่ได้ปรับตามอาการของคุณ')).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'ดูรายละเอียดกิจกรรม' }).first()
+  ).toHaveAttribute('href', '/app/exercises/sit-to-stand-demo')
+
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    await expect(
+      page.getByRole('heading', { name: 'แผนกิจกรรมสาธิต 7 วัน' })
+    ).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true)
+  }
 })

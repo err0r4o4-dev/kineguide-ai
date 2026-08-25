@@ -64,6 +64,7 @@ func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.
 	secured.POST("/assessments", api.saveAssessment)
 	secured.GET("/exercises", api.listExercises)
 	secured.GET("/exercises/:slug", api.getExercise)
+	secured.GET("/activity-plan", api.activityPlan)
 	secured.GET("/dashboard", api.dashboard)
 	secured.GET("/sessions", api.listSessions)
 	secured.POST("/sessions", api.createSession)
@@ -322,6 +323,10 @@ func (a *productAPI) getExercise(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, exercise)
+}
+
+func (a *productAPI) activityPlan(c *gin.Context) {
+	c.JSON(http.StatusOK, product.BuildDemoActivityPlan())
 }
 
 func (a *productAPI) createSession(c *gin.Context) {
