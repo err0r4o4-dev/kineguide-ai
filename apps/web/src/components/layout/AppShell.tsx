@@ -2,11 +2,11 @@ import {
   BarChart3,
   CalendarDays,
   CircleHelp,
-  ClipboardList,
   Dumbbell,
   History,
   Home,
   LogOut,
+  MessageCircle,
   Menu,
   Settings,
   UserRound,
@@ -22,7 +22,7 @@ import { useAuth } from '@/features/auth/AuthContext'
 
 const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
-  { to: '/app/assessment', key: 'assessment', icon: ClipboardList, end: false },
+  { to: '/app/assessment', key: 'assessment', icon: MessageCircle, end: false },
   { to: '/app/plan', key: 'plan', icon: CalendarDays, end: false },
   { to: '/app/exercises', key: 'exercises', icon: Dumbbell, end: false },
   { to: '/app/history', key: 'history', icon: History, end: false },

@@ -4,6 +4,7 @@ import {
   CalendarCheck2,
   Clock3,
   Flame,
+  MessageCircle,
   Play,
   ShieldCheck
 } from 'lucide-react'
@@ -26,17 +27,46 @@ export function DashboardPage() {
   return (
     <div>
       <header>
-        <p className="text-sm text-slate-500">
-          {new Intl.DateTimeFormat(
-            i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
-            { dateStyle: 'full' }
-          ).format(new Date())}
-        </p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
-          {t('dashboard.hello', { name: auth.user?.display_name })}
-        </h1>
-        <p className="mt-2 text-slate-600">{t('dashboard.ready')}</p>
+        <div>
+          <p className="text-sm text-slate-500">
+            {new Intl.DateTimeFormat(
+              i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
+              { dateStyle: 'full' }
+            ).format(new Date())}
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
+            {t('dashboard.hello', { name: auth.user?.display_name })}
+          </h1>
+          <p className="mt-2 text-slate-600">{t('dashboard.ready')}</p>
+        </div>
       </header>
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-teal-200 bg-teal-50 p-5 sm:p-6">
+        <div className="flex min-w-0 items-start gap-4">
+          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-teal-700 text-white">
+            <MessageCircle aria-hidden="true" />
+          </span>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-950">
+                {t('dashboard.aiTitle')}
+              </h2>
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-teal-800">
+                {t('dashboard.aiStructured')}
+              </span>
+            </div>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              {t('dashboard.aiBody')}
+            </p>
+            <p className="mt-1 text-xs text-slate-600">
+              {t('dashboard.aiBoundary')}
+            </p>
+          </div>
+        </div>
+        <Link className="kg-button-secondary shrink-0" to="/app/assessment">
+          {t('dashboard.aiStart')}
+          <ArrowRight aria-hidden="true" />
+        </Link>
+      </section>
       {location.state?.assessmentSaved && (
         <p className="kg-alert-success mt-5" role="status">
           {t('assessment.saved')}

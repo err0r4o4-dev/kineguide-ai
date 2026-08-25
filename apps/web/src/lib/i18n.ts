@@ -33,7 +33,7 @@ const th = {
     menu: 'เปิดเมนู',
     closeMenu: 'ปิดเมนู',
     home: 'หน้าหลัก',
-    assessment: 'ประเมินอาการ',
+    assessment: 'คุยกับ AI',
     plan: 'แผนกิจกรรม',
     exercises: 'ท่าฝึกสาธิต',
     history: 'ประวัติ',
@@ -109,9 +109,9 @@ const th = {
     failed: 'ไม่สามารถบันทึก consent ได้'
   },
   assessment: {
-    title: 'เล่าอาการของคุณให้เราฟัง',
+    title: 'คุยกับ KineGuide AI',
     subtitle:
-      'คำตอบนี้ใช้จัดระเบียบข้อมูลเท่านั้น ระบบไม่วินิจฉัยหรือคัดกรองความเสี่ยง',
+      'ผู้ช่วยจะถามคำถามแบบมีโครงสร้างเพื่อจัดระเบียบข้อมูลเท่านั้น ระบบไม่วินิจฉัยหรือคัดกรองความเสี่ยง',
     progress: 'ขั้นตอน {{current}} จาก {{total}}',
     reviewProgress: 'พร้อมตรวจทานคำตอบ',
     start: 'เริ่มประเมิน',
@@ -189,6 +189,13 @@ const th = {
   dashboard: {
     hello: 'สวัสดี {{name}}',
     ready: 'พร้อมสำหรับกิจกรรมวันนี้หรือยัง?',
+    aiTitle: 'ผู้ช่วยสนทนา KineGuide AI',
+    aiStructured: 'คำถามแบบมีโครงสร้าง',
+    aiBody:
+      'ตอบคำถามสั้น ๆ ผ่านหน้าสนทนา เพื่อจัดระเบียบข้อมูลที่คุณต้องการบันทึกและไปยังแผนกิจกรรมสาธิต',
+    aiBoundary:
+      'ผู้ช่วยนี้ไม่วิเคราะห์ข้อความอิสระ ไม่วินิจฉัย และไม่สร้างคำแนะนำการรักษา',
+    aiStart: 'เริ่มคุยกับ AI',
     recommended: 'การสาธิตที่แนะนำสำหรับการสำรวจระบบ',
     start: 'เลือกการสาธิต',
     sessions: 'session ที่เสร็จ',
@@ -361,7 +368,7 @@ const en: typeof th = {
     menu: 'Open menu',
     closeMenu: 'Close menu',
     home: 'Home',
-    assessment: 'Assessment',
+    assessment: 'Chat with AI',
     plan: 'Activity plan',
     exercises: 'Movement demos',
     history: 'History',
@@ -373,8 +380,7 @@ const en: typeof th = {
   landing: {
     features: 'Features',
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
-    title:
-      'Explore movement confidently with support that values your privacy',
+    title: 'Explore movement confidently with support that values your privacy',
     subtitle:
       'Try an on-device camera flow, save minimal activity summaries, and track consistency without uploading photos or video.',
     start: 'Get started',
@@ -439,9 +445,9 @@ const en: typeof th = {
     failed: 'Unable to save consent.'
   },
   assessment: {
-    title: 'Tell us about your concern',
+    title: 'Chat with KineGuide AI',
     subtitle:
-      'Answers organize information only. The system does not diagnose or screen risk.',
+      'The assistant asks structured questions to organize information only. It does not diagnose or screen risk.',
     progress: 'Step {{current}} of {{total}}',
     reviewProgress: 'Ready to review answers',
     start: 'Start assessment',
@@ -520,6 +526,13 @@ const en: typeof th = {
   dashboard: {
     hello: 'Hello {{name}}',
     ready: 'Ready for an activity?',
+    aiTitle: 'KineGuide AI conversation assistant',
+    aiStructured: 'Structured questions',
+    aiBody:
+      'Answer short questions in a conversation-style flow to organize what you want to record and continue to the demo activity plan.',
+    aiBoundary:
+      'This assistant does not interpret free text, diagnose, or generate treatment guidance.',
+    aiStart: 'Start AI chat',
     recommended: 'Recommended demo for exploring the system',
     start: 'Choose a demo',
     sessions: 'completed sessions',

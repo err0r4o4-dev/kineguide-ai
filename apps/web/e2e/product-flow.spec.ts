@@ -156,4 +156,16 @@ test('new user completes consent and structured onboarding', async ({
       )
     ).toBe(true)
   }
+
+  await page.getByRole('link', { name: 'หน้าหลัก' }).click()
+  await expect(
+    page.getByRole('link', { name: 'เริ่มคุยกับ AI' })
+  ).toHaveAttribute('href', '/app/assessment')
+  await expect(
+    page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+  ).toHaveAttribute('href', '/app/assessment')
+  await page.getByRole('link', { name: 'เริ่มคุยกับ AI' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'คุยกับ KineGuide AI' })
+  ).toBeVisible()
 })
