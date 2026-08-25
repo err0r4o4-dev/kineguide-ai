@@ -10,6 +10,16 @@ import (
 
 const testJWTSecret = "test-secret-with-at-least-thirty-two-characters"
 
+func TestTokenSignerAcceptsTwentyNineCharacterSecret(t *testing.T) {
+	_, err := NewTokenSigner("12345678901234567890123456789")
+	require.NoError(t, err)
+}
+
+func TestTokenSignerRejectsSecretShorterThanTwentyNineCharacters(t *testing.T) {
+	_, err := NewTokenSigner("1234567890123456789012345678")
+	require.ErrorContains(t, err, "at least 29 characters")
+}
+
 func TestTokenSignerUsesFixedIssuer(t *testing.T) {
 	signer, err := NewTokenSigner(testJWTSecret)
 	require.NoError(t, err)

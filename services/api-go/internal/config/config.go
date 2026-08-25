@@ -10,6 +10,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const minimumProductionJWTSecretLength = 32
+
 type Config struct {
 	Environment        string        `validate:"required"`
 	Version            string        `validate:"required"`
@@ -19,7 +21,7 @@ type Config struct {
 	CORSAllowedOrigins []string      `validate:"min=1,dive,required"`
 	RequestTimeout     time.Duration `validate:"gt=0"`
 	ShutdownTimeout    time.Duration `validate:"gt=0"`
-	JWTSecret          string        `validate:"required,min=32"`
+	JWTSecret          string        `validate:"required,min=29"`
 	AccessTokenTTL     time.Duration `validate:"gt=0"`
 	RefreshTokenTTL    time.Duration `validate:"gt=0"`
 }
@@ -56,6 +58,9 @@ func (c Config) Validate() error {
 	}
 	if c.Environment == "production" && c.JWTSecret == "development-only-secret-change-me-32-chars" {
 		return fmt.Errorf("JWT_SECRET must be replaced in production")
+	}
+	if c.Environment == "production" && len(c.JWTSecret) < minimumProductionJWTSecretLength {
+		return fmt.Errorf("JWT_SECRET must contain at least %d characters in production", minimumProductionJWTSecretLength)
 	}
 	for label, value := range map[string]string{"DATABASE_URL": c.DatabaseURL, "AI_SERVICE_URL": c.AIServiceURL} {
 		parsed, err := url.ParseRequestURI(value)

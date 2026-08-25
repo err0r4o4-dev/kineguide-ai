@@ -12,15 +12,18 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-const tokenIssuer = "kineguide-api"
+const (
+	tokenIssuer            = "kineguide-api"
+	minimumJWTSecretLength = 29
+)
 
 type TokenSigner struct {
 	secret []byte
 }
 
 func NewTokenSigner(secret string) (*TokenSigner, error) {
-	if len(secret) < 32 {
-		return nil, errors.New("JWT secret must contain at least 32 characters")
+	if len(secret) < minimumJWTSecretLength {
+		return nil, errors.New("JWT secret must contain at least 29 characters")
 	}
 	return &TokenSigner{secret: []byte(secret)}, nil
 }

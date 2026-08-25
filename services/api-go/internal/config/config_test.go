@@ -31,3 +31,29 @@ func TestValidateRejectsDevelopmentJWTSecretInProduction(t *testing.T) {
 
 	require.ErrorContains(t, cfg.Validate(), "JWT_SECRET must be replaced")
 }
+
+func TestValidateAcceptsTwentyNineCharacterJWTSecretInDevelopment(t *testing.T) {
+	cfg := validConfigForTest()
+	cfg.Environment = "development"
+	cfg.JWTSecret = "12345678901234567890123456789"
+
+	require.NoError(t, cfg.Validate())
+}
+
+func TestValidateRejectsTwentyNineCharacterJWTSecretInProduction(t *testing.T) {
+	cfg := validConfigForTest()
+	cfg.Environment = "production"
+	cfg.JWTSecret = "12345678901234567890123456789"
+
+	require.ErrorContains(t, cfg.Validate(), "at least 32 characters in production")
+}
+
+func validConfigForTest() Config {
+	return Config{
+		Environment: "development", Version: "0.2.0", Port: "8080",
+		DatabaseURL: "postgres://localhost/test", AIServiceURL: "http://localhost:8001",
+		CORSAllowedOrigins: []string{"http://localhost:5173"}, RequestTimeout: time.Second,
+		ShutdownTimeout: time.Second, JWTSecret: "test-secret-with-at-least-thirty-two-characters",
+		AccessTokenTTL: time.Minute, RefreshTokenTTL: time.Hour,
+	}
+}
