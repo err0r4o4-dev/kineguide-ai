@@ -13,17 +13,30 @@ import (
 const minimumProductionJWTSecretLength = 32
 
 type Config struct {
-	Environment        string        `validate:"required"`
-	Version            string        `validate:"required"`
-	Port               string        `validate:"required,numeric"`
-	DatabaseURL        string        `validate:"required"`
-	AIServiceURL       string        `validate:"required"`
-	CORSAllowedOrigins []string      `validate:"min=1,dive,required"`
-	RequestTimeout     time.Duration `validate:"gt=0"`
-	ShutdownTimeout    time.Duration `validate:"gt=0"`
-	JWTSecret          string        `validate:"required,min=29"`
-	AccessTokenTTL     time.Duration `validate:"gt=0"`
-	RefreshTokenTTL    time.Duration `validate:"gt=0"`
+	Environment         string        `validate:"required"`
+	Version             string        `validate:"required"`
+	Port                string        `validate:"required,numeric"`
+	DatabaseURL         string        `validate:"required"`
+	AIServiceURL        string        `validate:"required"`
+	CORSAllowedOrigins  []string      `validate:"min=1,dive,required"`
+	RequestTimeout      time.Duration `validate:"gt=0"`
+	ShutdownTimeout     time.Duration `validate:"gt=0"`
+	JWTSecret           string        `validate:"required,min=29"`
+	AccessTokenTTL      time.Duration `validate:"gt=0"`
+	RefreshTokenTTL     time.Duration `validate:"gt=0"`
+	OAuthWebRedirectURL string
+	GoogleOAuth         OAuthProviderConfig
+	FacebookOAuth       OAuthProviderConfig
+}
+
+type OAuthProviderConfig struct {
+	ClientID     string
+	ClientSecret string
+	RedirectURL  string
+}
+
+func (c OAuthProviderConfig) Enabled() bool {
+	return c.ClientID != "" && c.ClientSecret != "" && c.RedirectURL != ""
 }
 
 func Load() (Config, error) {
@@ -37,17 +50,28 @@ func Load() (Config, error) {
 	}
 
 	cfg := Config{
-		Environment:        envOr("APP_ENV", "development"),
-		Version:            envOr("APP_VERSION", "0.1.0"),
-		Port:               envOr("API_PORT", "8080"),
-		DatabaseURL:        envOr("DATABASE_URL", "postgres://kineguide:change-me@localhost:5432/kineguide?sslmode=disable"),
-		AIServiceURL:       envOr("AI_SERVICE_URL", "http://localhost:8001"),
-		CORSAllowedOrigins: splitCSV(envOr("CORS_ALLOWED_ORIGINS", "http://localhost:5173")),
-		RequestTimeout:     requestTimeout,
-		ShutdownTimeout:    shutdownTimeout,
-		JWTSecret:          envOr("JWT_SECRET", "development-only-secret-change-me-32-chars"),
-		AccessTokenTTL:     15 * time.Minute,
-		RefreshTokenTTL:    7 * 24 * time.Hour,
+		Environment:         envOr("APP_ENV", "development"),
+		Version:             envOr("APP_VERSION", "0.1.0"),
+		Port:                envOr("API_PORT", "8080"),
+		DatabaseURL:         envOr("DATABASE_URL", "postgres://kineguide:change-me@localhost:5432/kineguide?sslmode=disable"),
+		AIServiceURL:        envOr("AI_SERVICE_URL", "http://localhost:8001"),
+		CORSAllowedOrigins:  splitCSV(envOr("CORS_ALLOWED_ORIGINS", "http://localhost:5173")),
+		RequestTimeout:      requestTimeout,
+		ShutdownTimeout:     shutdownTimeout,
+		JWTSecret:           envOr("JWT_SECRET", "development-only-secret-change-me-32-chars"),
+		AccessTokenTTL:      15 * time.Minute,
+		RefreshTokenTTL:     7 * 24 * time.Hour,
+		OAuthWebRedirectURL: envOr("OAUTH_WEB_REDIRECT_URL", "http://localhost:5173/auth/callback"),
+		GoogleOAuth: OAuthProviderConfig{
+			ClientID:     strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID")),
+			ClientSecret: strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET")),
+			RedirectURL:  envOr("GOOGLE_OAUTH_REDIRECT_URL", "http://localhost:8080/v1/auth/oauth/google/callback"),
+		},
+		FacebookOAuth: OAuthProviderConfig{
+			ClientID:     strings.TrimSpace(os.Getenv("FACEBOOK_OAUTH_CLIENT_ID")),
+			ClientSecret: strings.TrimSpace(os.Getenv("FACEBOOK_OAUTH_CLIENT_SECRET")),
+			RedirectURL:  envOr("FACEBOOK_OAUTH_REDIRECT_URL", "http://localhost:8080/v1/auth/oauth/facebook/callback"),
+		},
 	}
 	return cfg, cfg.Validate()
 }
@@ -73,6 +97,31 @@ func (c Config) Validate() error {
 		if err != nil || parsed.Scheme == "" || parsed.Host == "" {
 			return fmt.Errorf("invalid CORS origin %q", origin)
 		}
+	}
+	if err := validateAbsoluteURL("OAUTH_WEB_REDIRECT_URL", c.OAuthWebRedirectURL, c.Environment); err != nil {
+		return err
+	}
+	for name, provider := range map[string]OAuthProviderConfig{"GOOGLE_OAUTH": c.GoogleOAuth, "FACEBOOK_OAUTH": c.FacebookOAuth} {
+		configured := provider.ClientID != "" || provider.ClientSecret != ""
+		if configured && !provider.Enabled() {
+			return fmt.Errorf("%s client ID, client secret, and redirect URL must be configured together", name)
+		}
+		if provider.Enabled() {
+			if err := validateAbsoluteURL(name+"_REDIRECT_URL", provider.RedirectURL, c.Environment); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func validateAbsoluteURL(label, value, environment string) error {
+	parsed, err := url.ParseRequestURI(value)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return fmt.Errorf("%s must be an absolute URL", label)
+	}
+	if environment == "production" && parsed.Scheme != "https" {
+		return fmt.Errorf("%s must use HTTPS in production", label)
 	}
 	return nil
 }

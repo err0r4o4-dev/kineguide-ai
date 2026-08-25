@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { LockKeyhole, Mail, ShieldCheck, UserRound } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -9,7 +10,13 @@ import { z } from 'zod'
 import { Brand } from '@/components/Brand'
 import { LanguageButton } from '@/components/LanguageButton'
 import { useAuth } from '@/features/auth/AuthContext'
-import { getConsent } from '@/services/product'
+import { ProviderIcon } from '@/features/auth/ProviderIcon'
+import {
+  getConsent,
+  getOAuthLoginURL,
+  getOAuthProviders,
+  type OAuthProvider
+} from '@/services/product'
 
 const schema = z.object({
   display_name: z.string().trim().min(2).max(80).optional(),
@@ -26,6 +33,9 @@ export function AuthPage() {
   const auth = useAuth()
   const isRegister = location.pathname === '/register'
   const [serverError, setServerError] = useState('')
+  const [socialProvider, setSocialProvider] = useState<OAuthProvider | null>(
+    null
+  )
   const submissionInFlight = useRef(false)
   const {
     register,
@@ -35,6 +45,13 @@ export function AuthPage() {
     resolver: zodResolver(schema),
     defaultValues: { display_name: '', email: '', password: '' }
   })
+  const providers = useQuery({
+    queryKey: ['auth-providers'],
+    queryFn: getOAuthProviders,
+    staleTime: 5 * 60_000
+  })
+  const enabledProviders =
+    providers.data?.providers.filter((provider) => provider.enabled) ?? []
 
   if (auth.ready && auth.user && !submissionInFlight.current)
     return <Navigate replace to="/app" />
@@ -63,6 +80,12 @@ export function AuthPage() {
       submissionInFlight.current = false
       setServerError(t(isRegister ? 'auth.createFailed' : 'auth.invalid'))
     }
+  }
+
+  const beginSocialSignIn = (provider: OAuthProvider) => {
+    setServerError('')
+    setSocialProvider(provider)
+    window.location.assign(getOAuthLoginURL(provider))
   }
 
   return (
@@ -163,6 +186,39 @@ export function AuthPage() {
                   : t('auth.signIn')}
             </button>
           </form>
+          {enabledProviders.length > 0 && (
+            <section aria-label={t('auth.or')} className="mt-7">
+              <div className="flex items-center gap-3" aria-hidden="true">
+                <span className="h-px flex-1 bg-slate-200" />
+                <span className="text-[0.7rem] font-semibold tracking-wider text-slate-500">
+                  {t('auth.or')}
+                </span>
+                <span className="h-px flex-1 bg-slate-200" />
+              </div>
+              <div className="mt-4 flex justify-center gap-3">
+                {enabledProviders.map(({ provider }) => (
+                  <button
+                    aria-label={t(`auth.${provider}`)}
+                    className="grid min-h-11 min-w-14 place-items-center rounded-lg border border-slate-200 bg-slate-50 px-4 transition-colors hover:border-slate-300 hover:bg-white disabled:opacity-60"
+                    disabled={socialProvider !== null}
+                    key={provider}
+                    onClick={() => beginSocialSignIn(provider)}
+                    type="button"
+                  >
+                    <ProviderIcon provider={provider} />
+                  </button>
+                ))}
+              </div>
+              {socialProvider && (
+                <p
+                  className="mt-3 text-center text-sm text-slate-600"
+                  role="status"
+                >
+                  {t('auth.socialLoading')}
+                </p>
+              )}
+            </section>
+          )}
           <p className="mt-6 text-center text-sm text-slate-600">
             {isRegister ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
             <Link

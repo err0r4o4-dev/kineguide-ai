@@ -7,14 +7,20 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("not found")
-	ErrConflict = errors.New("conflict")
+	ErrNotFound        = errors.New("not found")
+	ErrConflict        = errors.New("conflict")
+	ErrLastLoginMethod = errors.New("last login method")
 )
 
 type Store interface {
 	CreateUser(context.Context, string, string, string) (User, error)
+	CreateOAuthUser(context.Context, string, string, string, string) (User, error)
 	UserByEmail(context.Context, string) (User, error)
 	UserByID(context.Context, string) (User, error)
+	UserByAuthIdentity(context.Context, string, string) (User, error)
+	LinkAuthIdentity(context.Context, string, string, string) error
+	ListAuthIdentities(context.Context, string) ([]AuthIdentity, error)
+	DeleteAuthIdentity(context.Context, string, string) error
 	DeleteUser(context.Context, string) error
 	SaveRefreshToken(context.Context, string, string, time.Time) error
 	RefreshToken(context.Context, string) (RefreshToken, error)

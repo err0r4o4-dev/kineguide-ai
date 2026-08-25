@@ -17,6 +17,11 @@ const LandingPage = lazy(() =>
 const AuthPage = lazy(() =>
   import('@/routes/AuthPage').then((module) => ({ default: module.AuthPage }))
 )
+const AuthCallbackPage = lazy(() =>
+  import('@/routes/AuthCallbackPage').then((module) => ({
+    default: module.AuthCallbackPage
+  }))
+)
 const StatusPage = lazy(() =>
   import('@/routes/StatusPage').then((module) => ({
     default: module.StatusPage
@@ -96,6 +101,7 @@ const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <AuthPage /> },
   { path: '/register', element: <AuthPage /> },
+  { path: '/auth/callback', element: <AuthCallbackPage /> },
   { path: '/status', element: <StatusPage /> },
   {
     element: <ProtectedRoute />,

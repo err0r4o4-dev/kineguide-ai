@@ -12,6 +12,16 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+type OAuthStateClaims struct {
+	Provider     string `json:"provider"`
+	State        string `json:"state"`
+	Nonce        string `json:"nonce"`
+	CodeVerifier string `json:"code_verifier"`
+	Mode         string `json:"mode"`
+	UserID       string `json:"user_id,omitempty"`
+	jwt.RegisteredClaims
+}
+
 const (
 	tokenIssuer            = "kineguide-api"
 	minimumJWTSecretLength = 29
@@ -56,6 +66,37 @@ func (s *TokenSigner) Parse(encoded string) (*Claims, error) {
 	claims, ok := token.Claims.(*Claims)
 	if !ok || !token.Valid {
 		return nil, errors.New("invalid token")
+	}
+	return claims, nil
+}
+
+func (s *TokenSigner) SignOAuthState(provider, state, nonce, codeVerifier, mode, userID string, ttl time.Duration) (string, error) {
+	if provider == "" || state == "" || nonce == "" || codeVerifier == "" || ttl <= 0 {
+		return "", errors.New("OAuth state fields and positive TTL are required")
+	}
+	now := time.Now().UTC()
+	claims := OAuthStateClaims{
+		Provider: provider, State: state, Nonce: nonce, CodeVerifier: codeVerifier, Mode: mode, UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer: tokenIssuer, IssuedAt: jwt.NewNumericDate(now), ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),
+		},
+	}
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(s.secret)
+}
+
+func (s *TokenSigner) ParseOAuthState(encoded string) (*OAuthStateClaims, error) {
+	token, err := jwt.ParseWithClaims(encoded, &OAuthStateClaims{}, func(token *jwt.Token) (any, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, errors.New("unexpected signing method")
+		}
+		return s.secret, nil
+	}, jwt.WithIssuer(tokenIssuer), jwt.WithExpirationRequired())
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(*OAuthStateClaims)
+	if !ok || !token.Valid || claims.Provider == "" || claims.State == "" || claims.CodeVerifier == "" {
+		return nil, errors.New("invalid OAuth state")
 	}
 	return claims, nil
 }
