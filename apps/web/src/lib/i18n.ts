@@ -4,6 +4,9 @@ import { initReactI18next } from 'react-i18next'
 const th = {
   common: {
     language: 'English',
+    languageSelector: 'เลือกภาษา',
+    languageThai: 'ไทย',
+    languageEnglish: 'English',
     loading: 'กำลังโหลด…',
     error: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
     retry: 'ลองอีกครั้ง',
@@ -292,6 +295,9 @@ const th = {
 const en: typeof th = {
   common: {
     language: 'ไทย',
+    languageSelector: 'Choose language',
+    languageThai: 'ไทย',
+    languageEnglish: 'English',
     loading: 'Loading…',
     error: 'Something went wrong. Please try again.',
     retry: 'Try again',
