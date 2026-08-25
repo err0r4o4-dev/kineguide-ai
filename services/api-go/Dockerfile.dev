@@ -1,0 +1,21 @@
+FROM golang:1.26-alpine
+
+ARG AIR_VERSION=v1.67.3
+
+RUN go install github.com/air-verse/air@${AIR_VERSION} \
+    && addgroup -S kineguide \
+    && adduser -S -G kineguide kineguide
+
+WORKDIR /workspace/services/api-go
+
+COPY services/api-go/go.mod services/api-go/go.sum ./
+RUN go mod download \
+    && mkdir -p /tmp/air /home/kineguide/.cache/go-build \
+    && chown -R kineguide:kineguide /go/pkg /tmp/air /home/kineguide /workspace
+
+ENV GOCACHE=/home/kineguide/.cache/go-build
+
+USER kineguide:kineguide
+EXPOSE 8080
+
+CMD ["air", "-c", ".air.toml"]

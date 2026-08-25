@@ -10,8 +10,8 @@ setup: ## Install JavaScript and Python dependencies and download Go modules
 	cd services/api-go && go mod download
 	cd services/ai-python && python -m pip install -e ".[dev]"
 
-dev: ## Start the full development stack
-	docker compose up --build
+dev: ## Start the full development stack with live reload
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 up: ## Start containers in the background
 	docker compose up --build -d

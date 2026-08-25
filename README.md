@@ -282,6 +282,36 @@ On Windows, activate the environment with `.venv\Scripts\Activate.ps1` when usin
 docker compose up --build
 ```
 
+This command runs production-style images. Source changes are not reflected until
+the affected image is rebuilt.
+
+### Run the development environment with live reload
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+The first run builds the development images. Leave the command running after that:
+
+- React and CSS changes are updated by Vite without rebuilding the image.
+- Go changes are rebuilt and the API is restarted automatically by Air.
+- Python changes restart Uvicorn automatically.
+- PostgreSQL data remains in the existing `postgres-data` volume.
+
+On systems that provide the standalone Compose command, use the equivalent form:
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+Rebuild the development images only after changing a Dockerfile, `package.json`,
+`pnpm-lock.yaml`, `go.mod`, `go.sum`, or `pyproject.toml`. Stop the development
+stack with the same file selection:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+```
+
 Stop it safely:
 
 ```bash
