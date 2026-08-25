@@ -1,6 +1,8 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
+import { getLanguagePreference } from './languagePreference'
+
 const th = {
   common: {
     language: 'English',
@@ -245,6 +247,9 @@ const th = {
   },
   settings: {
     title: 'ตั้งค่าและความเป็นส่วนตัว',
+    language: 'ภาษาและการแสดงผล',
+    languageBody:
+      'เลือกภาษาที่ต้องการใช้ใน KineGuide AI การตั้งค่านี้ไม่เปลี่ยนข้อมูลหรือ consent ของคุณ',
     consent: 'จัดการ consent',
     revoke: 'ถอน consent',
     delete: 'ลบบัญชีและข้อมูลทั้งหมด',
@@ -537,6 +542,9 @@ const en: typeof th = {
   },
   settings: {
     title: 'Settings and privacy',
+    language: 'Language and display',
+    languageBody:
+      'Choose the language used in KineGuide AI. This setting does not change your data or consent.',
     consent: 'Manage consent',
     revoke: 'Withdraw consent',
     delete: 'Delete account and all data',
@@ -584,11 +592,16 @@ const en: typeof th = {
   home: 'Return home'
 }
 
-void i18n.use(initReactI18next).init({
-  resources: { th: { translation: th }, en: { translation: en } },
-  lng: 'th',
-  fallbackLng: 'en',
-  interpolation: { escapeValue: false }
-})
+void i18n
+  .use(initReactI18next)
+  .init({
+    resources: { th: { translation: th }, en: { translation: en } },
+    lng: getLanguagePreference() ?? 'th',
+    fallbackLng: 'en',
+    interpolation: { escapeValue: false }
+  })
+  .then(() => {
+    document.documentElement.lang = i18n.resolvedLanguage === 'en' ? 'en' : 'th'
+  })
 
 export default i18n
