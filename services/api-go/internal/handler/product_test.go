@@ -46,7 +46,7 @@ func TestRegisterCreatesShortLivedAccessAndHTTPOnlyRefreshSession(t *testing.T) 
 		AccessTokenTTL: 15 * time.Minute, RefreshTokenTTL: 24 * time.Hour,
 	}
 	router := NewRouter(cfg, Dependencies{Store: store, Signer: signer}, slog.New(slog.NewTextHandler(io.Discard, nil)))
-	request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/register", strings.NewReader(`{"email":"demo@example.com","password":"long-demo-password","display_name":"Demo User"}`))
+	request := httptest.NewRequest(http.MethodPost, "/v1/auth/register", strings.NewReader(`{"email":"demo@example.com","password":"long-demo-password","display_name":"Demo User"}`))
 	request.Header.Set("Content-Type", "application/json")
 	response := httptest.NewRecorder()
 
@@ -65,7 +65,7 @@ func TestProtectedRouteDeniesMissingAccessToken(t *testing.T) {
 	require.NoError(t, err)
 	cfg := config.Config{Environment: "test", Version: "0.2.0", RequestTimeout: time.Second, ShutdownTimeout: time.Second, AccessTokenTTL: time.Minute, RefreshTokenTTL: time.Hour}
 	router := NewRouter(cfg, Dependencies{Store: store, Signer: signer}, slog.New(slog.NewTextHandler(io.Discard, nil)))
-	request := httptest.NewRequest(http.MethodGet, "/api/v1/me", nil)
+	request := httptest.NewRequest(http.MethodGet, "/v1/me", nil)
 	response := httptest.NewRecorder()
 
 	router.ServeHTTP(response, request)

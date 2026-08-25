@@ -30,4 +30,4 @@ Cover the relevant loading, empty, success, degraded, offline, validation, unaut
 
 ## Commands
 
-Run `corepack pnpm --filter @kineguide/web format:check`, `lint`, `typecheck`, `test`, and `build` with `VITE_API_BASE_URL=/api/v1`. Run `test:e2e` when browser behavior changes and its runtime is available. Never weaken or skip a test to obtain a green result.
+Run `corepack pnpm --filter @kineguide/web format:check`, `lint`, `typecheck`, `test`, and `build` with `VITE_API_BASE_URL=/v1`. Run `test:e2e` when browser behavior changes and its runtime is available. Never weaken or skip a test to obtain a green result.

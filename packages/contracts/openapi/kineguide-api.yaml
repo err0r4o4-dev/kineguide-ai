@@ -38,21 +38,21 @@ paths:
       responses:
         "200": { $ref: "#/components/responses/SystemStatus" }
         "503": { $ref: "#/components/responses/SystemStatus" }
-  /api/v1/health:
+  /v1/health:
     get:
       operationId: getVersionedHealth
       tags: [System]
       summary: Check versioned Go API liveness
       responses:
         "200": { $ref: "#/components/responses/Health" }
-  /api/v1/system/status:
+  /v1/system/status:
     get:
       operationId: getSystemStatus
       tags: [System]
       summary: Get individual dependency states
       responses:
         "200": { $ref: "#/components/responses/SystemStatus" }
-  /api/v1/auth/register:
+  /v1/auth/register:
     post:
       operationId: registerAccount
       tags: [Authentication]
@@ -71,7 +71,7 @@ paths:
             application/json: { schema: { $ref: "#/components/schemas/AuthResponse" } }
         "409": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
-  /api/v1/auth/login:
+  /v1/auth/login:
     post:
       operationId: login
       tags: [Authentication]
@@ -89,7 +89,7 @@ paths:
           content:
             application/json: { schema: { $ref: "#/components/schemas/AuthResponse" } }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/auth/refresh:
+  /v1/auth/refresh:
     post:
       operationId: refreshSession
       tags: [Authentication]
@@ -101,7 +101,7 @@ paths:
           content:
             application/json: { schema: { $ref: "#/components/schemas/AuthResponse" } }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/auth/logout:
+  /v1/auth/logout:
     post:
       operationId: logout
       tags: [Authentication]
@@ -109,7 +109,7 @@ paths:
       security: [{ refreshCookie: [] }]
       responses:
         "204": { description: Refresh session revoked. }
-  /api/v1/me:
+  /v1/me:
     get:
       operationId: getCurrentUser
       tags: [Authentication]
@@ -129,7 +129,7 @@ paths:
       responses:
         "204": { description: Account and owned records deleted. }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/consents/current:
+  /v1/consents/current:
     get:
       operationId: getCurrentConsent
       tags: [Consent]
@@ -155,7 +155,7 @@ paths:
       responses:
         "204": { description: Active consent records revoked. }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/consents:
+  /v1/consents:
     post:
       operationId: recordConsent
       tags: [Consent]
@@ -173,7 +173,7 @@ paths:
             application/json: { schema: { $ref: "#/components/schemas/Consent" } }
         "401": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
-  /api/v1/assessments/latest:
+  /v1/assessments/latest:
     get:
       operationId: getLatestAssessment
       tags: [Assessment]
@@ -191,7 +191,7 @@ paths:
                 properties:
                   assessment: { anyOf: [{ $ref: "#/components/schemas/Assessment" }, { type: "null" }] }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/assessments:
+  /v1/assessments:
     post:
       operationId: saveAssessment
       tags: [Assessment]
@@ -210,7 +210,7 @@ paths:
             application/json: { schema: { $ref: "#/components/schemas/Assessment" } }
         "403": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
-  /api/v1/exercises:
+  /v1/exercises:
     get:
       operationId: listMovementDemos
       tags: [Exercises]
@@ -228,7 +228,7 @@ paths:
                 properties:
                   exercises: { type: array, items: { $ref: "#/components/schemas/Exercise" } }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/exercises/{slug}:
+  /v1/exercises/{slug}:
     parameters:
       - $ref: "#/components/parameters/ExerciseSlug"
     get:
@@ -242,7 +242,7 @@ paths:
           content:
             application/json: { schema: { $ref: "#/components/schemas/Exercise" } }
         "404": { $ref: "#/components/responses/Error" }
-  /api/v1/dashboard:
+  /v1/dashboard:
     get:
       operationId: getDashboard
       tags: [Sessions]
@@ -254,7 +254,7 @@ paths:
           content:
             application/json: { schema: { $ref: "#/components/schemas/Dashboard" } }
         "401": { $ref: "#/components/responses/Error" }
-  /api/v1/sessions:
+  /v1/sessions:
     get:
       operationId: listSessions
       tags: [Sessions]
@@ -290,7 +290,7 @@ paths:
             application/json: { schema: { $ref: "#/components/schemas/Session" } }
         "403": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
-  /api/v1/sessions/{id}:
+  /v1/sessions/{id}:
     parameters:
       - $ref: "#/components/parameters/SessionID"
     get:

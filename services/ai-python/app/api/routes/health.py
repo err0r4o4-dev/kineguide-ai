@@ -15,7 +15,7 @@ def provider_from_app(request: Request) -> LLMProvider:
 
 
 @router.get("/health", response_model=HealthResponse)
-@router.get("/api/v1/health", response_model=HealthResponse)
+@router.get("/v1/health", response_model=HealthResponse)
 async def health(settings: Annotated[Settings, Depends(get_settings)]) -> HealthResponse:
     return HealthResponse(status="ok", version=settings.app_version)
 

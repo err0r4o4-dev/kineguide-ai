@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('shows the Thai system status shell', async ({ page }) => {
-  await page.route('**/api/v1/system/status', (route) =>
+  await page.route('**/v1/system/status', (route) =>
     route.fulfill({
       json: {
         status: 'ok',

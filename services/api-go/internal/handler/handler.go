@@ -15,6 +15,8 @@ import (
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/security"
 )
 
+const apiV1Prefix = "/v1"
+
 type Pinger interface {
 	Ping(context.Context) error
 }
@@ -62,9 +64,9 @@ func NewRouter(cfg config.Config, dependencies Dependencies, logger *slog.Logger
 		c.JSON(http.StatusOK, HealthResponse{Status: "ok", Service: "api-go", Version: cfg.Version})
 	}
 	router.GET("/health", health)
-	router.GET("/api/v1/health", health)
+	router.GET(apiV1Prefix+"/health", health)
 	router.GET("/ready", readinessHandler(cfg.Version, dependencies))
-	router.GET("/api/v1/system/status", systemStatusHandler(cfg.Version, dependencies))
+	router.GET(apiV1Prefix+"/system/status", systemStatusHandler(cfg.Version, dependencies))
 	router.GET("/openapi.json", openAPIHandler)
 	router.GET("/docs", docsHandler)
 	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer)

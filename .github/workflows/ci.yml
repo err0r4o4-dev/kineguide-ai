@@ -32,7 +32,7 @@ jobs:
       - run: pnpm --filter @kineguide/web test
       - run: pnpm --filter @kineguide/web build
         env:
-          VITE_API_BASE_URL: /api/v1
+          VITE_API_BASE_URL: /v1
 
   go:
     runs-on: ubuntu-latest

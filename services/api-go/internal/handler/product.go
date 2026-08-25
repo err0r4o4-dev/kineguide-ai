@@ -38,7 +38,7 @@ func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.
 		return
 	}
 	api := &productAPI{cfg: cfg, store: store, signer: signer}
-	v1 := router.Group("/api/v1")
+	v1 := router.Group(apiV1Prefix)
 	auth := v1.Group("/auth")
 	auth.POST("/register", api.register)
 	auth.POST("/login", api.login)
@@ -190,7 +190,7 @@ func (a *productAPI) startSession(c *gin.Context, user product.User, oldHash str
 		return authResponse{}, err
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("kg_refresh", refreshToken, int(a.cfg.RefreshTokenTTL.Seconds()), "/api/v1/auth", "", a.cfg.Environment == "production", true)
+	c.SetCookie("kg_refresh", refreshToken, int(a.cfg.RefreshTokenTTL.Seconds()), apiV1Prefix+"/auth", "", a.cfg.Environment == "production", true)
 	return authResponse{AccessToken: accessToken, ExpiresIn: int(a.cfg.AccessTokenTTL.Seconds()), User: user}, nil
 }
 
@@ -397,7 +397,7 @@ func (a *productAPI) dashboard(c *gin.Context) {
 
 func (a *productAPI) clearRefreshCookie(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("kg_refresh", "", -1, "/api/v1/auth", "", a.cfg.Environment == "production", true)
+	c.SetCookie("kg_refresh", "", -1, apiV1Prefix+"/auth", "", a.cfg.Environment == "production", true)
 }
 
 func validEmail(value string) bool {

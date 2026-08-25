@@ -228,7 +228,7 @@ corepack pnpm format:check
 corepack pnpm lint
 corepack pnpm typecheck
 corepack pnpm test
-VITE_API_BASE_URL=/api/v1 corepack pnpm build
+VITE_API_BASE_URL=/v1 corepack pnpm build
 
 cd services/api-go
 go fmt ./...

@@ -12,7 +12,8 @@ def test_health(client: TestClient) -> None:
 
 
 def test_versioned_health(client: TestClient) -> None:
-    assert client.get("/api/v1/health").status_code == 200
+    assert client.get("/v1/health").status_code == 200
+    assert client.get("/api/v1/health").status_code == 404
 
 
 def test_readiness(client: TestClient) -> None:

@@ -5,8 +5,11 @@
 :80 {
 	encode zstd gzip
 
-	@api path /api/*
+	@api path /v1/*
 	reverse_proxy @api api-go:8080
+
+	@legacyApi path /api/*
+	respond @legacyApi 404
 
 	@docs path /docs*
 	reverse_proxy @docs api-go:8080

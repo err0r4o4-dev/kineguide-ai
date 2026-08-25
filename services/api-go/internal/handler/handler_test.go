@@ -39,6 +39,20 @@ func TestHealth(t *testing.T) {
 	assert.NotEmpty(t, response.Header().Get("X-Request-ID"))
 }
 
+func TestVersionedHealthUsesV1Prefix(t *testing.T) {
+	router := testRouter(Dependencies{})
+
+	request := httptest.NewRequest(http.MethodGet, "/v1/health", nil)
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, request)
+	require.Equal(t, http.StatusOK, response.Code)
+
+	legacyRequest := httptest.NewRequest(http.MethodGet, "/api/v1/health", nil)
+	legacyResponse := httptest.NewRecorder()
+	router.ServeHTTP(legacyResponse, legacyRequest)
+	require.Equal(t, http.StatusNotFound, legacyResponse.Code)
+}
+
 func TestReadinessWhenDependenciesAreReady(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/ready", nil)
 	response := httptest.NewRecorder()

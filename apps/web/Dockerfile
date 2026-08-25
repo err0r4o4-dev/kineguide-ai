@@ -6,7 +6,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
 RUN pnpm install --frozen-lockfile --filter @kineguide/web...
 COPY apps/web apps/web
-ARG VITE_API_BASE_URL=/api/v1
+ARG VITE_API_BASE_URL=/v1
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm --dir apps/web build && test -d /app/apps/web/dist
 

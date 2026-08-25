@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('new user completes consent and structured onboarding', async ({
   page
 }) => {
-  await page.route('http://localhost:8080/api/v1/**', async (route) => {
+  await page.route('http://localhost:8080/v1/**', async (route) => {
     const url = route.request().url()
     const method = route.request().method()
     if (url.endsWith('/auth/refresh')) {

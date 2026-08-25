@@ -70,7 +70,7 @@
         }
       }
     },
-    "/api/v1/health": {
+    "/v1/health": {
       "get": {
         "operationId": "getVersionedHealth",
         "tags": [
@@ -84,7 +84,7 @@
         }
       }
     },
-    "/api/v1/system/status": {
+    "/v1/system/status": {
       "get": {
         "operationId": "getSystemStatus",
         "tags": [
@@ -98,7 +98,7 @@
         }
       }
     },
-    "/api/v1/auth/register": {
+    "/v1/auth/register": {
       "post": {
         "operationId": "registerAccount",
         "tags": [
@@ -142,7 +142,7 @@
         }
       }
     },
-    "/api/v1/auth/login": {
+    "/v1/auth/login": {
       "post": {
         "operationId": "login",
         "tags": [
@@ -183,7 +183,7 @@
         }
       }
     },
-    "/api/v1/auth/refresh": {
+    "/v1/auth/refresh": {
       "post": {
         "operationId": "refreshSession",
         "tags": [
@@ -212,7 +212,7 @@
         }
       }
     },
-    "/api/v1/auth/logout": {
+    "/v1/auth/logout": {
       "post": {
         "operationId": "logout",
         "tags": [
@@ -231,7 +231,7 @@
         }
       }
     },
-    "/api/v1/me": {
+    "/v1/me": {
       "get": {
         "operationId": "getCurrentUser",
         "tags": [
@@ -280,7 +280,7 @@
         }
       }
     },
-    "/api/v1/consents/current": {
+    "/v1/consents/current": {
       "get": {
         "operationId": "getCurrentConsent",
         "tags": [
@@ -345,7 +345,7 @@
         }
       }
     },
-    "/api/v1/consents": {
+    "/v1/consents": {
       "post": {
         "operationId": "recordConsent",
         "tags": [
@@ -387,7 +387,7 @@
         }
       }
     },
-    "/api/v1/assessments/latest": {
+    "/v1/assessments/latest": {
       "get": {
         "operationId": "getLatestAssessment",
         "tags": [
@@ -432,7 +432,7 @@
         }
       }
     },
-    "/api/v1/assessments": {
+    "/v1/assessments": {
       "post": {
         "operationId": "saveAssessment",
         "tags": [
@@ -475,7 +475,7 @@
         }
       }
     },
-    "/api/v1/exercises": {
+    "/v1/exercises": {
       "get": {
         "operationId": "listMovementDemos",
         "tags": [
@@ -516,7 +516,7 @@
         }
       }
     },
-    "/api/v1/exercises/{slug}": {
+    "/v1/exercises/{slug}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/ExerciseSlug"
@@ -550,7 +550,7 @@
         }
       }
     },
-    "/api/v1/dashboard": {
+    "/v1/dashboard": {
       "get": {
         "operationId": "getDashboard",
         "tags": [
@@ -579,7 +579,7 @@
         }
       }
     },
-    "/api/v1/sessions": {
+    "/v1/sessions": {
       "get": {
         "operationId": "listSessions",
         "tags": [
@@ -661,7 +661,7 @@
         }
       }
     },
-    "/api/v1/sessions/{id}": {
+    "/v1/sessions/{id}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/SessionID"

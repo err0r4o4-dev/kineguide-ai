@@ -346,7 +346,7 @@ Every Make target has an equivalent direct command in this README for Windows en
 | `DATABASE_URL`         | Go-owned PostgreSQL connection | See `.env.example`             |
 | `AI_SERVICE_URL`       | Go-to-Python internal URL      | `http://ai-python:8001`        |
 | `CORS_ALLOWED_ORIGINS` | Explicit browser origins       | Local web/API origins          |
-| `VITE_API_BASE_URL`    | Browser-to-Go base URL         | `http://localhost:8080/api/v1` |
+| `VITE_API_BASE_URL`    | Browser-to-Go base URL         | `http://localhost:8080/v1` |
 | `LLM_PROVIDER`         | Python provider selection      | `disabled`                     |
 | `LLM_API_KEY`          | Future provider secret         | Empty                          |
 
@@ -360,8 +360,8 @@ Service-specific examples are located at `apps/web/.env.example`, `services/api-
 | --------------------------- | ------------------------------------------ |
 | `GET /health`               | Process liveness                           |
 | `GET /ready`                | PostgreSQL and Python dependency readiness |
-| `GET /api/v1/health`        | Versioned health response                  |
-| `GET /api/v1/system/status` | Individual dependency states               |
+| `GET /v1/health`        | Versioned health response                  |
+| `GET /v1/system/status` | Individual dependency states               |
 | `GET /openapi.json`         | OpenAPI schema                             |
 | `GET /docs`                 | Scalar API Reference                       |
 
@@ -371,7 +371,7 @@ Service-specific examples are located at `apps/web/.env.example`, `services/api-
 | -------------------- | ------------------------- |
 | `GET /health`        | Process liveness          |
 | `GET /ready`         | Provider readiness        |
-| `GET /api/v1/health` | Versioned health response |
+| `GET /v1/health` | Versioned health response |
 | `GET /openapi.json`  | FastAPI OpenAPI schema    |
 | `GET /docs`          | Swagger UI                |
 | `GET /redoc`         | ReDoc                     |
@@ -461,7 +461,7 @@ corepack pnpm format:check
 corepack pnpm lint
 corepack pnpm typecheck
 corepack pnpm test
-VITE_API_BASE_URL=/api/v1 corepack pnpm build
+VITE_API_BASE_URL=/v1 corepack pnpm build
 
 cd services/api-go
 go fmt ./...

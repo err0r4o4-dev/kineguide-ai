@@ -14,8 +14,8 @@ export const env = envSchema.parse({
   VITE_API_BASE_URL:
     import.meta.env.VITE_API_BASE_URL ??
     (import.meta.env.MODE === 'test'
-      ? '/api/v1'
+      ? '/v1'
       : import.meta.env.MODE === 'development'
-        ? 'http://localhost:8080/api/v1'
+        ? 'http://localhost:8080/v1'
         : undefined)
 })
