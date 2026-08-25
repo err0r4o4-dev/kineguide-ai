@@ -54,6 +54,19 @@ export interface Exercise {
   review_status: 'pending_clinical_review'
 }
 
+export interface ActivityPlanDay {
+  day: number
+  exercises: Exercise[]
+}
+
+export interface ActivityPlan {
+  plan_type: 'demo_exploration'
+  review_status: 'pending_clinical_review'
+  personalized: false
+  duration_days: 7
+  days: ActivityPlanDay[]
+}
+
 export interface ExerciseSession {
   id: string
   exercise_slug: string
@@ -178,6 +191,11 @@ export async function getExercises(signal?: AbortSignal) {
 
 export async function getExercise(slug: string, signal?: AbortSignal) {
   const response = await http.get<Exercise>(`/exercises/${slug}`, { signal })
+  return response.data
+}
+
+export async function getActivityPlan(signal?: AbortSignal) {
+  const response = await http.get<ActivityPlan>('/activity-plan', { signal })
   return response.data
 }
 

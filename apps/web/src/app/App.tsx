@@ -42,6 +42,11 @@ const AssessmentPage = lazy(() =>
     default: module.AssessmentPage
   }))
 )
+const PlanPage = lazy(() =>
+  import('@/routes/PlanPage').then((module) => ({
+    default: module.PlanPage
+  }))
+)
 const ExerciseLibraryPage = lazy(() =>
   import('@/routes/ExerciseLibraryPage').then((module) => ({
     default: module.ExerciseLibraryPage
@@ -113,6 +118,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <DashboardPage /> },
           { path: 'assessment', element: <AssessmentPage /> },
+          { path: 'plan', element: <PlanPage /> },
           { path: 'exercises', element: <ExerciseLibraryPage /> },
           { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
           { path: 'exercises/:slug/setup', element: <CameraSetupPage /> },
