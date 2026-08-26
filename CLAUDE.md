@@ -1,23 +1,24 @@
 @AGENTS.md
 
-Claude Code additions
+# Claude Code Additions
 
-AGENTS.md is authoritative. This file adds only Claude Code-specific task-state behavior; never duplicate repository rules here.
+`AGENTS.md` is imported above and is authoritative. This file defines only Claude Code-specific task-state and context behavior. On conflict, follow `AGENTS.md` and preserve the safer medical, privacy, security, and data-integrity boundary.
 
-Task state
+## Durable task state
 
-Start changes by checking git status --short --branch and existing root TODO.md.
+- Use the named root `TODO.md` section required by `AGENTS.md` as the durable record for repository mutations. Preserve all unrelated content.
+- For non-trivial, multi-file, or cross-service work, keep Claude's active plan synchronized with that section: the plan is the execution view; `TODO.md` is the resumable record.
+- Work from the first unchecked item. Check only successful work and record failed commands or blockers under the relevant unchecked item.
+- After context compaction, interruption, or resumption, re-read `TODO.md`, `git status --short --branch`, and the affected diff before continuing. Do not restart completed work or repeat verified checks without a reason.
+- After successful verification, remove only the completed task section and delete `TODO.md` only when it is empty.
 
-Create a clearly named task section, or create TODO.md if absent. Preserve all unrelated content.
+## Context discipline
 
-For large, cross-service, or multi-file work, keep Claude's plan synchronized with that section.
+- Follow the skill routing in `AGENTS.md`. Load only matching scoped rules and the smallest sufficient skill set; expand scope only when evidence shows another ownership boundary is affected.
+- Treat `AGENTS.md`, selected rules, selected skills, affected code, nearby tests, and current contracts as the source of truth. Do not substitute remembered or duplicated repository guidance.
+- Preserve user work and re-check the working tree after any external or concurrent change.
 
-Work from its first unchecked item; check only successful work. Record failures/blockers under the relevant unchecked item.
+## Handoff
 
-After verification, remove only the completed section. Delete TODO.md only when Claude created it and nothing else remains.
-
-Execution
-
-Before editing an owned area, load the smallest matching repository skill and scoped rule required by AGENTS.md; never invent or substitute skills.
-
-Re-read the final diff and verification results before reporting completion.
+- Re-read the final diff and verification output before reporting completion.
+- Lead with the outcome, list exact checks run, distinguish project failures from environment limits, and state remaining blockers or unverified behavior plainly.
