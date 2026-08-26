@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouterProvider, createBrowserRouter } from 'react-router'
+import { Navigate, RouterProvider, createBrowserRouter } from 'react-router'
 
 import { AppShell } from '@/components/layout/AppShell'
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
@@ -67,6 +67,11 @@ const CameraSetupPage = lazy(() =>
     default: module.CameraSetupPage
   }))
 )
+const CameraPracticePage = lazy(() =>
+  import('@/routes/CameraPracticePage').then((module) => ({
+    default: module.CameraPracticePage
+  }))
+)
 const LiveSessionPage = lazy(() =>
   import('@/routes/LiveSessionPage').then((module) => ({
     default: module.LiveSessionPage
@@ -75,11 +80,6 @@ const LiveSessionPage = lazy(() =>
 const SessionSummaryPage = lazy(() =>
   import('@/routes/SessionSummaryPage').then((module) => ({
     default: module.SessionSummaryPage
-  }))
-)
-const HistoryPage = lazy(() =>
-  import('@/routes/HistoryPage').then((module) => ({
-    default: module.HistoryPage
   }))
 )
 const ProgressPage = lazy(() =>
@@ -128,6 +128,7 @@ const router = createBrowserRouter([
               { path: 'chat', element: <ChatPage /> },
               { path: 'assessment', element: <AssessmentPage /> },
               { path: 'plan', element: <PlanPage /> },
+              { path: 'camera', element: <CameraPracticePage /> },
               { path: 'exercises', element: <ExerciseLibraryPage /> },
               { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
               { path: 'exercises/:slug/setup', element: <CameraSetupPage /> },
@@ -136,7 +137,10 @@ const router = createBrowserRouter([
                 path: 'sessions/:id/summary',
                 element: <SessionSummaryPage />
               },
-              { path: 'history', element: <HistoryPage /> },
+              {
+                path: 'history',
+                element: <Navigate replace to="/app/progress" />
+              },
               { path: 'progress', element: <ProgressPage /> },
               { path: 'profile', element: <ProfilePage /> },
               { path: 'settings', element: <SettingsPage /> },

@@ -61,6 +61,25 @@ export function PlanPage() {
           {t('plan.saved')}
         </p>
       )}
+      <div
+        className="mb-6 flex gap-2 border-b border-slate-200"
+        role="tablist"
+        aria-label={t('nav.plan')}
+      >
+        <Link
+          aria-current="page"
+          className="border-b-2 border-teal-700 px-4 py-3 text-sm font-bold text-teal-800 no-underline"
+          to="/app/plan"
+        >
+          {t('plan.title')}
+        </Link>
+        <Link
+          className="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
+          to="/app/exercises"
+        >
+          {t('exercises.title')}
+        </Link>
+      </div>
       <header className="flex flex-wrap items-start justify-between gap-5 border-b border-slate-200 pb-6">
         <div>
           <div className="flex items-center gap-3">

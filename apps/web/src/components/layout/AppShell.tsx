@@ -1,50 +1,33 @@
 import {
   BarChart3,
   CalendarDays,
-  CircleHelp,
-  Dumbbell,
-  History,
   Home,
-  LogOut,
   MessageCircle,
   Menu,
-  Settings,
-  ShieldCheck,
-  UserRound,
+  Video,
   X
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Outlet, useNavigate } from 'react-router'
+import { NavLink, Outlet } from 'react-router'
 
 import { Brand } from '@/components/Brand'
 import { LanguageButton } from '@/components/LanguageButton'
-import { useAuth } from '@/features/auth/AuthContext'
+import { UserAccountMenu } from '@/components/layout/UserAccountMenu'
 
 const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
   { to: '/app/chat', key: 'chat', icon: MessageCircle, end: false },
-  { to: '/app/assessment', key: 'assessment', icon: ShieldCheck, end: false },
   { to: '/app/plan', key: 'plan', icon: CalendarDays, end: false },
-  { to: '/app/exercises', key: 'exercises', icon: Dumbbell, end: false },
-  { to: '/app/history', key: 'history', icon: History, end: false },
-  { to: '/app/progress', key: 'progress', icon: BarChart3, end: false },
-  { to: '/app/profile', key: 'profile', icon: UserRound, end: false },
-  { to: '/app/settings', key: 'settings', icon: Settings, end: false },
-  { to: '/app/help', key: 'help', icon: CircleHelp, end: false }
+  { to: '/app/camera', key: 'camera', icon: Video, end: false },
+  { to: '/app/progress', key: 'progress', icon: BarChart3, end: false }
 ] as const
 
 export function AppShell() {
   const [open, setOpen] = useState(false)
   const { t } = useTranslation()
-  const auth = useAuth()
-  const navigate = useNavigate()
-  const logout = async () => {
-    await auth.logout()
-    navigate('/')
-  }
   return (
-    <div className="min-h-screen bg-[#f8f7ff] lg:grid lg:grid-cols-[280px_1fr]">
+    <div className="min-h-screen bg-[#f5f8f8] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
         <Brand compact />
         <div className="flex items-center gap-2">
@@ -73,7 +56,7 @@ export function AppShell() {
 
       <aside
         id="app-navigation"
-        className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col overflow-y-auto border-r border-slate-200 bg-white p-5 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto border-r border-slate-200 bg-white p-5 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex items-start justify-between gap-3">
           <Brand />
@@ -103,21 +86,11 @@ export function AppShell() {
           ))}
         </nav>
         <div className="mt-auto border-t border-slate-200 pt-5">
-          <p className="mb-3 truncate px-3 text-sm text-slate-500">
-            {auth.user?.display_name}
-          </p>
-          <button
-            className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-left text-sm font-medium text-red-700 hover:bg-red-50"
-            onClick={() => void logout()}
-            type="button"
-          >
-            <LogOut aria-hidden="true" size={20} />
-            {t('auth.signOut')}
-          </button>
+          <UserAccountMenu />
         </div>
       </aside>
 
-      <main className="min-w-0 px-4 py-6 sm:px-7 lg:px-10 lg:py-8">
+      <main className="min-w-0 px-4 py-6 sm:px-7 lg:px-8 lg:py-8">
         <a className="sr-only focus:not-sr-only" href="#page-content">
           {t('common.skip')}
         </a>
