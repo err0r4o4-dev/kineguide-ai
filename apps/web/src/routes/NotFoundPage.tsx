@@ -6,18 +6,15 @@ export function NotFoundPage() {
   const { t } = useTranslation()
 
   return (
-    <main className="grid min-h-screen place-items-center p-6">
-      <section className="text-center">
+    <main className="grid min-h-screen place-items-center bg-kg-canvas p-6">
+      <section className="kg-card w-full max-w-lg p-8 text-center sm:p-12">
         <p className="text-sm font-semibold tracking-widest text-teal-700">
           404
         </p>
         <h1 className="mt-3 text-3xl font-semibold text-slate-900">
           {t('notFound')}
         </h1>
-        <Link
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
-          to="/"
-        >
+        <Link className="kg-button-primary mt-7" to="/">
           <ArrowLeft aria-hidden="true" size={18} />
           {t('home')}
         </Link>

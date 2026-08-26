@@ -24,7 +24,7 @@ export function SessionSummaryPage() {
   if (query.isLoading) return <QueryLoading />
   if (query.isError) return <QueryError retry={() => void query.refetch()} />
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl pb-4">
       <Link
         className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-800"
         to="/app/progress"
@@ -42,7 +42,7 @@ export function SessionSummaryPage() {
               <p className="text-sm font-semibold text-teal-700">
                 {t('session.summary')}
               </p>
-              <h1 className="mt-1 text-3xl font-bold">
+              <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em]">
                 {query.data?.exercise_slug}
               </h1>
               <p className="mt-2 text-sm text-slate-600">
@@ -57,23 +57,23 @@ export function SessionSummaryPage() {
           </span>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <Clock3 aria-hidden="true" className="mx-auto text-teal-700" />
             <p className="mt-3 text-sm text-slate-500">
               {t('session.elapsed')}
             </p>
-            <p className="mt-1 text-3xl font-bold">
+            <p className="mt-1 text-3xl font-bold tabular-nums">
               {formatDuration(query.data?.elapsed_seconds ?? 0)}
             </p>
           </div>
-          <div className="rounded-2xl bg-slate-50 p-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <Hash aria-hidden="true" className="mx-auto text-teal-700" />
             <p className="mt-3 text-sm text-slate-500">{t('session.reps')}</p>
-            <p className="mt-1 text-3xl font-bold">
+            <p className="mt-1 text-3xl font-bold tabular-nums">
               {query.data?.manual_repetitions}
             </p>
           </div>
-          <div className="rounded-2xl bg-slate-50 p-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <CalendarDays
               aria-hidden="true"
               className="mx-auto text-teal-700"
@@ -89,7 +89,7 @@ export function SessionSummaryPage() {
             </p>
           </div>
         </div>
-        <p className="mt-6 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+        <p className="mt-6 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
           <ShieldCheck
             aria-hidden="true"
             className="mt-0.5 shrink-0"

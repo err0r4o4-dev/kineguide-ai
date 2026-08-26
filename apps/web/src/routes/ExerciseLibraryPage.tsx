@@ -30,19 +30,19 @@ export function ExerciseLibraryPage() {
   return (
     <div>
       <div
-        className="mb-6 flex gap-2 border-b border-slate-200"
+        className="mb-8 inline-flex gap-1 rounded-xl border border-slate-200 bg-white p-1"
         role="tablist"
         aria-label={t('nav.plan')}
       >
         <Link
-          className="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
+          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
           to="/app/plan"
         >
           {t('plan.title')}
         </Link>
         <Link
           aria-current="page"
-          className="border-b-2 border-teal-700 px-4 py-3 text-sm font-bold text-teal-800 no-underline"
+          className="rounded-lg bg-teal-50 px-4 py-2.5 text-sm font-bold text-teal-800 no-underline"
           to="/app/exercises"
         >
           {t('exercises.title')}
@@ -50,7 +50,7 @@ export function ExerciseLibraryPage() {
       </div>
       <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold sm:text-4xl">
+          <h1 className="text-3xl font-bold leading-tight tracking-[-0.025em] sm:text-4xl">
             {t('exercises.title')}
           </h1>
           <p className="mt-2 max-w-2xl text-slate-600">
@@ -65,7 +65,7 @@ export function ExerciseLibraryPage() {
             size={20}
           />
           <input
-            className="min-w-72 rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4"
+            className="min-h-12 min-w-72 rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
             onChange={(event) => setSearch(event.target.value)}
             placeholder={t('exercises.search')}
             value={search}
@@ -98,7 +98,7 @@ export function ExerciseLibraryPage() {
         <section className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((exercise) => (
             <article className="kg-card overflow-hidden" key={exercise.slug}>
-              <div className="grid aspect-[16/9] place-items-center bg-indigo-50 text-teal-700">
+              <div className="grid aspect-[16/9] place-items-center border-b border-slate-200 bg-slate-50 text-teal-700">
                 <Camera aria-hidden="true" size={54} />
               </div>
               <div className="p-6">

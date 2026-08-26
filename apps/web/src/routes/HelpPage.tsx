@@ -8,7 +8,7 @@ export function HelpPage() {
   return (
     <div>
       <PageHeader title={t('help.title')} />
-      <section className="mt-7 grid gap-5 md:grid-cols-2">
+      <section className="mt-8 grid gap-5 md:grid-cols-2">
         <HelpCard
           icon={Camera}
           title={t('camera.title')}
@@ -38,8 +38,10 @@ function HelpCard({
   body: string
 }) {
   return (
-    <article className="kg-card p-6">
-      <Icon aria-hidden="true" className="text-teal-700" />
+    <article className="kg-card p-6 sm:p-7">
+      <span className="grid size-11 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
+        <Icon aria-hidden="true" size={21} />
+      </span>
       <h2 className="mt-4 text-xl font-bold">{title}</h2>
       <p className="mt-3 leading-7 text-slate-600">{body}</p>
     </article>

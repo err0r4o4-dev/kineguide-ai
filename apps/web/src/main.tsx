@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import '@fontsource-variable/noto-sans-thai'
 
 import { App } from '@/app/App'
 import '@/lib/i18n'

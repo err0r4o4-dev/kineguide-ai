@@ -1,18 +1,28 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-sans:
+    'Noto Sans Thai Variable', 'Noto Sans Thai', system-ui, sans-serif;
+  --color-kg-canvas: #f4f7f6;
+  --color-kg-surface: #ffffff;
+  --color-kg-soft: #edf5f3;
+  --color-kg-ink: #142321;
+  --color-kg-muted: #5f706d;
+  --color-kg-border: #d7e2df;
+  --color-kg-primary: #0f766e;
+  --color-kg-primary-strong: #0b5f59;
+}
+
 :root {
-  color: #172033;
-  background: #f5f8f8;
+  color: #142321;
+  background: #f4f7f6;
   font-family:
-    Inter,
-    'Noto Sans Thai',
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+    'Noto Sans Thai Variable', 'Noto Sans Thai', system-ui, sans-serif;
   font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.65;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -23,6 +33,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #f4f7f6;
 }
 
 a {
@@ -31,7 +42,8 @@ a {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -41,10 +53,12 @@ button:disabled {
 }
 
 .kg-card {
-  border: 1px solid #d6dfdf;
-  border-radius: 1rem;
+  border: 1px solid #d7e2df;
+  border-radius: 1.25rem;
   background: #fff;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
+  box-shadow:
+    0 1px 2px rgb(20 35 33 / 4%),
+    0 10px 30px rgb(20 35 33 / 3%);
 }
 
 .kg-button-primary,
@@ -56,7 +70,8 @@ button:disabled {
   justify-content: center;
   gap: 0.5rem;
   border-radius: 0.75rem;
-  font-weight: 650;
+  font-weight: 600;
+  line-height: 1.35;
   text-decoration: none;
   transition:
     background-color 150ms ease,
@@ -67,8 +82,9 @@ button:disabled {
 .kg-button-primary {
   border: 1px solid #0f766e;
   background: #0f766e;
-  padding: 0.72rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   color: white;
+  box-shadow: 0 1px 2px rgb(15 118 110 / 18%);
 }
 
 .kg-button-primary:hover:not(:disabled) {
@@ -76,9 +92,9 @@ button:disabled {
 }
 
 .kg-button-secondary {
-  border: 1px solid #b8c5c5;
+  border: 1px solid #c8d6d3;
   background: white;
-  padding: 0.72rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   color: #115e59;
 }
 
@@ -87,16 +103,23 @@ button:disabled {
 }
 
 .kg-icon-button {
-  border: 1px solid #d6dfdf;
+  min-width: 44px;
+  border: 1px solid #d7e2df;
   background: white;
   padding: 0.55rem 0.75rem;
-  color: #334155;
+  color: #40514e;
+}
+
+.kg-icon-button:hover:not(:disabled) {
+  border-color: #afc6c1;
+  background: #f3f8f7;
+  color: #0f766e;
 }
 
 .kg-field {
   display: grid;
   gap: 0.45rem;
-  color: #334155;
+  color: #344744;
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -104,11 +127,24 @@ button:disabled {
 .kg-field input {
   width: 100%;
   min-height: 48px;
-  border: 1px solid #b8c5c5;
+  border: 1px solid #c8d6d3;
   border-radius: 0.75rem;
   padding: 0.7rem 0.9rem 0.7rem 2.75rem;
   font-weight: 400;
-  color: #172033;
+  color: #142321;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.kg-field input:hover {
+  border-color: #9fb8b3;
+}
+
+.kg-field input:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgb(20 184 166 / 16%);
 }
 
 .kg-field-icon {
@@ -127,8 +163,8 @@ button:disabled {
 .kg-alert-danger,
 .kg-alert-success {
   border-left: 4px solid;
-  border-radius: 0.65rem;
-  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  padding: 0.95rem 1rem;
   font-size: 0.9rem;
 }
 
@@ -175,9 +211,9 @@ button:disabled {
   gap: 0.75rem;
   min-height: 56px;
   cursor: pointer;
-  border: 1px solid #d6dfdf;
-  border-radius: 0.8rem;
-  background: #f8fafc;
+  border: 1px solid #d7e2df;
+  border-radius: 1rem;
+  background: #fff;
   padding: 1rem;
   color: #334155;
 }
@@ -199,14 +235,14 @@ button:disabled {
 .kg-filter,
 .kg-filter-active {
   min-height: 42px;
-  border: 1px solid #b8c5c5;
+  border: 1px solid #c8d6d3;
   border-radius: 999px;
   padding: 0.5rem 1rem;
 }
 
 .kg-filter {
   background: white;
-  color: #334155;
+  color: #40514e;
 }
 
 .kg-filter-active {
@@ -233,4 +269,16 @@ a {
 
 :focus-visible {
   outline: 3px solid #14b8a6;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #99f6e4;
+  color: #134e4a;
+}
+
+@media (min-width: 768px) {
+  :root {
+    line-height: 1.6;
+  }
 }

@@ -66,14 +66,14 @@ export function ConsentPage() {
     }
   ]
   return (
-    <main className="min-h-screen bg-[#f8f7ff] px-4 py-8">
-      <div className="relative mx-auto max-w-3xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/40 sm:p-10">
+    <main className="min-h-screen bg-kg-canvas px-4 py-8 sm:py-12">
+      <div className="relative mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-10 lg:p-12">
         <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
           <LanguageButton variant="segmented" />
         </div>
         <div className="text-center">
           <Brand compact />
-          <h1 className="mt-6 text-3xl font-bold text-teal-800">
+          <h1 className="mt-6 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
             {t('consent.title')}
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-slate-600">
@@ -83,10 +83,12 @@ export function ConsentPage() {
         <section className="mt-8 grid gap-4 sm:grid-cols-2">
           {cards.map(({ icon: Icon, title, body }) => (
             <article
-              className="rounded-2xl border border-slate-200 p-5"
+              className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5"
               key={title}
             >
-              <Icon aria-hidden="true" className="text-teal-700" />
+              <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
+                <Icon aria-hidden="true" size={20} />
+              </span>
               <h2 className="mt-3 font-bold">{title}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
             </article>

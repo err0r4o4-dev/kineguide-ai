@@ -11,9 +11,9 @@ export function ProfilePage() {
   return (
     <div>
       <PageHeader title={t('profile.title')} subtitle={t('profile.subtitle')} />
-      <section className="kg-card mt-7 max-w-3xl p-6 sm:p-8">
+      <section className="kg-card mt-8 max-w-3xl p-6 sm:p-8">
         <div className="flex items-center gap-4 border-b border-slate-200 pb-6">
-          <span className="grid size-16 place-items-center rounded-full bg-teal-50 text-teal-700">
+          <span className="grid size-16 place-items-center rounded-2xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
             <UserRound aria-hidden="true" size={38} />
           </span>
           <div>

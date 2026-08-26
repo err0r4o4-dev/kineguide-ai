@@ -73,9 +73,11 @@ export function LiveSessionPage() {
           <p className="text-sm font-semibold text-teal-700">
             {query.data?.exercise_slug}
           </p>
-          <h1 className="mt-1 text-3xl font-bold">{t('session.live')}</h1>
+          <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950">
+            {t('session.live')}
+          </h1>
         </div>
-        <span className="rounded-full bg-indigo-50 px-4 py-2 font-mono text-lg">
+        <span className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-lg font-semibold tabular-nums">
           {formatDuration(seconds)}
         </span>
       </header>
@@ -101,7 +103,7 @@ export function LiveSessionPage() {
                 </button>
               </div>
             )}
-            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-3 rounded-full bg-white/95 p-2 shadow">
+            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-3 rounded-2xl bg-white/95 p-2 shadow-lg shadow-slate-950/15 backdrop-blur">
               <button
                 aria-label={running ? t('session.pause') : t('session.resume')}
                 className="kg-icon-button"
@@ -115,7 +117,7 @@ export function LiveSessionPage() {
                 )}
               </button>
               <button
-                className="rounded-full bg-red-600 px-5 py-2 font-semibold text-white"
+                className="inline-flex min-h-11 items-center rounded-xl bg-red-700 px-5 py-2 font-semibold text-white hover:bg-red-800"
                 disabled={saving}
                 onClick={() => void finish('stopped')}
                 type="button"
@@ -133,7 +135,7 @@ export function LiveSessionPage() {
             </p>
             <p
               aria-live="polite"
-              className="mt-3 text-5xl font-bold text-teal-800"
+              className="mt-3 text-5xl font-bold tabular-nums text-teal-800"
             >
               {reps}
             </p>
@@ -157,7 +159,7 @@ export function LiveSessionPage() {
               </button>
             </div>
           </article>
-          <p className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
+          <p className="rounded-2xl border border-teal-200 bg-teal-50 p-4 text-sm leading-6 text-teal-950">
             {t('session.estimate')}
           </p>
           {error && (

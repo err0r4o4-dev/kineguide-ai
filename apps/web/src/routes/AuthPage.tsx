@@ -91,8 +91,8 @@ export function AuthPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f8f7ff] p-4">
-      <div className="w-full max-w-5xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/50 lg:grid lg:h-[760px] lg:grid-cols-2">
+    <main className="grid min-h-screen place-items-center bg-kg-canvas p-4 sm:p-6">
+      <div className="w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 lg:grid lg:min-h-[760px] lg:grid-cols-[0.95fr_1.05fr]">
         <section className="relative isolate hidden h-full flex-col justify-between overflow-hidden p-10 text-white lg:flex">
           <img
             alt=""
@@ -112,17 +112,19 @@ export function AuthPage() {
             </p>
           </div>
         </section>
-        <section className="p-6 sm:p-10 lg:overflow-y-auto lg:p-14">
+        <section className="p-6 sm:p-10 lg:overflow-y-auto lg:p-14 xl:p-16">
           <div className="flex items-center justify-between lg:justify-end">
             <span className="lg:hidden">
               <Brand compact />
             </span>
             <LanguageButton />
           </div>
-          <h1 className="mt-10 text-3xl font-bold text-slate-950">
+          <h1 className="mt-10 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
             {isRegister ? t('auth.register') : t('auth.welcome')}
           </h1>
-          <p className="mt-2 text-slate-600">{t('auth.subtitle')}</p>
+          <p className="mt-3 max-w-lg leading-7 text-slate-600">
+            {t('auth.subtitle')}
+          </p>
           <form
             className="mt-8 space-y-5"
             noValidate
@@ -234,7 +236,7 @@ export function AuthPage() {
           <p className="mt-6 text-center text-sm text-slate-600">
             {isRegister ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
             <Link
-              className="font-semibold text-teal-700"
+              className="rounded font-semibold text-teal-700 underline-offset-4 hover:underline"
               to={isRegister ? '/login' : '/register'}
             >
               {isRegister ? t('auth.signIn') : t('auth.register')}

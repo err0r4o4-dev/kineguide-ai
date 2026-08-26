@@ -29,15 +29,15 @@ export function LandingPage() {
     }
   ]
   return (
-    <div className="min-h-screen bg-[#fbfaff]">
+    <div className="min-h-screen bg-kg-canvas">
       <PublicHeader />
       <main>
-        <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:py-20">
+        <section className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-24">
           <div>
-            <p className="font-semibold text-teal-700">
+            <p className="text-sm font-semibold tracking-wide text-teal-700">
               {t('landing.eyebrow')}
             </p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-slate-950 sm:text-[2.5rem] lg:text-6xl">
+            <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.16] tracking-[-0.035em] text-slate-950 sm:text-5xl lg:text-[3.75rem]">
               {t('landing.title')}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
@@ -52,8 +52,8 @@ export function LandingPage() {
               </a>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950 p-6 shadow-xl shadow-slate-200/60">
-            <div className="aspect-[4/3] rounded-2xl bg-[radial-gradient(circle_at_50%_35%,#5eead4_0,transparent_18%),linear-gradient(145deg,#1e293b,#0f172a)] p-6 text-white">
+          <div className="relative overflow-hidden rounded-3xl border border-slate-700 bg-slate-950 p-3 shadow-xl shadow-slate-900/10 sm:p-5">
+            <div className="aspect-[4/3] rounded-2xl border border-white/10 bg-slate-900 p-6 text-white">
               <div className="flex items-center justify-between text-sm text-slate-300">
                 <span>{t('landing.cameraTitle')}</span>
                 <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-emerald-200">
@@ -61,7 +61,7 @@ export function LandingPage() {
                 </span>
               </div>
               <div className="grid h-[80%] place-items-center">
-                <div className="grid size-44 place-items-center rounded-full border border-dashed border-teal-300/60 sm:size-56">
+                <div className="grid size-44 place-items-center rounded-full border border-dashed border-teal-300/60 bg-teal-400/5 sm:size-56">
                   <Camera
                     aria-hidden="true"
                     className="text-teal-200"
@@ -74,13 +74,13 @@ export function LandingPage() {
         </section>
 
         <section
-          className="border-y border-slate-200 bg-white py-14"
+          className="border-y border-slate-200/80 bg-white py-16"
           id="features"
         >
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 md:grid-cols-3">
             {features.map(({ icon: Icon, title, body }) => (
-              <article className="kg-card p-7" key={title}>
-                <span className="grid size-12 place-items-center rounded-full bg-teal-50 text-teal-700">
+              <article className="kg-card p-7 sm:p-8" key={title}>
+                <span className="grid size-12 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
                   <Icon aria-hidden="true" />
                 </span>
                 <h2 className="mt-5 text-xl font-bold text-slate-900">
@@ -92,8 +92,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-          <div className="grid gap-8 rounded-[2rem] border border-indigo-100 bg-indigo-50 p-8 md:grid-cols-[220px_1fr] md:items-center">
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="grid gap-8 rounded-3xl border border-teal-100 bg-teal-50/70 p-7 sm:p-10 md:grid-cols-[180px_1fr] md:items-center">
             <ShieldCheck
               aria-hidden="true"
               className="mx-auto text-teal-700"
@@ -113,7 +113,7 @@ export function LandingPage() {
           </div>
         </section>
       </main>
-      <footer className="border-t border-slate-200 bg-indigo-100/60 px-4 py-8 text-center text-sm text-slate-600">
+      <footer className="border-t border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-600">
         {t('landing.footer')}
       </footer>
     </div>

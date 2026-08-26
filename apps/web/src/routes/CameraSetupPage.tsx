@@ -43,11 +43,13 @@ export function CameraSetupPage() {
   return (
     <div>
       <header>
-        <h1 className="text-3xl font-bold sm:text-4xl">{t('camera.title')}</h1>
+        <h1 className="text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
+          {t('camera.title')}
+        </h1>
         <p className="mt-2 text-slate-600">{t('camera.subtitle')}</p>
       </header>
-      <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_390px]">
-        <div className="kg-card overflow-hidden bg-slate-950">
+      <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_400px]">
+        <div className="kg-card overflow-hidden bg-slate-950 ring-1 ring-slate-900/5">
           <div className="relative aspect-video">
             <video
               aria-label={t('camera.visibility')}
@@ -92,7 +94,7 @@ export function CameraSetupPage() {
             )}
           </div>
         </div>
-        <aside className="kg-card p-6">
+        <aside className="kg-card p-6 sm:p-7">
           <h2 className="text-2xl font-bold">{t('camera.readiness')}</h2>
           <div className="mt-6 space-y-3">
             <Ready
@@ -170,7 +172,7 @@ function Ready({
 }) {
   return (
     <div
-      className={`flex items-start gap-3 rounded-xl border p-4 ${ok ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-slate-50'}`}
+      className={`flex items-start gap-3 rounded-2xl border p-4 ${ok ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-slate-50'}`}
     >
       <Icon
         aria-hidden="true"

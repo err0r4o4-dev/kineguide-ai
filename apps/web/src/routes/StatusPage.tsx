@@ -28,9 +28,11 @@ export function StatusCard({ label, state, icon }: StatusCardProps) {
         : 'bg-slate-100 text-slate-600'
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="kg-card p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
-        <span className="rounded-xl bg-teal-50 p-3 text-teal-700">{icon}</span>
+        <span className="rounded-xl bg-teal-50 p-3 text-teal-700 ring-1 ring-inset ring-teal-100">
+          {icon}
+        </span>
         <span
           className={`rounded-full px-3 py-1 text-xs font-semibold ${color}`}
         >
@@ -57,8 +59,8 @@ export function StatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ccfbf1,transparent_36%)]">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
+    <div className="min-h-screen bg-kg-canvas">
+      <header className="mx-auto flex max-w-6xl items-center justify-between border-b border-slate-200/80 px-5 py-5 sm:px-8">
         <div className="flex items-center gap-3 font-semibold text-slate-900">
           <span className="grid size-10 place-items-center rounded-xl bg-teal-700 text-white">
             K
@@ -66,7 +68,7 @@ export function StatusPage() {
           KineGuide AI
         </div>
         <button
-          className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
+          className="kg-button-secondary"
           onClick={toggleLanguage}
           type="button"
         >
@@ -74,10 +76,10 @@ export function StatusPage() {
         </button>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-8 sm:pt-16">
+      <main className="mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-8 sm:pt-16">
         <div className="max-w-2xl">
           <p className="font-medium text-teal-700">KineGuide AI</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+          <h1 className="mt-2 text-4xl font-bold leading-tight tracking-[-0.03em] text-slate-950 sm:text-5xl">
             {t('status')}
           </h1>
           <p className="mt-4 text-lg text-slate-600">{t('subtitle')}</p>

@@ -9,7 +9,7 @@ export function ProtectedRoute() {
   const location = useLocation()
   if (!auth.ready) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f8f7ff] px-4">
+      <main className="grid min-h-screen place-items-center bg-kg-canvas px-4 text-slate-600">
         <p aria-live="polite" className="kg-card">
           {t('common.loading')}
         </p>

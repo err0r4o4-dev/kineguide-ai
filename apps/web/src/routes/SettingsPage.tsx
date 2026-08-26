@@ -82,8 +82,8 @@ export function SettingsPage() {
   return (
     <div>
       <PageHeader title={t('settings.title')} />
-      <section className="mt-7 grid max-w-4xl gap-4">
-        <article className="kg-card p-5 sm:p-6">
+      <section className="mt-8 grid max-w-4xl gap-5">
+        <article className="kg-card p-5 sm:p-7">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Languages aria-hidden="true" className="text-teal-700" />
@@ -97,7 +97,7 @@ export function SettingsPage() {
             <LanguageButton variant="segmented" />
           </div>
         </article>
-        <article className="kg-card p-5 sm:p-6">
+        <article className="kg-card p-5 sm:p-7">
           <Link2 aria-hidden="true" className="text-teal-700" />
           <h2 className="mt-4 text-xl font-bold">
             {t('settings.connectedAccounts')}
@@ -124,7 +124,7 @@ export function SettingsPage() {
                   )
                   return (
                     <div
-                      className="flex min-h-16 items-center justify-between gap-3 rounded-xl border border-slate-200 p-3"
+                      className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4"
                       key={provider}
                     >
                       <span className="flex items-center gap-3 font-semibold">
@@ -159,18 +159,18 @@ export function SettingsPage() {
             </p>
           )}
         </article>
-        <article className="kg-card p-5 sm:p-6">
-          <DatabaseZap aria-hidden="true" className="text-indigo-700" />
+        <article className="kg-card p-5 sm:p-7">
+          <DatabaseZap aria-hidden="true" className="text-teal-700" />
           <h2 className="mt-4 text-xl font-bold">{t('common.retention')}</h2>
           <p className="mt-3 leading-7 text-slate-600">
             {t('settings.retention')}
           </p>
         </article>
         <Link
-          className="kg-card flex min-h-24 items-center gap-4 p-5 no-underline hover:border-teal-300 hover:bg-teal-50 sm:p-6"
+          className="kg-card flex min-h-24 items-center gap-4 p-5 no-underline transition hover:border-teal-300 hover:bg-teal-50 sm:p-6"
           to="/app/camera"
         >
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
             <Camera aria-hidden="true" size={21} />
           </span>
           <span className="min-w-0 flex-1">
@@ -184,7 +184,7 @@ export function SettingsPage() {
           <ChevronRight aria-hidden="true" className="text-teal-700" />
         </Link>
         <article className="kg-card flex min-h-24 items-center gap-4 p-5 sm:p-6">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
             <ShieldCheck aria-hidden="true" size={21} />
           </span>
           <div>

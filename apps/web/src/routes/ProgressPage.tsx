@@ -58,7 +58,7 @@ export function ProgressPage() {
   return (
     <div>
       <PageHeader title={t('nav.progress')} subtitle={t('progress.subtitle')} />
-      <section className="mt-7 grid gap-4 sm:grid-cols-3">
+      <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           icon={CalendarCheck2}
           label={t('progress.sessions')}
@@ -75,7 +75,7 @@ export function ProgressPage() {
           value={String(dashboard.data.current_streak)}
         />
       </section>
-      <section className="kg-card mt-6 p-5 sm:p-6">
+      <section className="kg-card mt-6 p-5 sm:p-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold">{t('progress.chart')}</h2>
           <div className="flex gap-2" aria-label={t('progress.chart')}>
@@ -134,7 +134,7 @@ export function ProgressPage() {
               size={18}
             />
             <input
-              className="min-h-11 rounded-xl border border-slate-300 pl-10 pr-3"
+              className="min-h-11 rounded-xl border border-slate-300 bg-white pl-10 pr-3 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
               onChange={(event) => setSearch(event.target.value)}
               placeholder={t('exercises.search')}
               value={search}
@@ -144,7 +144,7 @@ export function ProgressPage() {
         <div className="divide-y divide-slate-100">
           {visibleSessions.map((session) => (
             <Link
-              className="flex items-center gap-3 p-4 no-underline hover:bg-slate-50 sm:px-5"
+              className="flex items-center gap-3 p-4 no-underline hover:bg-slate-50 sm:px-6"
               key={session.id}
               to={`/app/sessions/${session.id}/summary`}
             >

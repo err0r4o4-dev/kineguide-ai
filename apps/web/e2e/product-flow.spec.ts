@@ -209,12 +209,12 @@ test('new user completes consent and structured onboarding', async ({
     ).toBe(true)
   }
 
-  await page.getByRole('link', { name: 'หน้าหลัก' }).click()
+  await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(
     page.getByRole('link', { name: 'เริ่มคุยกับ AI' })
   ).toHaveAttribute('href', '/app/chat')
   await expect(
-    page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+    page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
   ).toHaveAttribute('href', '/app/chat')
   await page.getByRole('link', { name: 'เริ่มคุยกับ AI' }).click()
   await expect(

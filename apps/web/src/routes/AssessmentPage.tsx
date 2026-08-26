@@ -97,10 +97,10 @@ export function AssessmentPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl pb-4">
       <header className="text-center">
         <p className="font-semibold text-teal-700">KineGuide AI</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
           {t('assessment.title')}
         </h1>
         <p className="mx-auto mt-3 max-w-3xl text-slate-600">
@@ -138,10 +138,10 @@ export function AssessmentPage() {
       {!reviewing ? (
         <section
           aria-label={t('assessment.conversation')}
-          className="mx-auto mt-8 max-w-3xl border-y border-slate-200 py-8"
+          className="kg-card mx-auto mt-8 max-w-3xl p-5 sm:p-8"
         >
           <div
-            className="max-h-[30rem] space-y-5 overflow-y-auto px-1 pb-2"
+            className="max-h-[30rem] space-y-5 overflow-y-auto px-1 pb-2 pr-2"
             ref={conversationRef}
           >
             {questions.slice(0, step).map((question) => (
@@ -206,7 +206,7 @@ export function AssessmentPage() {
       ) : (
         <section className="kg-card mx-auto mt-8 max-w-3xl p-6 sm:p-8">
           <div className="flex items-start gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-teal-700 text-white">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-700 text-white">
               <Check aria-hidden="true" />
             </span>
             <div>
@@ -267,7 +267,7 @@ export function AssessmentPage() {
         </section>
       )}
 
-      <p className="mx-auto mt-6 flex max-w-3xl items-start gap-2 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+      <p className="mx-auto mt-6 flex max-w-3xl items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
         <ShieldAlert aria-hidden="true" className="mt-0.5 shrink-0" size={19} />
         {t('assessment.safety')}
       </p>
@@ -284,12 +284,12 @@ function AssistantMessage({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-teal-700 text-white">
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-teal-700 text-white">
         <Bot aria-hidden="true" size={18} />
       </span>
       <p
         aria-live={current ? 'polite' : undefined}
-        className="max-w-xl rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-5 py-4 leading-7 shadow-sm"
+        className="max-w-xl rounded-2xl rounded-tl-sm border border-slate-200 bg-slate-50/70 px-5 py-4 leading-7"
       >
         {text}
       </p>

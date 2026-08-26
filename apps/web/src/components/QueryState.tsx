@@ -21,8 +21,15 @@ export function QueryError({ retry }: { retry(): void }) {
 export function QueryLoading() {
   const { t } = useTranslation()
   return (
-    <p aria-live="polite" className="kg-card mt-6 p-6 text-slate-600">
-      {t('common.loading')}
-    </p>
+    <div
+      aria-live="polite"
+      className="kg-card mt-6 flex items-center gap-3 p-5 text-slate-600"
+    >
+      <span
+        aria-hidden="true"
+        className="size-5 animate-spin rounded-full border-2 border-teal-700 border-r-transparent motion-reduce:animate-none"
+      />
+      <p>{t('common.loading')}</p>
+    </div>
   )
 }

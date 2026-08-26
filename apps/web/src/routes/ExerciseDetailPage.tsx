@@ -31,7 +31,7 @@ export function ExerciseDetailPage() {
 
   return (
     <div>
-      <header className="flex flex-col gap-5 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+      <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <Link
             className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-600"
@@ -40,7 +40,7 @@ export function ExerciseDetailPage() {
             <ArrowLeft aria-hidden="true" size={18} />
             {t('common.back')}
           </Link>
-          <h1 className="mt-2 text-3xl font-bold text-teal-800 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
             {t('plan.viewExercise')}
           </h1>
           <p className="mt-2 text-lg text-slate-600">{title}</p>
@@ -59,9 +59,9 @@ export function ExerciseDetailPage() {
         </div>
       </header>
 
-      <section className="mt-7 grid gap-6 xl:grid-cols-[minmax(310px,0.75fr)_minmax(0,1fr)]">
+      <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(330px,0.78fr)_minmax(0,1fr)]">
         <div>
-          <div className="relative grid aspect-video place-items-center overflow-hidden rounded-2xl bg-slate-200 text-teal-800">
+          <div className="relative grid aspect-video place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 text-teal-800">
             <div className="text-center">
               <Camera aria-hidden="true" className="mx-auto" size={54} />
               <p className="mt-3 px-6 text-sm font-semibold">
@@ -69,7 +69,7 @@ export function ExerciseDetailPage() {
               </p>
             </div>
             <span className="absolute inset-0 grid place-items-center">
-              <span className="grid size-16 place-items-center rounded-full bg-white/90 text-teal-800 shadow">
+              <span className="grid size-16 place-items-center rounded-2xl bg-white/95 text-teal-800 shadow-lg shadow-slate-900/10">
                 <Play aria-hidden="true" fill="currentColor" size={25} />
               </span>
             </span>
@@ -80,7 +80,7 @@ export function ExerciseDetailPage() {
               {t('exercises.what')}
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-slate-50 p-4 text-center">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
                 <p className="text-xs text-slate-500">{t('nav.plan')}</p>
                 <p className="mt-1 font-bold text-slate-900">
                   {t(
@@ -90,7 +90,7 @@ export function ExerciseDetailPage() {
                   )}
                 </p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-4 text-center">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
                 <p className="text-xs text-slate-500">
                   {t('exercises.review')}
                 </p>

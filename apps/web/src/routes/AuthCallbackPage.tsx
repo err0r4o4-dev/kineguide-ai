@@ -39,8 +39,8 @@ export function AuthCallbackPage() {
   const visibleError = error || (sessionError ? 'session_failed' : '')
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-50 p-4">
-      <section className="kg-card w-full max-w-md p-7 text-center sm:p-9">
+    <main className="grid min-h-screen place-items-center bg-kg-canvas p-4">
+      <section className="kg-card w-full max-w-md p-7 text-center sm:p-10">
         <div className="flex justify-center">
           <Brand compact />
         </div>

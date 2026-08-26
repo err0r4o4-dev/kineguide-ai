@@ -62,32 +62,32 @@ export function PlanPage() {
         </p>
       )}
       <div
-        className="mb-6 flex gap-2 border-b border-slate-200"
+        className="mb-8 inline-flex gap-1 rounded-xl border border-slate-200 bg-white p-1"
         role="tablist"
         aria-label={t('nav.plan')}
       >
         <Link
           aria-current="page"
-          className="border-b-2 border-teal-700 px-4 py-3 text-sm font-bold text-teal-800 no-underline"
+          className="rounded-lg bg-teal-50 px-4 py-2.5 text-sm font-bold text-teal-800 no-underline"
           to="/app/plan"
         >
           {t('plan.title')}
         </Link>
         <Link
-          className="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
+          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
           to="/app/exercises"
         >
           {t('exercises.title')}
         </Link>
       </div>
-      <header className="flex flex-wrap items-start justify-between gap-5 border-b border-slate-200 pb-6">
+      <header className="flex flex-wrap items-start justify-between gap-6">
         <div>
           <div className="flex items-center gap-3">
-            <span className="grid size-11 place-items-center rounded-xl bg-teal-100 text-teal-800">
+            <span className="grid size-11 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
               <CalendarDays aria-hidden="true" />
             </span>
             <div>
-              <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">
+              <h1 className="text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
                 {t('plan.title')}
               </h1>
               <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
@@ -118,7 +118,7 @@ export function PlanPage() {
       </header>
 
       <section
-        className="mt-7 grid gap-5 xl:grid-cols-[1fr_330px]"
+        className="mt-8 grid gap-5 xl:grid-cols-[1fr_350px]"
         id="plan-details"
       >
         <article className="kg-card p-6 sm:p-7">
@@ -151,7 +151,7 @@ export function PlanPage() {
             </div>
           </dl>
         </article>
-        <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+        <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-7">
           <h2 className="flex items-center gap-2 text-xl font-bold text-amber-950">
             <CircleAlert aria-hidden="true" />
             {t('plan.cautionTitle')}
@@ -171,14 +171,14 @@ export function PlanPage() {
 
       <div
         aria-label={t('plan.title')}
-        className="mt-7 flex gap-1 overflow-x-auto border-b border-slate-300"
+        className="mt-8 flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1"
         role="tablist"
       >
         {query.data?.days.map((item) => (
           <button
             aria-controls={`day-panel-${item.day}`}
             aria-selected={selectedDay === item.day}
-            className={`min-h-12 shrink-0 border-b-2 px-4 text-sm font-semibold ${selectedDay === item.day ? 'border-teal-700 text-teal-800' : 'border-transparent text-slate-600 hover:bg-slate-50'}`}
+            className={`min-h-11 shrink-0 rounded-lg px-4 text-sm font-semibold ${selectedDay === item.day ? 'bg-teal-50 text-teal-800' : 'text-slate-600 hover:bg-slate-50'}`}
             id={`day-tab-${item.day}`}
             key={item.day}
             onClick={() => selectDay(item.day)}
@@ -233,7 +233,7 @@ function ExerciseCard({
   const title = language === 'th' ? exercise.title_th : exercise.title_en
   return (
     <article className="kg-card flex min-h-full flex-col overflow-hidden">
-      <div className="grid aspect-[16/8] place-items-center bg-slate-100 text-teal-700">
+      <div className="grid aspect-[16/8] place-items-center border-b border-slate-200 bg-slate-50 text-teal-700">
         <div className="text-center">
           <Camera aria-hidden="true" className="mx-auto" size={42} />
           <p className="mt-2 text-sm font-semibold">{t('plan.camera')}</p>

@@ -29,7 +29,7 @@ export function DashboardPage() {
   })
 
   return (
-    <div>
+    <div className="pb-4">
       <PageHeader
         eyebrow={new Intl.DateTimeFormat(
           i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
@@ -46,10 +46,10 @@ export function DashboardPage() {
       )}
       {query.data && (
         <>
-          <section className="mt-7 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.85fr)]">
-            <article className="kg-card overflow-hidden p-5 sm:p-6">
+          <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.85fr)]">
+            <article className="kg-card overflow-hidden p-5 sm:p-7">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-800">
+                <span className="grid size-11 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
                   <CalendarCheck2 aria-hidden="true" size={21} />
                 </span>
                 <h2 className="text-xl font-bold text-slate-950">
@@ -57,7 +57,7 @@ export function DashboardPage() {
                 </h2>
               </div>
               <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(170px,0.8fr)_minmax(0,1fr)] sm:items-center">
-                <div className="grid aspect-square max-h-60 place-items-center rounded-2xl bg-teal-50 text-teal-800">
+                <div className="grid aspect-square max-h-60 place-items-center rounded-2xl border border-teal-100 bg-teal-50/70 text-teal-800">
                   <div className="text-center">
                     <Video aria-hidden="true" className="mx-auto" size={48} />
                     <p className="mt-3 px-5 text-sm font-semibold">
@@ -91,9 +91,9 @@ export function DashboardPage() {
               </div>
             </article>
             <div className="space-y-5">
-              <article className="rounded-2xl border border-teal-200 bg-teal-50 p-5">
+              <article className="rounded-2xl border border-teal-200 bg-teal-50/80 p-5 sm:p-6">
                 <div className="flex gap-3">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-teal-700 text-white">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-700 text-white shadow-sm">
                     <MessageCircle aria-hidden="true" size={21} />
                   </span>
                   <div>
@@ -104,7 +104,7 @@ export function DashboardPage() {
                       {t('dashboard.aiBody')}
                     </p>
                     <Link
-                      className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-teal-800"
+                      className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-bold text-teal-800 hover:text-teal-950"
                       to="/app/chat"
                     >
                       {t('dashboard.aiStart')}
@@ -139,7 +139,7 @@ export function DashboardPage() {
                   {t('dashboard.recent')}
                 </h2>
                 <Link
-                  className="text-sm font-semibold text-teal-800"
+                  className="rounded-lg px-2 py-1 text-sm font-semibold text-teal-800 hover:bg-teal-50"
                   to="/app/progress"
                 >
                   {t('nav.progress')}
@@ -148,7 +148,7 @@ export function DashboardPage() {
               <div className="mt-4 divide-y divide-slate-100">
                 {query.data.recent_sessions.slice(0, 4).map((session) => (
                   <Link
-                    className="flex items-center gap-3 py-4 no-underline hover:bg-slate-50"
+                    className="flex items-center gap-3 rounded-xl px-2 py-4 no-underline hover:bg-slate-50"
                     key={session.id}
                     to={`/app/sessions/${session.id}/summary`}
                   >

@@ -13,7 +13,7 @@ export function ConsentRoute() {
 
   if (consent.isPending) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f8f7ff] px-4">
+      <main className="grid min-h-screen place-items-center bg-kg-canvas px-4 text-slate-600">
         <QueryLoading />
       </main>
     )
@@ -21,7 +21,7 @@ export function ConsentRoute() {
 
   if (consent.isError) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f8f7ff] px-4">
+      <main className="grid min-h-screen place-items-center bg-kg-canvas px-4 text-slate-600">
         <QueryError retry={() => void consent.refetch()} />
       </main>
     )

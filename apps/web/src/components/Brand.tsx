@@ -14,12 +14,12 @@ export function Brand({
     <Link
       aria-label="KineGuide AI"
       className={`inline-flex items-center gap-3 no-underline ${
-        inverted ? 'text-white' : 'text-teal-800'
+        inverted ? 'text-white' : 'text-slate-950'
       }`}
       to="/"
     >
       <span
-        className={`grid size-10 place-items-center rounded-full text-white ${
+        className={`grid size-10 place-items-center rounded-xl text-white shadow-sm ${
           inverted ? 'bg-white/20' : 'bg-teal-700'
         }`}
       >
@@ -27,7 +27,7 @@ export function Brand({
       </span>
       {!compact && (
         <span className="min-w-0">
-          <span className="block whitespace-nowrap text-xl font-bold leading-tight tracking-tight">
+          <span className="block whitespace-nowrap text-xl font-bold leading-tight tracking-[-0.02em]">
             KineGuide AI
           </span>
           <span

@@ -110,13 +110,13 @@ export function ChatPage() {
   return (
     <div>
       <header>
-        <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">
+        <h1 className="text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
           {t('chat.title')}
         </h1>
         <p className="mt-2 max-w-3xl text-slate-600">{t('chat.subtitle')}</p>
       </header>
 
-      <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+      <p className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 sm:px-5">
         {t('chat.boundary')}
       </p>
       <div className="mt-5 flex flex-wrap gap-3" aria-label={t('chat.title')}>
@@ -143,8 +143,8 @@ export function ChatPage() {
       )}
 
       {conversations.data && (
-        <div className="mt-6 grid min-h-[34rem] gap-4 xl:grid-cols-[240px_minmax(0,1fr)_220px]">
-          <aside className="kg-card p-4" aria-label={t('chat.conversations')}>
+        <div className="mt-7 grid min-h-[36rem] gap-5 xl:grid-cols-[260px_minmax(0,1fr)_250px]">
+          <aside className="kg-card p-5" aria-label={t('chat.conversations')}>
             <button
               className="kg-button-primary w-full"
               disabled={create.isPending}
@@ -197,7 +197,7 @@ export function ChatPage() {
           </aside>
 
           <section
-            className="kg-card flex min-h-[34rem] min-w-0 flex-col overflow-hidden"
+            className="kg-card flex min-h-[36rem] min-w-0 flex-col overflow-hidden"
             aria-label={t('chat.conversation')}
           >
             {!selectedID && (
@@ -250,13 +250,13 @@ export function ChatPage() {
                   )}
                 </div>
                 <form
-                  className="border-t border-slate-200 p-4"
+                  className="border-t border-slate-200 bg-slate-50/40 p-4 sm:p-5"
                   onSubmit={onSubmit}
                 >
                   <label className="kg-field" htmlFor="chat-message">
                     {t('chat.messageLabel')}
                     <textarea
-                      className="min-h-24 w-full resize-y rounded-xl border border-slate-300 p-3 font-normal text-slate-900"
+                      className="min-h-24 w-full resize-y rounded-xl border border-slate-300 bg-white p-3 font-normal text-slate-900 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
                       id="chat-message"
                       maxLength={4000}
                       {...form.register('content')}
@@ -282,7 +282,7 @@ export function ChatPage() {
             )}
           </section>
           <aside
-            className="space-y-4 xl:border-l xl:border-slate-200 xl:pl-4"
+            className="space-y-4 xl:border-l xl:border-slate-200 xl:pl-5"
             aria-label={t('assessment.summary')}
           >
             <h2 className="text-lg font-bold text-slate-950">

@@ -172,8 +172,14 @@ export function App() {
 function AppLoading() {
   const { t } = useTranslation()
   return (
-    <main className="grid min-h-screen place-items-center text-slate-600">
-      {t('common.loading')}
+    <main className="grid min-h-screen place-items-center bg-kg-canvas text-slate-600">
+      <div className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="size-5 animate-spin rounded-full border-2 border-teal-700 border-r-transparent motion-reduce:animate-none"
+        />
+        {t('common.loading')}
+      </div>
     </main>
   )
 }

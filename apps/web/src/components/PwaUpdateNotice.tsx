@@ -73,7 +73,7 @@ export function PwaUpdateNotice() {
   return (
     <aside
       aria-live={isError ? 'assertive' : 'polite'}
-      className="fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-md rounded-2xl border border-teal-200 bg-white p-4 shadow-lg sm:right-6 sm:left-auto sm:m-0"
+      className="fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-md rounded-2xl border border-teal-200 bg-white p-5 shadow-xl shadow-slate-950/10 sm:right-6 sm:left-auto sm:m-0"
       role={isError ? 'alert' : 'status'}
     >
       <div className="flex items-start gap-3">

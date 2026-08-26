@@ -24,18 +24,18 @@ export function CameraPracticePage() {
         title={t('camera.practiceTitle')}
         subtitle={t('camera.practiceSubtitle')}
       />
-      <section className="mt-7">
+      <section className="mt-8">
         <h2 className="text-xl font-bold text-slate-950">
           {t('camera.chooseActivity')}
         </h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {query.data?.map((exercise) => (
             <Link
-              className="kg-card group flex min-h-40 items-center gap-4 p-5 no-underline transition hover:border-teal-300 hover:shadow-md"
+              className="kg-card group flex min-h-40 items-center gap-4 p-5 no-underline transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-lg motion-reduce:hover:translate-y-0"
               key={exercise.slug}
               to={`/app/exercises/${exercise.slug}/setup`}
             >
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-teal-50 text-teal-800">
+              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
                 <Camera aria-hidden="true" size={25} />
               </span>
               <span className="min-w-0 flex-1">
