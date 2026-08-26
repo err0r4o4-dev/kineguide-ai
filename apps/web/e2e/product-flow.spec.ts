@@ -34,7 +34,7 @@ test('new user completes consent and structured onboarding', async ({
         status: 201,
         json: {
           id: 'a91da3f1-00ae-4d7c-8ea3-b4e9f2c20d90',
-          policy_version: 'prototype-v1',
+          policy_version: 'prototype-v3',
           camera_processing: true,
           session_summary_storage: true,
           ai_chat_storage: true,
@@ -123,7 +123,7 @@ test('new user completes consent and structured onboarding', async ({
           locale: 'th',
           created_at: '2026-08-24T12:03:00Z',
           updated_at: '2026-08-24T12:03:00Z',
-          retention_until: '2026-09-23T12:03:00Z'
+          retention_policy: 'until_deleted'
         }
       })
       return
@@ -249,7 +249,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   }
   const consent = {
     id: 'a91da3f1-00ae-4d7c-8ea3-b4e9f2c20d90',
-    policy_version: 'prototype-v1',
+    policy_version: 'prototype-v3',
     camera_processing: true,
     session_summary_storage: true,
     ai_chat_storage: true,

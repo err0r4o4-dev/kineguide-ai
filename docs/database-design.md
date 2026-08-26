@@ -6,7 +6,7 @@ The foundation creates `application_metadata` plus prototype account, refresh-to
 
 Assessment answers intentionally exclude free text and have no diagnostic or red-flag interpretation. Assessment and session records carry a 365-day retention target and are deleted when the owning account is deleted. Raw images and videos are never stored.
 
-AI chat is separately consented free text and may contain sensitive health information. Conversations and their messages are owned by one account, expire 30 days after conversation creation, cascade on account or conversation deletion, and are physically removed by the Go API retention worker. Provider prompts and responses must not be logged.
+AI chat is separately consented free text and may contain sensitive health information. Conversations and their messages are owned by one account and remain stored until the owner deletes the conversation or account. Foreign-key cascades physically remove messages with their conversation and conversations with their account. Provider prompts and responses must not be logged.
 
 Still-planned entities include clinician-reviewed safety rules, exercise protocols, joint-angle rules, rehabilitation plans, pose metrics, feedback, clinical references, and privacy-safe audit events.
 

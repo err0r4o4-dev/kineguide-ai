@@ -218,27 +218,27 @@ func (p *Postgres) CreateConversation(ctx context.Context, conversation product.
 	err := p.pool.QueryRow(ctx, `
 		INSERT INTO conversations (user_id, title, locale)
 		VALUES ($1, $2, $3)
-		RETURNING id::text, created_at, updated_at, retention_until`,
+		RETURNING id::text, created_at, updated_at, retention_policy`,
 		conversation.UserID, conversation.Title, conversation.Locale).
-		Scan(&conversation.ID, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionUntil)
+		Scan(&conversation.ID, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionPolicy)
 	return conversation, mapError(err)
 }
 
 func (p *Postgres) ConversationByID(ctx context.Context, userID, conversationID string) (product.Conversation, error) {
 	var conversation product.Conversation
 	err := p.pool.QueryRow(ctx, `
-		SELECT id::text, user_id::text, title, locale, created_at, updated_at, retention_until
+		SELECT id::text, user_id::text, title, locale, created_at, updated_at, retention_policy
 		FROM conversations
-		WHERE id = $1 AND user_id = $2 AND retention_until > now()`, conversationID, userID).
-		Scan(&conversation.ID, &conversation.UserID, &conversation.Title, &conversation.Locale, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionUntil)
+		WHERE id = $1 AND user_id = $2`, conversationID, userID).
+		Scan(&conversation.ID, &conversation.UserID, &conversation.Title, &conversation.Locale, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionPolicy)
 	return conversation, mapError(err)
 }
 
 func (p *Postgres) ListConversations(ctx context.Context, userID string, limit int) ([]product.Conversation, error) {
 	rows, err := p.pool.Query(ctx, `
-		SELECT id::text, user_id::text, title, locale, created_at, updated_at, retention_until
+		SELECT id::text, user_id::text, title, locale, created_at, updated_at, retention_policy
 		FROM conversations
-		WHERE user_id = $1 AND retention_until > now()
+		WHERE user_id = $1
 		ORDER BY updated_at DESC LIMIT $2`, userID, limit)
 	if err != nil {
 		return nil, err
@@ -247,7 +247,7 @@ func (p *Postgres) ListConversations(ctx context.Context, userID string, limit i
 	conversations := make([]product.Conversation, 0)
 	for rows.Next() {
 		var conversation product.Conversation
-		if err := rows.Scan(&conversation.ID, &conversation.UserID, &conversation.Title, &conversation.Locale, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionUntil); err != nil {
+		if err := rows.Scan(&conversation.ID, &conversation.UserID, &conversation.Title, &conversation.Locale, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionPolicy); err != nil {
 			return nil, err
 		}
 		conversations = append(conversations, conversation)
@@ -272,7 +272,6 @@ func (p *Postgres) ListMessages(ctx context.Context, userID, conversationID stri
 		FROM conversation_messages m
 		JOIN conversations c ON c.id = m.conversation_id
 		WHERE c.id = $1 AND c.user_id = $2
-		  AND c.retention_until > now() AND m.retention_until > now()
 		ORDER BY m.sequence DESC LIMIT $3`, conversationID, userID, limit)
 	if err != nil {
 		return nil, err
@@ -292,25 +291,17 @@ func (p *Postgres) ListMessages(ctx context.Context, userID, conversationID stri
 	return messages, rows.Err()
 }
 
-func (p *Postgres) DeleteExpiredConversations(ctx context.Context) (int64, error) {
-	command, err := p.pool.Exec(ctx, `DELETE FROM conversations WHERE retention_until <= now()`)
-	if err != nil {
-		return 0, err
-	}
-	return command.RowsAffected(), nil
-}
-
 func (p *Postgres) SaveConversationExchange(ctx context.Context, userID, conversationID, userContent, assistantContent string) ([]product.Message, error) {
 	tx, err := p.pool.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback(ctx) //nolint:errcheck
-	var retentionUntil time.Time
+	var lockedConversationID string
 	if err := tx.QueryRow(ctx, `
-		SELECT retention_until FROM conversations
-		WHERE id = $1 AND user_id = $2 AND retention_until > now()
-		FOR UPDATE`, conversationID, userID).Scan(&retentionUntil); err != nil {
+		SELECT id::text FROM conversations
+		WHERE id = $1 AND user_id = $2
+		FOR UPDATE`, conversationID, userID).Scan(&lockedConversationID); err != nil {
 		return nil, mapError(err)
 	}
 	messages := make([]product.Message, 0, 2)
@@ -319,9 +310,9 @@ func (p *Postgres) SaveConversationExchange(ctx context.Context, userID, convers
 		{ConversationID: conversationID, Role: "assistant", Content: assistantContent},
 	} {
 		err := tx.QueryRow(ctx, `
-			INSERT INTO conversation_messages (conversation_id, role, content, retention_until)
-			VALUES ($1, $2, $3, $4)
-			RETURNING id::text, created_at`, conversationID, message.Role, message.Content, retentionUntil).
+			INSERT INTO conversation_messages (conversation_id, role, content)
+			VALUES ($1, $2, $3)
+			RETURNING id::text, created_at`, conversationID, message.Role, message.Content).
 			Scan(&message.ID, &message.CreatedAt)
 		if err != nil {
 			return nil, err

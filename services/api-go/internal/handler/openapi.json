@@ -39,7 +39,7 @@
     },
     {
       "name": "Conversations",
-      "description": "Account-scoped AI chat history retained for up to 30 days."
+      "description": "Account-scoped AI chat history retained until the user deletes the conversation or account."
     }
   ],
   "paths": {
@@ -1017,7 +1017,7 @@
         "tags": [
           "Conversations"
         ],
-        "summary": "List the authenticated account's unexpired conversations",
+        "summary": "List the authenticated account's conversations",
         "security": [
           {
             "bearerAuth": []
@@ -1074,7 +1074,7 @@
         },
         "responses": {
           "201": {
-            "description": "Conversation created with a 30-day retention deadline.",
+            "description": "Conversation created and retained until user deletion.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1593,7 +1593,7 @@
           },
           "ai_chat_storage": {
             "type": "boolean",
-            "description": "Explicit consent to retain account-scoped AI chat for up to 30 days."
+            "description": "Explicit consent to retain account-scoped AI chat until the user deletes the conversation or account."
           },
           "research_use": {
             "type": "boolean"
@@ -2030,7 +2030,7 @@
           "locale",
           "created_at",
           "updated_at",
-          "retention_until"
+          "retention_policy"
         ],
         "properties": {
           "id": {
@@ -2057,10 +2057,12 @@
             "type": "string",
             "format": "date-time"
           },
-          "retention_until": {
+          "retention_policy": {
             "type": "string",
-            "format": "date-time",
-            "description": "Automatic expiry no later than 30 days after creation."
+            "enum": [
+              "until_deleted"
+            ],
+            "description": "The conversation remains stored until its owner deletes the conversation or account."
           }
         }
       },

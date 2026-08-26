@@ -15,7 +15,7 @@ vi.mock('@/services/product', async () => {
 
 const activeConsent: product.Consent = {
   id: 'a91da3f1-00ae-4d7c-8ea3-b4e9f2c20d90',
-  policy_version: 'prototype-v1',
+  policy_version: 'prototype-v3',
   camera_processing: true,
   session_summary_storage: true,
   ai_chat_storage: false,
@@ -73,6 +73,19 @@ describe('ConsentRoute', () => {
     expect(
       screen.queryByRole('navigation', { name: 'เมนูหลัก' })
     ).not.toBeInTheDocument()
+  })
+
+  it('requires renewed consent when the retention policy is outdated', async () => {
+    vi.mocked(product.getConsent).mockResolvedValue({
+      ...activeConsent,
+      policy_version: 'prototype-v2'
+    })
+
+    renderRoute()
+
+    expect(
+      await screen.findByRole('heading', { name: 'หน้าความยินยอม' })
+    ).toBeInTheDocument()
   })
 
   it('shows a retryable failure instead of treating an API error as no consent', async () => {

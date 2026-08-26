@@ -43,7 +43,7 @@ func (s *chatStore) CreateConversation(_ context.Context, conversation product.C
 	conversation.ID = "864cb7ae-64dd-4db4-8200-12b44e5bcab1"
 	conversation.CreatedAt = time.Now().UTC()
 	conversation.UpdatedAt = conversation.CreatedAt
-	conversation.RetentionUntil = conversation.CreatedAt.Add(30 * 24 * time.Hour)
+	conversation.RetentionPolicy = product.RetentionUntilDeleted
 	s.conversation = conversation
 	return conversation, nil
 }
@@ -102,13 +102,15 @@ func chatRouter(t *testing.T, store *chatStore, chatAI *stubChatAI) http.Handler
 }
 
 func TestChatCreatesAccountScopedConversationAndStoresSuccessfulExchange(t *testing.T) {
-	store := &chatStore{consent: product.Consent{ID: "consent", AIChatStorage: true}}
+	store := &chatStore{consent: product.Consent{ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true}}
 	chatAI := &stubChatAI{response: ai.ChatResponse{Status: "completed", Message: "คำตอบจำลองที่ปลอดภัย"}}
 	router := chatRouter(t, store, chatAI)
 
 	created := httptest.NewRecorder()
 	router.ServeHTTP(created, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations", `{"locale":"th"}`))
 	require.Equal(t, http.StatusCreated, created.Code)
+	assert.Contains(t, created.Body.String(), `"retention_policy":"until_deleted"`)
+	assert.NotContains(t, created.Body.String(), `"retention_until"`)
 
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations/"+store.conversation.ID+"/messages", `{"content":"ข้อความทดสอบทั่วไป"}`))
@@ -118,6 +120,17 @@ func TestChatCreatesAccountScopedConversationAndStoresSuccessfulExchange(t *test
 	assert.Contains(t, response.Body.String(), "คำตอบจำลองที่ปลอดภัย")
 	assert.Equal(t, 1, chatAI.calls)
 	assert.Len(t, store.saved, 2)
+}
+
+func TestChatRequiresCurrentRetentionConsentPolicy(t *testing.T) {
+	store := &chatStore{consent: product.Consent{ID: "consent", PolicyVersion: "prototype-v2", AIChatStorage: true}}
+	router := chatRouter(t, store, &stubChatAI{})
+
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations", `{"locale":"th"}`))
+
+	assert.Equal(t, http.StatusForbidden, response.Code)
+	assert.Contains(t, response.Body.String(), `"code":"AI_CHAT_CONSENT_REQUIRED"`)
 }
 
 func TestChatRequiresExplicitStorageConsent(t *testing.T) {
@@ -135,7 +148,7 @@ func TestChatRequiresExplicitStorageConsent(t *testing.T) {
 
 func TestChatDoesNotPersistWhenAIIsUnavailable(t *testing.T) {
 	store := &chatStore{
-		consent:      product.Consent{ID: "consent", AIChatStorage: true},
+		consent:      product.Consent{ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true},
 		conversation: product.Conversation{ID: "864cb7ae-64dd-4db4-8200-12b44e5bcab1", UserID: chatTestUserID, Locale: "th"},
 	}
 	chatAI := &stubChatAI{err: errors.New("offline")}

@@ -22,7 +22,7 @@ tags:
   - name: Sessions
     description: Minimal user-owned activity summaries.
   - name: Conversations
-    description: Account-scoped AI chat history retained for up to 30 days.
+    description: Account-scoped AI chat history retained until the user deletes the conversation or account.
 security: []
 paths:
   /health:
@@ -439,7 +439,7 @@ paths:
     get:
       operationId: listConversations
       tags: [Conversations]
-      summary: List the authenticated account's unexpired conversations
+      summary: List the authenticated account's conversations
       security: [{ bearerAuth: [] }]
       responses:
         "200":
@@ -465,7 +465,7 @@ paths:
             schema: { $ref: "#/components/schemas/CreateConversationRequest" }
       responses:
         "201":
-          description: Conversation created with a 30-day retention deadline.
+          description: Conversation created and retained until user deletion.
           content:
             application/json: { schema: { $ref: "#/components/schemas/Conversation" } }
         "401": { $ref: "#/components/responses/Error" }
@@ -650,7 +650,7 @@ components:
       properties:
         camera_processing: { type: boolean }
         session_summary_storage: { type: boolean }
-        ai_chat_storage: { type: boolean, description: Explicit consent to retain account-scoped AI chat for up to 30 days. }
+        ai_chat_storage: { type: boolean, description: Explicit consent to retain account-scoped AI chat until the user deletes the conversation or account. }
         research_use: { type: boolean }
     Consent:
       type: object
@@ -777,14 +777,14 @@ components:
     Conversation:
       type: object
       additionalProperties: false
-      required: [id, title, locale, created_at, updated_at, retention_until]
+      required: [id, title, locale, created_at, updated_at, retention_policy]
       properties:
         id: { type: string, format: uuid }
         title: { type: string, minLength: 1, maxLength: 120 }
         locale: { type: string, enum: [th, en] }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
-        retention_until: { type: string, format: date-time, description: Automatic expiry no later than 30 days after creation. }
+        retention_policy: { type: string, enum: [until_deleted], description: The conversation remains stored until its owner deletes the conversation or account. }
     ConversationMessage:
       type: object
       additionalProperties: false

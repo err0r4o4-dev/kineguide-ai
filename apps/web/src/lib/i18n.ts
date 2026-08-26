@@ -122,7 +122,7 @@ const th = {
     required: 'ยอมรับการประมวลผลกล้องและการเก็บ session summary',
     aiChat: 'ยอมรับการใช้ AI chat และการเก็บประวัติ',
     aiChatBody:
-      'ข้อความแชตอาจมีข้อมูลสุขภาพและจะเก็บในบัญชีนี้ไม่เกิน 30 วัน คุณลบได้ก่อนกำหนด',
+      'ข้อความแชตอาจมีข้อมูลสุขภาพและจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี',
     research: 'ยอมรับการใช้เพื่อการวิจัย',
     accept: 'ยอมรับและดำเนินการต่อ',
     privacy:
@@ -132,7 +132,7 @@ const th = {
   chat: {
     title: 'คุยกับ KineGuide AI',
     subtitle:
-      'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บไม่เกิน 30 วัน',
+      'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี',
     boundary:
       'KineGuide AI ให้ข้อมูลเพื่อการศึกษาเท่านั้น ไม่วินิจฉัยโรค ไม่กำหนดการรักษา และไม่ใช้แทนแพทย์หรือนักกายภาพบำบัด',
     conversations: 'รายการบทสนทนา',
@@ -505,7 +505,7 @@ const en: typeof th = {
     required: 'Allow camera processing and session-summary storage',
     aiChat: 'Allow AI chat and conversation-history storage',
     aiChatBody:
-      'Chat may contain health information and is stored in this account for up to 30 days. You can delete it sooner.',
+      'Chat may contain health information and remains stored until you delete the conversation or your account.',
     research: 'Allow research use',
     accept: 'Accept and continue',
     privacy:
@@ -515,7 +515,7 @@ const en: typeof th = {
   chat: {
     title: 'Chat with KineGuide AI',
     subtitle:
-      'Continue a typed conversation using history from this account. Messages are retained for up to 30 days.',
+      'Continue a typed conversation using history from this account. Messages remain stored until you delete the conversation or your account.',
     boundary:
       'KineGuide AI provides educational information only. It does not diagnose, prescribe treatment, or replace a physician or physiotherapist.',
     conversations: 'Conversation list',

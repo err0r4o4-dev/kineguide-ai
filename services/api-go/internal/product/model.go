@@ -2,6 +2,11 @@ package product
 
 import "time"
 
+const (
+	CurrentConsentPolicyVersion = "prototype-v3"
+	RetentionUntilDeleted       = "until_deleted"
+)
+
 type User struct {
 	ID           string    `json:"id"`
 	Email        string    `json:"email"`
@@ -27,17 +32,17 @@ func (c Consent) IsActive() bool {
 }
 
 func (c Consent) AllowsAIChat() bool {
-	return c.ID != "" && c.RevokedAt == nil && c.AIChatStorage
+	return c.ID != "" && c.PolicyVersion == CurrentConsentPolicyVersion && c.RevokedAt == nil && c.AIChatStorage
 }
 
 type Conversation struct {
-	ID             string    `json:"id"`
-	UserID         string    `json:"-"`
-	Title          string    `json:"title"`
-	Locale         string    `json:"locale"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	RetentionUntil time.Time `json:"retention_until"`
+	ID              string    `json:"id"`
+	UserID          string    `json:"-"`
+	Title           string    `json:"title"`
+	Locale          string    `json:"locale"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+	RetentionPolicy string    `json:"retention_policy"`
 }
 
 type Message struct {

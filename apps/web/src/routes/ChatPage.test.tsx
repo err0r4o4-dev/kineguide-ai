@@ -27,7 +27,7 @@ describe('ChatPage', () => {
       locale: 'th',
       created_at: '2026-08-26T00:00:00Z',
       updated_at: '2026-08-26T00:00:00Z',
-      retention_until: '2026-09-25T00:00:00Z'
+      retention_policy: 'until_deleted'
     })
     vi.mocked(product.getConversationMessages).mockResolvedValue([])
     vi.mocked(product.sendConversationMessage).mockResolvedValue([
@@ -60,6 +60,12 @@ describe('ChatPage', () => {
         </MemoryRouter>
       </QueryClientProvider>
     )
+
+    expect(
+      screen.getByText(
+        'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี'
+      )
+    ).toBeInTheDocument()
 
     await user.click(
       await screen.findByRole('button', { name: 'เริ่มบทสนทนาใหม่' })

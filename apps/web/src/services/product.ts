@@ -36,6 +36,8 @@ export interface Consent {
   revoked_at: string | null
 }
 
+export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
+
 export interface Assessment {
   id: string
   concern_area: string
@@ -93,7 +95,7 @@ export interface Conversation {
   locale: 'th' | 'en'
   created_at: string
   updated_at: string
-  retention_until: string
+  retention_policy: 'until_deleted'
 }
 
 export interface ConversationMessage {

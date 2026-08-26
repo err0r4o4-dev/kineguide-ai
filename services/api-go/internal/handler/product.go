@@ -271,7 +271,7 @@ func (a *productAPI) saveConsent(c *gin.Context) {
 		writeError(c, http.StatusUnprocessableEntity, "CONSENT_REQUIRED", "Camera processing and session-summary storage consent are required for guided sessions.")
 		return
 	}
-	consent, err := a.store.SaveConsent(c.Request.Context(), product.Consent{UserID: c.GetString(userIDKey), PolicyVersion: "prototype-v2", CameraProcessing: request.CameraProcessing, SessionSummaryStorage: request.SessionSummaryStorage, AIChatStorage: request.AIChatStorage, ResearchUse: request.ResearchUse})
+	consent, err := a.store.SaveConsent(c.Request.Context(), product.Consent{UserID: c.GetString(userIDKey), PolicyVersion: product.CurrentConsentPolicyVersion, CameraProcessing: request.CameraProcessing, SessionSummaryStorage: request.SessionSummaryStorage, AIChatStorage: request.AIChatStorage, ResearchUse: request.ResearchUse})
 	if err != nil {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to save consent.")
 		return
