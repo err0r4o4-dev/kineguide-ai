@@ -138,7 +138,7 @@ const th = {
     failed: 'ไม่สามารถบันทึก consent ได้'
   },
   chat: {
-    title: 'คุยกับ KineGuide AI',
+    title: 'ผู้ช่วย KineGuide AI',
     subtitle:
       'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี',
     boundary:
@@ -149,6 +149,8 @@ const th = {
     empty: 'ยังไม่มีบทสนทนา เริ่มห้องใหม่เมื่อคุณพร้อม',
     startPrompt: 'พิมพ์ข้อความเพื่อเริ่มบทสนทนา',
     messageLabel: 'ข้อความถึง KineGuide AI',
+    placeholder: 'พิมพ์ข้อความของคุณ…',
+    composerHint: 'กด Enter เพื่อส่ง หรือ Shift และ Enter เพื่อขึ้นบรรทัดใหม่',
     messageRequired: 'กรุณาพิมพ์ข้อความไม่เกิน 4,000 ตัวอักษร',
     send: 'ส่งข้อความ',
     responding: 'KineGuide AI กำลังตอบ…',
@@ -538,7 +540,7 @@ const en: typeof th = {
     failed: 'Unable to save consent.'
   },
   chat: {
-    title: 'Chat with KineGuide AI',
+    title: 'KineGuide AI assistant',
     subtitle:
       'Continue a typed conversation using history from this account. Messages remain stored until you delete the conversation or your account.',
     boundary:
@@ -549,6 +551,8 @@ const en: typeof th = {
     empty: 'No conversations yet. Start one when you are ready.',
     startPrompt: 'Type a message to begin the conversation.',
     messageLabel: 'Message to KineGuide AI',
+    placeholder: 'Type your message…',
+    composerHint: 'Press Enter to send, or Shift and Enter for a new line.',
     messageRequired: 'Enter a message of no more than 4,000 characters.',
     send: 'Send message',
     responding: 'KineGuide AI is responding…',

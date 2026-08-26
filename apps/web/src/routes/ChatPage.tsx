@@ -1,17 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  CalendarDays,
-  ClipboardList,
+  ChevronDown,
+  HeartPulse,
   MessageCircle,
   Plus,
   Send,
+  ShieldCheck,
   Trash2
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { z } from 'zod'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
@@ -20,7 +21,6 @@ import {
   deleteConversation,
   getConversationMessages,
   getConversations,
-  getLatestAssessment,
   sendConversationMessage,
   type Conversation,
   type ConversationMessage
@@ -35,12 +35,13 @@ type MessageForm = z.infer<typeof messageSchema>
 export function ChatPage() {
   const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
   const [selectedID, setSelectedID] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
   const conversations = useQuery({
     queryKey: ['conversations'],
     queryFn: ({ signal }) => getConversations(signal)
   })
+
   useEffect(() => {
     if (!selectedID && conversations.data?.[0]) {
       setSelectedID(conversations.data[0].id)
@@ -51,10 +52,6 @@ export function ChatPage() {
     queryKey: ['conversation-messages', selectedID],
     queryFn: ({ signal }) => getConversationMessages(selectedID, signal),
     enabled: selectedID !== ''
-  })
-  const assessment = useQuery({
-    queryKey: ['latest-assessment'],
-    queryFn: ({ signal }) => getLatestAssessment(signal)
   })
   const form = useForm<MessageForm>({
     resolver: zodResolver(messageSchema),
@@ -106,89 +103,125 @@ export function ChatPage() {
   })
 
   const onSubmit = form.handleSubmit((input) => send.mutate(input))
+  const locale = i18n.resolvedLanguage === 'en' ? 'en' : 'th'
+  const formatTime = (value: string) =>
+    new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date(value))
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [messages.data?.length, send.isPending])
+
+  const conversationList = conversations.data && (
+    <div className="space-y-2">
+      {conversations.data.length === 0 && (
+        <p className="px-3 py-5 text-sm leading-6 text-kg-muted">
+          {t('chat.empty')}
+        </p>
+      )}
+      {conversations.data.map((conversation) => (
+        <div className="group flex items-center gap-1" key={conversation.id}>
+          <button
+            aria-pressed={selectedID === conversation.id}
+            className={`relative min-h-16 min-w-0 flex-1 rounded-xl px-4 py-2.5 text-left transition-colors ${
+              selectedID === conversation.id
+                ? 'bg-kg-soft text-kg-ink'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-kg-ink'
+            }`}
+            onClick={() => setSelectedID(conversation.id)}
+            type="button"
+          >
+            {selectedID === conversation.id && (
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-kg-primary"
+              />
+            )}
+            <span className="block truncate text-sm font-semibold">
+              {conversation.title}
+            </span>
+            <span className="mt-1 block text-xs tabular-nums text-kg-muted">
+              {formatTime(conversation.updated_at)}
+            </span>
+          </button>
+          <button
+            aria-label={t('chat.delete', { title: conversation.title })}
+            className="kg-icon-button shrink-0 opacity-100 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100"
+            disabled={remove.isPending}
+            onClick={() => {
+              if (window.confirm(t('chat.deleteConfirm'))) {
+                remove.mutate(conversation.id)
+              }
+            }}
+            type="button"
+          >
+            <Trash2 aria-hidden="true" size={17} />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
 
   return (
-    <div>
-      <header>
-        <h1 className="text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
-          {t('chat.title')}
-        </h1>
-        <p className="mt-2 max-w-3xl text-slate-600">{t('chat.subtitle')}</p>
-      </header>
-
-      <p className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 sm:px-5">
-        {t('chat.boundary')}
-      </p>
-      <div className="mt-5 flex flex-wrap gap-3" aria-label={t('chat.title')}>
+    <div className="flex min-h-[calc(100dvh-7.5rem)] flex-col overflow-hidden rounded-[1.5rem] border border-kg-border bg-white shadow-sm lg:h-[calc(100dvh-5rem)] lg:min-h-[44rem]">
+      <header className="flex flex-col gap-4 border-b border-kg-border px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-7">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold leading-tight tracking-[-0.02em] text-kg-ink sm:text-3xl">
+            {t('chat.title')}
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-kg-muted">
+            {t('chat.subtitle')}
+          </p>
+        </div>
         <button
-          className="kg-button-secondary"
-          onClick={() => navigate('/app/assessment')}
+          className="kg-button-secondary shrink-0 self-start sm:self-auto"
+          disabled={create.isPending}
+          onClick={() => create.mutate()}
           type="button"
         >
-          {t('assessment.start')}
+          <Plus aria-hidden="true" size={18} />
+          {t('chat.new')}
         </button>
-        <Link className="kg-button-secondary" to="/app/plan">
-          {t('nav.plan')}
-        </Link>
-        <Link className="kg-button-secondary" to="/app/camera">
-          {t('nav.camera')}
-        </Link>
-      </div>
+      </header>
+
+      {create.isError && (
+        <div className="m-4 kg-alert-danger sm:mx-6" role="alert">
+          <p>{t('chat.consentRequired')}</p>
+          <Link className="mt-2 inline-block underline" to="/consent">
+            {t('chat.manageConsent')}
+          </Link>
+        </div>
+      )}
 
       {conversations.isLoading && <QueryLoading />}
       {conversations.isError && (
-        <div className="mt-6">
+        <div className="p-6">
           <QueryError retry={() => void conversations.refetch()} />
         </div>
       )}
 
       {conversations.data && (
-        <div className="mt-7 grid min-h-[36rem] gap-5 xl:grid-cols-[260px_minmax(0,1fr)_250px]">
-          <aside className="kg-card p-5" aria-label={t('chat.conversations')}>
-            <button
-              className="kg-button-primary w-full"
-              disabled={create.isPending}
-              onClick={() => create.mutate()}
-              type="button"
-            >
-              <Plus aria-hidden="true" size={18} />
-              {t('chat.new')}
-            </button>
-            {create.isError && (
-              <div className="kg-alert-danger mt-3" role="alert">
-                <p>{t('chat.consentRequired')}</p>
-                <Link className="mt-2 inline-block underline" to="/consent">
-                  {t('chat.manageConsent')}
-                </Link>
-              </div>
-            )}
-            <div className="mt-4 space-y-2">
-              {conversations.data.map((conversation) => (
-                <div className="flex gap-2" key={conversation.id}>
-                  <button
-                    aria-pressed={selectedID === conversation.id}
-                    className={`min-h-11 min-w-0 flex-1 rounded-xl px-3 text-left text-sm ${selectedID === conversation.id ? 'bg-teal-50 font-semibold text-teal-900' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`}
-                    onClick={() => setSelectedID(conversation.id)}
-                    type="button"
-                  >
-                    <span className="block truncate">{conversation.title}</span>
-                  </button>
-                  <button
-                    aria-label={t('chat.delete', { title: conversation.title })}
-                    className="kg-icon-button"
-                    disabled={remove.isPending}
-                    onClick={() => {
-                      if (window.confirm(t('chat.deleteConfirm'))) {
-                        remove.mutate(conversation.id)
-                      }
-                    }}
-                    type="button"
-                  >
-                    <Trash2 aria-hidden="true" size={18} />
-                  </button>
-                </div>
-              ))}
+        <div className="min-h-0 flex-1 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+          <details className="border-b border-kg-border bg-white lg:hidden">
+            <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between px-4 font-semibold text-kg-ink marker:content-none">
+              {t('chat.conversations')}
+              <ChevronDown aria-hidden="true" size={19} />
+            </summary>
+            <div className="max-h-72 overflow-y-auto border-t border-kg-border p-3">
+              {conversationList}
             </div>
+          </details>
+
+          <aside
+            aria-label={t('chat.conversations')}
+            className="hidden border-r border-kg-border bg-slate-50/45 p-4 lg:block"
+          >
+            <h2 className="mb-3 px-3 text-sm font-bold text-kg-ink">
+              {t('chat.conversations')}
+            </h2>
+            {conversationList}
             {remove.isError && (
               <p className="kg-alert-danger mt-3" role="alert">
                 {t('chat.deleteFailed')}
@@ -197,49 +230,90 @@ export function ChatPage() {
           </aside>
 
           <section
-            className="kg-card flex min-h-[36rem] min-w-0 flex-col overflow-hidden"
             aria-label={t('chat.conversation')}
+            className="flex min-h-[34rem] min-w-0 flex-col bg-white lg:min-h-0"
           >
-            {!selectedID && (
-              <div className="m-auto max-w-md px-6 text-center text-slate-600">
-                <MessageCircle
-                  aria-hidden="true"
-                  className="mx-auto text-teal-700"
-                  size={42}
-                />
-                <p className="mt-4">{t('chat.empty')}</p>
-              </div>
-            )}
-            {selectedID && messages.isLoading && <QueryLoading />}
-            {selectedID && messages.isError && (
-              <div className="m-auto p-6">
-                <QueryError retry={() => void messages.refetch()} />
-              </div>
-            )}
-            {selectedID && messages.data && (
-              <>
-                <div
-                  className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6"
-                  aria-live="polite"
-                >
+            <div
+              aria-live="polite"
+              className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8"
+            >
+              {!selectedID && (
+                <div className="m-auto max-w-md py-12 text-center text-kg-muted">
+                  <MessageCircle
+                    aria-hidden="true"
+                    className="mx-auto text-kg-primary"
+                    size={42}
+                  />
+                  <p className="mt-4 leading-7">{t('chat.empty')}</p>
+                </div>
+              )}
+              {selectedID && messages.isLoading && <QueryLoading />}
+              {selectedID && messages.isError && (
+                <div className="m-auto">
+                  <QueryError retry={() => void messages.refetch()} />
+                </div>
+              )}
+              {selectedID && messages.data && (
+                <>
                   {messages.data.length === 0 && (
-                    <p className="m-auto max-w-md py-16 text-center text-slate-500">
-                      {t('chat.startPrompt')}
-                    </p>
+                    <div className="m-auto max-w-md py-12 text-center text-kg-muted">
+                      <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-kg-primary text-white">
+                        <HeartPulse aria-hidden="true" size={21} />
+                      </div>
+                      <p className="mt-4 leading-7">{t('chat.startPrompt')}</p>
+                    </div>
                   )}
                   {messages.data.map((message) => (
                     <article
-                      className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-6 sm:max-w-[75%] ${message.role === 'user' ? 'ml-auto bg-teal-700 text-white' : 'mr-auto border border-slate-200 bg-slate-50 text-slate-800'}`}
+                      className={`flex max-w-[94%] items-start gap-3 sm:max-w-[82%] ${
+                        message.role === 'user'
+                          ? 'ml-auto flex-row-reverse'
+                          : 'mr-auto'
+                      }`}
                       key={message.id}
                     >
-                      <span className="sr-only">
-                        {message.role === 'user' ? t('chat.you') : t('chat.ai')}
-                      </span>
-                      {message.content}
+                      {message.role === 'assistant' && (
+                        <div className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full bg-kg-primary text-white">
+                          <HeartPulse aria-hidden="true" size={17} />
+                        </div>
+                      )}
+                      <div
+                        className={`min-w-0 rounded-2xl px-4 py-3 text-sm leading-7 ${
+                          message.role === 'user'
+                            ? 'rounded-tr-md bg-kg-primary text-white'
+                            : 'rounded-tl-md bg-kg-soft text-kg-ink'
+                        }`}
+                      >
+                        <span className="sr-only">
+                          {message.role === 'user'
+                            ? t('chat.you')
+                            : t('chat.ai')}
+                        </span>
+                        <p className="whitespace-pre-wrap break-words">
+                          {message.content}
+                        </p>
+                        <time
+                          className={`mt-1 block text-right text-[0.7rem] tabular-nums ${
+                            message.role === 'user'
+                              ? 'text-teal-100'
+                              : 'text-kg-muted'
+                          }`}
+                          dateTime={message.created_at}
+                        >
+                          {formatTime(message.created_at)}
+                        </time>
+                      </div>
                     </article>
                   ))}
                   {send.isPending && (
-                    <p className="text-sm text-slate-500" role="status">
+                    <p
+                      className="flex items-center gap-2 text-sm text-kg-muted"
+                      role="status"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="size-2 rounded-full bg-kg-primary"
+                      />
                       {t('chat.responding')}
                     </p>
                   )}
@@ -248,96 +322,67 @@ export function ChatPage() {
                       {t('chat.sendFailed')}
                     </p>
                   )}
-                </div>
-                <form
-                  className="border-t border-slate-200 bg-slate-50/40 p-4 sm:p-5"
-                  onSubmit={onSubmit}
-                >
-                  <label className="kg-field" htmlFor="chat-message">
+                  <div ref={messagesEndRef} />
+                </>
+              )}
+            </div>
+
+            {selectedID && messages.data && (
+              <div className="border-t border-kg-border px-4 py-4 sm:px-6">
+                <form onSubmit={onSubmit}>
+                  <label className="sr-only" htmlFor="chat-message">
                     {t('chat.messageLabel')}
+                  </label>
+                  <div className="flex items-end gap-2 rounded-2xl border border-kg-border bg-white p-2 shadow-sm focus-within:border-kg-primary focus-within:ring-4 focus-within:ring-teal-100">
                     <textarea
-                      className="min-h-24 w-full resize-y rounded-xl border border-slate-300 bg-white p-3 font-normal text-slate-900 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
+                      aria-describedby="chat-composer-hint"
+                      className="max-h-36 min-h-11 min-w-0 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-kg-ink outline-none placeholder:text-slate-400"
                       id="chat-message"
                       maxLength={4000}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === 'Enter' &&
+                          !event.shiftKey &&
+                          !event.nativeEvent.isComposing
+                        ) {
+                          event.preventDefault()
+                          void onSubmit()
+                        }
+                      }}
+                      placeholder={t('chat.placeholder')}
+                      rows={1}
                       {...form.register('content')}
                     />
-                  </label>
+                    <button
+                      aria-label={t('chat.send')}
+                      className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-kg-primary text-white transition-colors hover:bg-kg-primary-strong disabled:opacity-50"
+                      disabled={send.isPending}
+                      type="submit"
+                    >
+                      <Send aria-hidden="true" size={19} />
+                    </button>
+                  </div>
+                  <p className="sr-only" id="chat-composer-hint">
+                    {t('chat.composerHint')}
+                  </p>
                   {form.formState.errors.content && (
                     <p className="kg-error mt-2" role="alert">
                       {t('chat.messageRequired')}
                     </p>
                   )}
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      className="kg-button-primary"
-                      disabled={send.isPending}
-                      type="submit"
-                    >
-                      <Send aria-hidden="true" size={18} />
-                      {t('chat.send')}
-                    </button>
-                  </div>
                 </form>
-              </>
-            )}
-          </section>
-          <aside
-            className="space-y-4 xl:border-l xl:border-slate-200 xl:pl-5"
-            aria-label={t('assessment.summary')}
-          >
-            <h2 className="text-lg font-bold text-slate-950">
-              {t('assessment.summary')}
-            </h2>
-            {assessment.data ? (
-              <article className="kg-card p-4">
-                <div className="flex items-start gap-3">
-                  <ClipboardList
+
+                <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-950">
+                  <ShieldCheck
                     aria-hidden="true"
-                    className="mt-0.5 shrink-0 text-teal-700"
-                    size={20}
+                    className="mt-0.5 shrink-0 text-amber-700"
+                    size={18}
                   />
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      {t('assessment.area')}
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">
-                      {t(`assessment.areas.${assessment.data.concern_area}`)}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-4 text-xs leading-5 text-slate-500">
-                  {t('assessment.reviewBody')}
-                </p>
-              </article>
-            ) : (
-              <article className="kg-card p-4 text-sm leading-6 text-slate-600">
-                {t('assessment.welcome')}
-              </article>
-            )}
-            <article className="kg-card p-4">
-              <div className="flex items-start gap-3">
-                <CalendarDays
-                  aria-hidden="true"
-                  className="mt-0.5 shrink-0 text-teal-700"
-                  size={20}
-                />
-                <div>
-                  <p className="font-semibold text-slate-900">
-                    {t('nav.plan')}
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    {t('plan.subtitle')}
-                  </p>
+                  <p>{t('chat.boundary')}</p>
                 </div>
               </div>
-              <Link
-                className="kg-button-secondary mt-4 w-full text-sm"
-                to="/app/plan"
-              >
-                {t('nav.plan')}
-              </Link>
-            </article>
-          </aside>
+            )}
+          </section>
         </div>
       )}
     </div>

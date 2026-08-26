@@ -64,6 +64,9 @@ describe('ChatPage', () => {
     )
 
     expect(
+      screen.getByRole('heading', { name: 'ผู้ช่วย KineGuide AI' })
+    ).toBeInTheDocument()
+    expect(
       screen.getByText(
         'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี'
       )
@@ -75,8 +78,16 @@ describe('ChatPage', () => {
     const textbox = await screen.findByRole('textbox', {
       name: 'ข้อความถึง KineGuide AI'
     })
-    await user.type(textbox, 'สวัสดี')
-    await user.click(screen.getByRole('button', { name: 'ส่งข้อความ' }))
+    expect(
+      screen.queryByRole('link', { name: 'เริ่มประเมิน' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: 'แผนกิจกรรม' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: 'ฝึกด้วยกล้อง' })
+    ).not.toBeInTheDocument()
+    await user.type(textbox, 'สวัสดี{Enter}')
 
     expect(await screen.findByText('คำตอบจำลองที่ปลอดภัย')).toBeInTheDocument()
     expect(product.sendConversationMessage).toHaveBeenCalledWith(
