@@ -1,103 +1,185 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarCheck2, Clock3, Flame } from 'lucide-react'
+import {
+  CalendarCheck2,
+  ChevronRight,
+  Clock3,
+  Flame,
+  Search
+} from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 
+import { PageHeader } from '@/components/PageHeader'
 import { QueryError, QueryLoading } from '@/components/QueryState'
-import { formatDuration } from '@/lib/format'
-import { getDashboard } from '@/services/product'
+import { StatCard } from '@/components/StatCard'
+import { formatDate, formatDuration } from '@/lib/format'
+import { getDashboard, getSessions } from '@/services/product'
 
 export function ProgressPage() {
-  const { t } = useTranslation()
-  const query = useQuery({
+  const { t, i18n } = useTranslation()
+  const [range, setRange] = useState(7)
+  const [search, setSearch] = useState('')
+  const dashboard = useQuery({
     queryKey: ['dashboard'],
     queryFn: ({ signal }) => getDashboard(signal)
   })
+  const sessions = useQuery({
+    queryKey: ['sessions'],
+    queryFn: ({ signal }) => getSessions(signal)
+  })
+  const visibleSessions = useMemo(
+    () =>
+      (sessions.data ?? [])
+        .filter((session) =>
+          session.exercise_slug.toLowerCase().includes(search.toLowerCase())
+        )
+        .filter(
+          (session) =>
+            range === 0 ||
+            new Date(session.started_at).getTime() >=
+              Date.now() - range * 86400000
+        ),
+    [range, search, sessions.data]
+  )
+
+  if (dashboard.isLoading || sessions.isLoading) return <QueryLoading />
+  if (dashboard.isError || sessions.isError)
+    return (
+      <QueryError
+        retry={() => {
+          void dashboard.refetch()
+          void sessions.refetch()
+        }}
+      />
+    )
+  if (!dashboard.data) return null
+
   return (
     <div>
-      <header>
-        <h1 className="text-3xl font-bold sm:text-4xl">
-          {t('progress.title')}
-        </h1>
-        <p className="mt-2 max-w-3xl text-slate-600">
-          {t('progress.subtitle')}
-        </p>
-      </header>
-      {query.isLoading && <QueryLoading />}
-      {query.isError && (
-        <div className="mt-6">
-          <QueryError retry={() => void query.refetch()} />
+      <PageHeader title={t('nav.progress')} subtitle={t('progress.subtitle')} />
+      <section className="mt-7 grid gap-4 sm:grid-cols-3">
+        <StatCard
+          icon={CalendarCheck2}
+          label={t('progress.sessions')}
+          value={String(dashboard.data.completed_sessions)}
+        />
+        <StatCard
+          icon={Clock3}
+          label={t('progress.time')}
+          value={formatDuration(dashboard.data.total_seconds)}
+        />
+        <StatCard
+          icon={Flame}
+          label={t('progress.streak')}
+          value={String(dashboard.data.current_streak)}
+        />
+      </section>
+      <section className="kg-card mt-6 p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-xl font-bold">{t('progress.chart')}</h2>
+          <div className="flex gap-2" aria-label={t('progress.chart')}>
+            {[7, 30, 90, 0].map((value) => (
+              <button
+                className={range === value ? 'kg-filter-active' : 'kg-filter'}
+                key={value}
+                onClick={() => setRange(value)}
+                type="button"
+              >
+                {value === 0
+                  ? t('exercises.all')
+                  : `${value} ${i18n.resolvedLanguage === 'th' ? 'วัน' : 'days'}`}
+              </button>
+            ))}
+          </div>
         </div>
-      )}
-      {query.data && (
-        <>
-          <section className="mt-7 grid gap-4 sm:grid-cols-3">
-            <ProgressStat
-              icon={CalendarCheck2}
-              label={t('progress.sessions')}
-              value={String(query.data.completed_sessions)}
+        <div
+          className="mt-7 flex h-52 items-end gap-3 border-b border-slate-200 px-2"
+          aria-label={t('progress.subtitle')}
+          role="img"
+        >
+          {visibleSessions
+            .slice(0, 12)
+            .reverse()
+            .map((session) => (
+              <div
+                className="flex h-full flex-1 flex-col justify-end"
+                key={session.id}
+              >
+                <span
+                  className="rounded-t-lg bg-teal-700"
+                  style={{
+                    height: `${Math.max(8, Math.min(100, session.elapsed_seconds / 6))}%`
+                  }}
+                />
+                <span className="pt-2 text-center text-xs text-slate-500">
+                  {new Date(session.started_at).getDate()}
+                </span>
+              </div>
+            ))}
+          {visibleSessions.length === 0 && (
+            <p className="m-auto text-slate-500">{t('history.empty')}</p>
+          )}
+        </div>
+        <p className="mt-4 text-xs text-slate-500">{t('dashboard.manual')}</p>
+      </section>
+      <section className="kg-card mt-6 overflow-hidden">
+        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-xl font-bold">{t('history.title')}</h2>
+          <label className="relative">
+            <span className="sr-only">{t('exercises.search')}</span>
+            <Search
+              aria-hidden="true"
+              className="absolute left-3 top-3 text-slate-500"
+              size={18}
             />
-            <ProgressStat
-              icon={Clock3}
-              label={t('progress.time')}
-              value={formatDuration(query.data.total_seconds)}
+            <input
+              className="min-h-11 rounded-xl border border-slate-300 pl-10 pr-3"
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={t('exercises.search')}
+              value={search}
             />
-            <ProgressStat
-              icon={Flame}
-              label={t('progress.streak')}
-              value={String(query.data.current_streak)}
-            />
-          </section>
-          <section className="kg-card mt-6 p-6">
-            <h2 className="text-2xl font-bold">{t('progress.chart')}</h2>
-            <div
-              className="mt-7 flex h-64 items-end gap-3 border-b border-l border-slate-200 p-4"
-              role="img"
-              aria-label={t('progress.subtitle')}
+          </label>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {visibleSessions.map((session) => (
+            <Link
+              className="flex items-center gap-3 p-4 no-underline hover:bg-slate-50 sm:px-5"
+              key={session.id}
+              to={`/app/sessions/${session.id}/summary`}
             >
-              {query.data.recent_sessions
-                .slice(0, 12)
-                .reverse()
-                .map((session) => (
-                  <div
-                    className="group relative flex h-full flex-1 items-end"
-                    key={session.id}
-                  >
-                    <div
-                      className="w-full rounded-t-lg bg-teal-600"
-                      style={{
-                        height: `${Math.max(5, Math.min(100, session.elapsed_seconds / 6))}%`
-                      }}
-                      title={formatDuration(session.elapsed_seconds)}
-                    />
-                  </div>
-                ))}
-              {query.data.recent_sessions.length === 0 && (
-                <p className="m-auto text-slate-500">{t('history.empty')}</p>
-              )}
-            </div>
-            <p className="mt-4 text-sm text-slate-500">
-              {t('dashboard.manual')}
+              <span
+                className={`size-2 rounded-full ${session.status === 'completed' ? 'bg-emerald-600' : 'bg-amber-500'}`}
+                aria-hidden="true"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold text-slate-900">
+                  {session.exercise_slug}
+                </span>
+                <span className="mt-1 block text-sm text-slate-500">
+                  {formatDate(
+                    session.started_at,
+                    i18n.resolvedLanguage ?? 'th'
+                  )}
+                </span>
+              </span>
+              <span className="hidden text-sm text-slate-500 sm:block">
+                {formatDuration(session.elapsed_seconds)}
+              </span>
+              <ChevronRight
+                aria-hidden="true"
+                className="text-slate-400"
+                size={18}
+              />
+            </Link>
+          ))}
+          {visibleSessions.length === 0 && (
+            <p className="p-8 text-center text-slate-500">
+              {t('history.empty')}
             </p>
-          </section>
-        </>
-      )}
+          )}
+        </div>
+      </section>
     </div>
-  )
-}
-function ProgressStat({
-  icon: Icon,
-  label,
-  value
-}: {
-  icon: typeof Clock3
-  label: string
-  value: string
-}) {
-  return (
-    <article className="kg-card p-6">
-      <Icon aria-hidden="true" className="text-teal-700" />
-      <p className="mt-4 text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-3xl font-bold">{value}</p>
-    </article>
   )
 }

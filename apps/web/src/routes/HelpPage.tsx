@@ -1,13 +1,13 @@
 import { Camera, CircleHelp, ShieldAlert } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { PageHeader } from '@/components/PageHeader'
+
 export function HelpPage() {
   const { t } = useTranslation()
   return (
     <div>
-      <header>
-        <h1 className="text-3xl font-bold sm:text-4xl">{t('help.title')}</h1>
-      </header>
+      <PageHeader title={t('help.title')} />
       <section className="mt-7 grid gap-5 md:grid-cols-2">
         <HelpCard
           icon={Camera}

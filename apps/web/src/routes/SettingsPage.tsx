@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { LanguageButton } from '@/components/LanguageButton'
+import { PageHeader } from '@/components/PageHeader'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import {
@@ -72,11 +73,7 @@ export function SettingsPage() {
   }
   return (
     <div>
-      <header>
-        <h1 className="text-3xl font-bold sm:text-4xl">
-          {t('settings.title')}
-        </h1>
-      </header>
+      <PageHeader title={t('settings.title')} />
       <section className="mt-7 grid gap-5 lg:grid-cols-2">
         <article className="kg-card p-6 lg:col-span-2">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">

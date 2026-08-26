@@ -3,21 +3,25 @@ import { useTranslation } from 'react-i18next'
 
 import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate } from '@/lib/format'
+import { PageHeader } from '@/components/PageHeader'
 
 export function ProfilePage() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
   return (
     <div>
-      <header>
-        <h1 className="text-3xl font-bold sm:text-4xl">{t('profile.title')}</h1>
-        <p className="mt-2 text-slate-600">{t('profile.subtitle')}</p>
-      </header>
-      <section className="kg-card mt-7 max-w-2xl p-7">
-        <span className="grid size-20 place-items-center rounded-full bg-teal-50 text-teal-700">
-          <UserRound aria-hidden="true" size={38} />
-        </span>
-        <dl className="mt-7 space-y-5">
+      <PageHeader title={t('profile.title')} subtitle={t('profile.subtitle')} />
+      <section className="kg-card mt-7 max-w-3xl p-6 sm:p-8">
+        <div className="flex items-center gap-4 border-b border-slate-200 pb-6">
+          <span className="grid size-16 place-items-center rounded-full bg-teal-50 text-teal-700">
+            <UserRound aria-hidden="true" size={38} />
+          </span>
+          <div>
+            <p className="text-lg font-bold">{user?.display_name}</p>
+            <p className="mt-1 text-sm text-slate-500">{user?.email}</p>
+          </div>
+        </div>
+        <dl className="mt-6 grid gap-5 sm:grid-cols-2">
           <div>
             <dt className="text-sm text-slate-500">{t('profile.name')}</dt>
             <dd className="mt-1 text-lg font-semibold">{user?.display_name}</dd>

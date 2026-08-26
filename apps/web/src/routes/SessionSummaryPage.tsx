@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, Clock3, Hash } from 'lucide-react'
+import {
+  ArrowLeft,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Hash,
+  ShieldCheck
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 
@@ -9,7 +16,7 @@ import { getSession } from '@/services/product'
 
 export function SessionSummaryPage() {
   const { id = '' } = useParams()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const query = useQuery({
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal)
@@ -17,14 +24,39 @@ export function SessionSummaryPage() {
   if (query.isLoading) return <QueryLoading />
   if (query.isError) return <QueryError retry={() => void query.refetch()} />
   return (
-    <div className="mx-auto max-w-3xl">
-      <section className="kg-card p-7 text-center sm:p-10">
-        <span className="mx-auto grid size-16 place-items-center rounded-full bg-emerald-50 text-emerald-700">
-          <CheckCircle2 aria-hidden="true" size={34} />
-        </span>
-        <h1 className="mt-5 text-3xl font-bold">{t('session.summary')}</h1>
-        <p className="mt-2 text-slate-600">{t('session.completed')}</p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+    <div className="mx-auto max-w-4xl">
+      <Link
+        className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-800"
+        to="/app/progress"
+      >
+        <ArrowLeft aria-hidden="true" size={18} />
+        {t('nav.progress')}
+      </Link>
+      <section className="kg-card mt-5 p-6 sm:p-8">
+        <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex gap-4">
+            <span className="grid size-14 place-items-center rounded-2xl bg-teal-50 text-teal-800">
+              <CheckCircle2 aria-hidden="true" size={29} />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-teal-700">
+                {t('session.summary')}
+              </p>
+              <h1 className="mt-1 text-3xl font-bold">
+                {query.data?.exercise_slug}
+              </h1>
+              <p className="mt-2 text-sm text-slate-600">
+                {t('dashboard.manual')}
+              </p>
+            </div>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-800">
+            {query.data?.status === 'completed'
+              ? t('history.completed')
+              : t('history.stopped')}
+          </span>
+        </div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-slate-50 p-6">
             <Clock3 aria-hidden="true" className="mx-auto text-teal-700" />
             <p className="mt-3 text-sm text-slate-500">
@@ -41,14 +73,39 @@ export function SessionSummaryPage() {
               {query.data?.manual_repetitions}
             </p>
           </div>
+          <div className="rounded-2xl bg-slate-50 p-6">
+            <CalendarDays
+              aria-hidden="true"
+              className="mx-auto text-teal-700"
+            />
+            <p className="mt-3 text-sm text-slate-500">{t('history.title')}</p>
+            <p className="mt-1 text-center font-semibold">
+              {query.data?.started_at
+                ? new Intl.DateTimeFormat(
+                    i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
+                    { dateStyle: 'medium' }
+                  ).format(new Date(query.data.started_at))
+                : '-'}
+            </p>
+          </div>
         </div>
-        <p className="mt-7 text-sm text-slate-500">{t('dashboard.manual')}</p>
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link className="kg-button-primary" to="/app">
-            {t('session.backHome')}
+        <p className="mt-6 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+          <ShieldCheck
+            aria-hidden="true"
+            className="mt-0.5 shrink-0"
+            size={18}
+          />
+          {t('dashboard.manual')}
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            className="kg-button-primary"
+            to={`/app/exercises/${query.data?.exercise_slug}/setup`}
+          >
+            {t('plan.start')}
           </Link>
-          <Link className="kg-button-secondary" to="/app/history">
-            {t('session.viewHistory')}
+          <Link className="kg-button-secondary" to="/app/progress">
+            {t('nav.progress')}
           </Link>
         </div>
       </section>

@@ -4,7 +4,7 @@ import { MessageCircle, Plus, Send, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { z } from 'zod'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
@@ -27,6 +27,7 @@ type MessageForm = z.infer<typeof messageSchema>
 export function ChatPage() {
   const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [selectedID, setSelectedID] = useState('')
   const conversations = useQuery({
     queryKey: ['conversations'],
@@ -106,6 +107,21 @@ export function ChatPage() {
       <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
         {t('chat.boundary')}
       </p>
+      <div className="mt-5 flex flex-wrap gap-3" aria-label={t('chat.title')}>
+        <button
+          className="kg-button-secondary"
+          onClick={() => navigate('/app/assessment')}
+          type="button"
+        >
+          {t('assessment.start')}
+        </button>
+        <Link className="kg-button-secondary" to="/app/plan">
+          {t('nav.plan')}
+        </Link>
+        <Link className="kg-button-secondary" to="/app/camera">
+          {t('nav.camera')}
+        </Link>
+      </div>
 
       {conversations.isLoading && <QueryLoading />}
       {conversations.isError && (

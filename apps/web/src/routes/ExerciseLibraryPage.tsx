@@ -29,6 +29,25 @@ export function ExerciseLibraryPage() {
   )
   return (
     <div>
+      <div
+        className="mb-6 flex gap-2 border-b border-slate-200"
+        role="tablist"
+        aria-label={t('nav.plan')}
+      >
+        <Link
+          className="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
+          to="/app/plan"
+        >
+          {t('plan.title')}
+        </Link>
+        <Link
+          aria-current="page"
+          className="border-b-2 border-teal-700 px-4 py-3 text-sm font-bold text-teal-800 no-underline"
+          to="/app/exercises"
+        >
+          {t('exercises.title')}
+        </Link>
+      </div>
       <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold sm:text-4xl">

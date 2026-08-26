@@ -2,16 +2,20 @@ import { useQuery } from '@tanstack/react-query'
 import {
   ArrowRight,
   CalendarCheck2,
+  CheckCircle2,
   Clock3,
   Flame,
   MessageCircle,
   Play,
-  ShieldCheck
+  Video
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 
+import { PageHeader } from '@/components/PageHeader'
 import { QueryError, QueryLoading } from '@/components/QueryState'
+import { SafetyNotice } from '@/components/SafetyNotice'
+import { StatCard } from '@/components/StatCard'
 import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
 import { getDashboard } from '@/services/product'
@@ -19,59 +23,21 @@ import { getDashboard } from '@/services/product'
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
   const auth = useAuth()
-  const location = useLocation()
   const query = useQuery({
     queryKey: ['dashboard'],
     queryFn: ({ signal }) => getDashboard(signal)
   })
+
   return (
     <div>
-      <header>
-        <div>
-          <p className="text-sm text-slate-500">
-            {new Intl.DateTimeFormat(
-              i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
-              { dateStyle: 'full' }
-            ).format(new Date())}
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
-            {t('dashboard.hello', { name: auth.user?.display_name })}
-          </h1>
-          <p className="mt-2 text-slate-600">{t('dashboard.ready')}</p>
-        </div>
-      </header>
-      <section className="mt-6 flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-teal-200 bg-teal-50 p-5 sm:p-6">
-        <div className="flex min-w-0 items-start gap-4">
-          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-teal-700 text-white">
-            <MessageCircle aria-hidden="true" />
-          </span>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-950">
-                {t('dashboard.aiTitle')}
-              </h2>
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-teal-800">
-                {t('dashboard.aiStructured')}
-              </span>
-            </div>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              {t('dashboard.aiBody')}
-            </p>
-            <p className="mt-1 text-xs text-slate-600">
-              {t('dashboard.aiBoundary')}
-            </p>
-          </div>
-        </div>
-        <Link className="kg-button-secondary shrink-0" to="/app/chat">
-          {t('dashboard.aiStart')}
-          <ArrowRight aria-hidden="true" />
-        </Link>
-      </section>
-      {location.state?.assessmentSaved && (
-        <p className="kg-alert-success mt-5" role="status">
-          {t('assessment.saved')}
-        </p>
-      )}
+      <PageHeader
+        eyebrow={new Intl.DateTimeFormat(
+          i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
+          { dateStyle: 'full' }
+        ).format(new Date())}
+        title={t('dashboard.hello', { name: auth.user?.display_name })}
+        subtitle={t('dashboard.ready')}
+      />
       {query.isLoading && <QueryLoading />}
       {query.isError && (
         <div className="mt-6">
@@ -80,61 +46,151 @@ export function DashboardPage() {
       )}
       {query.data && (
         <>
-          <section className="mt-8 grid gap-5 xl:grid-cols-[1fr_320px]">
-            <article className="kg-card overflow-hidden p-6 sm:p-8">
-              <p className="font-semibold text-teal-700">
-                ★ {t('dashboard.recommended')}
-              </p>
-              <div className="mt-4 grid gap-6 md:grid-cols-[160px_1fr] md:items-center">
-                <div className="grid aspect-square place-items-center rounded-2xl bg-indigo-50 text-teal-700">
-                  <Play aria-hidden="true" size={52} />
+          <section className="mt-7 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.85fr)]">
+            <article className="kg-card overflow-hidden p-5 sm:p-6">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-800">
+                  <CalendarCheck2 aria-hidden="true" size={21} />
+                </span>
+                <h2 className="text-xl font-bold text-slate-950">
+                  {t('dashboard.today')}
+                </h2>
+              </div>
+              <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(170px,0.8fr)_minmax(0,1fr)] sm:items-center">
+                <div className="grid aspect-square max-h-60 place-items-center rounded-2xl bg-teal-50 text-teal-800">
+                  <div className="text-center">
+                    <Video aria-hidden="true" className="mx-auto" size={48} />
+                    <p className="mt-3 px-5 text-sm font-semibold">
+                      {t('camera.secure')}
+                    </p>
+                  </div>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">
-                    {i18n.resolvedLanguage === 'th'
-                      ? 'สาธิตการลุกนั่งจากเก้าอี้'
-                      : 'Sit-to-stand movement demo'}
-                  </h2>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                  <h3 className="text-2xl font-bold text-slate-950">
+                    {t('dashboard.todayName')}
+                  </h3>
+                  <p className="mt-2 font-semibold text-slate-700">
+                    {t('dashboard.todayProgress')}
+                  </p>
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <span className="block h-full w-[14%] rounded-full bg-teal-700" />
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-slate-600">
                     {t('common.pendingReview')}
                   </p>
-                  <Link className="kg-button-primary mt-5" to="/app/exercises">
-                    {t('dashboard.start')}
-                    <ArrowRight aria-hidden="true" />
-                  </Link>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <Link className="kg-button-primary" to="/app/camera">
+                      <Play aria-hidden="true" size={18} />
+                      {t('plan.start')}
+                    </Link>
+                    <Link className="kg-button-secondary" to="/app/exercises">
+                      {t('dashboard.viewDetails')}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </article>
-            <div className="grid grid-cols-2 gap-4 xl:grid-cols-1">
-              <Stat
-                icon={CalendarCheck2}
-                label={t('dashboard.sessions')}
-                value={String(query.data.completed_sessions)}
-              />
-              <Stat
-                icon={Flame}
-                label={t('dashboard.streak')}
-                value={String(query.data.current_streak)}
-              />
-              <Stat
-                icon={Clock3}
-                label={t('dashboard.time')}
-                value={formatDuration(query.data.total_seconds)}
-              />
-              <Stat
-                icon={ShieldCheck}
-                label={t('common.privacy')}
-                value={t('common.onDevice')}
-                small
-              />
+            <div className="space-y-5">
+              <article className="rounded-2xl border border-teal-200 bg-teal-50 p-5">
+                <div className="flex gap-3">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-teal-700 text-white">
+                    <MessageCircle aria-hidden="true" size={21} />
+                  </span>
+                  <div>
+                    <h2 className="font-bold text-slate-950">
+                      {t('dashboard.aiTitle')}
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-700">
+                      {t('dashboard.aiBody')}
+                    </p>
+                    <Link
+                      className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-teal-800"
+                      to="/app/chat"
+                    >
+                      {t('dashboard.aiStart')}
+                      <ArrowRight aria-hidden="true" size={16} />
+                    </Link>
+                  </div>
+                </div>
+              </article>
+              <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+                <StatCard
+                  icon={CheckCircle2}
+                  label={t('dashboard.completed')}
+                  value={String(query.data.completed_sessions)}
+                />
+                <StatCard
+                  icon={Flame}
+                  label={t('dashboard.streak')}
+                  value={String(query.data.current_streak)}
+                />
+                <StatCard
+                  icon={Clock3}
+                  label={t('dashboard.time')}
+                  value={formatDuration(query.data.total_seconds)}
+                />
+              </div>
             </div>
           </section>
-          <section className="mt-6 grid gap-5 lg:grid-cols-[1fr_380px]">
-            <article className="kg-card min-h-72 p-6">
-              <h2 className="text-2xl font-bold">{t('dashboard.weekly')}</h2>
+          <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+            <article className="kg-card p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-xl font-bold text-slate-950">
+                  {t('dashboard.recent')}
+                </h2>
+                <Link
+                  className="text-sm font-semibold text-teal-800"
+                  to="/app/progress"
+                >
+                  {t('nav.progress')}
+                </Link>
+              </div>
+              <div className="mt-4 divide-y divide-slate-100">
+                {query.data.recent_sessions.slice(0, 4).map((session) => (
+                  <Link
+                    className="flex items-center gap-3 py-4 no-underline hover:bg-slate-50"
+                    key={session.id}
+                    to={`/app/sessions/${session.id}/summary`}
+                  >
+                    <span className="grid size-9 place-items-center rounded-full bg-teal-50 text-teal-800">
+                      <CheckCircle2 aria-hidden="true" size={18} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold text-slate-900">
+                        {session.exercise_slug}
+                      </span>
+                      <span className="mt-1 block text-sm text-slate-500">
+                        {formatDate(
+                          session.started_at,
+                          i18n.resolvedLanguage ?? 'th'
+                        )}
+                      </span>
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      {formatDuration(session.elapsed_seconds)}
+                    </span>
+                    <ArrowRight
+                      aria-hidden="true"
+                      className="text-slate-400"
+                      size={17}
+                    />
+                  </Link>
+                ))}
+                {query.data.recent_sessions.length === 0 && (
+                  <p className="py-8 text-center text-slate-500">
+                    {t('dashboard.noRecent')}
+                  </p>
+                )}
+              </div>
+            </article>
+            <article className="kg-card p-5 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-950">
+                {t('dashboard.weekly')}
+              </h2>
               <div
-                className="mt-8 flex h-40 items-end gap-3"
+                className="mt-7 flex h-40 items-end gap-3"
                 aria-label={t('dashboard.manual')}
+                role="img"
               >
                 {query.data.recent_sessions
                   .slice(0, 7)
@@ -145,7 +201,7 @@ export function DashboardPage() {
                       key={session.id}
                     >
                       <div
-                        className="w-full rounded-t-lg bg-teal-600"
+                        className="w-full rounded-t-lg bg-teal-700"
                         style={{
                           height: `${Math.max(12, Math.min(100, session.elapsed_seconds / 6))}%`
                         }}
@@ -161,65 +217,14 @@ export function DashboardPage() {
                   </p>
                 )}
               </div>
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="mt-4 text-xs leading-5 text-slate-500">
                 {t('dashboard.manual')}
               </p>
             </article>
-            <article className="kg-card p-6">
-              <h2 className="text-2xl font-bold">{t('dashboard.recent')}</h2>
-              <div className="mt-5 space-y-4">
-                {query.data.recent_sessions.slice(0, 3).map((session) => (
-                  <div className="rounded-xl bg-slate-50 p-4" key={session.id}>
-                    <p className="font-semibold">{session.exercise_slug}</p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      {formatDate(
-                        session.started_at,
-                        i18n.resolvedLanguage ?? 'th'
-                      )}{' '}
-                      · {formatDuration(session.elapsed_seconds)}
-                    </p>
-                  </div>
-                ))}
-                {query.data.recent_sessions.length === 0 && (
-                  <p className="text-slate-500">{t('dashboard.noRecent')}</p>
-                )}
-              </div>
-              <Link
-                className="kg-button-secondary mt-5 w-full"
-                to="/app/history"
-              >
-                {t('nav.history')}
-              </Link>
-            </article>
           </section>
+          <SafetyNotice>{t('common.noDiagnosis')}</SafetyNotice>
         </>
       )}
     </div>
-  )
-}
-
-function Stat({
-  icon: Icon,
-  label,
-  value,
-  small = false
-}: {
-  icon: typeof Clock3
-  label: string
-  value: string
-  small?: boolean
-}) {
-  return (
-    <article className="kg-card p-5">
-      <div className="flex items-center justify-between text-sm text-slate-600">
-        <span>{label}</span>
-        <Icon aria-hidden="true" className="text-teal-700" size={19} />
-      </div>
-      <p
-        className={`mt-3 font-bold text-slate-950 ${small ? 'text-xl' : 'text-3xl'}`}
-      >
-        {value}
-      </p>
-    </article>
   )
 }
