@@ -63,6 +63,7 @@ Use one primary skill whenever possible; add a specialist only when its trigger 
 | Docker, Caddy, CI, environment | `$operate-kineguide-infrastructure` | Owning service skill when runtime behavior changes |
 | Auth, consent, health data, secrets | `$protect-kineguide-data` | Required alongside the owning implementation skill |
 | Symptoms, pain, exercise, pose feedback | `$review-kineguide-clinical-safety` | Required alongside the owning implementation skill |
+| Concise, token-efficient replies | `$caveman` | Use when explicitly requested; preserve technical and safety detail |
 
 Web work starts with `$build-kineguide-web`. Add at most one web specialist unless an independent audit is explicitly required. Diagnose broken behavior before considering redesign.
 

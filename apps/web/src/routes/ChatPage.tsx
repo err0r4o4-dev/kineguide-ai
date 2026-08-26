@@ -122,14 +122,17 @@ export function ChatPage() {
         </p>
       )}
       {conversations.data.map((conversation) => (
-        <div className="group flex items-center gap-1" key={conversation.id}>
+        <div
+          className={`group relative flex items-stretch overflow-hidden rounded-xl transition-colors ${
+            selectedID === conversation.id
+              ? 'bg-kg-soft text-kg-ink'
+              : 'text-slate-600 hover:bg-slate-50 hover:text-kg-ink'
+          }`}
+          key={conversation.id}
+        >
           <button
             aria-pressed={selectedID === conversation.id}
-            className={`relative min-h-16 min-w-0 flex-1 rounded-xl px-4 py-2.5 text-left transition-colors ${
-              selectedID === conversation.id
-                ? 'bg-kg-soft text-kg-ink'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-kg-ink'
-            }`}
+            className="relative min-h-16 min-w-0 flex-1 bg-transparent py-2.5 pl-4 pr-14 text-left"
             onClick={() => setSelectedID(conversation.id)}
             type="button"
           >
@@ -148,7 +151,7 @@ export function ChatPage() {
           </button>
           <button
             aria-label={t('chat.delete', { title: conversation.title })}
-            className="kg-icon-button shrink-0 opacity-100 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100"
+            className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg border-0 bg-transparent text-slate-500 transition-colors hover:bg-white/80 hover:text-red-700 disabled:opacity-50"
             disabled={remove.isPending}
             onClick={() => {
               if (window.confirm(t('chat.deleteConfirm'))) {
