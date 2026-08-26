@@ -169,3 +169,156 @@ test('new user completes consent and structured onboarding', async ({
     page.getByRole('heading', { name: 'คุยกับ KineGuide AI' })
   ).toBeVisible()
 })
+
+test('login, hard refresh, and every authenticated navigation target stay consistent', async ({
+  page
+}) => {
+  const runtimeErrors: string[] = []
+  page.on('pageerror', (error) => runtimeErrors.push(error.message))
+  page.on('console', (message) => {
+    if (message.type() === 'error') runtimeErrors.push(message.text())
+  })
+  let signedIn = false
+  let refreshRequests = 0
+  const user = {
+    id: '3356dcec-f826-41f1-8dba-f434b74e75c8',
+    email: 'student@example.com',
+    display_name: 'ผู้ใช้ทดสอบ',
+    created_at: '2026-08-24T12:00:00Z'
+  }
+  const authResponse = {
+    access_token: 'synthetic-access-token',
+    expires_in: 900,
+    user
+  }
+  const consent = {
+    id: 'a91da3f1-00ae-4d7c-8ea3-b4e9f2c20d90',
+    policy_version: 'prototype-v1',
+    camera_processing: true,
+    session_summary_storage: true,
+    research_use: false,
+    accepted_at: '2026-08-24T12:01:00Z',
+    revoked_at: null
+  }
+
+  await page.route('http://localhost:8080/v1/**', async (route) => {
+    const url = route.request().url()
+    if (url.endsWith('/auth/refresh')) {
+      refreshRequests += 1
+      await route.fulfill(
+        signedIn
+          ? { status: 200, json: authResponse }
+          : {
+              status: 401,
+              json: { error: { code: 'REFRESH_REQUIRED' } }
+            }
+      )
+      return
+    }
+    if (url.endsWith('/auth/login')) {
+      signedIn = true
+      await route.fulfill({ status: 200, json: authResponse })
+      return
+    }
+    if (url.endsWith('/auth/providers')) {
+      await route.fulfill({ json: { providers: [] } })
+      return
+    }
+    if (url.endsWith('/me/auth-identities')) {
+      await route.fulfill({ json: { identities: [] } })
+      return
+    }
+    if (url.endsWith('/consents/current')) {
+      await route.fulfill({ json: { consent } })
+      return
+    }
+    if (url.endsWith('/dashboard')) {
+      await route.fulfill({
+        json: {
+          completed_sessions: 0,
+          current_streak: 0,
+          total_seconds: 0,
+          recent_sessions: []
+        }
+      })
+      return
+    }
+    if (url.endsWith('/activity-plan')) {
+      await route.fulfill({
+        json: {
+          plan_type: 'demo_exploration',
+          review_status: 'pending_clinical_review',
+          personalized: false,
+          duration_days: 7,
+          days: []
+        }
+      })
+      return
+    }
+    if (url.endsWith('/exercises')) {
+      await route.fulfill({ json: { exercises: [] } })
+      return
+    }
+    if (url.endsWith('/sessions')) {
+      await route.fulfill({ json: { sessions: [] } })
+      return
+    }
+    await route.abort()
+  })
+
+  await page.goto('/login')
+  await page.getByLabel('อีเมล').fill('student@example.com')
+  await page.getByLabel('รหัสผ่าน').fill('safe-demo-password')
+  runtimeErrors.length = 0
+  await page.getByRole('button', { name: 'เข้าสู่ระบบ' }).click()
+
+  await expect(page).toHaveURL('/app')
+  await expect(
+    page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+  ).toBeVisible()
+
+  for (let reload = 0; reload < 3; reload += 1) {
+    await page.reload()
+    await expect(
+      page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+    ).toBeVisible()
+  }
+  expect(refreshRequests).toBe(4)
+
+  await page.setViewportSize({ width: 320, height: 900 })
+  const menuButton = page.locator('button[aria-controls="app-navigation"]')
+  await menuButton.click()
+  await expect(menuButton).toHaveAccessibleName('ปิดเมนู')
+  await expect(
+    page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+  ).toBeVisible()
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true)
+  await page
+    .locator('#app-navigation')
+    .getByRole('button', { name: 'ปิดเมนู' })
+    .click()
+  await page.setViewportSize({ width: 1280, height: 900 })
+
+  const destinations = [
+    ['คุยกับ AI', '/app/assessment'],
+    ['แผนกิจกรรม', '/app/plan'],
+    ['ท่าฝึกสาธิต', '/app/exercises'],
+    ['ประวัติ', '/app/history'],
+    ['ความก้าวหน้า', '/app/progress'],
+    ['โปรไฟล์', '/app/profile'],
+    ['ตั้งค่า', '/app/settings'],
+    ['ช่วยเหลือ', '/app/help'],
+    ['หน้าหลัก', '/app']
+  ] as const
+
+  for (const [name, path] of destinations) {
+    await page.getByRole('link', { name, exact: true }).click()
+    await expect(page).toHaveURL(path)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  }
+  expect(runtimeErrors).toEqual([])
+})

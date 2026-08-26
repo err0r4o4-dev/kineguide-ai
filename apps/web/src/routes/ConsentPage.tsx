@@ -1,4 +1,5 @@
 import { Camera, Database, MicOff, ShieldCheck } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
@@ -10,6 +11,7 @@ import { saveConsent } from '@/services/product'
 export function ConsentPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [required, setRequired] = useState(false)
   const [research, setResearch] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -19,11 +21,12 @@ export function ConsentPage() {
     setSaving(true)
     setError('')
     try {
-      await saveConsent({
+      const consent = await saveConsent({
         camera_processing: true,
         session_summary_storage: true,
         research_use: research
       })
+      queryClient.setQueryData(['consent'], consent)
       navigate('/app/assessment', { replace: true })
     } catch {
       setError(t('consent.failed'))

@@ -4,7 +4,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router'
 
 import { Brand } from '@/components/Brand'
 import { useAuth } from '@/features/auth/AuthContext'
-import { getConsent } from '@/services/product'
 
 const errorTranslation: Record<string, string> = {
   cancelled: 'auth.socialCancelled',
@@ -34,21 +33,7 @@ export function AuthCallbackPage() {
       })
       return
     }
-    let active = true
-    getConsent()
-      .then((consent) => {
-        if (active) {
-          navigate(consent && !consent.revoked_at ? '/app' : '/consent', {
-            replace: true
-          })
-        }
-      })
-      .catch(() => {
-        if (active) navigate('/consent', { replace: true })
-      })
-    return () => {
-      active = false
-    }
+    navigate('/app', { replace: true })
   }, [auth.ready, auth.user, error, mode, navigate, provider])
 
   const visibleError = error || (sessionError ? 'session_failed' : '')

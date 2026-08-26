@@ -32,6 +32,18 @@ const th = {
     pendingReview:
       'เนื้อหาสาธิตนี้ยังรอการทบทวนจากผู้เชี่ยวชาญ จึงไม่มีคำแนะนำทางคลินิกหรือคะแนนความถูกต้อง'
   },
+  pwa: {
+    updateTitle: 'มี KineGuide AI รุ่นใหม่',
+    updateBody:
+      'อัปเดตเพื่อให้เมนูและหน้าจอเป็นรุ่นล่าสุด โดยสถานะการเข้าสู่ระบบจะยังคงอยู่',
+    updateNow: 'อัปเดตตอนนี้',
+    updating: 'กำลังอัปเดต…',
+    updateFailed: 'อัปเดตไม่สำเร็จ กรุณาลองอีกครั้ง',
+    retryUpdate: 'ลองอัปเดตอีกครั้ง',
+    offlineTitle: 'พร้อมใช้งานแบบออฟไลน์',
+    offlineBody: 'ไฟล์ที่จำเป็นถูกเตรียมไว้ในอุปกรณ์นี้แล้ว',
+    dismiss: 'ปิดข้อความ'
+  },
   nav: {
     public: 'เมนูเว็บไซต์',
     main: 'เมนูหลัก',
@@ -372,6 +384,18 @@ const en: typeof th = {
       'This support and educational tool does not diagnose or replace a healthcare professional.',
     pendingReview:
       'This demo is pending professional review, so it does not provide clinical guidance or correctness scores.'
+  },
+  pwa: {
+    updateTitle: 'A new KineGuide AI version is available',
+    updateBody:
+      'Update to load the latest menus and screens. Your signed-in session will remain available.',
+    updateNow: 'Update now',
+    updating: 'Updating…',
+    updateFailed: 'The update failed. Please try again.',
+    retryUpdate: 'Try the update again',
+    offlineTitle: 'Ready for offline use',
+    offlineBody: 'Required application files are now available on this device.',
+    dismiss: 'Dismiss message'
   },
   nav: {
     public: 'Website navigation',

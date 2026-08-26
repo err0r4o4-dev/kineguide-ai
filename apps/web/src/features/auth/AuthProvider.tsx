@@ -10,6 +10,20 @@ import {
 import { setAccessToken } from '@/services/http'
 import { AuthContext, type AuthContextValue } from './AuthContext'
 
+let bootstrapRefresh: ReturnType<typeof refreshAccount> | null = null
+
+function refreshSessionOnce() {
+  if (!bootstrapRefresh) {
+    const request = refreshAccount()
+    bootstrapRefresh = request
+    const clearRequest = () => {
+      if (bootstrapRefresh === request) bootstrapRefresh = null
+    }
+    request.then(clearRequest, clearRequest)
+  }
+  return bootstrapRefresh
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [ready, setReady] = useState(false)
@@ -24,12 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true
-    refreshAccount()
+    refreshSessionOnce()
       .then((result) => {
         if (active) applyAuth(result)
       })
       .catch(() => {
-        setAccessToken(null)
+        if (active) setAccessToken(null)
       })
       .finally(() => {
         if (active) setReady(true)
