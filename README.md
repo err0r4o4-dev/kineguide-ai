@@ -318,6 +318,28 @@ Stop it safely:
 docker compose down
 ```
 
+### Frontend update and cache behavior
+
+Use the development stack above when editing React code; Vite applies changes with
+live reload. Use the production-style stack only when verifying the built PWA. A
+production frontend change requires a new image:
+
+```bash
+docker compose up -d --build web
+```
+
+Open <http://localhost:5173>. When a newer PWA build is available, KineGuide AI
+shows an update notice; choose **อัปเดตตอนนี้** to activate it. Signing in does
+not itself reload JavaScript because navigation inside the React application is
+client-side.
+
+If this site was opened before the update mechanism was added, clean the old
+worker once in Chrome or Edge: open DevTools, select **Application** → **Service
+Workers** → **Unregister**, then **Application** → **Storage** → **Clear site
+data**. Close the old tab and reopen <http://localhost:5173>. Normal releases
+after that should use the in-app update notice and should not require
+`Ctrl+Shift+R`.
+
 The complete stack contains `web`, `api-go`, `ai-python`, `postgres`, and `caddy`. The Python service is internal by default.
 
 ### Run services separately

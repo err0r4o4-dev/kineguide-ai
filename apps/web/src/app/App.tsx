@@ -5,6 +5,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router'
 
 import { AppShell } from '@/components/layout/AppShell'
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
+import { PwaUpdateNotice } from '@/components/PwaUpdateNotice'
 import { AuthProvider } from '@/features/auth/AuthProvider'
 import { ConsentRoute } from '@/features/auth/ConsentRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
@@ -150,6 +151,7 @@ export function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <PwaUpdateNotice />
           <Suspense fallback={<AppLoading />}>
             <RouterProvider router={router} />
           </Suspense>

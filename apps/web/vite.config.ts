@@ -13,7 +13,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      workbox: {
+        cleanupOutdatedCaches: true
+      },
       manifest: {
         name: 'KineGuide AI',
         short_name: 'KineGuide',
