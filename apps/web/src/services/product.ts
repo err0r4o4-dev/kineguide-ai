@@ -30,10 +30,13 @@ export interface Consent {
   policy_version: string
   camera_processing: boolean
   session_summary_storage: boolean
+  ai_chat_storage: boolean
   research_use: boolean
   accepted_at: string
   revoked_at: string | null
 }
+
+export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
 
 export interface Assessment {
   id: string
@@ -84,6 +87,23 @@ export interface Dashboard {
   current_streak: number
   total_seconds: number
   recent_sessions: ExerciseSession[]
+}
+
+export interface Conversation {
+  id: string
+  title: string
+  locale: 'th' | 'en'
+  created_at: string
+  updated_at: string
+  retention_policy: 'until_deleted'
+}
+
+export interface ConversationMessage {
+  id: string
+  conversation_id: string
+  role: 'user' | 'assistant'
+  content: string
+  created_at: string
 }
 
 export async function registerAccount(input: {
@@ -154,10 +174,50 @@ export async function getConsent(signal?: AbortSignal) {
 export async function saveConsent(input: {
   camera_processing: boolean
   session_summary_storage: boolean
+  ai_chat_storage: boolean
   research_use: boolean
 }) {
   const response = await http.post<Consent>('/consents', input)
   return response.data
+}
+
+export async function getConversations(signal?: AbortSignal) {
+  const response = await http.get<{ conversations: Conversation[] }>(
+    '/conversations',
+    { signal }
+  )
+  return response.data.conversations
+}
+
+export async function createConversation(input: { locale: 'th' | 'en' }) {
+  const response = await http.post<Conversation>('/conversations', input)
+  return response.data
+}
+
+export async function deleteConversation(id: string) {
+  await http.delete(`/conversations/${id}`)
+}
+
+export async function getConversationMessages(
+  id: string,
+  signal?: AbortSignal
+) {
+  const response = await http.get<{ messages: ConversationMessage[] }>(
+    `/conversations/${id}/messages`,
+    { signal }
+  )
+  return response.data.messages
+}
+
+export async function sendConversationMessage(
+  id: string,
+  input: { content: string }
+) {
+  const response = await http.post<{ messages: ConversationMessage[] }>(
+    `/conversations/${id}/messages`,
+    input
+  )
+  return response.data.messages
 }
 
 export async function revokeConsent() {

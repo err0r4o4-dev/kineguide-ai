@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Navigate, Outlet, useLocation } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
-import { getConsent } from '@/services/product'
+import { CURRENT_CONSENT_POLICY_VERSION, getConsent } from '@/services/product'
 
 export function ConsentRoute() {
   const location = useLocation()
@@ -29,6 +29,7 @@ export function ConsentRoute() {
 
   if (
     !consent.data ||
+    consent.data.policy_version !== CURRENT_CONSENT_POLICY_VERSION ||
     consent.data.revoked_at ||
     !consent.data.camera_processing ||
     !consent.data.session_summary_storage

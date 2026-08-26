@@ -2,6 +2,11 @@ package product
 
 import "time"
 
+const (
+	CurrentConsentPolicyVersion = "prototype-v3"
+	RetentionUntilDeleted       = "until_deleted"
+)
+
 type User struct {
 	ID           string    `json:"id"`
 	Email        string    `json:"email"`
@@ -16,6 +21,7 @@ type Consent struct {
 	PolicyVersion         string     `json:"policy_version"`
 	CameraProcessing      bool       `json:"camera_processing"`
 	SessionSummaryStorage bool       `json:"session_summary_storage"`
+	AIChatStorage         bool       `json:"ai_chat_storage"`
 	ResearchUse           bool       `json:"research_use"`
 	AcceptedAt            time.Time  `json:"accepted_at"`
 	RevokedAt             *time.Time `json:"revoked_at"`
@@ -23,6 +29,28 @@ type Consent struct {
 
 func (c Consent) IsActive() bool {
 	return c.ID != "" && c.RevokedAt == nil && c.CameraProcessing
+}
+
+func (c Consent) AllowsAIChat() bool {
+	return c.ID != "" && c.PolicyVersion == CurrentConsentPolicyVersion && c.RevokedAt == nil && c.AIChatStorage
+}
+
+type Conversation struct {
+	ID              string    `json:"id"`
+	UserID          string    `json:"-"`
+	Title           string    `json:"title"`
+	Locale          string    `json:"locale"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+	RetentionPolicy string    `json:"retention_policy"`
+}
+
+type Message struct {
+	ID             string    `json:"id"`
+	ConversationID string    `json:"conversation_id"`
+	Role           string    `json:"role"`
+	Content        string    `json:"content"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 type Assessment struct {

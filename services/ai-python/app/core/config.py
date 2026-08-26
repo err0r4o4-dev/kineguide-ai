@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     def reject_provider_credentials(self) -> "Settings":
         if self.llm_provider in {"disabled", "mock"} and self.llm_api_key:
             raise ValueError("LLM_API_KEY must be empty while the provider is disabled or mocked")
+        if self.app_env == "production" and self.llm_provider == "mock":
+            raise ValueError("The mock LLM provider cannot be used in production")
         return self
 
 

@@ -62,7 +62,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, Store: store, Signer: tokenSigner, OAuthProviders: oauthProviders}, logger),
+		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, ChatAI: aiClient, Store: store, Signer: tokenSigner, OAuthProviders: oauthProviders}, logger),
 		ReadHeaderTimeout: cfg.RequestTimeout,
 		ReadTimeout:       cfg.RequestTimeout,
 		WriteTimeout:      cfg.RequestTimeout,

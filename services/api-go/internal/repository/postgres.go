@@ -196,9 +196,9 @@ func (p *Postgres) RevokeRefreshToken(ctx context.Context, tokenHash string) err
 func (p *Postgres) SaveConsent(ctx context.Context, consent product.Consent) (product.Consent, error) {
 	err := p.pool.QueryRow(ctx, `
 		INSERT INTO consent_records
-			(user_id, policy_version, camera_processing, session_summary_storage, research_use)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id::text, accepted_at`, consent.UserID, consent.PolicyVersion, consent.CameraProcessing, consent.SessionSummaryStorage, consent.ResearchUse).
+			(user_id, policy_version, camera_processing, session_summary_storage, ai_chat_storage, research_use)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id::text, accepted_at`, consent.UserID, consent.PolicyVersion, consent.CameraProcessing, consent.SessionSummaryStorage, consent.AIChatStorage, consent.ResearchUse).
 		Scan(&consent.ID, &consent.AcceptedAt)
 	return consent, mapError(err)
 }
@@ -207,11 +207,125 @@ func (p *Postgres) LatestConsent(ctx context.Context, userID string) (product.Co
 	var consent product.Consent
 	err := p.pool.QueryRow(ctx, `
 		SELECT id::text, user_id::text, policy_version, camera_processing,
-		       session_summary_storage, research_use, accepted_at, revoked_at
+		       session_summary_storage, ai_chat_storage, research_use, accepted_at, revoked_at
 		FROM consent_records WHERE user_id = $1
 		ORDER BY accepted_at DESC LIMIT 1`, userID).
-		Scan(&consent.ID, &consent.UserID, &consent.PolicyVersion, &consent.CameraProcessing, &consent.SessionSummaryStorage, &consent.ResearchUse, &consent.AcceptedAt, &consent.RevokedAt)
+		Scan(&consent.ID, &consent.UserID, &consent.PolicyVersion, &consent.CameraProcessing, &consent.SessionSummaryStorage, &consent.AIChatStorage, &consent.ResearchUse, &consent.AcceptedAt, &consent.RevokedAt)
 	return consent, mapError(err)
+}
+
+func (p *Postgres) CreateConversation(ctx context.Context, conversation product.Conversation) (product.Conversation, error) {
+	err := p.pool.QueryRow(ctx, `
+		INSERT INTO conversations (user_id, title, locale)
+		VALUES ($1, $2, $3)
+		RETURNING id::text, created_at, updated_at, retention_policy`,
+		conversation.UserID, conversation.Title, conversation.Locale).
+		Scan(&conversation.ID, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionPolicy)
+	return conversation, mapError(err)
+}
+
+func (p *Postgres) ConversationByID(ctx context.Context, userID, conversationID string) (product.Conversation, error) {
+	var conversation product.Conversation
+	err := p.pool.QueryRow(ctx, `
+		SELECT id::text, user_id::text, title, locale, created_at, updated_at, retention_policy
+		FROM conversations
+		WHERE id = $1 AND user_id = $2`, conversationID, userID).
+		Scan(&conversation.ID, &conversation.UserID, &conversation.Title, &conversation.Locale, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionPolicy)
+	return conversation, mapError(err)
+}
+
+func (p *Postgres) ListConversations(ctx context.Context, userID string, limit int) ([]product.Conversation, error) {
+	rows, err := p.pool.Query(ctx, `
+		SELECT id::text, user_id::text, title, locale, created_at, updated_at, retention_policy
+		FROM conversations
+		WHERE user_id = $1
+		ORDER BY updated_at DESC LIMIT $2`, userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	conversations := make([]product.Conversation, 0)
+	for rows.Next() {
+		var conversation product.Conversation
+		if err := rows.Scan(&conversation.ID, &conversation.UserID, &conversation.Title, &conversation.Locale, &conversation.CreatedAt, &conversation.UpdatedAt, &conversation.RetentionPolicy); err != nil {
+			return nil, err
+		}
+		conversations = append(conversations, conversation)
+	}
+	return conversations, rows.Err()
+}
+
+func (p *Postgres) DeleteConversation(ctx context.Context, userID, conversationID string) error {
+	command, err := p.pool.Exec(ctx, `DELETE FROM conversations WHERE id = $1 AND user_id = $2`, conversationID, userID)
+	if err != nil {
+		return err
+	}
+	if command.RowsAffected() == 0 {
+		return product.ErrNotFound
+	}
+	return nil
+}
+
+func (p *Postgres) ListMessages(ctx context.Context, userID, conversationID string, limit int) ([]product.Message, error) {
+	rows, err := p.pool.Query(ctx, `
+		SELECT m.id::text, m.conversation_id::text, m.role, m.content, m.created_at
+		FROM conversation_messages m
+		JOIN conversations c ON c.id = m.conversation_id
+		WHERE c.id = $1 AND c.user_id = $2
+		ORDER BY m.sequence DESC LIMIT $3`, conversationID, userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	messages := make([]product.Message, 0)
+	for rows.Next() {
+		var message product.Message
+		if err := rows.Scan(&message.ID, &message.ConversationID, &message.Role, &message.Content, &message.CreatedAt); err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+	for left, right := 0, len(messages)-1; left < right; left, right = left+1, right-1 {
+		messages[left], messages[right] = messages[right], messages[left]
+	}
+	return messages, rows.Err()
+}
+
+func (p *Postgres) SaveConversationExchange(ctx context.Context, userID, conversationID, userContent, assistantContent string) ([]product.Message, error) {
+	tx, err := p.pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+	var lockedConversationID string
+	if err := tx.QueryRow(ctx, `
+		SELECT id::text FROM conversations
+		WHERE id = $1 AND user_id = $2
+		FOR UPDATE`, conversationID, userID).Scan(&lockedConversationID); err != nil {
+		return nil, mapError(err)
+	}
+	messages := make([]product.Message, 0, 2)
+	for _, message := range []product.Message{
+		{ConversationID: conversationID, Role: "user", Content: userContent},
+		{ConversationID: conversationID, Role: "assistant", Content: assistantContent},
+	} {
+		err := tx.QueryRow(ctx, `
+			INSERT INTO conversation_messages (conversation_id, role, content)
+			VALUES ($1, $2, $3)
+			RETURNING id::text, created_at`, conversationID, message.Role, message.Content).
+			Scan(&message.ID, &message.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE conversations SET updated_at = now() WHERE id = $1`, conversationID); err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return messages, nil
 }
 
 func (p *Postgres) RevokeConsent(ctx context.Context, userID string) error {

@@ -9,6 +9,7 @@ import {
   MessageCircle,
   Menu,
   Settings,
+  ShieldCheck,
   UserRound,
   X
 } from 'lucide-react'
@@ -22,7 +23,8 @@ import { useAuth } from '@/features/auth/AuthContext'
 
 const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
-  { to: '/app/assessment', key: 'assessment', icon: MessageCircle, end: false },
+  { to: '/app/chat', key: 'chat', icon: MessageCircle, end: false },
+  { to: '/app/assessment', key: 'assessment', icon: ShieldCheck, end: false },
   { to: '/app/plan', key: 'plan', icon: CalendarDays, end: false },
   { to: '/app/exercises', key: 'exercises', icon: Dumbbell, end: false },
   { to: '/app/history', key: 'history', icon: History, end: false },

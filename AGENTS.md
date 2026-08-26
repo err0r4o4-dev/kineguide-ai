@@ -1,248 +1,127 @@
 # KineGuide AI Agent Guide
 
-This file is the authoritative repository-wide instruction set for AI coding agents. Apply it to every file in this monorepo. More specific instructions in `.agent/rules/` and repository-local skills refine these rules but may not weaken safety, privacy, architecture, or verification requirements.
+Authoritative repository-wide instructions for AI coding agents. Scoped rules and repository skills refine this guide but must not weaken safety, privacy, architecture, or verification.
 
-## Mission
+## Mission and product boundary
 
-Build KineGuide AI as a safe, explainable physiotherapy support and educational prototype. Deliver small verified changes that preserve clear service ownership and are easy for a two-person university team to review.
+Build a safe, explainable, Thai-first physiotherapy support and education prototype that a two-person university team can maintain.
 
-KineGuide AI does not diagnose disease and does not replace a physician, physiotherapist, or qualified healthcare professional.
+KineGuide AI does not diagnose, prescribe, or replace a physician, physiotherapist, or other qualified clinician. Treat pose estimates and LLM output as uncertain support, never final clinical judgment.
 
-## Instruction priority
+Never invent diagnoses, red flags, exercise protocols, treatment, dosage, progression, or pose thresholds. Every clinical rule requires a traceable source and qualified review.
 
-1. Follow the user's current request.
-2. Follow this `AGENTS.md`.
-3. Follow the matching scoped rule in `.agent/rules/`.
-4. Load the matching skill from `.agents/skills/`.
-5. Follow established code, tests, contracts, and documentation in the affected area.
+## Instruction order
 
-When instructions conflict, preserve the safer medical, privacy, security, and data-integrity behavior and report the conflict.
+Follow, in order:
 
-## Before changing anything
+1. The current user request.
+2. This `AGENTS.md`.
+3. Every matching `.agent/rules/*.md` rule.
+4. The smallest matching `.agents/skills/*/SKILL.md` skill set.
+5. Existing contracts, tests, code, and documentation.
 
-1. At the start of every requested repository change, inspect `git status --short --branch`.
-2. Before modifying any project file, create a root `TODO.md` containing a concrete checklist for the current task.
-3. Include test design, test implementation, production implementation, and verification steps in `TODO.md`.
-4. Write unit or integration tests before production implementation whenever the task changes code, configuration behavior, API behavior, business logic, or user-visible behavior.
-5. Prefer a failing test that reproduces the expected behavior or reported problem.
-6. Work from the first unchecked `- [ ]` item, complete it, mark it `- [x]`, save `TODO.md`, and continue until every item is complete.
-7. Preserve unrelated user changes and never use destructive Git commands.
-8. Run all affected formatting, linting, type-checking, testing, and build commands.
-9. Never mark a verification item complete unless its command has actually passed.
-10. After every checklist item is complete and verification passes, always delete the root `TODO.md`.
-11. Never delete tests created for the completed work.
+Resolve conflicts toward medical safety, privacy, security, and data integrity, and report the conflict. Do not invent a rule or substitute a similar skill when ownership is unclear.
 
-If implementation is blocked or verification fails, keep `TODO.md`, leave the affected item unchecked, and record the blocker or failed command under that item.
+## Efficient task workflow
 
-## Test-first development
+Before any repository mutation:
 
-Testing is required for nearly every implementation task.
+1. Run `git status --short --branch` and preserve unrelated work.
+2. Scope the affected ownership area; inspect only relevant code, nearby tests, contracts, and documentation.
+3. Read every matching scoped rule and each selected `SKILL.md` fully. Do not load unrelated skills.
+4. Create or extend a clearly named section in root `TODO.md` covering investigation, tests, implementation, verification, and cleanup. Preserve unrelated sections.
+5. Define the observable pass/fail signal. For bugs and behavior changes, write a failing regression test first when a reliable seam exists.
 
-- Write tests before implementation for features, bug fixes, refactors, API changes, configuration behavior, database behavior, security changes, and user-visible behavior.
-- Add both unit and integration tests when the change crosses package, service, database, HTTP, or browser boundaries.
-- A bug fix must include a regression test that fails before the fix and passes after it.
-- An API change must test validation, successful responses, expected errors, authentication, and authorization as applicable.
-- Frontend changes must test observable user behavior, including loading, success, empty, failure, retry, accessibility, and permission states as applicable.
-- Healthcare-related behavior must test safety boundaries, unavailable results, low-confidence results, stop conditions, and escalation behavior as applicable.
-- Documentation-only, comment-only, formatting-only, and static metadata changes do not require artificial unit tests, but they still require an appropriate verification command.
-- Never remove or weaken an existing test merely to make implementation pass.
-- Never report that tests passed unless they were actually executed successfully.
+During work:
+
+- Work from the first unchecked TODO item and check it only after successful work.
+- Implement the smallest complete vertical slice; reuse established components, clients, schemas, libraries, and test seams.
+- Run narrow checks while iterating. Add boundary or integration coverage when behavior crosses services.
+- Record blockers and failed commands under the relevant unchecked item.
+- Never delete, skip, weaken, or over-mock tests to obtain a pass.
+
+Before completion:
+
+- Run every affected verification group, inspect the final diff, and report only checks that actually completed.
+- Remove only the completed task's TODO section. Delete `TODO.md` only when it is empty.
+- Stop temporary processes and project containers started for the task.
+
+## Skill routing
+
+Use one primary skill whenever possible; add a specialist only when its trigger is genuinely present.
+
+| Work | Primary skill | Add when needed |
+| --- | --- | --- |
+| Cross-service feature | `$develop-kineguide-feature` | Area-specific skill for the changed boundary |
+| Bug, regression, outage, slowness | `$diagnose-kineguide-system` | Owning implementation skill after diagnosis |
+| React/PWA work | `$build-kineguide-web` | `$design-kineguide-web`, `$test-kineguide-web`, or `$audit-kineguide-web` |
+| Supplied screenshot/mockup/Figma | `$implement-kineguide-visual-reference` | Only when a real approved reference exists |
+| Go API | `$build-kineguide-go-api` | `$evolve-kineguide-contracts` or `$migrate-kineguide-database` |
+| Python AI service | `$build-kineguide-ai-service` | `$review-kineguide-clinical-safety` for clinical behavior |
+| Public HTTP contract | `$evolve-kineguide-contracts` | Every affected producer and consumer skill |
+| PostgreSQL persistence | `$migrate-kineguide-database` | Go API skill for repository behavior |
+| Docker, Caddy, CI, environment | `$operate-kineguide-infrastructure` | Owning service skill when runtime behavior changes |
+| Auth, consent, health data, secrets | `$protect-kineguide-data` | Required alongside the owning implementation skill |
+| Symptoms, pain, exercise, pose feedback | `$review-kineguide-clinical-safety` | Required alongside the owning implementation skill |
+
+Web work starts with `$build-kineguide-web`. Add at most one web specialist unless an independent audit is explicitly required. Diagnose broken behavior before considering redesign.
 
 ## Non-negotiable architecture
 
 ```text
 Browser / React PWA
-  ├─ browser-only camera and pose processing
-  └─ REST/JSON → Go Main API
-                    ├─ PostgreSQL
-                    └─ internal REST/JSON → Python AI Service
-                                                └─ LLM provider abstraction
+  ├─ local camera + pose processing
+  └─ REST/JSON → Go API → PostgreSQL
+                  └─ internal REST/JSON → Python AI → LLM adapter
 ```
 
-- The browser calls the Go API, never PostgreSQL or Python directly.
-- The Go API is the only owner of primary PostgreSQL access.
-- The Python service is internal, stateless by default, and has no primary database credentials.
-- Raw camera frames, images, and videos remain in the browser. APIs receive only approved derived metrics.
-- Caddy is the integrated entry point; direct service ports exist for development and diagnostics.
-- Public Go behavior is documented in `packages/contracts/openapi/kineguide-api.yaml`.
+- The browser calls only the public Go API.
+- Go alone owns primary PostgreSQL access and application orchestration.
+- Python AI is internal and stateless, has no primary database credentials, and cannot make final clinical decisions.
+- Raw camera media stays in-browser. APIs receive only explicitly approved derived metrics.
+- Caddy is the integrated entry point; direct service ports are for development and diagnostics.
+- `packages/contracts/openapi/kineguide-api.yaml` is the public API source of truth.
 
-Do not bypass these boundaries for convenience.
+Ownership follows directory boundaries: `apps/web`, `services/api-go`, `services/ai-python`, `packages/contracts`, `packages/ui`, `database`, `infrastructure`, `.github`, `docs`, and `research`. Do not bypass an owner or create parallel infrastructure without demonstrated need.
 
-## Repository map and ownership
+## Engineering gates
 
-| Path                 | Ownership                                                                 |
-| -------------------- | ------------------------------------------------------------------------- |
-| `apps/web`           | React, PWA, localization, accessibility, camera, pose, browser tests      |
-| `services/api-go`    | Public API, orchestration, authentication boundary, PostgreSQL, AI client |
-| `services/ai-python` | Bounded text processing and provider adapters                             |
-| `packages/contracts` | Public OpenAPI source of truth                                            |
-| `packages/ui`        | Proven cross-application UI primitives only                               |
-| `database`           | Reversible migrations and synthetic seeds                                 |
-| `infrastructure`     | Caddy and shared container support                                        |
-| `.github`            | CI, issue forms, and pull request workflow                                |
-| `docs`               | Architecture, API, database, privacy, research, and clinical references   |
-| `research`           | Reproducible non-sensitive research definitions; never tracked datasets   |
+- Validate input at trust boundaries; keep invariants with the owning domain.
+- Propagate cancellation and bounded timeouts through database, network, provider, and long-running browser work.
+- Return actionable internal errors and safe, consistent external errors. Use structured logs with request IDs; never log secrets or sensitive payloads.
+- Add dependencies only when existing options are insufficient. Update affected contracts, examples, environment templates, and documentation in the same change.
+- Public API changes update OpenAPI, Go implementation, typed web clients, examples, and tests together. Document auth, validation, statuses, errors, nullability, units, and coordinate systems.
+- Database changes use reversible sequential migrations, UUID keys, UTC timestamps, explicit constraints, query-justified indexes, and synthetic non-medical seeds. Destructive data work requires explicit authorization and a rollback or backup plan.
 
-## Repository-local skills
+### Web gates
 
-Load a skill when its trigger matches the task:
+- Read `.agent/rules/web.md`, every matching `web-*.md`, and `packages/ui/DESIGN_TOKENS.md` before editing `apps/web`.
+- Use strict TypeScript and the central router, TanStack Query, Axios/env, i18n, React Hook Form/Zod, and styling patterns. Do not introduce duplicate infrastructure.
+- Thai is the default; add English in the same change and never hardcode feature copy.
+- Use semantic, accessible UI with visible focus, practical targets, reduced motion, and reachable loading, empty, degraded, offline, denied, unsupported, failure, and retry states.
+- Design from 320 px and verify at 320, 768, 1024, and 1440 px without overflow, obstruction, or hover-only actions.
+- Explain camera purpose before permission. Process media locally and release every track, frame, timer, worker, observer, subscription, and object URL on every exit path.
+- Present pose results with honest unavailable and low-confidence states. Never cache authenticated or sensitive health data without an explicit reviewed policy.
 
-| Skill                               | Use for                                                       |
-| ----------------------------------- | ------------------------------------------------------------- |
-| `$develop-kineguide-feature`        | Cross-service or end-to-end feature slices                    |
-| `$build-kineguide-web`              | React, TypeScript, PWA, camera, pose, accessibility, i18n     |
-| `$design-kineguide-web`             | New UI, redesigns, responsive layout, interaction, visual UX  |
-| `$implement-kineguide-visual-reference` | Screenshots, mockups, or design references translated to React |
-| `$test-kineguide-web`               | Vitest, Testing Library, Playwright, and frontend TDD          |
-| `$audit-kineguide-web`              | Accessibility, responsive, privacy, performance, and UX audits |
-| `$build-kineguide-go-api`           | Gin, middleware, repositories, PostgreSQL, AI client, auth    |
-| `$build-kineguide-ai-service`       | FastAPI, Pydantic, providers, bounded AI behavior             |
-| `$evolve-kineguide-contracts`       | Endpoints, schemas, errors, clients, versioning               |
-| `$migrate-kineguide-database`       | Migrations, sqlc, indexes, repositories, seeds                |
-| `$review-kineguide-clinical-safety` | Symptoms, red flags, exercises, pose feedback, plans          |
-| `$protect-kineguide-data`           | Health data, secrets, auth, logs, consent, retention          |
-| `$operate-kineguide-infrastructure` | Docker, Compose, Caddy, CI, Makefile, health checks           |
-| `$diagnose-kineguide-system`        | Bugs, degraded readiness, integration or performance failures |
+### Go and Python gates
 
-Use the smallest set that covers the task. Read each selected `SKILL.md` completely before acting.
+- Go `main` owns only configuration, wiring, lifecycle, and shutdown. Keep HTTP, service, repository, middleware, and AI-client concerns separated; use `context.Context`, standard JSON errors, table tests, and `httptest`.
+- Python uses strict Pydantic boundary schemas and provider adapters. Preserve the deterministic disabled provider, remain stateless, and never log health prompts or provider responses by default.
+- Neither an LLM nor low-confidence/unavailable pose output may be converted into confident synthetic clinical guidance.
 
-For web work, start with `$build-kineguide-web`. Add at most one specialist web skill unless the task genuinely spans implementation and an independent audit. Use `$design-kineguide-web` for new or redesigned interfaces, `$implement-kineguide-visual-reference` only when a real visual reference is provided, `$test-kineguide-web` for test-first or test-focused work, and `$audit-kineguide-web` for reviews. Use `$diagnose-kineguide-system` instead of a design skill for broken behavior or regressions.
+## Privacy and healthcare safety gates
 
-## Implementation principles
+- Minimize data before securing it. Never commit secrets, `.env`, health data, datasets, recordings, uploads, or model artifacts.
+- Define purpose, consent, retention, export, correction, and deletion before storing health data.
+- Keep secrets server-side and deny access by default. Test unauthorized, forbidden, expired, invalid, and deleted states where applicable.
+- Preserve consent, pain reporting, stop conditions, escalation, accessibility, and honest unavailable-service behavior.
+- Stop and request a clinical-owner decision when safety behavior is undefined. Never claim regulatory compliance without evidence.
 
-- Prefer the smallest complete solution over speculative abstraction.
-- Keep modules cohesive and dependencies explicit.
-- Add an interface when there is a real alternate adapter, external seam, or deterministic test need.
-- Keep functions focused; name by domain intent rather than implementation detail.
-- Validate at trust boundaries and keep invariants close to the owning domain.
-- Carry cancellation and bounded timeouts through network and database I/O.
-- Return actionable errors internally and safe, consistent errors externally.
-- Use structured logs with request IDs; never log secrets or sensitive payloads.
-- Update examples, docs, and environment templates when behavior changes.
-- Add dependencies only when existing libraries or the standard library are insufficient.
+## Verification matrix
 
-## Web rules
+Run narrow checks during development, then each affected group below.
 
-### Frontend workflow
-
-1. Read `.agent/rules/web.md` and every matching `web-*.md` rule before editing `apps/web`.
-2. Inspect the route, feature folder, existing components, translation keys, API client, nearby tests, and `packages/ui/DESIGN_TOKENS.md` before creating new UI.
-3. State the user journey, trust boundary, responsive targets, accessibility behavior, and verification signal.
-4. Prefer extending an established pattern over adding a parallel component, state store, style system, or HTTP client.
-5. For behavior changes, implement a vertical slice with a failing behavior test when a reliable seam exists.
-6. Verify the narrow behavior, then run format, lint, type-check, unit tests, and a production build. Add Playwright coverage for critical browser journeys.
-
-### Structure and ownership
-
-- Keep route composition in `src/routes`, domain behavior in `src/features/<feature>`, shared application components in `src/components`, reusable hooks in `src/hooks`, infrastructure helpers in `src/lib`, and Go API calls in `src/services`.
-- Keep feature-specific components, schemas, hooks, and tests together. Promote UI into `packages/ui` only after real reuse by more than one application surface.
-- Keep components focused on presentation and interaction. Put reusable domain state transitions, geometry, parsing, and validation in deterministic modules.
-- Do not create a second router, query client, localization instance, HTTP client, styling system, or form abstraction.
-
-### React, state, data, and forms
-
-- Use strict TypeScript. Avoid `any`, unsafe casts, non-null assertions without proof, and duplicated API types.
-- Use TanStack Query for server state, React Hook Form plus Zod for forms, URL state for shareable navigation state, and local React state for local interaction.
-- Do not copy query results into local state. Keep query keys stable, abortable, and scoped to the authenticated resource.
-- Do not add Zustand or another state library unless multiple distant consumers need durable client-only state and the need is documented.
-- Use the centralized Axios client and validated environment configuration. The browser calls only the public Go API.
-- Map backend validation errors to specific fields or an accessible form summary. Preserve entered values after recoverable failures.
-
-### UI and responsive behavior
-
-- Read `packages/ui/DESIGN_TOKENS.md` before new UI or a visual redesign. Use semantic colors, the existing 4 px spacing rhythm, consistent typography, and the established Lucide icon set.
-- Prefer semantic HTML and natural document flow. Use cards, overlays, animation, gradients, and shadows only when they communicate hierarchy or state.
-- Design from 320 px upward and verify at 320, 768, 1024, and 1440 px. Avoid horizontal scrolling, hidden fixed content, and hover-only actions.
-- Provide loading, empty, success, degraded, offline, permission-denied, unsupported, and failure states when the user journey can reach them.
-- Respect `prefers-reduced-motion`; animate only `transform` and `opacity` when practical and never let motion delay urgent safety information.
-
-### Language and accessibility
-
-- Default to Thai and add the English translation in the same change. Never hardcode user-facing copy in feature components.
-- Use semantic landmarks, a logical heading hierarchy, visible keyboard focus, programmatic labels, useful alternative text, live regions for asynchronous feedback, and practical touch targets.
-- Do not use color, icon shape, or motion as the only indication of health, confidence, pain, error, or completion.
-- Preserve Thai text expansion and line breaking. Do not encode meaning through English abbreviations that are not explained in both languages.
-
-### Camera, pose, privacy, and safety
-
-- Request camera access only after explicit user action and applicable consent. Explain purpose before the browser permission prompt.
-- Process raw camera frames and MediaPipe inference only in the browser. Never upload, persist, log, screenshot, or place raw media in test fixtures.
-- Stop every `MediaStreamTrack` on cancellation, navigation, unmount, permission failure, device change, and unexpected error.
-- Treat landmarks, joint angles, repetition counts, and confidence values as uncertain estimates. Show unavailable and low-confidence states honestly.
-- Do not invent clinical thresholds, exercise corrections, pain advice, diagnoses, or progression logic. Require a clinical source and qualified reviewer.
-
-### Performance and PWA
-
-- Keep camera and pose loops out of React render paths. Bound inference frequency and move sustained CPU-heavy work to a typed worker when measurements justify it.
-- Clean up timers, subscriptions, animation frames, observers, object URLs, workers, and media tracks.
-- Preserve route-level loading behavior and PWA update/offline clarity. Do not cache authenticated health responses or sensitive payloads without an explicit reviewed policy.
-- Measure before optimizing. Protect interaction responsiveness, layout stability, startup cost, and memory on realistic mobile hardware.
-
-### Frontend verification
-
-- Test observable behavior with Testing Library and `userEvent`; do not assert internal hook calls or component implementation details.
-- Cover keyboard use, translated copy, loading, empty, failure, retry, permission, low-confidence, cleanup, and authorization states as applicable.
-- Mock the network at the HTTP boundary and browser media/pose APIs at typed adapters. Never use real health data or camera recordings.
-- Run the complete frontend commands shown under Testing and verification before reporting completion.
-
-## Go rules
-
-- Keep `main` limited to configuration, dependency wiring, lifecycle, and shutdown.
-- Keep HTTP concerns in handlers/middleware, business behavior in services, persistence in repositories, and AI calls in `internal/client/ai`.
-- Validate external input and use the standard JSON error envelope.
-- Wrap errors with context; never expose SQL, credentials, internal URLs, or stack traces.
-- Use `context.Context` for database and network work.
-- Prefer table-driven tests, `httptest`, and small deterministic dependency adapters.
-- Run formatting, vet, tests, and build for every Go change.
-
-## Python AI rules
-
-- Use strict Pydantic schemas for every request, response, and structured provider result.
-- Keep provider behavior behind the provider protocol.
-- Preserve the deterministic disabled provider.
-- Never add primary database access.
-- Never let an LLM make final diagnostic, red-flag, exercise-selection, dosage, or progression decisions.
-- Do not log health prompts or provider responses by default.
-- Require deterministic tests and run Ruff, mypy, pytest, and startup validation.
-
-## API contract rules
-
-- Update OpenAPI, implementation, typed consumers, examples, and tests together.
-- Prefer backward-compatible additions; explicitly plan breaking changes.
-- Document authentication, validation, status codes, error shapes, nullability, units, and coordinate systems.
-- Use UUID strings and UTC RFC 3339 timestamps for persisted resources.
-- Never claim synchronization without running contract validation and affected tests.
-
-## Database rules
-
-- Use paired sequential up/down migrations.
-- Never modify a migration already applied outside disposable local development.
-- Use UUID primary keys, `timestamptz`, explicit constraints, and query-justified indexes.
-- Keep seeds synthetic and non-medical.
-- Do not store raw camera media, credentials, model artifacts, or unnecessary provider content.
-- Require explicit authorization and a rollback/backup plan for destructive data operations.
-
-## Healthcare safety
-
-- Do not invent diagnoses, red-flag criteria, exercise protocols, joint-angle thresholds, or treatment plans.
-- Require a traceable clinical source and qualified reviewer for every clinical rule.
-- Treat pose estimates and LLM output as uncertain supporting information.
-- Present service/model failures honestly; never replace unavailable results with confident synthetic content.
-- Preserve stop conditions, pain reporting, escalation paths, informed consent, and accessibility where relevant.
-- Stop and request a clinical-owner decision when safety behavior is undefined.
-
-## Privacy and security
-
-- Minimize data before securing it.
-- Never commit `.env`, credentials, tokens, health information, datasets, recordings, uploads, or model artifacts.
-- Keep secrets server-side and use environment or approved secret management.
-- Deny access by default and test unauthorized, forbidden, expired, invalid, and deleted states.
-- Define purpose, consent, retention, export, correction, and deletion before persisting health data.
-- Do not claim regulatory compliance without formal evidence.
-
-## Testing and verification
-
-Run the narrowest useful loop while developing, then all affected checks:
+### Web
 
 ```bash
 corepack pnpm format:check
@@ -250,42 +129,48 @@ corepack pnpm lint
 corepack pnpm typecheck
 corepack pnpm test
 VITE_API_BASE_URL=/v1 corepack pnpm build
+```
 
+Run `corepack pnpm --filter @kineguide/web test:e2e` for critical browser journeys.
+
+### Go
+
+```bash
 cd services/api-go
 go fmt ./...
 go vet ./...
 go test ./...
 go build ./cmd/server
+```
 
+Use `go test -race ./...` when the host supports it.
+
+### Python
+
+```bash
 cd services/ai-python
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy app
 uv run pytest
+```
 
+### Contracts and infrastructure
+
+```bash
+corepack pnpm openapi:lint
 docker compose config
 ```
 
-Use `go test -race ./...` when supported. For integrated changes, build and start Compose, verify health/readiness/docs/frontend behavior, then shut it down. Distinguish a host Docker failure from a project failure.
+For integrated changes, start Compose, verify health, readiness, docs, and UI behavior, then stop it. A successful `docker compose config` does not prove runtime health. Distinguish project failures from host or tool limitations.
 
-Never report a check as passed unless it actually completed successfully.
+For documentation-only changes, validate references, commands, Markdown structure, and `git diff --check`; do not create artificial tests.
 
-## Git and collaboration
+## Git and completion
 
-- Permanent branches are `main` and `develop`.
-- Create `feature/<issue>-<name>`, `fix/<issue>-<name>`, or `docs/<issue>-<name>` from `develop`.
-- Open focused pull requests into `develop`; promote verified releases to `main`.
-- Use Conventional Commits and link the issue with `Closes #<issue>`.
-- Do not push directly to `main`, force-push protected branches, invent remotes, change global Git configuration, or commit unrelated changes.
-- Do not commit unless the user requests it or the governing task explicitly authorizes it.
+- Branch from `develop` as `feature/<issue>-<name>`, `fix/<issue>-<name>`, or `docs/<issue>-<name>` and open focused PRs into `develop`.
+- Use Conventional Commits and `Closes #<issue>` when applicable.
+- Never push directly to `main`, force-push protected branches, invent remotes, alter Git configuration, stage unrelated work, or use destructive Git commands.
+- Do not commit without explicit user or governing-task authorization.
 
-## Completion checklist
-
-- Behavior and service ownership match the request.
-- Tests cover the new behavior and important failure paths.
-- Formatting, lint, type checks, tests, and builds pass for affected areas.
-- OpenAPI, migrations, environment examples, and documentation are synchronized.
-- No secret, sensitive data, generated artifact, or unrelated change is staged.
-- Medical, privacy, security, accessibility, and operational implications are reported.
-- Temporary processes, debug instrumentation, and project containers are stopped.
-- The current task checklist is fully checked, and its temporary `TODO.md` section or agent-created file is removed only after successful completion.
+Finish only when requested behavior and failure paths are covered, affected checks pass, contracts and docs agree, safety/privacy implications are reported, cleanup is complete, and no secret, sensitive/generated artifact, or unrelated file is staged.

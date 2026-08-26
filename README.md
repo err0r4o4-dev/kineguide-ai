@@ -63,7 +63,7 @@ Not implemented yet:
 - Red-flag screening rules
 - Rehabilitation plan or exercise generation
 - MediaPipe pose inference, automated repetition counting, or form scoring
-- Real LLM provider integration
+- Real LLM provider integration after approved consent, retention, data-processing, and clinical-safety evaluation
 - Production deployment or regulatory certification
 
 ## Architecture
@@ -674,4 +674,3 @@ Wait until the owner and visibility are explicitly confirmed. Do not invent orga
 KineGuide AI is a physiotherapy support and educational prototype. It does not provide medical diagnoses and does not replace a physician, physiotherapist, or other qualified healthcare professional.
 
 KineGuide AI เป็นระบบต้นแบบสำหรับสนับสนุนและให้ความรู้ด้านกายภาพบำบัด ไม่ใช่เครื่องมือวินิจฉัยโรค และไม่สามารถใช้แทนแพทย์ นักกายภาพบำบัด หรือบุคลากรทางการแพทย์ที่มีคุณสมบัติเหมาะสมได้
-

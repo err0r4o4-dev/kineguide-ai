@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/client/ai"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	appmiddleware "github.com/kineguide-ai/kineguide-ai/services/api-go/internal/middleware"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/oauthprovider"
@@ -27,6 +28,7 @@ type productAPI struct {
 	store     product.Store
 	signer    *security.TokenSigner
 	providers map[string]oauthprovider.Provider
+	chatAI    ChatResponder
 }
 
 type authResponse struct {
@@ -35,11 +37,11 @@ type authResponse struct {
 	User        product.User `json:"user"`
 }
 
-func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider) {
+func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider, chatAI ChatResponder) {
 	if store == nil || signer == nil {
 		return
 	}
-	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers}
+	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers, chatAI: chatAI}
 	v1 := router.Group(apiV1Prefix)
 	auth := v1.Group("/auth")
 	auth.POST("/register", api.register)
@@ -70,6 +72,11 @@ func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.
 	secured.POST("/sessions", api.createSession)
 	secured.GET("/sessions/:id", api.getSession)
 	secured.PATCH("/sessions/:id", api.updateSession)
+	secured.GET("/conversations", api.listConversations)
+	secured.POST("/conversations", api.createConversation)
+	secured.DELETE("/conversations/:id", api.deleteConversation)
+	secured.GET("/conversations/:id/messages", api.listConversationMessages)
+	secured.POST("/conversations/:id/messages", api.sendConversationMessage)
 }
 
 func (a *productAPI) register(c *gin.Context) {
@@ -257,18 +264,145 @@ func (a *productAPI) saveConsent(c *gin.Context) {
 	var request struct {
 		CameraProcessing      bool `json:"camera_processing"`
 		SessionSummaryStorage bool `json:"session_summary_storage"`
+		AIChatStorage         bool `json:"ai_chat_storage"`
 		ResearchUse           bool `json:"research_use"`
 	}
 	if err := c.ShouldBindJSON(&request); err != nil || !request.CameraProcessing || !request.SessionSummaryStorage {
 		writeError(c, http.StatusUnprocessableEntity, "CONSENT_REQUIRED", "Camera processing and session-summary storage consent are required for guided sessions.")
 		return
 	}
-	consent, err := a.store.SaveConsent(c.Request.Context(), product.Consent{UserID: c.GetString(userIDKey), PolicyVersion: "prototype-v1", CameraProcessing: request.CameraProcessing, SessionSummaryStorage: request.SessionSummaryStorage, ResearchUse: request.ResearchUse})
+	consent, err := a.store.SaveConsent(c.Request.Context(), product.Consent{UserID: c.GetString(userIDKey), PolicyVersion: product.CurrentConsentPolicyVersion, CameraProcessing: request.CameraProcessing, SessionSummaryStorage: request.SessionSummaryStorage, AIChatStorage: request.AIChatStorage, ResearchUse: request.ResearchUse})
 	if err != nil {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to save consent.")
 		return
 	}
 	c.JSON(http.StatusCreated, consent)
+}
+
+func (a *productAPI) requireAIChatConsent(c *gin.Context) bool {
+	consent, err := a.store.LatestConsent(c.Request.Context(), c.GetString(userIDKey))
+	if err != nil || !consent.AllowsAIChat() {
+		writeError(c, http.StatusForbidden, "AI_CHAT_CONSENT_REQUIRED", "AI chat storage consent is required before using chat.")
+		return false
+	}
+	return true
+}
+
+func (a *productAPI) createConversation(c *gin.Context) {
+	if !a.requireAIChatConsent(c) {
+		return
+	}
+	var request struct {
+		Locale string `json:"locale"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil || !oneOf(request.Locale, "th", "en") {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Conversation locale must be th or en.")
+		return
+	}
+	title := "บทสนทนาใหม่"
+	if request.Locale == "en" {
+		title = "New conversation"
+	}
+	conversation, err := a.store.CreateConversation(c.Request.Context(), product.Conversation{
+		UserID: c.GetString(userIDKey), Title: title, Locale: request.Locale,
+	})
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to create the conversation.")
+		return
+	}
+	c.JSON(http.StatusCreated, conversation)
+}
+
+func (a *productAPI) listConversations(c *gin.Context) {
+	conversations, err := a.store.ListConversations(c.Request.Context(), c.GetString(userIDKey), 50)
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load conversations.")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"conversations": conversations})
+}
+
+func (a *productAPI) deleteConversation(c *gin.Context) {
+	err := a.store.DeleteConversation(c.Request.Context(), c.GetString(userIDKey), c.Param("id"))
+	if errors.Is(err, product.ErrNotFound) {
+		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
+		return
+	}
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to delete the conversation.")
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+func (a *productAPI) listConversationMessages(c *gin.Context) {
+	if _, err := a.store.ConversationByID(c.Request.Context(), c.GetString(userIDKey), c.Param("id")); err != nil {
+		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
+		return
+	}
+	messages, err := a.store.ListMessages(c.Request.Context(), c.GetString(userIDKey), c.Param("id"), 100)
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load messages.")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"messages": messages})
+}
+
+func (a *productAPI) sendConversationMessage(c *gin.Context) {
+	if !a.requireAIChatConsent(c) {
+		return
+	}
+	if a.chatAI == nil {
+		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable.")
+		return
+	}
+	var request struct {
+		Content string `json:"content"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		writeError(c, http.StatusBadRequest, "INVALID_REQUEST", "Please check the message.")
+		return
+	}
+	request.Content = strings.TrimSpace(request.Content)
+	if len([]rune(request.Content)) < 1 || len([]rune(request.Content)) > 4000 {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Message must contain between 1 and 4000 characters.")
+		return
+	}
+	conversation, err := a.store.ConversationByID(c.Request.Context(), c.GetString(userIDKey), c.Param("id"))
+	if errors.Is(err, product.ErrNotFound) {
+		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
+		return
+	}
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load the conversation.")
+		return
+	}
+	history, err := a.store.ListMessages(c.Request.Context(), c.GetString(userIDKey), conversation.ID, 20)
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load conversation context.")
+		return
+	}
+	recent := make([]ai.ChatMessage, 0, len(history))
+	for _, message := range history {
+		recent = append(recent, ai.ChatMessage{Role: message.Role, Content: message.Content})
+	}
+	generated, err := a.chatAI.Respond(c.Request.Context(), ai.ChatRequest{
+		Locale: conversation.Locale, Message: request.Content, RecentMessages: recent,
+	})
+	if err != nil {
+		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable. Please try again.")
+		return
+	}
+	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversation.ID, request.Content, generated.Message)
+	if errors.Is(err, product.ErrNotFound) {
+		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
+		return
+	}
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to save the conversation.")
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"messages": messages})
 }
 
 func (a *productAPI) revokeConsent(c *gin.Context) {
