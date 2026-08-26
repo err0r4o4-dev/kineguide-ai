@@ -2,74 +2,55 @@
 
 ## Claude Code-specific instructions
 
-You are working on KineGuide AI, a Thai-first physiotherapy support and educational prototype built as a React PWA, Go API, internal Python AI service, and PostgreSQL-backed monorepo.
-
-`AGENTS.md` is the authoritative source of repository-wide instructions. This section only adds Claude Code workflow guidance. If anything here conflicts with `AGENTS.md`, follow `AGENTS.md` and preserve the safer medical, privacy, security, and data-integrity behavior.
+`AGENTS.md` is authoritative. These rules add Claude Code workflow guidance only. On conflict, follow `AGENTS.md` and preserve the safer medical, privacy, security, and data-integrity behavior.
 
 ### Working workflow
 
-- At the start of every repository change, inspect `git status --short --branch` and check for an existing root `TODO.md`.
-- Before editing project files, create or safely extend `TODO.md` with a clearly scoped checklist for the current task. Preserve all pre-existing or unrelated checklist content.
-- List investigation, test or verification design, test implementation when applicable, production implementation, relevant checks, and cleanup in execution order.
-- For features, bug fixes, refactors, and behavior changes, place tests before production code and first confirm the new or failing behavior at the real seam when practical. Do not invent unit tests for documentation-only or metadata-only edits; include a proportional verification item instead.
-- Read `TODO.md`, complete the first unchecked item in the current task section, mark it `- [x]`, save the file, and repeat until all items are complete.
-- After successful verification, remove the completed temporary task section. Delete `TODO.md` only when Claude created it for this task and it contains no pre-existing or unrelated work. Never delete completed tests.
-- If blocked or a check fails, leave the relevant item unchecked and record the concise blocker or failing command in `TODO.md`.
-- Inspect the affected files, nearby tests, and existing patterns. Preserve unrelated user changes.
-- Read the applicable rules under `.agent/rules/` and load the smallest matching repository skill from `.agents/skills/` before changing an owned area.
-- For large features, cross-service changes, or multi-file refactors, keep Claude Code's planning or task-tracking state synchronized with `TODO.md`.
-- For bug fixes and observable behavior changes, define the verification signal first and prefer a failing test at the real failure seam when practical.
-- Implement the smallest complete solution. Avoid speculative abstractions, parallel frameworks, duplicate clients, or broad cleanup unrelated to the request.
-- Re-read the final diff, check for unintended files or sensitive data, and run the relevant verification commands from `AGENTS.md` before reporting completion.
-- Do not commit, push, force-push, change Git configuration, or alter branch history unless the user explicitly requests it.
+- Start each repository change with `git status --short --branch` and inspect root `TODO.md`.
+- Before editing, create or extend a clearly scoped `TODO.md` task section. Preserve unrelated content.
+- Order items as: investigation, verification/test design, tests when applicable, implementation, checks, cleanup.
+- Work from the first unchecked item; check it only after success. Record blockers or failing commands under unchecked items.
+- For large, cross-service, or multi-file work, keep Claude's plan synchronized with `TODO.md`.
+- After verification, remove only the completed task section. Delete `TODO.md` only if Claude created it and no unrelated content remains. Never delete completed tests.
+- Inspect affected code, nearby tests, established patterns, applicable `.agent/rules/`, and the smallest matching `.agents/skills/` skill before editing.
+- Re-read the final diff, check for unintended or sensitive files, and run applicable `AGENTS.md` checks.
+- Do not commit, push, rewrite history, or change Git configuration without explicit user authorization.
 
 ### Skill routing
 
-- Use `$build-kineguide-web` for React, TypeScript, PWA, browser camera, pose, accessibility, localization, and other `apps/web` implementation work.
-- Add `$design-kineguide-web` for a new or redesigned interface, `$test-kineguide-web` for test-focused frontend work, or `$audit-kineguide-web` for an independent web quality review. Follow the web-skill limits in `AGENTS.md`.
-- Use `$develop-kineguide-feature` when a vertical slice spans more than one service or repository area.
-- Use `$build-kineguide-go-api` for Go API behavior and `$build-kineguide-ai-service` for the internal Python AI service.
-- Use `$evolve-kineguide-contracts`, `$migrate-kineguide-database`, or `$operate-kineguide-infrastructure` when the change is owned by contracts, persistence, or infrastructure respectively.
-- Use `$diagnose-kineguide-system` for failures and regressions, `$protect-kineguide-data` for sensitive-data or security work, and `$review-kineguide-clinical-safety` for health-language or clinical-behavior changes.
-- Load only skills that match the task. Do not invent or substitute skills from another repository.
+- Follow the `AGENTS.md` skill table and web-skill limits; load only skills matching the task.
+- Use `$develop-kineguide-feature` for cross-area slices, `$diagnose-kineguide-system` for failures, `$protect-kineguide-data` for sensitive/security work, and `$review-kineguide-clinical-safety` for clinical behavior or language.
+- Never invent or substitute skills from another repository.
 
 ### Architecture and data boundaries
 
-- Keep the request path `Browser / React PWA -> Go Main API -> PostgreSQL and/or internal Python AI Service`.
-- The browser must not call PostgreSQL or the Python service directly. The Python service must not receive primary database credentials.
-- Raw camera frames, images, and videos stay in the browser. Send only explicitly approved derived metrics across API boundaries.
-- Keep public API behavior synchronized with `packages/contracts/openapi/kineguide-api.yaml` and typed consumers.
-- Preserve clear ownership: web UI in `apps/web`, public API and database orchestration in `services/api-go`, bounded AI processing in `services/ai-python`, and shared contracts in `packages/contracts`.
+- Preserve `Browser / React PWA -> Go API -> PostgreSQL and/or internal Python AI`.
+- Browser never calls PostgreSQL/Python directly; Python never receives primary DB credentials.
+- Raw camera media stays in-browser; transmit only approved derived metrics.
+- Keep OpenAPI, typed consumers, and ownership boundaries synchronized as defined in `AGENTS.md`.
 
 ### Implementation principles
 
-- Match the established code style and use existing libraries, components, clients, schemas, and test seams before creating new ones.
-- Keep functions and modules focused, dependencies explicit, and trust-boundary validation close to the owning service.
-- Add a dependency only when the standard library and existing project dependencies are insufficient, and document the reason.
-- Carry cancellation and bounded timeouts through database, network, camera, pose, worker, and provider operations as applicable.
-- Return actionable internal errors and safe external errors. Never expose stack traces, SQL details, credentials, internal URLs, prompts containing health data, or provider responses.
-- Do not modify secrets, tokens, credentials, `.env` files, real health information, recordings, datasets, or model artifacts unless the user explicitly authorizes a necessary and safe operation.
+- Reuse established libraries, components, clients, schemas, and test seams; implement the smallest complete solution.
+- Avoid speculative abstractions, duplicate infrastructure, and unrelated cleanup.
+- Add dependencies only when existing options are insufficient and document why.
+- Apply validation, cancellation, bounded timeouts, and safe errors at the owning boundary.
+- Do not access or modify secrets, `.env`, credentials, real health data, recordings, datasets, or model artifacts without explicit safe authorization.
 
 ### Technology guidance
 
-- React and TypeScript: keep strict typing, accessible semantic HTML, Thai and English translations together, server state in TanStack Query, forms in React Hook Form with Zod, and Go API calls in the centralized client.
-- Camera and pose: request permission only after explicit user action, process media locally, represent uncertainty honestly, and clean up every track, timer, frame, worker, and subscription on all exit paths.
-- Go: keep `main` focused on wiring and lifecycle; separate handlers, services, repositories, middleware, and AI clients; use `context.Context`, wrapped errors, table-driven tests, and the standard JSON error envelope.
-- Python: use strict Pydantic schemas and provider abstractions, remain stateless by default, preserve the disabled deterministic provider, and never delegate final clinical decisions to an LLM.
-- Database and contracts: use reversible migrations, explicit constraints, UUIDs and UTC timestamps, synthetic non-medical seeds, and synchronized OpenAPI, implementation, examples, clients, and tests.
+- **Web:** Follow strict TypeScript, i18n, accessibility, state/form, centralized API-client, camera-cleanup, and responsive rules in `AGENTS.md`.
+- **Go:** Keep lifecycle, handlers, services, repositories, middleware, and AI clients separated; use context, wrapped errors, and deterministic tests.
+- **Python:** Use strict Pydantic/provider boundaries, remain stateless by default, preserve the disabled provider, and forbid final LLM clinical decisions.
+- **Data/contracts:** Use reversible migrations, explicit constraints, synthetic seeds, UUID/UTC conventions, and synchronized contracts/tests.
 
 ### Safety, privacy, and accessibility
 
-- KineGuide AI supports education and physiotherapy workflows; it does not diagnose or replace a qualified healthcare professional.
-- Never invent diagnoses, red-flag criteria, exercise protocols, treatment plans, dosage, progression rules, or pose thresholds. Require a traceable clinical source and qualified reviewer.
-- Minimize sensitive data, deny access by default, avoid sensitive logs and caches, and preserve consent, retention, export, correction, and deletion requirements.
-- Default user-facing content to Thai and provide English in the same change. Maintain keyboard access, visible focus, semantic structure, screen-reader feedback, practical touch targets, and non-color-only status cues.
+- Apply the healthcare, privacy, security, language, and accessibility rules in `AGENTS.md` without exception.
+- Clinical rules require traceable sources and qualified review; never invent diagnoses, thresholds, protocols, treatments, dosage, or progression.
+- Minimize sensitive data, deny access by default, avoid sensitive logs/caches, and preserve consent and data-right requirements.
 
 ### Verification
 
-- Run the narrowest useful checks while developing, then all checks relevant to the affected area as listed in `AGENTS.md`.
-- Web changes normally require format checking, lint, type-check, unit tests, and a production build; critical browser journeys may also require Playwright.
-- Go changes normally require `go fmt`, `go vet`, `go test`, and `go build`; use the race detector when supported and relevant.
-- Python changes normally require Ruff lint and format checks, mypy, pytest, and startup validation.
-- Infrastructure or integrated changes require configuration validation and proportional health/readiness checks.
-- Never claim a check passed unless the command completed successfully. Clearly distinguish project failures from unavailable tools, host limitations, or sandbox restrictions.
+- Run narrow checks while developing, then every affected command in `AGENTS.md`; add proportional integration or browser checks where required.
+- Never claim an unexecuted check passed. Distinguish project failures from unavailable tools, host limits, and sandbox restrictions.
