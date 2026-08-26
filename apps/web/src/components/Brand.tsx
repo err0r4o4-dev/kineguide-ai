@@ -26,10 +26,12 @@ export function Brand({
         <HeartPulse aria-hidden="true" size={21} />
       </span>
       {!compact && (
-        <span>
-          <span className="block text-xl font-bold">KineGuide AI</span>
+        <span className="min-w-0">
+          <span className="block whitespace-nowrap text-xl font-bold leading-tight tracking-tight">
+            KineGuide AI
+          </span>
           <span
-            className={`block text-xs tracking-wide ${
+            className={`mt-1 block whitespace-nowrap text-xs tracking-wide ${
               inverted ? 'text-white/80' : 'text-slate-500'
             }`}
           >

@@ -58,4 +58,29 @@ describe('AppShell', () => {
       screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0]
     ).toHaveFocus()
   })
+
+  it('uses one menu toggle and dismisses the mobile navigation with Escape', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/app']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route index element={<h1>หน้าแรก</h1>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    const menuButton = screen.getByRole('button', { name: 'เปิดเมนู' })
+    await user.click(menuButton)
+
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getAllByRole('button', { name: 'ปิดเมนู' })).toHaveLength(1)
+
+    await user.keyboard('{Escape}')
+
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false')
+    expect(menuButton).toHaveFocus()
+  })
 })

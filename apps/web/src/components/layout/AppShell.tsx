@@ -4,10 +4,9 @@ import {
   Home,
   MessageCircle,
   Menu,
-  Video,
-  X
+  Video
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet } from 'react-router'
 
@@ -25,10 +24,30 @@ const links = [
 
 export function AppShell() {
   const [open, setOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const { t } = useTranslation()
+
+  useEffect(() => {
+    if (!open) return
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      menuButtonRef.current?.focus()
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [open])
+
+  const closeMenuAndRestoreFocus = () => {
+    setOpen(false)
+    menuButtonRef.current?.focus()
+  }
+
   return (
-    <div className="min-h-screen bg-[#f5f8f8] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
+    <div className="min-h-screen bg-[#f5f8f8] lg:grid lg:grid-cols-[272px_minmax(0,1fr)]">
+      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
         <Brand compact />
         <div className="flex items-center gap-2">
           <LanguageButton />
@@ -38,50 +57,42 @@ export function AppShell() {
             aria-label={t(open ? 'nav.closeMenu' : 'nav.menu')}
             className="kg-icon-button"
             onClick={() => setOpen((value) => !value)}
+            ref={menuButtonRef}
             type="button"
           >
-            {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+            <Menu aria-hidden="true" size={21} />
           </button>
         </div>
       </header>
 
       {open && (
-        <button
-          aria-label={t('nav.closeMenu')}
-          className="fixed inset-0 z-30 bg-slate-950/30 lg:hidden"
-          onClick={() => setOpen(false)}
-          type="button"
+        <div
+          aria-hidden="true"
+          className="fixed inset-x-0 bottom-0 top-16 z-30 bg-slate-950/30 lg:hidden"
+          onClick={closeMenuAndRestoreFocus}
         />
       )}
 
       <aside
         id="app-navigation"
-        className={`fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto border-r border-slate-200 bg-white p-5 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed bottom-0 left-0 top-16 z-40 flex w-[272px] flex-col overflow-y-auto border-r border-slate-200 bg-white px-4 py-5 transition-transform sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:px-6 lg:py-7 ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="hidden lg:block">
           <Brand />
-          <button
-            aria-label={t('nav.closeMenu')}
-            className="kg-icon-button shrink-0 lg:hidden"
-            onClick={() => setOpen(false)}
-            type="button"
-          >
-            <X aria-hidden="true" />
-          </button>
         </div>
-        <nav aria-label={t('nav.main')} className="mt-10 space-y-1">
+        <nav aria-label={t('nav.main')} className="space-y-1.5 lg:mt-9">
           {links.map(({ to, key, icon: Icon, end }) => (
             <NavLink
               className={({ isActive }) =>
-                `flex min-h-12 items-center gap-3 rounded-xl px-4 text-sm font-medium no-underline ${isActive ? 'bg-teal-50 text-teal-800' : 'text-slate-600 hover:bg-slate-50'}`
+                `flex min-h-12 items-center gap-3.5 rounded-xl px-4 text-sm font-semibold no-underline transition-colors ${isActive ? 'bg-teal-50 text-teal-900 ring-1 ring-inset ring-teal-100' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`
               }
               end={end}
               key={to}
               onClick={() => setOpen(false)}
               to={to}
             >
-              <Icon aria-hidden="true" size={20} />
-              {t(`nav.${key}`)}
+              <Icon aria-hidden="true" className="shrink-0" size={21} />
+              <span className="leading-5">{t(`nav.${key}`)}</span>
             </NavLink>
           ))}
         </nav>

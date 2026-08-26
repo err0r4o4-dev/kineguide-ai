@@ -289,6 +289,14 @@ test('login, hard refresh, and every authenticated navigation target stay consis
       await route.fulfill({ json: { consent } })
       return
     }
+    if (url.endsWith('/conversations')) {
+      await route.fulfill({ json: { conversations: [] } })
+      return
+    }
+    if (url.endsWith('/assessments/latest')) {
+      await route.fulfill({ json: { assessment: null } })
+      return
+    }
     if (url.endsWith('/dashboard')) {
       await route.fulfill({
         json: {
@@ -331,13 +339,13 @@ test('login, hard refresh, and every authenticated navigation target stay consis
 
   await expect(page).toHaveURL('/app')
   await expect(
-    page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+    page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
   ).toBeVisible()
 
   for (let reload = 0; reload < 3; reload += 1) {
     await page.reload()
     await expect(
-      page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+      page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
     ).toBeVisible()
   }
   expect(refreshRequests).toBe(4)
@@ -347,34 +355,29 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await menuButton.click()
   await expect(menuButton).toHaveAccessibleName('ปิดเมนู')
   await expect(
-    page.getByRole('link', { name: 'คุยกับ AI', exact: true })
+    page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
   ).toBeVisible()
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth
     )
   ).toBe(true)
-  await page
-    .locator('#app-navigation')
-    .getByRole('button', { name: 'ปิดเมนู' })
-    .click()
+  await menuButton.click()
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const destinations = [
-    ['คุยกับ AI', '/app/chat'],
-    ['แบบประเมิน', '/app/assessment'],
+    ['ผู้ช่วย AI', '/app/chat'],
     ['แผนกิจกรรม', '/app/plan'],
-    ['ท่าฝึกสาธิต', '/app/exercises'],
-    ['ประวัติ', '/app/history'],
-    ['ความก้าวหน้า', '/app/progress'],
-    ['โปรไฟล์', '/app/profile'],
-    ['ตั้งค่า', '/app/settings'],
-    ['ช่วยเหลือ', '/app/help'],
-    ['หน้าหลัก', '/app']
+    ['ฝึกด้วยกล้อง', '/app/camera'],
+    ['บันทึกและความก้าวหน้า', '/app/progress'],
+    ['หน้าแรก', '/app']
   ] as const
+  const primaryNavigation = page.getByRole('navigation', {
+    name: 'เมนูหลัก'
+  })
 
   for (const [name, path] of destinations) {
-    await page.getByRole('link', { name, exact: true }).click()
+    await primaryNavigation.getByRole('link', { name, exact: true }).click()
     await expect(page).toHaveURL(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   }
