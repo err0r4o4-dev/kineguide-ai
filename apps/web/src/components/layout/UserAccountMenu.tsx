@@ -18,6 +18,7 @@ export function UserAccountMenu() {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const label = shortName(auth.user?.display_name)
 
   useEffect(() => {
@@ -25,7 +26,10 @@ export function UserAccountMenu() {
       if (!menuRef.current?.contains(event.target as Node)) setOpen(false)
     }
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') {
+        setOpen(false)
+        triggerRef.current?.focus()
+      }
     }
     document.addEventListener('mousedown', closeOnPointer)
     document.addEventListener('keydown', closeOnEscape)
@@ -46,10 +50,10 @@ export function UserAccountMenu() {
       {open && (
         <div
           aria-label={t('account.menu')}
-          className="absolute bottom-[calc(100%+0.75rem)] right-0 z-20 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-lg"
+          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-20 w-full min-w-52 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_8px_24px_rgb(15_23_42_/_0.12)]"
           role="menu"
         >
-          <p className="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-wide text-slate-500">
+          <p className="px-2.5 pb-1 pt-1 text-[10px] font-bold text-slate-500">
             {t('account.account')}
           </p>
           <MenuLink
@@ -64,8 +68,8 @@ export function UserAccountMenu() {
             to="/app/settings"
             onClick={() => setOpen(false)}
           />
-          <div className="my-2 border-t border-slate-200" />
-          <p className="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-wide text-slate-500">
+          <div className="my-1 border-t border-slate-200" />
+          <p className="px-2.5 pb-1 pt-1 text-[10px] font-bold text-slate-500">
             {t('account.system')}
           </p>
           <MenuLink
@@ -75,12 +79,12 @@ export function UserAccountMenu() {
             onClick={() => setOpen(false)}
           />
           <button
-            className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-red-700 hover:bg-red-50"
+            className="flex min-h-10 w-full items-center gap-2 rounded-lg px-2.5 text-left text-xs font-semibold text-red-700 hover:bg-red-50"
             onClick={() => void logout()}
             role="menuitem"
             type="button"
           >
-            <LogOut aria-hidden="true" size={18} />
+            <LogOut aria-hidden="true" size={15} />
             {t('auth.signOut')}
           </button>
         </div>
@@ -89,23 +93,25 @@ export function UserAccountMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={t('account.menu')}
-        className="flex min-h-12 w-full items-center gap-3 rounded-xl border border-teal-200 bg-white px-3 text-left shadow-sm hover:bg-teal-50"
+        className="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2 text-left hover:bg-slate-50"
         onClick={() => setOpen((current) => !current)}
+        ref={triggerRef}
         type="button"
       >
         <span
-          className="grid size-9 shrink-0 place-items-center rounded-full bg-teal-100 font-bold text-teal-800"
+          className="relative grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-bold text-teal-800"
           aria-hidden="true"
         >
           {initials(auth.user?.display_name)}
+          <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-white bg-emerald-500" />
         </span>
-        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">
+        <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-700">
           {label}
         </span>
         <ChevronUp
           aria-hidden="true"
           className={open ? '' : 'rotate-180'}
-          size={18}
+          size={15}
         />
       </button>
     </div>
@@ -125,12 +131,12 @@ function MenuLink({
 }) {
   return (
     <Link
-      className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-700 no-underline hover:bg-slate-50"
+      className="flex min-h-10 items-center gap-2 rounded-lg px-2.5 text-xs font-medium text-slate-700 no-underline hover:bg-slate-50"
       onClick={onClick}
       role="menuitem"
       to={to}
     >
-      <Icon aria-hidden="true" size={18} />
+      <Icon aria-hidden="true" size={15} />
       {label}
     </Link>
   )

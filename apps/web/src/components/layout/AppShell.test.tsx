@@ -49,5 +49,13 @@ describe('AppShell', () => {
     expect(
       screen.getByRole('menuitem', { name: 'ช่วยเหลือ' })
     ).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+    expect(
+      screen.queryByRole('menuitem', { name: 'โปรไฟล์' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0]
+    ).toHaveFocus()
   })
 })
