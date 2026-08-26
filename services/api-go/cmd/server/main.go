@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/client/ai"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
@@ -47,6 +48,7 @@ func main() {
 		os.Exit(1)
 	}
 	store := repository.NewPostgres(pool)
+	go runConversationRetentionCleanup(ctx, store, logger)
 	providerHTTPClient := &http.Client{Timeout: cfg.RequestTimeout}
 	oauthProviders := make(map[string]oauthprovider.Provider)
 	if cfg.GoogleOAuth.Enabled() {
@@ -62,7 +64,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, Store: store, Signer: tokenSigner, OAuthProviders: oauthProviders}, logger),
+		Handler:           handler.NewRouter(cfg, handler.Dependencies{Database: pool, AI: aiClient, ChatAI: aiClient, Store: store, Signer: tokenSigner, OAuthProviders: oauthProviders}, logger),
 		ReadHeaderTimeout: cfg.RequestTimeout,
 		ReadTimeout:       cfg.RequestTimeout,
 		WriteTimeout:      cfg.RequestTimeout,
@@ -84,4 +86,30 @@ func main() {
 		logger.Error("graceful shutdown failed", "error", err)
 	}
 	logger.Info("api server stopped")
+}
+
+func runConversationRetentionCleanup(ctx context.Context, store *repository.Postgres, logger *slog.Logger) {
+	cleanup := func() {
+		cleanupContext, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		removed, err := store.DeleteExpiredConversations(cleanupContext)
+		if err != nil {
+			logger.Error("conversation retention cleanup failed", "error", err)
+			return
+		}
+		if removed > 0 {
+			logger.Info("expired conversations removed", "count", removed)
+		}
+	}
+	cleanup()
+	ticker := time.NewTicker(time.Hour)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			cleanup()
+		}
+	}
 }

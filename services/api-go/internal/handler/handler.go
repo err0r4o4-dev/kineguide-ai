@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/client/ai"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/config"
 	appmiddleware "github.com/kineguide-ai/kineguide-ai/services/api-go/internal/middleware"
 	"github.com/kineguide-ai/kineguide-ai/services/api-go/internal/oauthprovider"
@@ -22,9 +23,14 @@ type Pinger interface {
 	Ping(context.Context) error
 }
 
+type ChatResponder interface {
+	Respond(context.Context, ai.ChatRequest) (ai.ChatResponse, error)
+}
+
 type Dependencies struct {
 	Database       Pinger
 	AI             Pinger
+	ChatAI         ChatResponder
 	Store          product.Store
 	Signer         *security.TokenSigner
 	OAuthProviders map[string]oauthprovider.Provider
@@ -71,7 +77,7 @@ func NewRouter(cfg config.Config, dependencies Dependencies, logger *slog.Logger
 	router.GET(apiV1Prefix+"/system/status", systemStatusHandler(cfg.Version, dependencies))
 	router.GET("/openapi.json", openAPIHandler)
 	router.GET("/docs", docsHandler)
-	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders)
+	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders, dependencies.ChatAI)
 	return router
 }
 

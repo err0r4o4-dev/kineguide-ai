@@ -62,7 +62,7 @@ export function DashboardPage() {
             </p>
           </div>
         </div>
-        <Link className="kg-button-secondary shrink-0" to="/app/assessment">
+        <Link className="kg-button-secondary shrink-0" to="/app/chat">
           {t('dashboard.aiStart')}
           <ArrowRight aria-hidden="true" />
         </Link>

@@ -50,7 +50,8 @@ const th = {
     menu: 'เปิดเมนู',
     closeMenu: 'ปิดเมนู',
     home: 'หน้าหลัก',
-    assessment: 'คุยกับ AI',
+    chat: 'คุยกับ AI',
+    assessment: 'แบบประเมิน',
     plan: 'แผนกิจกรรม',
     exercises: 'ท่าฝึกสาธิต',
     history: 'ประวัติ',
@@ -119,11 +120,39 @@ const th = {
       'เก็บชื่อการสาธิต เวลา และจำนวนครั้งที่คุณกดบันทึกเองเป็นเวลาไม่เกิน 365 วัน',
     researchTitle: 'อนุญาตใช้ข้อมูลแบบไม่ระบุตัวตนเพื่อการวิจัย (ทางเลือก)',
     required: 'ยอมรับการประมวลผลกล้องและการเก็บ session summary',
+    aiChat: 'ยอมรับการใช้ AI chat และการเก็บประวัติ',
+    aiChatBody:
+      'ข้อความแชตอาจมีข้อมูลสุขภาพและจะเก็บในบัญชีนี้ไม่เกิน 30 วัน คุณลบได้ก่อนกำหนด',
     research: 'ยอมรับการใช้เพื่อการวิจัย',
     accept: 'ยอมรับและดำเนินการต่อ',
     privacy:
       'ข้อมูลอาการเป็นข้อมูลละเอียดอ่อน คุณสามารถถอน consent และลบบัญชีได้เสมอ',
     failed: 'ไม่สามารถบันทึก consent ได้'
+  },
+  chat: {
+    title: 'คุยกับ KineGuide AI',
+    subtitle:
+      'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บไม่เกิน 30 วัน',
+    boundary:
+      'KineGuide AI ให้ข้อมูลเพื่อการศึกษาเท่านั้น ไม่วินิจฉัยโรค ไม่กำหนดการรักษา และไม่ใช้แทนแพทย์หรือนักกายภาพบำบัด',
+    conversations: 'รายการบทสนทนา',
+    conversation: 'บทสนทนา',
+    new: 'เริ่มบทสนทนาใหม่',
+    empty: 'ยังไม่มีบทสนทนา เริ่มห้องใหม่เมื่อคุณพร้อม',
+    startPrompt: 'พิมพ์ข้อความเพื่อเริ่มบทสนทนา',
+    messageLabel: 'ข้อความถึง KineGuide AI',
+    messageRequired: 'กรุณาพิมพ์ข้อความไม่เกิน 4,000 ตัวอักษร',
+    send: 'ส่งข้อความ',
+    responding: 'KineGuide AI กำลังตอบ…',
+    sendFailed:
+      'บริการ AI ไม่พร้อมใช้งานในขณะนี้ ข้อความยังไม่ถูกบันทึก กรุณาลองใหม่',
+    consentRequired: 'ต้องอนุญาตการเก็บประวัติ AI chat ก่อนเริ่มสนทนา',
+    manageConsent: 'จัดการ consent',
+    delete: 'ลบบทสนทนา {{title}}',
+    deleteConfirm: 'ลบบทสนทนานี้และข้อความทั้งหมดอย่างถาวรหรือไม่?',
+    deleteFailed: 'ไม่สามารถลบบทสนทนาได้ กรุณาลองใหม่',
+    you: 'คุณ: ',
+    ai: 'KineGuide AI: '
   },
   assessment: {
     title: 'คุยกับ KineGuide AI',
@@ -403,7 +432,8 @@ const en: typeof th = {
     menu: 'Open menu',
     closeMenu: 'Close menu',
     home: 'Home',
-    assessment: 'Chat with AI',
+    chat: 'Chat with AI',
+    assessment: 'Assessment',
     plan: 'Activity plan',
     exercises: 'Movement demos',
     history: 'History',
@@ -473,11 +503,40 @@ const en: typeof th = {
       'Store the demo name, time, and manually recorded count for up to 365 days.',
     researchTitle: 'Allow de-identified research use (optional)',
     required: 'Allow camera processing and session-summary storage',
+    aiChat: 'Allow AI chat and conversation-history storage',
+    aiChatBody:
+      'Chat may contain health information and is stored in this account for up to 30 days. You can delete it sooner.',
     research: 'Allow research use',
     accept: 'Accept and continue',
     privacy:
       'Symptom data is sensitive. You may withdraw consent and delete your account at any time.',
     failed: 'Unable to save consent.'
+  },
+  chat: {
+    title: 'Chat with KineGuide AI',
+    subtitle:
+      'Continue a typed conversation using history from this account. Messages are retained for up to 30 days.',
+    boundary:
+      'KineGuide AI provides educational information only. It does not diagnose, prescribe treatment, or replace a physician or physiotherapist.',
+    conversations: 'Conversation list',
+    conversation: 'Conversation',
+    new: 'Start a new conversation',
+    empty: 'No conversations yet. Start one when you are ready.',
+    startPrompt: 'Type a message to begin the conversation.',
+    messageLabel: 'Message to KineGuide AI',
+    messageRequired: 'Enter a message of no more than 4,000 characters.',
+    send: 'Send message',
+    responding: 'KineGuide AI is responding…',
+    sendFailed:
+      'AI is currently unavailable. Your message was not stored. Please try again.',
+    consentRequired:
+      'Allow AI-chat history storage before starting a conversation.',
+    manageConsent: 'Manage consent',
+    delete: 'Delete conversation {{title}}',
+    deleteConfirm: 'Permanently delete this conversation and all messages?',
+    deleteFailed: 'Unable to delete the conversation. Please try again.',
+    you: 'You: ',
+    ai: 'KineGuide AI: '
   },
   assessment: {
     title: 'Chat with KineGuide AI',

@@ -35,4 +35,10 @@ type Store interface {
 	UpdateSession(context.Context, Session) (Session, error)
 	SessionByID(context.Context, string, string) (Session, error)
 	ListSessions(context.Context, string, int) ([]Session, error)
+	CreateConversation(context.Context, Conversation) (Conversation, error)
+	ConversationByID(context.Context, string, string) (Conversation, error)
+	ListConversations(context.Context, string, int) ([]Conversation, error)
+	DeleteConversation(context.Context, string, string) error
+	ListMessages(context.Context, string, string, int) ([]Message, error)
+	SaveConversationExchange(context.Context, string, string, string, string) ([]Message, error)
 }

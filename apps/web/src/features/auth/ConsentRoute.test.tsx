@@ -18,6 +18,7 @@ const activeConsent: product.Consent = {
   policy_version: 'prototype-v1',
   camera_processing: true,
   session_summary_storage: true,
+  ai_chat_storage: false,
   research_use: false,
   accepted_at: '2026-08-24T12:01:00Z',
   revoked_at: null

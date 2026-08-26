@@ -37,6 +37,7 @@ test('new user completes consent and structured onboarding', async ({
           policy_version: 'prototype-v1',
           camera_processing: true,
           session_summary_storage: true,
+          ai_chat_storage: true,
           research_use: false,
           accepted_at: '2026-08-24T12:01:00Z',
           revoked_at: null
@@ -109,6 +110,56 @@ test('new user completes consent and structured onboarding', async ({
       })
       return
     }
+    if (url.endsWith('/conversations') && method === 'GET') {
+      await route.fulfill({ json: { conversations: [] } })
+      return
+    }
+    if (url.endsWith('/conversations') && method === 'POST') {
+      await route.fulfill({
+        status: 201,
+        json: {
+          id: '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
+          title: 'บทสนทนาใหม่',
+          locale: 'th',
+          created_at: '2026-08-24T12:03:00Z',
+          updated_at: '2026-08-24T12:03:00Z',
+          retention_until: '2026-09-23T12:03:00Z'
+        }
+      })
+      return
+    }
+    if (
+      url.endsWith(
+        '/conversations/864cb7ae-64dd-4db4-8200-12b44e5bcab1/messages'
+      )
+    ) {
+      if (method === 'GET') {
+        await route.fulfill({ json: { messages: [] } })
+      } else {
+        await route.fulfill({
+          status: 201,
+          json: {
+            messages: [
+              {
+                id: '55eaef83-72c6-4180-a442-49f6cb698c12',
+                conversation_id: '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
+                role: 'user',
+                content: 'สวัสดี',
+                created_at: '2026-08-24T12:04:00Z'
+              },
+              {
+                id: '1eb4cb23-7615-46d6-a702-fe557578b1d6',
+                conversation_id: '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
+                role: 'assistant',
+                content: 'คำตอบจำลองที่ปลอดภัย',
+                created_at: '2026-08-24T12:04:01Z'
+              }
+            ]
+          }
+        })
+      }
+      return
+    }
     await route.abort()
   })
 
@@ -125,6 +176,7 @@ test('new user completes consent and structured onboarding', async ({
   await page
     .getByLabel('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
     .check()
+  await page.getByLabel('ยอมรับการใช้ AI chat และการเก็บประวัติ').check()
   await page.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' }).click()
 
   await page.getByLabel('ไม่ประสงค์ระบุ').first().check()
@@ -160,14 +212,18 @@ test('new user completes consent and structured onboarding', async ({
   await page.getByRole('link', { name: 'หน้าหลัก' }).click()
   await expect(
     page.getByRole('link', { name: 'เริ่มคุยกับ AI' })
-  ).toHaveAttribute('href', '/app/assessment')
+  ).toHaveAttribute('href', '/app/chat')
   await expect(
     page.getByRole('link', { name: 'คุยกับ AI', exact: true })
-  ).toHaveAttribute('href', '/app/assessment')
+  ).toHaveAttribute('href', '/app/chat')
   await page.getByRole('link', { name: 'เริ่มคุยกับ AI' }).click()
   await expect(
     page.getByRole('heading', { name: 'คุยกับ KineGuide AI' })
   ).toBeVisible()
+  await page.getByRole('button', { name: 'เริ่มบทสนทนาใหม่' }).click()
+  await page.getByLabel('ข้อความถึง KineGuide AI').fill('สวัสดี')
+  await page.getByRole('button', { name: 'ส่งข้อความ' }).click()
+  await expect(page.getByText('คำตอบจำลองที่ปลอดภัย')).toBeVisible()
 })
 
 test('login, hard refresh, and every authenticated navigation target stay consistent', async ({
@@ -196,6 +252,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     policy_version: 'prototype-v1',
     camera_processing: true,
     session_summary_storage: true,
+    ai_chat_storage: true,
     research_use: false,
     accepted_at: '2026-08-24T12:01:00Z',
     revoked_at: null
@@ -304,7 +361,8 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const destinations = [
-    ['คุยกับ AI', '/app/assessment'],
+    ['คุยกับ AI', '/app/chat'],
+    ['แบบประเมิน', '/app/assessment'],
     ['แผนกิจกรรม', '/app/plan'],
     ['ท่าฝึกสาธิต', '/app/exercises'],
     ['ประวัติ', '/app/history'],

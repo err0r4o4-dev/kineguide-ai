@@ -1,4 +1,10 @@
-import { Camera, Database, MicOff, ShieldCheck } from 'lucide-react'
+import {
+  Camera,
+  Database,
+  MessageCircle,
+  MicOff,
+  ShieldCheck
+} from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -14,6 +20,7 @@ export function ConsentPage() {
   const queryClient = useQueryClient()
   const [required, setRequired] = useState(false)
   const [research, setResearch] = useState(false)
+  const [aiChat, setAIChat] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const submit = async () => {
@@ -24,6 +31,7 @@ export function ConsentPage() {
       const consent = await saveConsent({
         camera_processing: true,
         session_summary_storage: true,
+        ai_chat_storage: aiChat,
         research_use: research
       })
       queryClient.setQueryData(['consent'], consent)
@@ -50,6 +58,11 @@ export function ConsentPage() {
       icon: Database,
       title: t('consent.storageTitle'),
       body: t('consent.storageBody')
+    },
+    {
+      icon: MessageCircle,
+      title: t('consent.aiChat'),
+      body: t('consent.aiChatBody')
     }
   ]
   return (
@@ -89,6 +102,17 @@ export function ConsentPage() {
           <span>
             <strong>{t('consent.required')}</strong>
             <small>{t('consent.storageBody')}</small>
+          </span>
+        </label>
+        <label className="kg-check mt-4">
+          <input
+            checked={aiChat}
+            onChange={(event) => setAIChat(event.target.checked)}
+            type="checkbox"
+          />
+          <span>
+            <strong>{t('consent.aiChat')}</strong>
+            <small>{t('consent.aiChatBody')}</small>
           </span>
         </label>
         <label className="kg-check mt-4">
