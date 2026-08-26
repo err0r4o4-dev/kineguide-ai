@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { DatabaseZap, Languages, Link2, ShieldOff, Trash2 } from 'lucide-react'
+import { DatabaseZap, Languages, Link2, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router'
@@ -13,9 +13,7 @@ import {
   deleteAccount,
   deleteAuthIdentity,
   getAuthIdentities,
-  getConsent,
   getOAuthProviders,
-  revokeConsent,
   startAuthIdentityLink,
   type OAuthProvider
 } from '@/services/product'
@@ -33,17 +31,6 @@ export function SettingsPage() {
       : ''
   )
   const [identityError, setIdentityError] = useState('')
-  const consent = useQuery({
-    queryKey: ['consent'],
-    queryFn: ({ signal }) => getConsent(signal)
-  })
-  const revoke = useMutation({
-    mutationFn: revokeConsent,
-    onSuccess: async () => {
-      setMessage(t('settings.revokeDone'))
-      await client.invalidateQueries({ queryKey: ['consent'] })
-    }
-  })
   const providers = useQuery({
     queryKey: ['auth-providers'],
     queryFn: getOAuthProviders,
@@ -167,42 +154,7 @@ export function SettingsPage() {
             </p>
           )}
         </article>
-        <article className="kg-card p-6">
-          <ShieldOff aria-hidden="true" className="text-teal-700" />
-          <h2 className="mt-4 text-xl font-bold">{t('settings.consent')}</h2>
-          {consent.isLoading && <QueryLoading />}
-          {consent.isError && (
-            <QueryError retry={() => void consent.refetch()} />
-          )}
-          {consent.data && (
-            <dl className="mt-5 space-y-2 text-sm">
-              <div className="flex justify-between gap-3">
-                <dt>{t('consent.required')}</dt>
-                <dd className="font-semibold text-emerald-700">
-                  {consent.data.revoked_at
-                    ? t('common.inactive')
-                    : t('common.active')}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-3">
-                <dt>{t('consent.research')}</dt>
-                <dd>
-                  {consent.data.research_use ? t('common.yes') : t('common.no')}
-                </dd>
-              </div>
-            </dl>
-          )}
-          <button
-            className="kg-button-secondary mt-6"
-            disabled={!consent.data || revoke.isPending}
-            onClick={() => revoke.mutate()}
-            type="button"
-          >
-            <ShieldOff aria-hidden="true" />
-            {t('settings.revoke')}
-          </button>
-        </article>
-        <article className="kg-card p-6">
+        <article className="kg-card p-6 lg:col-span-2">
           <DatabaseZap aria-hidden="true" className="text-indigo-700" />
           <h2 className="mt-4 text-xl font-bold">{t('common.retention')}</h2>
           <p className="mt-3 leading-7 text-slate-600">
