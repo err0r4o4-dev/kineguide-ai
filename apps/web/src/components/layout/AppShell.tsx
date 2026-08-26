@@ -85,12 +85,12 @@ export function AppShell() {
             </NavLink>
           ))}
         </nav>
-        <div className="mt-auto pt-5 lg:hidden">
+        <div className="mt-auto border-t border-slate-200 pt-5">
           <UserAccountMenu />
         </div>
       </aside>
 
-      <main className="min-w-0 px-4 py-6 pb-24 sm:px-7 lg:px-10 lg:py-8 lg:pb-24">
+      <main className="min-w-0 px-4 py-6 sm:px-7 lg:px-8 lg:py-8">
         <a className="sr-only focus:not-sr-only" href="#page-content">
           {t('common.skip')}
         </a>
@@ -98,9 +98,6 @@ export function AppShell() {
           <Outlet />
         </div>
       </main>
-      <div className="fixed bottom-5 right-5 z-20 hidden w-60 lg:block">
-        <UserAccountMenu />
-      </div>
     </div>
   )
 }

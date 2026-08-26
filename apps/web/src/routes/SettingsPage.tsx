@@ -1,9 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { DatabaseZap, Languages, Link2, Trash2 } from 'lucide-react'
+import {
+  Camera,
+  ChevronRight,
+  DatabaseZap,
+  Languages,
+  Link2,
+  ShieldCheck,
+  Trash2
+} from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useSearchParams } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { LanguageButton } from '@/components/LanguageButton'
@@ -74,8 +82,8 @@ export function SettingsPage() {
   return (
     <div>
       <PageHeader title={t('settings.title')} />
-      <section className="mt-7 grid gap-5 lg:grid-cols-2">
-        <article className="kg-card p-6 lg:col-span-2">
+      <section className="mt-7 grid max-w-4xl gap-4">
+        <article className="kg-card p-5 sm:p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Languages aria-hidden="true" className="text-teal-700" />
@@ -89,7 +97,7 @@ export function SettingsPage() {
             <LanguageButton variant="segmented" />
           </div>
         </article>
-        <article className="kg-card p-6 lg:col-span-2">
+        <article className="kg-card p-5 sm:p-6">
           <Link2 aria-hidden="true" className="text-teal-700" />
           <h2 className="mt-4 text-xl font-bold">
             {t('settings.connectedAccounts')}
@@ -151,14 +159,42 @@ export function SettingsPage() {
             </p>
           )}
         </article>
-        <article className="kg-card p-6 lg:col-span-2">
+        <article className="kg-card p-5 sm:p-6">
           <DatabaseZap aria-hidden="true" className="text-indigo-700" />
           <h2 className="mt-4 text-xl font-bold">{t('common.retention')}</h2>
           <p className="mt-3 leading-7 text-slate-600">
             {t('settings.retention')}
           </p>
         </article>
-        <article className="kg-card border-red-200 p-6 lg:col-span-2">
+        <Link
+          className="kg-card flex min-h-24 items-center gap-4 p-5 no-underline hover:border-teal-300 hover:bg-teal-50 sm:p-6"
+          to="/app/camera"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700">
+            <Camera aria-hidden="true" size={21} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-bold text-slate-950">
+              {t('camera.permission')}
+            </span>
+            <span className="mt-1 block text-sm leading-6 text-slate-600">
+              {t('camera.instructions')}
+            </span>
+          </span>
+          <ChevronRight aria-hidden="true" className="text-teal-700" />
+        </Link>
+        <article className="kg-card flex min-h-24 items-center gap-4 p-5 sm:p-6">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700">
+            <ShieldCheck aria-hidden="true" size={21} />
+          </span>
+          <div>
+            <h2 className="font-bold text-slate-950">{t('common.safety')}</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              {t('common.noDiagnosis')}
+            </p>
+          </div>
+        </article>
+        <article className="kg-card border-red-200 p-5 sm:p-6">
           <Trash2 aria-hidden="true" className="text-red-700" />
           <h2 className="mt-4 text-xl font-bold text-red-900">
             {t('settings.delete')}

@@ -1,6 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { MessageCircle, Plus, Send, Trash2 } from 'lucide-react'
+import {
+  CalendarDays,
+  ClipboardList,
+  MessageCircle,
+  Plus,
+  Send,
+  Trash2
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +20,7 @@ import {
   deleteConversation,
   getConversationMessages,
   getConversations,
+  getLatestAssessment,
   sendConversationMessage,
   type Conversation,
   type ConversationMessage
@@ -43,6 +51,10 @@ export function ChatPage() {
     queryKey: ['conversation-messages', selectedID],
     queryFn: ({ signal }) => getConversationMessages(selectedID, signal),
     enabled: selectedID !== ''
+  })
+  const assessment = useQuery({
+    queryKey: ['latest-assessment'],
+    queryFn: ({ signal }) => getLatestAssessment(signal)
   })
   const form = useForm<MessageForm>({
     resolver: zodResolver(messageSchema),
@@ -131,7 +143,7 @@ export function ChatPage() {
       )}
 
       {conversations.data && (
-        <div className="mt-6 grid min-h-[34rem] gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="mt-6 grid min-h-[34rem] gap-4 xl:grid-cols-[240px_minmax(0,1fr)_220px]">
           <aside className="kg-card p-4" aria-label={t('chat.conversations')}>
             <button
               className="kg-button-primary w-full"
@@ -269,6 +281,63 @@ export function ChatPage() {
               </>
             )}
           </section>
+          <aside
+            className="space-y-4 xl:border-l xl:border-slate-200 xl:pl-4"
+            aria-label={t('assessment.summary')}
+          >
+            <h2 className="text-lg font-bold text-slate-950">
+              {t('assessment.summary')}
+            </h2>
+            {assessment.data ? (
+              <article className="kg-card p-4">
+                <div className="flex items-start gap-3">
+                  <ClipboardList
+                    aria-hidden="true"
+                    className="mt-0.5 shrink-0 text-teal-700"
+                    size={20}
+                  />
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      {t('assessment.area')}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                      {t(`assessment.areas.${assessment.data.concern_area}`)}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs leading-5 text-slate-500">
+                  {t('assessment.reviewBody')}
+                </p>
+              </article>
+            ) : (
+              <article className="kg-card p-4 text-sm leading-6 text-slate-600">
+                {t('assessment.welcome')}
+              </article>
+            )}
+            <article className="kg-card p-4">
+              <div className="flex items-start gap-3">
+                <CalendarDays
+                  aria-hidden="true"
+                  className="mt-0.5 shrink-0 text-teal-700"
+                  size={20}
+                />
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    {t('nav.plan')}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {t('plan.subtitle')}
+                  </p>
+                </div>
+              </div>
+              <Link
+                className="kg-button-secondary mt-4 w-full text-sm"
+                to="/app/plan"
+              >
+                {t('nav.plan')}
+              </Link>
+            </article>
+          </aside>
         </div>
       )}
     </div>
