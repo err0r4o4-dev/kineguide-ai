@@ -5,12 +5,25 @@ import {
   ShieldCheck
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, Navigate } from 'react-router'
 
 import { PublicHeader } from '@/components/layout/PublicHeader'
+import { useAuth } from '@/features/auth/AuthContext'
 
 export function LandingPage() {
   const { t } = useTranslation()
+  const auth = useAuth()
+
+  if (!auth.ready) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-kg-canvas px-4 text-slate-600">
+        <p aria-live="polite">{t('common.loading')}</p>
+      </main>
+    )
+  }
+
+  if (auth.user) return <Navigate replace to="/app" />
+
   const features = [
     {
       icon: Camera,
