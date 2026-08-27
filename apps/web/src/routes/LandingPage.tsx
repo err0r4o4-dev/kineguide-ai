@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 import { PublicHeader } from '@/components/layout/PublicHeader'
+import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
 
 export function LandingPage() {
@@ -15,11 +16,7 @@ export function LandingPage() {
   const auth = useAuth()
 
   if (!auth.ready) {
-    return (
-      <main className="grid min-h-screen place-items-center bg-kg-canvas px-4 text-slate-600">
-        <p aria-live="polite">{t('common.loading')}</p>
-      </main>
-    )
+    return <SystemLoading progress={32} />
   }
 
   const features = [

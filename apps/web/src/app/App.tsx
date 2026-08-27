@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { lazy, Suspense } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router'
 
 import { AppShell } from '@/components/layout/AppShell'
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
 import { PwaUpdateNotice } from '@/components/PwaUpdateNotice'
+import { SystemLoading } from '@/components/SystemState'
 import { AuthProvider } from '@/features/auth/AuthProvider'
 import { ConsentRoute } from '@/features/auth/ConsentRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
@@ -170,16 +170,5 @@ export function App() {
 }
 
 function AppLoading() {
-  const { t } = useTranslation()
-  return (
-    <main className="grid min-h-screen place-items-center bg-kg-canvas text-slate-600">
-      <div className="flex items-center gap-3">
-        <span
-          aria-hidden="true"
-          className="size-5 animate-spin rounded-full border-2 border-teal-700 border-r-transparent motion-reduce:animate-none"
-        />
-        {t('common.loading')}
-      </div>
-    </main>
-  )
+  return <SystemLoading progress={36} />
 }

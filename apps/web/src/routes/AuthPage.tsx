@@ -9,6 +9,7 @@ import { z } from 'zod'
 
 import { Brand } from '@/components/Brand'
 import { LanguageButton } from '@/components/LanguageButton'
+import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import {
@@ -60,6 +61,8 @@ export function AuthPage() {
 
   if (auth.ready && auth.user && !submissionInFlight.current)
     return <Navigate replace to="/app" />
+
+  if (isSubmitting || socialProvider) return <SystemLoading progress={68} />
 
   const submit = async (values: FormValues) => {
     submissionInFlight.current = true

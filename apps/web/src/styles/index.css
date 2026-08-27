@@ -362,6 +362,19 @@ a {
   color: #134e4a;
 }
 
+.kg-orbit-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kg-orbit 5s linear infinite;
+  color: #0f766e;
+}
+
+@keyframes kg-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (min-width: 768px) {
   :root {
     line-height: 1.6;
