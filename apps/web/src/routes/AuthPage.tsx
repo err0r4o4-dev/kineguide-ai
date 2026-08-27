@@ -12,6 +12,7 @@ import { LanguageButton } from '@/components/LanguageButton'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
+import { withMinimumLoadingDuration } from '@/lib/minimumLoadingDuration'
 import {
   getOAuthLoginURL,
   getOAuthProviders,
@@ -69,12 +70,16 @@ export function AuthPage() {
     setServerError('')
     try {
       if (isRegister) {
-        await auth.register({
-          ...values,
-          display_name: values.display_name
-        })
+        await withMinimumLoadingDuration(
+          auth.register({
+            ...values,
+            display_name: values.display_name
+          })
+        )
       } else {
-        await auth.login({ email: values.email, password: values.password })
+        await withMinimumLoadingDuration(
+          auth.login({ email: values.email, password: values.password })
+        )
       }
       if (isRegister) {
         navigate('/consent', { replace: true })

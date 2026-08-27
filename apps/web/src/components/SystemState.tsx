@@ -1,4 +1,5 @@
 import { Check, Circle, HeartPulse, Home, RefreshCw } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
@@ -69,7 +70,13 @@ export function SystemLoading({
   contained?: boolean
 }) {
   const { t } = useTranslation()
-  const value = Math.max(0, Math.min(99, progress))
+  const targetProgress = Math.max(0, Math.min(99, progress))
+  const [value, setValue] = useState(Math.min(18, targetProgress))
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setValue(targetProgress), 50)
+    return () => window.clearTimeout(timer)
+  }, [targetProgress])
   const content = (
     <section
       className={`mx-auto flex max-w-3xl flex-col items-center justify-center py-8 text-center ${contained ? 'min-h-[60vh]' : 'min-h-[calc(100vh-7rem)]'}`}
@@ -93,7 +100,7 @@ export function SystemLoading({
           role="progressbar"
         >
           <span
-            className="block h-full rounded-full bg-teal-600 shadow-[0_0_18px_rgba(13,148,136,0.35)] transition-[width]"
+            className="block h-full rounded-full bg-teal-600 shadow-[0_0_18px_rgba(13,148,136,0.35)] transition-[width] duration-[1200ms] ease-out motion-reduce:transition-none"
             style={{ width: `${value}%` }}
           />
         </div>

@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Brand } from '@/components/Brand'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
+import { minimumLoadingDurationMs } from '@/lib/minimumLoadingDuration'
 
 const errorTranslation: Record<string, string> = {
   cancelled: 'auth.socialCancelled',
@@ -18,12 +19,21 @@ export function AuthCallbackPage() {
   const navigate = useNavigate()
   const [search] = useSearchParams()
   const [sessionError, setSessionError] = useState(false)
+  const [minimumDurationElapsed, setMinimumDurationElapsed] = useState(false)
   const error = search.get('error')
   const mode = search.get('mode')
   const provider = search.get('provider')
 
   useEffect(() => {
-    if (error || !auth.ready) return
+    const timer = window.setTimeout(
+      () => setMinimumDurationElapsed(true),
+      minimumLoadingDurationMs
+    )
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (error || !auth.ready || !minimumDurationElapsed) return
     if (!auth.user) {
       setSessionError(true)
       return
@@ -35,7 +45,15 @@ export function AuthCallbackPage() {
       return
     }
     navigate('/app', { replace: true })
-  }, [auth.ready, auth.user, error, mode, navigate, provider])
+  }, [
+    auth.ready,
+    auth.user,
+    error,
+    minimumDurationElapsed,
+    mode,
+    navigate,
+    provider
+  ])
 
   const visibleError = error || (sessionError ? 'session_failed' : '')
 

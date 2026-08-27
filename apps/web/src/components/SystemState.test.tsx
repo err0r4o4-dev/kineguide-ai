@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
@@ -6,9 +6,14 @@ import { vi } from 'vitest'
 import '@/lib/i18n'
 import { SystemError, SystemLoading } from './SystemState'
 
-it('describes login preparation with progress and steps', () => {
+it('describes login preparation with progress and steps', async () => {
   render(<SystemLoading progress={68} />)
-  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '68')
+  await waitFor(() =>
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '68'
+    )
+  )
   expect(screen.getByRole('status')).toHaveTextContent(
     'กำลังเตรียม KineGuide AI'
   )
