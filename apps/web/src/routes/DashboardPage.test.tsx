@@ -51,9 +51,10 @@ describe('DashboardPage', () => {
     expect(
       await screen.findByRole('heading', {
         level: 1,
-        name: 'กิจกรรมวันนี้'
+        name: 'สวัสดี Thirawat Duangta'
       })
     ).toBeInTheDocument()
+    expect(screen.getByText(/อัปเดตล่าสุด/)).toBeVisible()
     expect(
       await screen.findByRole('img', {
         name: 'ภาพประกอบการสาธิตลุกนั่งจากเก้าอี้'
@@ -62,6 +63,9 @@ describe('DashboardPage', () => {
     expect(screen.getByRole('link', { name: 'เริ่มกิจกรรม' })).toHaveAttribute(
       'href',
       '/app/camera'
+    )
+    expect(screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })).toHaveClass(
+      '!text-kg-primary'
     )
     expect(
       await screen.findByRole('group', { name: 'สรุปกิจกรรม' })

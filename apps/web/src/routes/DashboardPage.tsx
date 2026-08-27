@@ -14,8 +14,10 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
+import { PageHeader } from '@/components/PageHeader'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
+import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
 import { getDashboard, type ExerciseSession } from '@/services/product'
 
@@ -25,6 +27,7 @@ const illustrationPath = '/dashboard-sit-to-stand.png'
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
+  const auth = useAuth()
   const [range, setRange] = useState<(typeof ranges)[number]>(7)
   const [today] = useState(() => new Date())
   const query = useQuery({
@@ -32,6 +35,9 @@ export function DashboardPage() {
     queryFn: ({ signal }) => getDashboard(signal)
   })
   const language = i18n.resolvedLanguage === 'th' ? 'th' : 'en'
+  const date = new Intl.DateTimeFormat(language === 'th' ? 'th-TH' : 'en-GB', {
+    dateStyle: 'long'
+  }).format(today)
   const visibleSessions = useMemo(
     () =>
       (query.data?.recent_sessions ?? []).filter(
@@ -44,15 +50,25 @@ export function DashboardPage() {
 
   return (
     <div className="pb-4">
+      <PageHeader
+        eyebrow={t('dashboard.updated', { date })}
+        subtitle={t('dashboard.ready')}
+        title={t('dashboard.hello', { name: auth.user?.display_name })}
+      />
+
       {query.isLoading && <QueryLoading />}
-      {query.isError && <QueryError retry={() => void query.refetch()} />}
+      {query.isError && (
+        <div className="mt-6">
+          <QueryError retry={() => void query.refetch()} />
+        </div>
+      )}
 
       {query.data && (
         <>
-          <section className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.95fr)]">
+          <section className="mt-7 grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.95fr)]">
             <TodayActivity />
 
-            <div className="grid gap-4">
+            <div className="grid gap-4 xl:grid-rows-[minmax(0,1fr)_auto]">
               <AiAssistantCard />
               <div
                 aria-label={t('dashboard.activitySummary')}
@@ -105,9 +121,9 @@ function TodayActivity() {
         <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
           <CalendarCheck2 aria-hidden="true" size={18} />
         </span>
-        <h1 className="text-lg font-bold text-slate-950 sm:text-xl">
+        <h2 className="text-lg font-bold text-slate-950 sm:text-xl">
           {t('dashboard.today')}
-        </h1>
+        </h2>
       </div>
 
       <div className="mt-4 grid flex-1 gap-6 md:grid-cols-[minmax(0,1.12fr)_minmax(13rem,0.88fr)] md:items-center">
@@ -162,8 +178,8 @@ function AiAssistantCard() {
   const { t } = useTranslation()
 
   return (
-    <article className="kg-card p-5 sm:p-6">
-      <div className="flex gap-4">
+    <article className="kg-card flex items-center p-5 sm:p-6">
+      <div className="flex gap-3.5">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-700 text-white shadow-sm">
           <MessageCircle aria-hidden="true" size={21} />
         </span>
@@ -178,7 +194,7 @@ function AiAssistantCard() {
             {t('dashboard.aiBoundary')}
           </p>
           <Link
-            className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-xl font-bold text-teal-800 no-underline hover:text-teal-950"
+            className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-xl px-2 text-sm font-bold !text-kg-primary no-underline transition-colors hover:bg-teal-50 hover:!text-kg-primary-strong"
             to="/app/chat"
           >
             {t('dashboard.aiStart')}

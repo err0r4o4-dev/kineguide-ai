@@ -63,11 +63,6 @@ const CameraSetupPage = lazy(() =>
     default: module.CameraSetupPage
   }))
 )
-const CameraPracticePage = lazy(() =>
-  import('@/routes/CameraPracticePage').then((module) => ({
-    default: module.CameraPracticePage
-  }))
-)
 const LiveSessionPage = lazy(() =>
   import('@/routes/LiveSessionPage').then((module) => ({
     default: module.LiveSessionPage
@@ -128,7 +123,6 @@ const router = createBrowserRouter([
               { index: true, element: <DashboardPage /> },
               { path: 'chat', element: <ChatPage /> },
               { path: 'plan', element: <PlanPage /> },
-              { path: 'camera', element: <CameraPracticePage /> },
               { path: 'exercises', element: <ExerciseLibraryPage /> },
               { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
               { path: 'exercises/:slug/setup', element: <CameraSetupPage /> },
