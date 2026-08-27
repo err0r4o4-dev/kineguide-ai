@@ -27,7 +27,7 @@ export function PublicHeader() {
             className="kg-button-primary h-11 whitespace-nowrap px-3 sm:px-4"
             to="/login"
           >
-            {t('auth.signIn')}
+            {t('nav.getStarted')}
           </Link>
         </nav>
       </div>

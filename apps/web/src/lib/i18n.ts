@@ -59,7 +59,8 @@ const th = {
     progress: 'บันทึกและความก้าวหน้า',
     profile: 'โปรไฟล์',
     settings: 'ตั้งค่า',
-    help: 'ช่วยเหลือ'
+    help: 'ช่วยเหลือ',
+    getStarted: 'เริ่มต้นใช้งาน'
   },
   account: {
     menu: 'เมนูบัญชี',
@@ -460,7 +461,8 @@ const en: typeof th = {
     progress: 'Activity records and progress',
     profile: 'Profile',
     settings: 'Settings',
-    help: 'Help'
+    help: 'Help',
+    getStarted: 'Get started'
   },
   account: {
     menu: 'Account menu',
