@@ -133,12 +133,20 @@ export function UserAccountMenu() {
           {label}
         </span>
         {unreadCount > 0 && (
-          <span
-            aria-hidden="true"
-            className="grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
-          >
-            {unreadCount}
-          </span>
+          <>
+            <Bell
+              aria-hidden="true"
+              className="shrink-0 text-slate-600"
+              data-testid="account-notification-bell"
+              size={16}
+            />
+            <span
+              aria-hidden="true"
+              className="grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
+            >
+              {unreadCount}
+            </span>
+          </>
         )}
         <ChevronUp
           aria-hidden="true"

@@ -105,11 +105,14 @@ describe('AppShell', () => {
       </MemoryRouter>
     )
 
+    const accountButton = screen.getAllByRole('button', {
+      name: 'เมนูบัญชี มีการแจ้งเตือนที่ยังไม่ได้อ่าน 3 รายการ'
+    })[0]
+
+    expect(accountButton).toHaveTextContent('3')
     expect(
-      screen.getAllByRole('button', {
-        name: 'เมนูบัญชี มีการแจ้งเตือนที่ยังไม่ได้อ่าน 3 รายการ'
-      })[0]
-    ).toHaveTextContent('3')
+      within(accountButton).getByTestId('account-notification-bell')
+    ).toBeInTheDocument()
   })
 
   it('uses one menu toggle and dismisses the mobile navigation with Escape', async () => {
