@@ -50,7 +50,7 @@ export function AppShell() {
       <header className="sticky top-0 z-50 flex h-[4.5rem] items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur-lg lg:hidden">
         <Brand compact />
         <div className="flex items-center gap-2">
-          <LanguageButton compactOnMobile />
+          <LanguageButton />
           <button
             aria-controls="app-navigation"
             aria-expanded={open}

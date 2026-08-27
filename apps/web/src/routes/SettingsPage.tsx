@@ -115,7 +115,7 @@ export function SettingsPage() {
                 {t('settings.languageBody')}
               </p>
             </div>
-            <LanguageButton variant="segmented" />
+            <LanguageButton />
           </div>
         </article>
         <article className="kg-card p-5 sm:p-7">

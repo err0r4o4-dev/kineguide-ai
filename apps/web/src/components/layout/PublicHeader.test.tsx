@@ -43,6 +43,9 @@ describe('PublicHeader', () => {
       'href',
       '/login'
     )
+    expect(
+      screen.queryByRole('link', { name: 'คุณสมบัติ' })
+    ).not.toBeInTheDocument()
   })
 
   it('presents the app CTA to an authenticated user', () => {

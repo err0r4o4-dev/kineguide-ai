@@ -18,13 +18,7 @@ export function PublicHeader() {
           <Brand />
         </span>
         <nav aria-label={t('nav.public')} className="flex items-center gap-2">
-          <a
-            className="hidden min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 sm:inline-flex"
-            href="#features"
-          >
-            {t('landing.features')}
-          </a>
-          <LanguageButton compactOnMobile />
+          <LanguageButton />
           <Link
             className="kg-button-primary h-11 whitespace-nowrap px-3 sm:px-4"
             to={auth.user ? '/app' : '/login'}

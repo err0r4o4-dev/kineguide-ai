@@ -69,7 +69,7 @@ export function ConsentPage() {
     <main className="min-h-screen bg-kg-canvas px-4 py-8 sm:py-12">
       <div className="relative mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-10 lg:p-12">
         <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
-          <LanguageButton variant="segmented" />
+          <LanguageButton />
         </div>
         <div className="text-center">
           <Brand compact />

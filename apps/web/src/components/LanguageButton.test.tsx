@@ -13,9 +13,21 @@ describe('LanguageButton', () => {
     await i18n.changeLanguage('th')
   })
 
+  it('shows Thai and English together in the default selector', () => {
+    render(<LanguageButton />)
+
+    const thaiButton = screen.getByRole('button', { name: 'ไทย' })
+    const englishButton = screen.getByRole('button', { name: 'English' })
+
+    expect(thaiButton).toHaveTextContent(/^TH$/)
+    expect(thaiButton).toHaveAttribute('aria-pressed', 'true')
+    expect(englishButton).toHaveTextContent(/^EN$/)
+    expect(englishButton).toHaveAttribute('aria-pressed', 'false')
+  })
+
   it('stores the selected language without changing consent data', async () => {
     const user = userEvent.setup()
-    render(<LanguageButton variant="segmented" />)
+    render(<LanguageButton />)
 
     await user.click(screen.getByRole('button', { name: 'English' }))
 
