@@ -228,9 +228,9 @@ export function ChatPage() {
 
           <aside
             aria-label={t('chat.conversations')}
-            className="hidden border-r border-kg-border bg-slate-50/45 p-4 lg:block"
+            className="hidden overflow-y-auto border-r border-kg-border bg-slate-50/45 p-4 lg:block"
           >
-            <h2 className="mb-3 px-3 text-sm font-bold text-kg-ink">
+            <h2 className="sticky top-0 z-10 mb-3 bg-slate-50/95 px-3 pb-1 text-sm font-bold text-kg-ink backdrop-blur">
               {t('chat.conversations')}
             </h2>
             {conversationList}
