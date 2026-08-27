@@ -1,14 +1,8 @@
 import { render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
 
-import '@/lib/i18n'
 import { QueryLoading } from './QueryState'
 
-vi.mock('@/lib/navigation', () => ({
-  isBrowserRefresh: () => true
-}))
-
-it('does not show the in-app loading page during browser refresh', () => {
+it('does not render an in-app query loading screen', () => {
   const { container } = render(<QueryLoading />)
 
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
