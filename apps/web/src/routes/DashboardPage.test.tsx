@@ -49,8 +49,20 @@ describe('DashboardPage', () => {
     )
 
     expect(
-      await screen.findByRole('heading', { name: 'สวัสดี Thirawat Duangta' })
+      await screen.findByRole('heading', {
+        level: 1,
+        name: 'กิจกรรมวันนี้'
+      })
     ).toBeInTheDocument()
+    expect(
+      await screen.findByRole('img', {
+        name: 'ภาพประกอบการสาธิตลุกนั่งจากเก้าอี้'
+      })
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'เริ่มกิจกรรม' })).toHaveAttribute(
+      'href',
+      '/app/camera'
+    )
     expect(
       await screen.findByRole('group', { name: 'สรุปกิจกรรม' })
     ).toHaveTextContent('3')
@@ -67,7 +79,7 @@ describe('DashboardPage', () => {
     expect(
       screen.getByRole('heading', { name: 'กิจกรรมล่าสุด' })
     ).toBeInTheDocument()
-    expect(screen.getByText('sit-to-stand-demo')).toBeInTheDocument()
+    expect(screen.getAllByText('การลุกนั่งจากเก้าอี้')).toHaveLength(2)
     expect(
       screen.getByText(
         'ตัวเลขทั้งหมดเป็นข้อมูลกิจกรรมที่บันทึกเอง ไม่ใช่ผลการประเมินการฟื้นตัว'

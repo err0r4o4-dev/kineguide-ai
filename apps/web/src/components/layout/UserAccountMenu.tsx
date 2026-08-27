@@ -132,25 +132,25 @@ export function UserAccountMenu() {
         <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-700">
           {label}
         </span>
-        {unreadCount > 0 && (
-          <>
-            <Bell
-              aria-hidden="true"
-              className="shrink-0 text-slate-600"
-              data-testid="account-notification-bell"
-              size={16}
-            />
+        <div className="relative flex items-center justify-center pl-1">
+          <Bell
+            aria-hidden="true"
+            className="shrink-0 text-slate-600"
+            data-testid="account-notification-bell"
+            size={18}
+          />
+          {unreadCount > 0 && (
             <span
               aria-hidden="true"
-              className="grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
+              className="absolute -right-1.5 -top-1 grid min-w-4 place-items-center rounded-full bg-teal-700 px-1 py-0.5 text-[9px] font-bold leading-none text-white tabular-nums"
             >
               {unreadCount}
             </span>
-          </>
-        )}
-        <ChevronUp
+          )}
+        </div>
+         <ChevronUp
           aria-hidden="true"
-          className={open ? '' : 'rotate-180'}
+          className={`shrink-0 text-slate-600 transition-transform ${open ? '' : 'rotate-180'}`}
           size={15}
         />
       </button>
