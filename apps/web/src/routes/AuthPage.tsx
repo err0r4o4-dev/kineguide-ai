@@ -8,7 +8,6 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { z } from 'zod'
 
 import { Brand } from '@/components/Brand'
-import { LanguageButton } from '@/components/LanguageButton'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
@@ -127,11 +126,10 @@ export function AuthPage() {
           </div>
         </section>
         <section className="p-6 sm:p-10 lg:overflow-y-auto lg:p-14 xl:p-16">
-          <div className="flex items-center justify-between lg:justify-end">
+          <div className="flex items-center lg:justify-end">
             <span className="lg:hidden">
               <Brand compact />
             </span>
-            <LanguageButton />
           </div>
           <h1 className="mt-10 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
             {isRegister ? t('auth.register') : t('auth.welcome')}
