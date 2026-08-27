@@ -264,6 +264,7 @@ const th = {
     empty: 'ยังไม่มีรายการสาธิตสำหรับวันนี้'
   },
   dashboard: {
+    updated: 'อัปเดตล่าสุด {{date}}',
     hello: 'สวัสดี {{name}}',
     ready: 'พร้อมสำหรับกิจกรรมวันนี้หรือยัง?',
     aiTitle: 'ผู้ช่วยสนทนา KineGuide AI',
@@ -283,9 +284,14 @@ const th = {
     sessions: 'session ที่เสร็จ',
     streak: 'วันที่ต่อเนื่อง',
     time: 'เวลาที่บันทึก',
+    activitySummary: 'สรุปกิจกรรม',
     recent: 'กิจกรรมล่าสุด',
+    viewAll: 'ดูทั้งหมด',
     noRecent: 'ยังไม่มี session ที่บันทึก',
-    weekly: 'ภาพรวมกิจกรรม',
+    weekly: 'กิจกรรมรายสัปดาห์',
+    range: 'ช่วงเวลาของกราฟกิจกรรม',
+    rangeDays: '{{count}} วัน',
+    chartSummary: 'กิจกรรมที่บันทึก {{count}} รายการในช่วง {{range}} วัน',
     manual:
       'ตัวเลขทั้งหมดเป็นข้อมูลกิจกรรมที่บันทึกเอง ไม่ใช่ผลการประเมินการฟื้นตัว'
   },
@@ -691,6 +697,7 @@ const en: typeof th = {
     empty: 'No demo activities are available for this day.'
   },
   dashboard: {
+    updated: 'Last updated {{date}}',
     hello: 'Hello {{name}}',
     ready: 'Ready for an activity?',
     aiTitle: 'KineGuide AI conversation assistant',
@@ -710,9 +717,14 @@ const en: typeof th = {
     sessions: 'completed sessions',
     streak: 'day streak',
     time: 'recorded time',
+    activitySummary: 'Activity summary',
     recent: 'Recent activity',
+    viewAll: 'View all',
     noRecent: 'No recorded sessions yet',
-    weekly: 'Activity overview',
+    weekly: 'Weekly activity',
+    range: 'Activity chart range',
+    rangeDays: '{{count}} days',
+    chartSummary: '{{count}} recorded activities in the past {{range}} days',
     manual:
       'All figures are self-recorded activity data, not recovery outcomes.'
   },
