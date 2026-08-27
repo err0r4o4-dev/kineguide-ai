@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@/lib/i18n'
@@ -9,12 +9,18 @@ import i18n from '@/lib/i18n'
 import * as product from '@/services/product'
 import { ConsentPage } from './ConsentPage'
 
+vi.mock('@/lib/minimumLoadingDuration', () => ({
+  waitForLoadingCompletion: vi.fn().mockResolvedValue(undefined),
+  withMinimumLoadingDuration: async <T,>(operation: Promise<T>) => operation
+}))
+
 vi.mock('@/services/product', () => ({
   saveConsent: vi.fn()
 }))
 
 describe('ConsentPage language selector', () => {
   beforeEach(async () => {
+    vi.clearAllMocks()
     await i18n.changeLanguage('th')
   })
 
@@ -85,5 +91,44 @@ describe('ConsentPage language selector', () => {
       ai_chat_storage: false,
       research_use: false
     })
+  })
+
+  it('opens the app dashboard after consent is saved', async () => {
+    const user = userEvent.setup()
+    vi.mocked(product.saveConsent).mockResolvedValue({
+      camera_processing: true,
+      session_summary_storage: true,
+      ai_chat_storage: false,
+      research_use: false,
+      id: 'c42b9d5a-ef9e-4c57-88a5-0c3ac29dcd17',
+      policy_version: 'prototype-v3',
+      accepted_at: '2026-08-27T08:00:00Z',
+      revoked_at: null
+    })
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    })
+
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={['/consent']}>
+          <Routes>
+            <Route path="/consent" element={<ConsentPage />} />
+            <Route path="/app" element={<h1>แดชบอร์ด</h1>} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    )
+
+    await user.click(
+      screen.getByRole('checkbox', { name: /ยอมรับการประมวลผลกล้อง/ })
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' })
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'แดชบอร์ด' })
+    ).toBeInTheDocument()
   })
 })

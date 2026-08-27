@@ -38,17 +38,6 @@ export interface Consent {
 
 export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
 
-export interface Assessment {
-  id: string
-  concern_area: string
-  duration_band: string
-  daily_impact: string
-  goal: string
-  status: 'captured_not_evaluated'
-  created_at: string
-  retention_until: string
-}
-
 export interface Exercise {
   slug: string
   title_th: string
@@ -222,24 +211,6 @@ export async function sendConversationMessage(
 
 export async function revokeConsent() {
   await http.delete('/consents/current')
-}
-
-export async function getLatestAssessment(signal?: AbortSignal) {
-  const response = await http.get<{ assessment: Assessment | null }>(
-    '/assessments/latest',
-    { signal }
-  )
-  return response.data.assessment
-}
-
-export async function saveAssessment(
-  input: Pick<
-    Assessment,
-    'concern_area' | 'duration_band' | 'daily_impact' | 'goal'
-  >
-) {
-  const response = await http.post<Assessment>('/assessments', input)
-  return response.data
 }
 
 export async function getExercises(signal?: AbortSignal) {

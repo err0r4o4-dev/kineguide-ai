@@ -9,21 +9,17 @@ import {
   Play,
   ShieldCheck
 } from 'lucide-react'
-import { type KeyboardEvent, useEffect, useRef } from 'react'
+import { type KeyboardEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
-import { showSuccess } from '@/lib/notification'
 import { getActivityPlan, type Exercise } from '@/services/product'
 
 export function PlanPage() {
   const { t, i18n } = useTranslation()
-  const location = useLocation()
-  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
-  const notifiedSaveRef = useRef(false)
   const query = useQuery({
     queryKey: ['activity-plan'],
     queryFn: ({ signal }) => getActivityPlan(signal)
@@ -53,16 +49,6 @@ export function PlanPage() {
       selectDay(nextDay, true)
     }
   }
-
-  useEffect(() => {
-    if (!location.state?.assessmentSaved || notifiedSaveRef.current) return
-    notifiedSaveRef.current = true
-    void showSuccess(t('plan.saved'))
-    navigate(`${location.pathname}${location.search}`, {
-      replace: true,
-      state: null
-    })
-  }, [location.pathname, location.search, location.state, navigate, t])
 
   if (query.isLoading) return <QueryLoading />
   if (query.isError) return <QueryError retry={() => void query.refetch()} />

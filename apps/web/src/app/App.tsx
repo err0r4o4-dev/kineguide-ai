@@ -40,11 +40,6 @@ const DashboardPage = lazy(() =>
     default: module.DashboardPage
   }))
 )
-const AssessmentPage = lazy(() =>
-  import('@/routes/AssessmentPage').then((module) => ({
-    default: module.AssessmentPage
-  }))
-)
 const ChatPage = lazy(() =>
   import('@/routes/ChatPage').then((module) => ({ default: module.ChatPage }))
 )
@@ -127,7 +122,6 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <DashboardPage /> },
               { path: 'chat', element: <ChatPage /> },
-              { path: 'assessment', element: <AssessmentPage /> },
               { path: 'plan', element: <PlanPage /> },
               { path: 'camera', element: <CameraPracticePage /> },
               { path: 'exercises', element: <ExerciseLibraryPage /> },

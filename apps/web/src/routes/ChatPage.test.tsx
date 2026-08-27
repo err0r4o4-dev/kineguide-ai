@@ -14,7 +14,6 @@ vi.mock('@/services/product', () => ({
   deleteConversation: vi.fn(),
   getConversationMessages: vi.fn(),
   getConversations: vi.fn(),
-  getLatestAssessment: vi.fn(),
   sendConversationMessage: vi.fn()
 }))
 
@@ -23,7 +22,6 @@ describe('ChatPage', () => {
     vi.clearAllMocks()
     await i18n.changeLanguage('th')
     vi.mocked(product.getConversations).mockResolvedValue([])
-    vi.mocked(product.getLatestAssessment).mockResolvedValue(null)
     vi.mocked(product.createConversation).mockResolvedValue({
       id: '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
       title: 'บทสนทนาใหม่',

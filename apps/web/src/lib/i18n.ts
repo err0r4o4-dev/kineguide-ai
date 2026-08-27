@@ -63,7 +63,6 @@ const th = {
     closeMenu: 'ปิดเมนู',
     home: 'หน้าแรก',
     chat: 'ผู้ช่วย AI',
-    assessment: 'แบบประเมิน',
     plan: 'แผนกิจกรรม',
     camera: 'ฝึกด้วยกล้อง',
     exercises: 'ท่าฝึกสาธิต',
@@ -180,58 +179,6 @@ const th = {
     you: 'คุณ: ',
     ai: 'KineGuide AI: '
   },
-  assessment: {
-    title: 'คุยกับ KineGuide AI',
-    subtitle:
-      'ผู้ช่วยจะถามคำถามแบบมีโครงสร้างเพื่อจัดระเบียบข้อมูลเท่านั้น ระบบไม่วินิจฉัยหรือคัดกรองความเสี่ยง',
-    progress: 'ขั้นตอน {{current}} จาก {{total}}',
-    reviewProgress: 'พร้อมตรวจทานคำตอบ',
-    start: 'เริ่มประเมิน',
-    summary: 'สรุปผล',
-    conversation: 'บทสนทนาแบบประเมิน',
-    welcome:
-      'ขอบคุณที่ให้ข้อมูล เพื่อจัดระเบียบคำตอบเบื้องต้น ขอถามเพิ่มเติมเล็กน้อยครับ',
-    area: 'บริเวณที่คุณต้องการบันทึก',
-    duration: 'เป็นมานานเท่าใด',
-    impact: 'มีผลต่อกิจวัตรมากเพียงใด',
-    goal: 'คุณต้องการใช้ระบบเพื่ออะไร',
-    submit: 'บันทึกข้อมูล',
-    sendAnswer: 'ส่งคำตอบ',
-    reviewAnswers: 'ตรวจทานคำตอบ',
-    reviewTitle: 'ตรวจทานคำตอบของคุณ',
-    reviewBody:
-      'ตรวจสอบข้อมูลก่อนบันทึก คำตอบเหล่านี้จะไม่ถูกใช้เพื่อวินิจฉัยหรือสร้างแผนรักษา',
-    edit: 'แก้ไข',
-    saveAndViewPlan: 'บันทึกและดูแผน',
-    areas: {
-      lower_back: 'หลังส่วนล่าง',
-      knee: 'เข่า',
-      shoulder: 'หัวไหล่',
-      general_mobility: 'การเคลื่อนไหวทั่วไป',
-      prefer_not_to_say: 'ไม่ประสงค์ระบุ'
-    },
-    durations: {
-      lt_week: 'น้อยกว่า 1 สัปดาห์',
-      one_to_four_weeks: '1–4 สัปดาห์',
-      gt_four_weeks: 'มากกว่า 4 สัปดาห์',
-      unsure: 'ไม่แน่ใจ'
-    },
-    impacts: {
-      none: 'ไม่มีผล',
-      some: 'มีผลบ้าง',
-      much: 'มีผลมาก',
-      prefer_not_to_say: 'ไม่ประสงค์ระบุ'
-    },
-    goals: {
-      understand: 'จัดระเบียบข้อมูลของฉัน',
-      camera_demo: 'ทดลองกล้องและการเคลื่อนไหว',
-      track_activity: 'ติดตามกิจกรรม'
-    },
-    safety:
-      'หากมีอาการรุนแรง ฉุกเฉิน หรือกังวลต่อความปลอดภัย ให้หยุดใช้งานและติดต่อบริการฉุกเฉินหรือผู้เชี่ยวชาญในพื้นที่',
-    saved: 'บันทึกข้อมูลแล้ว โดยยังไม่มีการประเมินหรือคำแนะนำทางคลินิก',
-    failed: 'ไม่สามารถบันทึกแบบประเมินได้'
-  },
   plan: {
     title: 'แผนกิจกรรมสาธิต 7 วัน',
     subtitle:
@@ -248,14 +195,13 @@ const th = {
     basis: 'หลักการจัดรายการ',
     basisValue: 'หมุนเวียนรายการสาธิตแบบคงที่',
     cautionTitle: 'ข้อควรทราบ',
-    cautionOne: 'รายการนี้ไม่ใช้คำตอบแบบประเมินในการเลือกกิจกรรม',
+    cautionOne: 'รายการนี้ใช้ชุดกิจกรรมสาธิตแบบคงที่ ไม่ได้ปรับตามอาการ',
     cautionTwo: 'ระบบยังไม่มีเกณฑ์ทางคลินิกหรือคะแนนความถูกต้องของท่า',
     day: 'วันที่ {{day}}',
     activitiesForDay: 'กิจกรรมสาธิตสำหรับวันที่ {{day}}',
     camera: 'ทดลองกล้องในอุปกรณ์',
     viewExercise: 'ดูรายละเอียดกิจกรรม',
     startExercise: 'ตั้งค่ากล้อง',
-    saved: 'บันทึกแบบประเมินแล้ว',
     empty: 'ยังไม่มีรายการสาธิตสำหรับวันนี้'
   },
   dashboard: {
@@ -381,7 +327,7 @@ const th = {
     deleted: 'ลบบัญชีแล้ว',
     deleteFailed: 'ไม่สามารถลบบัญชีได้ กรุณาลองใหม่',
     retention:
-      'คำตอบแบบประเมินและ session summary ตั้ง retention ไว้ 365 วัน และสามารถลบก่อนกำหนดด้วยการลบบัญชี',
+      'session summary และข้อมูลบัญชีที่เกี่ยวข้องตั้ง retention ไว้ 365 วัน และสามารถลบก่อนกำหนดด้วยการลบบัญชี',
     revokeDone: 'ถอน consent แล้ว',
     connectedAccounts: 'บัญชีที่เชื่อมต่อ',
     connectedAccountsBody:
@@ -481,7 +427,6 @@ const en: typeof th = {
     closeMenu: 'Close menu',
     home: 'Home',
     chat: 'AI assistant',
-    assessment: 'Assessment',
     plan: 'Activity plan',
     camera: 'Camera practice',
     exercises: 'Movement demos',
@@ -600,58 +545,6 @@ const en: typeof th = {
     you: 'You: ',
     ai: 'KineGuide AI: '
   },
-  assessment: {
-    title: 'Chat with KineGuide AI',
-    subtitle:
-      'The assistant asks structured questions to organize information only. It does not diagnose or screen risk.',
-    progress: 'Step {{current}} of {{total}}',
-    reviewProgress: 'Ready to review answers',
-    start: 'Start assessment',
-    summary: 'Summary',
-    conversation: 'Assessment conversation',
-    welcome:
-      'Thank you for sharing. To organize your answers, we have a few short questions.',
-    area: 'Area you want to record',
-    duration: 'How long has this been present?',
-    impact: 'How much does it affect daily activity?',
-    goal: 'What do you want to use the system for?',
-    submit: 'Save information',
-    sendAnswer: 'Send answer',
-    reviewAnswers: 'Review answers',
-    reviewTitle: 'Review your answers',
-    reviewBody:
-      'Check the information before saving. These answers are not used to diagnose or create a treatment plan.',
-    edit: 'Edit',
-    saveAndViewPlan: 'Save and view plan',
-    areas: {
-      lower_back: 'Lower back',
-      knee: 'Knee',
-      shoulder: 'Shoulder',
-      general_mobility: 'General mobility',
-      prefer_not_to_say: 'Prefer not to say'
-    },
-    durations: {
-      lt_week: 'Less than one week',
-      one_to_four_weeks: '1–4 weeks',
-      gt_four_weeks: 'More than four weeks',
-      unsure: 'Unsure'
-    },
-    impacts: {
-      none: 'No impact',
-      some: 'Some impact',
-      much: 'A lot of impact',
-      prefer_not_to_say: 'Prefer not to say'
-    },
-    goals: {
-      understand: 'Organize my information',
-      camera_demo: 'Try the camera flow',
-      track_activity: 'Track activity'
-    },
-    safety:
-      'For severe, urgent, or safety concerns, stop and contact local emergency services or a qualified professional.',
-    saved: 'Saved without clinical evaluation or guidance.',
-    failed: 'Unable to save the assessment.'
-  },
   plan: {
     title: '7-day demo activity plan',
     subtitle:
@@ -668,7 +561,8 @@ const en: typeof th = {
     basis: 'Selection basis',
     basisValue: 'Fixed demo rotation',
     cautionTitle: 'Important information',
-    cautionOne: 'Assessment answers are not used to select these activities.',
+    cautionOne:
+      'This uses a fixed demo activity set and is not personalized to symptoms.',
     cautionTwo:
       'No approved clinical thresholds or movement-correctness score is available.',
     day: 'Day {{day}}',
@@ -676,7 +570,6 @@ const en: typeof th = {
     camera: 'Try the on-device camera',
     viewExercise: 'View activity details',
     startExercise: 'Set up camera',
-    saved: 'Assessment saved',
     empty: 'No demo activities are available for this day.'
   },
   dashboard: {
@@ -800,7 +693,7 @@ const en: typeof th = {
     deleted: 'Account deleted',
     deleteFailed: 'Unable to delete the account. Please try again.',
     retention:
-      'Assessment answers and session summaries have a 365-day retention target and can be removed earlier by deleting the account.',
+      'Session summaries and related account records have a 365-day retention target and can be removed earlier by deleting the account.',
     revokeDone: 'Consent withdrawn',
     connectedAccounts: 'Connected accounts',
     connectedAccountsBody:

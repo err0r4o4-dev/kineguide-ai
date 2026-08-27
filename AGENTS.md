@@ -50,6 +50,8 @@ Before completion:
 
 Use one primary skill whenever possible; add a specialist only when its trigger is genuinely present.
 
+Before editing, report the exact scoped rules and `SKILL.md` files loaded for the task.
+
 | Work | Primary skill | Add when needed |
 | --- | --- | --- |
 | Cross-service feature | `$develop-kineguide-feature` | Area-specific skill for the changed boundary |
