@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router'
 
 import { AppShell } from '@/components/layout/AppShell'
@@ -9,7 +9,7 @@ import { SystemLoading } from '@/components/SystemState'
 import { AuthProvider } from '@/features/auth/AuthProvider'
 import { ConsentRoute } from '@/features/auth/ConsentRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
-import { isBrowserRefresh } from '@/lib/navigation'
+import { finishRouteRefresh, isRouteRefresh } from '@/lib/navigation'
 import { NotFoundPage } from '@/routes/NotFoundPage'
 
 const LandingPage = lazy(() =>
@@ -170,6 +170,15 @@ export function App() {
   )
 }
 
-function AppLoading() {
-  return isBrowserRefresh() ? null : <SystemLoading />
+export function AppLoading() {
+  const [suppressRefreshLoading] = useState(isRouteRefresh)
+
+  useEffect(
+    () => () => {
+      if (suppressRefreshLoading) finishRouteRefresh()
+    },
+    [suppressRefreshLoading]
+  )
+
+  return suppressRefreshLoading ? null : <SystemLoading />
 }
