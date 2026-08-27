@@ -12,7 +12,10 @@ import { LanguageButton } from '@/components/LanguageButton'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
-import { withMinimumLoadingDuration } from '@/lib/minimumLoadingDuration'
+import {
+  waitForLoadingCompletion,
+  withMinimumLoadingDuration
+} from '@/lib/minimumLoadingDuration'
 import {
   getOAuthLoginURL,
   getOAuthProviders,
@@ -40,6 +43,7 @@ export function AuthPage() {
   const auth = useAuth()
   const isRegister = location.pathname === '/register'
   const [serverError, setServerError] = useState('')
+  const [loadingComplete, setLoadingComplete] = useState(false)
   const [socialProvider, setSocialProvider] = useState<OAuthProvider | null>(
     null
   )
@@ -63,23 +67,25 @@ export function AuthPage() {
   if (auth.ready && auth.user && !submissionInFlight.current)
     return <Navigate replace to="/app" />
 
-  if (isSubmitting || socialProvider) return <SystemLoading progress={68} />
+  if (!isRegister && isSubmitting)
+    return <SystemLoading complete={loadingComplete} />
 
   const submit = async (values: FormValues) => {
     submissionInFlight.current = true
+    setLoadingComplete(false)
     setServerError('')
     try {
       if (isRegister) {
-        await withMinimumLoadingDuration(
-          auth.register({
-            ...values,
-            display_name: values.display_name
-          })
-        )
+        await auth.register({
+          ...values,
+          display_name: values.display_name
+        })
       } else {
         await withMinimumLoadingDuration(
           auth.login({ email: values.email, password: values.password })
         )
+        setLoadingComplete(true)
+        await waitForLoadingCompletion()
       }
       if (isRegister) {
         navigate('/consent', { replace: true })
@@ -227,7 +233,21 @@ export function AuthPage() {
                     onClick={() => beginSocialSignIn(provider)}
                     type="button"
                   >
-                    <ProviderIcon provider={provider} />
+                    <span className="relative grid size-6 place-items-center">
+                      <span
+                        className={
+                          socialProvider === provider ? 'opacity-20' : undefined
+                        }
+                      >
+                        <ProviderIcon provider={provider} />
+                      </span>
+                      {socialProvider === provider && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-0 animate-spin rounded-full border-2 border-teal-600 border-r-transparent motion-reduce:animate-none"
+                        />
+                      )}
+                    </span>
                   </button>
                 ))}
               </div>

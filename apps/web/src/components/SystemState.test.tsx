@@ -6,12 +6,14 @@ import { vi } from 'vitest'
 import '@/lib/i18n'
 import { SystemError, SystemLoading } from './SystemState'
 
-it('describes login preparation with progress and steps', async () => {
-  render(<SystemLoading progress={68} />)
+it('starts at zero and reaches 100 only when loading is complete', async () => {
+  const view = render(<SystemLoading />)
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  view.rerender(<SystemLoading complete />)
   await waitFor(() =>
     expect(screen.getByRole('progressbar')).toHaveAttribute(
       'aria-valuenow',
-      '68'
+      '100'
     )
   )
   expect(screen.getByRole('status')).toHaveTextContent(

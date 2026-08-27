@@ -170,5 +170,5 @@ export function App() {
 }
 
 function AppLoading() {
-  return <SystemLoading progress={36} />
+  return <SystemLoading />
 }

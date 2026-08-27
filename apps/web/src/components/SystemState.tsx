@@ -63,20 +63,28 @@ function PoseOrbit({ error = false }: { error?: boolean }) {
 }
 
 export function SystemLoading({
-  progress = 68,
+  complete = false,
   contained = false
 }: {
-  progress?: number
+  complete?: boolean
   contained?: boolean
 }) {
   const { t } = useTranslation()
-  const targetProgress = Math.max(0, Math.min(99, progress))
-  const [value, setValue] = useState(Math.min(18, targetProgress))
+  const [value, setValue] = useState(0)
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setValue(targetProgress), 50)
-    return () => window.clearTimeout(timer)
-  }, [targetProgress])
+    if (complete) {
+      setValue(100)
+      return
+    }
+    setValue(0)
+    const startedAt = Date.now()
+    const timer = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt
+      setValue(Math.min(90, Math.round((elapsed / 1_500) * 90)))
+    }, 100)
+    return () => window.clearInterval(timer)
+  }, [complete])
   const content = (
     <section
       className={`mx-auto flex max-w-3xl flex-col items-center justify-center py-8 text-center ${contained ? 'min-h-[60vh]' : 'min-h-[calc(100vh-7rem)]'}`}
@@ -100,16 +108,28 @@ export function SystemLoading({
           role="progressbar"
         >
           <span
-            className="block h-full rounded-full bg-teal-600 shadow-[0_0_18px_rgba(13,148,136,0.35)] transition-[width] duration-[1200ms] ease-out motion-reduce:transition-none"
+            className="block h-full rounded-full bg-teal-600 shadow-[0_0_18px_rgba(13,148,136,0.35)] transition-[width] duration-100 ease-linear motion-reduce:transition-none"
             style={{ width: `${value}%` }}
           />
         </div>
         <strong className="w-12 text-left text-teal-800">{value}%</strong>
       </div>
       <ol className="mt-7 grid w-full max-w-2xl gap-3 text-sm text-slate-600 sm:grid-cols-3">
-        <LoadingStep done label={t('common.loadingConnect')} />
-        <LoadingStep active label={t('common.loadingPrepare')} />
-        <LoadingStep label={t('common.loadingReady')} />
+        <LoadingStep
+          active={value < 34}
+          done={value >= 34}
+          label={t('common.loadingConnect')}
+        />
+        <LoadingStep
+          active={value >= 34 && value < 67}
+          done={value >= 67}
+          label={t('common.loadingPrepare')}
+        />
+        <LoadingStep
+          active={value >= 67 && value < 100}
+          done={value === 100}
+          label={t('common.loadingReady')}
+        />
       </ol>
       <p className="mt-9 text-sm text-slate-500">{t('common.loadingWait')}</p>
     </section>

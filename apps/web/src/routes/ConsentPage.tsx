@@ -12,6 +12,11 @@ import { useNavigate } from 'react-router'
 
 import { Brand } from '@/components/Brand'
 import { LanguageButton } from '@/components/LanguageButton'
+import { SystemLoading } from '@/components/SystemState'
+import {
+  waitForLoadingCompletion,
+  withMinimumLoadingDuration
+} from '@/lib/minimumLoadingDuration'
 import { saveConsent } from '@/services/product'
 
 export function ConsentPage() {
@@ -22,19 +27,25 @@ export function ConsentPage() {
   const [research, setResearch] = useState(false)
   const [aiChat, setAIChat] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [loadingComplete, setLoadingComplete] = useState(false)
   const [error, setError] = useState('')
   const submit = async () => {
     if (!required) return
     setSaving(true)
+    setLoadingComplete(false)
     setError('')
     try {
-      const consent = await saveConsent({
-        camera_processing: true,
-        session_summary_storage: true,
-        ai_chat_storage: aiChat,
-        research_use: research
-      })
+      const consent = await withMinimumLoadingDuration(
+        saveConsent({
+          camera_processing: true,
+          session_summary_storage: true,
+          ai_chat_storage: aiChat,
+          research_use: research
+        })
+      )
       queryClient.setQueryData(['consent'], consent)
+      setLoadingComplete(true)
+      await waitForLoadingCompletion()
       navigate('/app/assessment', { replace: true })
     } catch {
       setError(t('consent.failed'))
@@ -65,6 +76,7 @@ export function ConsentPage() {
       body: t('consent.aiChatBody')
     }
   ]
+  if (saving) return <SystemLoading complete={loadingComplete} />
   return (
     <main className="min-h-screen bg-kg-canvas px-4 py-8 sm:py-12">
       <div className="relative mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-10 lg:p-12">

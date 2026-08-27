@@ -7,7 +7,7 @@ export function ProtectedRoute() {
   const auth = useAuth()
   const location = useLocation()
   if (!auth.ready) {
-    return <SystemLoading progress={68} />
+    return <SystemLoading />
   }
   if (!auth.user) {
     return <Navigate replace state={{ from: location.pathname }} to="/login" />

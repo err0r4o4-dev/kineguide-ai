@@ -53,4 +53,37 @@ describe('ConsentPage language selector', () => {
     )
     expect(vi.mocked(product.saveConsent)).not.toHaveBeenCalled()
   })
+
+  it('shows full loading only after required consent is submitted', async () => {
+    const user = userEvent.setup()
+    vi.mocked(product.saveConsent).mockReturnValue(new Promise(() => undefined))
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    })
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter>
+          <ConsentPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    )
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    await user.click(
+      screen.getByRole('checkbox', { name: /ยอมรับการประมวลผลกล้อง/ })
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' })
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'กำลังเตรียม KineGuide AI'
+    )
+    expect(product.saveConsent).toHaveBeenCalledWith({
+      camera_processing: true,
+      session_summary_storage: true,
+      ai_chat_storage: false,
+      research_use: false
+    })
+  })
 })

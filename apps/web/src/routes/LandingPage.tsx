@@ -16,7 +16,7 @@ export function LandingPage() {
   const auth = useAuth()
 
   if (!auth.ready) {
-    return <SystemLoading progress={32} />
+    return <SystemLoading />
   }
 
   const features = [
