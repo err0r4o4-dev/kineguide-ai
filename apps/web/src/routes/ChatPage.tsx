@@ -151,7 +151,7 @@ export function ChatPage() {
           </button>
           <button
             aria-label={t('chat.delete', { title: conversation.title })}
-            className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg border-0 bg-transparent text-slate-500 transition-colors hover:bg-white/80 hover:text-red-700 disabled:opacity-50"
+            className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg border-0 bg-transparent text-slate-500 opacity-100 transition-[background-color,color,opacity] hover:bg-white/80 hover:text-red-700 disabled:opacity-50 lg:pointer-events-none lg:opacity-0 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100"
             disabled={remove.isPending}
             onClick={() => {
               if (window.confirm(t('chat.deleteConfirm'))) {
