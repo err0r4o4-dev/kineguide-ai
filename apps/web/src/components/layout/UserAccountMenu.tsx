@@ -1,4 +1,5 @@
 import {
+  Bell,
   ChevronUp,
   CircleHelp,
   LogOut,
@@ -11,11 +12,13 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 
 import { useAuth } from '@/features/auth/AuthContext'
+import { useNotifications } from '@/features/notifications/NotificationContext'
 import { confirmNotification } from '@/lib/notification'
 
 export function UserAccountMenu() {
   const { t } = useTranslation()
   const auth = useAuth()
+  const { unreadCount } = useNotifications()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -75,6 +78,16 @@ export function UserAccountMenu() {
             to="/app/settings"
             onClick={() => setOpen(false)}
           />
+          <MenuLink
+            ariaLabel={t('account.notificationMenuLabel', {
+              count: unreadCount
+            })}
+            badge={unreadCount}
+            icon={Bell}
+            label={t('notifications.title')}
+            to="/app/notifications"
+            onClick={() => setOpen(false)}
+          />
           <div className="my-1 border-t border-slate-200" />
           <p className="px-2.5 pb-1 pt-1 text-[10px] font-bold text-slate-500">
             {t('account.system')}
@@ -99,7 +112,11 @@ export function UserAccountMenu() {
       <button
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={t('account.menu')}
+        aria-label={
+          unreadCount > 0
+            ? t('account.menuWithUnread', { count: unreadCount })
+            : t('account.menu')
+        }
         className="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2 text-left hover:bg-slate-50"
         onClick={() => setOpen((current) => !current)}
         ref={triggerRef}
@@ -115,6 +132,14 @@ export function UserAccountMenu() {
         <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-700">
           {label}
         </span>
+        {unreadCount > 0 && (
+          <span
+            aria-hidden="true"
+            className="grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
+          >
+            {unreadCount}
+          </span>
+        )}
         <ChevronUp
           aria-hidden="true"
           className={open ? '' : 'rotate-180'}
@@ -129,22 +154,35 @@ function MenuLink({
   icon: Icon,
   label,
   to,
-  onClick
+  onClick,
+  badge,
+  ariaLabel
 }: {
   icon: LucideIcon
   label: string
   to: string
   onClick: () => void
+  badge?: number
+  ariaLabel?: string
 }) {
   return (
     <Link
+      aria-label={ariaLabel}
       className="flex min-h-10 items-center gap-2 rounded-lg px-2.5 text-xs font-medium text-slate-700 no-underline hover:bg-slate-50"
       onClick={onClick}
       role="menuitem"
       to={to}
     >
       <Icon aria-hidden="true" size={15} />
-      {label}
+      <span className="flex-1">{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span
+          aria-hidden="true"
+          className="grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
+        >
+          {badge}
+        </span>
+      )}
     </Link>
   )
 }
