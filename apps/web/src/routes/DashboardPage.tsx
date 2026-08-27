@@ -21,14 +21,13 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
 import { getDashboard, type ExerciseSession } from '@/services/product'
 
-const ranges = [7, 30, 90] as const
 const dayInMilliseconds = 86_400_000
 const illustrationPath = '/dashboard-sit-to-stand.png'
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
   const auth = useAuth()
-  const [range, setRange] = useState<(typeof ranges)[number]>(7)
+  const [range] = useState(7)
   const [today] = useState(() => new Date())
   const query = useQuery({
     queryKey: ['dashboard'],
@@ -97,7 +96,6 @@ export function DashboardPage() {
           <section className="mt-4 grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(19rem,1fr)]">
             <WeeklyActivity
               language={language}
-              onRangeChange={setRange}
               range={range}
               sessions={visibleSessions}
               today={today}
@@ -232,14 +230,12 @@ function DashboardStat({
 
 function WeeklyActivity({
   language,
-  onRangeChange,
   range,
   sessions,
   today
 }: {
   language: 'th' | 'en'
-  onRangeChange: (range: (typeof ranges)[number]) => void
-  range: (typeof ranges)[number]
+  range: number
   sessions: ExerciseSession[]
   today: Date
 }) {
@@ -258,23 +254,6 @@ function WeeklyActivity({
           <h2 className="text-lg font-bold text-slate-950 sm:text-xl">
             {t('dashboard.weekly')}
           </h2>
-        </div>
-        <div
-          aria-label={t('dashboard.range')}
-          className="grid grid-cols-3 gap-2"
-          role="group"
-        >
-          {ranges.map((value) => (
-            <button
-              aria-pressed={range === value}
-              className={`min-h-11 rounded-lg border px-3 text-sm font-semibold transition-colors ${range === value ? 'border-teal-700 bg-teal-700 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-teal-50'}`}
-              key={value}
-              onClick={() => onRangeChange(value)}
-              type="button"
-            >
-              {t('dashboard.rangeDays', { count: value })}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -356,7 +335,7 @@ function WeeklyActivity({
 
 function buildChartPoints(
   sessions: ExerciseSession[],
-  range: (typeof ranges)[number],
+  range: number,
   today: Date
 ) {
   const end = new Date(today)
