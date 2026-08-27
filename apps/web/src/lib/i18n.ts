@@ -75,11 +75,70 @@ const th = {
   },
   account: {
     menu: 'เมนูบัญชี',
+    menuWithUnread: 'เมนูบัญชี มีการแจ้งเตือนที่ยังไม่ได้อ่าน {{count}} รายการ',
+    notificationMenuLabel: 'การแจ้งเตือน {{count}} รายการยังไม่ได้อ่าน',
     account: 'บัญชี',
     system: 'ระบบ',
     settingsPrivacy: 'ตั้งค่าและความเป็นส่วนตัว',
     logoutTitle: 'ออกจากระบบ',
     logoutConfirm: 'ต้องการออกจากระบบหรือไม่?'
+  },
+  notifications: {
+    title: 'การแจ้งเตือน',
+    subtitle: 'ติดตามการแจ้งเตือนและกิจกรรมสำคัญของคุณ',
+    filters: 'ตัวกรองการแจ้งเตือน',
+    list: 'รายการแจ้งเตือน',
+    markAllRead: 'อ่านทั้งหมดแล้ว',
+    markOneRead: 'ทำเครื่องหมาย {{title}} ว่าอ่านแล้ว',
+    unreadStatus: 'มีการแจ้งเตือนที่ยังไม่ได้อ่าน {{count}} รายการ',
+    last30Days: '30 วันที่ผ่านมา',
+    empty: 'ไม่มีการแจ้งเตือนในหมวดนี้',
+    emptyBody: 'ลองเลือกหมวดอื่นหรือกลับมาตรวจสอบภายหลัง',
+    summary: 'สรุปการแจ้งเตือน',
+    preferences: 'การตั้งค่าการแจ้งเตือน',
+    manageSettings: 'จัดการการตั้งค่าทั้งหมด',
+    preferencesBody: 'การตั้งค่านี้มีผลเฉพาะระหว่างการใช้งานรอบปัจจุบัน',
+    startActivity: 'ดูกิจกรรม',
+    openMessage: 'เปิดข้อความ',
+    checkSettings: 'ตรวจสอบการตั้งค่า',
+    filter: {
+      all: 'ทั้งหมด',
+      unread: 'ยังไม่ได้อ่าน',
+      activity: 'กิจกรรม',
+      system: 'ระบบ'
+    },
+    group: {
+      today: 'วันนี้',
+      yesterday: 'เมื่อวาน',
+      earlier: 'ก่อนหน้านี้'
+    },
+    preference: {
+      activityReminder: 'เตือนกิจกรรมประจำวัน',
+      progressSummary: 'สรุปความสม่ำเสมอ',
+      systemUpdates: 'การแจ้งเตือนจากระบบ'
+    },
+    times: {
+      today0900: '09:00',
+      today0815: '08:15',
+      today0740: '07:40',
+      yesterday1830: 'เมื่อวาน 18:30',
+      yesterday1020: 'เมื่อวาน 10:20',
+      earlier: '25 ส.ค. 2569'
+    },
+    items: {
+      planTitle: 'ถึงเวลากิจกรรมที่วางแผนไว้วันนี้',
+      planBody: 'คุณมีกิจกรรมสาธิตที่บันทึกไว้ในแผนวันนี้',
+      streakTitle: 'คุณบันทึกกิจกรรมต่อเนื่องครบ 4 วัน',
+      streakBody: 'ดูสรุปความสม่ำเสมอจากกิจกรรมที่คุณบันทึกไว้',
+      assistantTitle: 'KineGuide AI มีข้อความใหม่',
+      assistantBody: 'สรุปข้อมูลล่าสุดของคุณพร้อมให้ตรวจสอบแล้ว',
+      savedTitle: 'บันทึกกิจกรรมเรียบร้อย',
+      savedBody: 'ระบบบันทึกสรุปกิจกรรมที่คุณกรอกด้วยตนเองแล้ว',
+      cameraTitle: 'ตรวจสอบสิทธิ์การใช้กล้อง',
+      cameraBody: 'อนุญาตให้ใช้กล้องก่อนเริ่มกิจกรรมด้วยกล้อง',
+      privacyTitle: 'อัปเดตการตั้งค่าความเป็นส่วนตัว',
+      privacyBody: 'ระบบบันทึกการเปลี่ยนแปลงการตั้งค่าของคุณเรียบร้อยแล้ว'
+    }
   },
   landing: {
     features: 'คุณสมบัติ',
@@ -205,6 +264,7 @@ const th = {
     empty: 'ยังไม่มีรายการสาธิตสำหรับวันนี้'
   },
   dashboard: {
+    updated: 'อัปเดตล่าสุด {{date}}',
     hello: 'สวัสดี {{name}}',
     ready: 'พร้อมสำหรับกิจกรรมวันนี้หรือยัง?',
     aiTitle: 'ผู้ช่วยสนทนา KineGuide AI',
@@ -224,9 +284,14 @@ const th = {
     sessions: 'session ที่เสร็จ',
     streak: 'วันที่ต่อเนื่อง',
     time: 'เวลาที่บันทึก',
+    activitySummary: 'สรุปกิจกรรม',
     recent: 'กิจกรรมล่าสุด',
+    viewAll: 'ดูทั้งหมด',
     noRecent: 'ยังไม่มี session ที่บันทึก',
-    weekly: 'ภาพรวมกิจกรรม',
+    weekly: 'กิจกรรมรายสัปดาห์',
+    range: 'ช่วงเวลาของกราฟกิจกรรม',
+    rangeDays: '{{count}} วัน',
+    chartSummary: 'กิจกรรมที่บันทึก {{count}} รายการในช่วง {{range}} วัน',
     manual:
       'ตัวเลขทั้งหมดเป็นข้อมูลกิจกรรมที่บันทึกเอง ไม่ใช่ผลการประเมินการฟื้นตัว'
   },
@@ -439,11 +504,70 @@ const en: typeof th = {
   },
   account: {
     menu: 'Account menu',
+    menuWithUnread: 'Account menu, {{count}} unread notifications',
+    notificationMenuLabel: 'Notifications, {{count}} unread',
     account: 'Account',
     system: 'System',
     settingsPrivacy: 'Settings and privacy',
     logoutTitle: 'Sign out',
     logoutConfirm: 'Do you want to sign out?'
+  },
+  notifications: {
+    title: 'Notifications',
+    subtitle: 'Keep track of your notifications and important activity',
+    filters: 'Notification filters',
+    list: 'Notification list',
+    markAllRead: 'Mark all as read',
+    markOneRead: 'Mark {{title}} as read',
+    unreadStatus: '{{count}} unread notifications',
+    last30Days: 'Past 30 days',
+    empty: 'No notifications in this category',
+    emptyBody: 'Choose another category or check again later.',
+    summary: 'Notification summary',
+    preferences: 'Notification preferences',
+    manageSettings: 'Manage all settings',
+    preferencesBody: 'These preferences apply only to the current app session.',
+    startActivity: 'View activity',
+    openMessage: 'Open message',
+    checkSettings: 'Check settings',
+    filter: {
+      all: 'All',
+      unread: 'Unread',
+      activity: 'Activity',
+      system: 'System'
+    },
+    group: {
+      today: 'Today',
+      yesterday: 'Yesterday',
+      earlier: 'Earlier'
+    },
+    preference: {
+      activityReminder: 'Daily activity reminder',
+      progressSummary: 'Consistency summary',
+      systemUpdates: 'System notifications'
+    },
+    times: {
+      today0900: '09:00',
+      today0815: '08:15',
+      today0740: '07:40',
+      yesterday1830: 'Yesterday 18:30',
+      yesterday1020: 'Yesterday 10:20',
+      earlier: '25 Aug 2026'
+    },
+    items: {
+      planTitle: "It's time for today's planned activity",
+      planBody: 'A demonstration activity is saved in your plan for today.',
+      streakTitle: 'You have recorded activity for 4 days in a row',
+      streakBody: 'Review consistency based on the activity you recorded.',
+      assistantTitle: 'KineGuide AI has a new message',
+      assistantBody: 'Your latest information summary is ready to review.',
+      savedTitle: 'Activity recorded',
+      savedBody: 'The activity summary you entered was saved.',
+      cameraTitle: 'Check camera permission',
+      cameraBody: 'Allow camera access before starting a camera activity.',
+      privacyTitle: 'Privacy settings updated',
+      privacyBody: 'Your settings change has been recorded.'
+    }
   },
   landing: {
     features: 'Features',
@@ -573,6 +697,7 @@ const en: typeof th = {
     empty: 'No demo activities are available for this day.'
   },
   dashboard: {
+    updated: 'Last updated {{date}}',
     hello: 'Hello {{name}}',
     ready: 'Ready for an activity?',
     aiTitle: 'KineGuide AI conversation assistant',
@@ -592,9 +717,14 @@ const en: typeof th = {
     sessions: 'completed sessions',
     streak: 'day streak',
     time: 'recorded time',
+    activitySummary: 'Activity summary',
     recent: 'Recent activity',
+    viewAll: 'View all',
     noRecent: 'No recorded sessions yet',
-    weekly: 'Activity overview',
+    weekly: 'Weekly activity',
+    range: 'Activity chart range',
+    rangeDays: '{{count}} days',
+    chartSummary: '{{count}} recorded activities in the past {{range}} days',
     manual:
       'All figures are self-recorded activity data, not recovery outcomes.'
   },

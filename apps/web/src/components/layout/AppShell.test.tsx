@@ -31,13 +31,13 @@ describe('AppShell', () => {
       </MemoryRouter>
     )
 
-    await user.click(screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0])
+    await user.click(screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0])
     await user.click(screen.getByRole('menuitem', { name: 'ออกจากระบบ' }))
     await screen.findByRole('dialog', { name: 'ออกจากระบบ' })
     await user.click(screen.getByRole('button', { name: 'ยกเลิก' }))
     expect(logoutMock).not.toHaveBeenCalled()
 
-    await user.click(screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0])
+    await user.click(screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0])
     await user.click(screen.getByRole('menuitem', { name: 'ออกจากระบบ' }))
     await user.click(screen.getByRole('button', { name: 'ออกจากระบบ' }))
     expect(logoutMock).toHaveBeenCalledTimes(1)
@@ -68,13 +68,18 @@ describe('AppShell', () => {
       within(navigation).queryByRole('link', { name: 'โปรไฟล์' })
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0])
+    await user.click(screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0])
     expect(
       screen.getByRole('menuitem', { name: 'โปรไฟล์' })
     ).toBeInTheDocument()
     expect(
       screen.getByRole('menuitem', { name: 'ตั้งค่าและความเป็นส่วนตัว' })
     ).toBeInTheDocument()
+    expect(
+      screen.getByRole('menuitem', {
+        name: 'การแจ้งเตือน 3 รายการยังไม่ได้อ่าน'
+      })
+    ).toHaveAttribute('href', '/app/notifications')
     expect(
       screen.getByRole('menuitem', { name: 'ช่วยเหลือ' })
     ).toBeInTheDocument()
@@ -84,8 +89,30 @@ describe('AppShell', () => {
       screen.queryByRole('menuitem', { name: 'โปรไฟล์' })
     ).not.toBeInTheDocument()
     expect(
-      screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0]
+      screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0]
     ).toHaveFocus()
+  })
+
+  it('shows the unread notification count on the account menu button', async () => {
+    await i18n.changeLanguage('th')
+    render(
+      <MemoryRouter initialEntries={['/app']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route index element={<h1>หน้าแรก</h1>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    const accountButton = screen.getAllByRole('button', {
+      name: 'เมนูบัญชี มีการแจ้งเตือนที่ยังไม่ได้อ่าน 3 รายการ'
+    })[0]
+
+    expect(accountButton).toHaveTextContent('3')
+    expect(
+      within(accountButton).getByTestId('account-notification-bell')
+    ).toBeInTheDocument()
   })
 
   it('uses one menu toggle and dismisses the mobile navigation with Escape', async () => {

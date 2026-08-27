@@ -96,6 +96,11 @@ const SettingsPage = lazy(() =>
 const HelpPage = lazy(() =>
   import('@/routes/HelpPage').then((module) => ({ default: module.HelpPage }))
 )
+const NotificationsPage = lazy(() =>
+  import('@/routes/NotificationsPage').then((module) => ({
+    default: module.NotificationsPage
+  }))
+)
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,6 +143,7 @@ const router = createBrowserRouter([
               },
               { path: 'progress', element: <ProgressPage /> },
               { path: 'profile', element: <ProfilePage /> },
+              { path: 'notifications', element: <NotificationsPage /> },
               { path: 'settings', element: <SettingsPage /> },
               { path: 'help', element: <HelpPage /> }
             ]
