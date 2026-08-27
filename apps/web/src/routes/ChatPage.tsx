@@ -215,7 +215,7 @@ export function ChatPage() {
       )}
 
       {conversations.data && (
-        <div className="min-h-0 flex-1 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+        <div className="min-h-0 flex-1 lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)]">
           <details className="border-b border-kg-border bg-white lg:hidden">
             <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between px-4 font-semibold text-kg-ink marker:content-none">
               {t('chat.conversations')}
@@ -228,12 +228,14 @@ export function ChatPage() {
 
           <aside
             aria-label={t('chat.conversations')}
-            className="hidden overflow-y-auto border-r border-kg-border bg-slate-50/45 p-4 lg:block"
+            className="hidden flex-col border-r border-kg-border bg-slate-50/45 lg:flex"
           >
-            <h2 className="sticky top-0 z-10 mb-3 bg-slate-50/95 px-3 pb-1 text-sm font-bold text-kg-ink backdrop-blur">
+            <h2 className="shrink-0 px-7 pt-4 pb-3 text-sm font-bold text-kg-ink">
               {t('chat.conversations')}
             </h2>
-            {conversationList}
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+              {conversationList}
+            </div>
           </aside>
 
           <section
