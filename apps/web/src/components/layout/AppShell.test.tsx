@@ -6,14 +6,43 @@ import { vi } from 'vitest'
 import i18n from '@/lib/i18n'
 import { AppShell } from './AppShell'
 
+const { logoutMock } = vi.hoisted(() => ({ logoutMock: vi.fn() }))
+
 vi.mock('@/features/auth/AuthContext', () => ({
   useAuth: () => ({
     user: { display_name: 'Thirawat Duangta' },
-    logout: vi.fn()
+    logout: logoutMock
   })
 }))
 
 describe('AppShell', () => {
+  it('requires confirmation before signing out', async () => {
+    await i18n.changeLanguage('th')
+    logoutMock.mockClear()
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/app']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route index element={<h1>หน้าแรก</h1>} />
+          </Route>
+          <Route element={<h1>หน้าสาธารณะ</h1>} path="/" />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0])
+    await user.click(screen.getByRole('menuitem', { name: 'ออกจากระบบ' }))
+    await screen.findByRole('dialog', { name: 'ออกจากระบบ' })
+    await user.click(screen.getByRole('button', { name: 'ยกเลิก' }))
+    expect(logoutMock).not.toHaveBeenCalled()
+
+    await user.click(screen.getAllByRole('button', { name: 'เมนูบัญชี' })[0])
+    await user.click(screen.getByRole('menuitem', { name: 'ออกจากระบบ' }))
+    await user.click(screen.getByRole('button', { name: 'ออกจากระบบ' }))
+    expect(logoutMock).toHaveBeenCalledTimes(1)
+  })
+
   it('keeps exactly five primary destinations and puts account pages in the account menu', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()

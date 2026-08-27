@@ -17,6 +17,8 @@ const th = {
     back: 'ย้อนกลับ',
     save: 'บันทึก',
     cancel: 'ยกเลิก',
+    close: 'ปิด',
+    delete: 'ลบ',
     brandSubtitle: 'ผู้ช่วยกายภาพบำบัด',
     onDevice: 'ทำงานในอุปกรณ์',
     active: 'ใช้งานอยู่',
@@ -67,6 +69,7 @@ const th = {
     account: 'บัญชี',
     system: 'ระบบ',
     settingsPrivacy: 'ตั้งค่าและความเป็นส่วนตัว',
+    logoutTitle: 'ออกจากระบบ',
     logoutConfirm: 'ต้องการออกจากระบบหรือไม่?'
   },
   landing: {
@@ -160,7 +163,9 @@ const th = {
     consentRequired: 'ต้องอนุญาตการเก็บประวัติ AI chat ก่อนเริ่มสนทนา',
     manageConsent: 'จัดการ consent',
     delete: 'ลบบทสนทนา {{title}}',
+    deleteTitle: 'ลบบทสนทนา',
     deleteConfirm: 'ลบบทสนทนานี้และข้อความทั้งหมดอย่างถาวรหรือไม่?',
+    deleted: 'ลบบทสนทนาแล้ว',
     deleteFailed: 'ไม่สามารถลบบทสนทนาได้ กรุณาลองใหม่',
     you: 'คุณ: ',
     ai: 'KineGuide AI: '
@@ -364,6 +369,7 @@ const th = {
     deleteConfirm:
       'ยืนยันว่าต้องการลบบัญชีและข้อมูลที่เกี่ยวข้องอย่างถาวรหรือไม่?',
     deleted: 'ลบบัญชีแล้ว',
+    deleteFailed: 'ไม่สามารถลบบัญชีได้ กรุณาลองใหม่',
     retention:
       'คำตอบแบบประเมินและ session summary ตั้ง retention ไว้ 365 วัน และสามารถลบก่อนกำหนดด้วยการลบบัญชี',
     revokeDone: 'ถอน consent แล้ว',
@@ -419,6 +425,8 @@ const en: typeof th = {
     back: 'Back',
     save: 'Save',
     cancel: 'Cancel',
+    close: 'Close',
+    delete: 'Delete',
     brandSubtitle: 'Physiotherapy support',
     onDevice: 'On-device',
     active: 'Active',
@@ -469,6 +477,7 @@ const en: typeof th = {
     account: 'Account',
     system: 'System',
     settingsPrivacy: 'Settings and privacy',
+    logoutTitle: 'Sign out',
     logoutConfirm: 'Do you want to sign out?'
   },
   landing: {
@@ -564,7 +573,9 @@ const en: typeof th = {
       'Allow AI-chat history storage before starting a conversation.',
     manageConsent: 'Manage consent',
     delete: 'Delete conversation {{title}}',
+    deleteTitle: 'Delete conversation',
     deleteConfirm: 'Permanently delete this conversation and all messages?',
+    deleted: 'Conversation deleted',
     deleteFailed: 'Unable to delete the conversation. Please try again.',
     you: 'You: ',
     ai: 'KineGuide AI: '
@@ -767,6 +778,7 @@ const en: typeof th = {
     delete: 'Delete account and all data',
     deleteConfirm: 'Permanently delete the account and all associated data?',
     deleted: 'Account deleted',
+    deleteFailed: 'Unable to delete the account. Please try again.',
     retention:
       'Assessment answers and session summaries have a 365-day retention target and can be removed earlier by deleting the account.',
     revokeDone: 'Consent withdrawn',

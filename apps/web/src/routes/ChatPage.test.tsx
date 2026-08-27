@@ -20,6 +20,7 @@ vi.mock('@/services/product', () => ({
 
 describe('ChatPage', () => {
   beforeEach(async () => {
+    vi.clearAllMocks()
     await i18n.changeLanguage('th')
     vi.mocked(product.getConversations).mockResolvedValue([])
     vi.mocked(product.getLatestAssessment).mockResolvedValue(null)
@@ -48,6 +49,60 @@ describe('ChatPage', () => {
         created_at: '2026-08-26T00:00:02Z'
       }
     ])
+    vi.mocked(product.deleteConversation).mockResolvedValue(undefined)
+  })
+
+  it('requires an accessible confirmation before deleting a conversation', async () => {
+    const user = userEvent.setup()
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
+    })
+    vi.mocked(product.getConversations).mockResolvedValue([
+      {
+        id: '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
+        title: 'บทสนทนาทดสอบ',
+        locale: 'th',
+        created_at: '2026-08-26T00:00:00Z',
+        updated_at: '2026-08-26T00:00:00Z',
+        retention_policy: 'until_deleted'
+      }
+    ])
+
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter>
+          <ChatPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    )
+
+    await screen.findAllByRole('button', {
+      name: 'ลบบทสนทนา บทสนทนาทดสอบ'
+    })
+    await user.click(
+      screen.getAllByRole('button', {
+        name: 'ลบบทสนทนา บทสนทนาทดสอบ'
+      })[0]
+    )
+
+    const dialog = await screen.findByRole('dialog', {
+      name: 'ลบบทสนทนา'
+    })
+    await user.click(screen.getByRole('button', { name: 'ยกเลิก' }))
+    expect(dialog).not.toBeInTheDocument()
+    expect(product.deleteConversation).not.toHaveBeenCalled()
+
+    await user.click(
+      screen.getAllByRole('button', {
+        name: 'ลบบทสนทนา บทสนทนาทดสอบ'
+      })[0]
+    )
+    await user.click(screen.getByRole('button', { name: 'ลบ' }))
+
+    expect(product.deleteConversation).toHaveBeenCalledTimes(1)
+    expect(
+      await screen.findByRole('alert', { name: 'ลบบทสนทนาแล้ว' })
+    ).toBeInTheDocument()
   })
 
   it('creates a conversation and sends a typed message with an accessible status', async () => {

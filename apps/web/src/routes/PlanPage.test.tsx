@@ -40,7 +40,15 @@ describe('PlanPage', () => {
 
     render(
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={['/app/plan?day=1']}>
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: '/app/plan',
+              search: '?day=1',
+              state: { assessmentSaved: true }
+            }
+          ]}
+        >
           <PlanPage />
         </MemoryRouter>
       </QueryClientProvider>
@@ -52,6 +60,9 @@ describe('PlanPage', () => {
       })
     ).toBeInTheDocument()
     expect(screen.getByText('ไม่ได้ปรับตามอาการของคุณ')).toBeInTheDocument()
+    expect(
+      await screen.findByRole('alert', { name: 'บันทึกแบบประเมินแล้ว' })
+    ).toBeInTheDocument()
 
     await user.click(screen.getByRole('tab', { name: 'วันที่ 3' }))
     expect(screen.getByRole('tab', { name: 'วันที่ 3' })).toHaveAttribute(

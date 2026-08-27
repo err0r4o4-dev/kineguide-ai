@@ -16,6 +16,7 @@ import { Link } from 'react-router'
 import { z } from 'zod'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
+import { confirmNotification, showError, showSuccess } from '@/lib/notification'
 import {
   createConversation,
   deleteConversation,
@@ -87,7 +88,9 @@ export function ChatPage() {
         queryKey: ['conversation-messages', removedID]
       })
       setSelectedID('')
-    }
+      void showSuccess(t('chat.deleted'))
+    },
+    onError: () => void showError(t('chat.deleteFailed'), t('common.close'))
   })
 
   const send = useMutation({
@@ -103,6 +106,16 @@ export function ChatPage() {
   })
 
   const onSubmit = form.handleSubmit((input) => send.mutate(input))
+  const confirmRemove = async (conversationID: string) => {
+    const confirmed = await confirmNotification({
+      title: t('chat.deleteTitle'),
+      text: t('chat.deleteConfirm'),
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      danger: true
+    })
+    if (confirmed) remove.mutate(conversationID)
+  }
   const locale = i18n.resolvedLanguage === 'en' ? 'en' : 'th'
   const formatTime = (value: string) =>
     new Intl.DateTimeFormat(locale, {
@@ -153,11 +166,7 @@ export function ChatPage() {
             aria-label={t('chat.delete', { title: conversation.title })}
             className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg border-0 bg-transparent text-slate-500 opacity-100 transition-[background-color,color,opacity] hover:bg-white/80 hover:text-red-700 disabled:opacity-50 lg:pointer-events-none lg:opacity-0 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100"
             disabled={remove.isPending}
-            onClick={() => {
-              if (window.confirm(t('chat.deleteConfirm'))) {
-                remove.mutate(conversation.id)
-              }
-            }}
+            onClick={() => void confirmRemove(conversation.id)}
             type="button"
           >
             <Trash2 aria-hidden="true" size={17} />
@@ -225,11 +234,6 @@ export function ChatPage() {
               {t('chat.conversations')}
             </h2>
             {conversationList}
-            {remove.isError && (
-              <p className="kg-alert-danger mt-3" role="alert">
-                {t('chat.deleteFailed')}
-              </p>
-            )}
           </aside>
 
           <section

@@ -168,6 +168,91 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+.kg-swal-popup {
+  width: min(30rem, calc(100vw - 2rem));
+  border: 1px solid #d7e2df;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  color: #142321;
+  font-family:
+    'Noto Sans Thai Variable', 'Noto Sans Thai', system-ui, sans-serif;
+}
+
+.kg-swal-title {
+  padding-inline: 0;
+  color: #142321;
+  font-size: 1.4rem;
+  line-height: 1.4;
+}
+
+.kg-swal-text {
+  margin-inline: 0;
+  color: #5f706d;
+  line-height: 1.7;
+}
+
+.kg-swal-actions {
+  width: 100%;
+  gap: 0.75rem;
+}
+
+.kg-swal-button {
+  min-height: 44px;
+  min-width: 7rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.7rem 1.1rem;
+  font-weight: 600;
+}
+
+.kg-swal-button-primary {
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #fff;
+}
+
+.kg-swal-button-primary:hover {
+  background: #0b5f59;
+}
+
+.kg-swal-button-danger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #fff;
+}
+
+.kg-swal-button-danger:hover {
+  background: #991b1b;
+}
+
+.kg-swal-button-secondary {
+  border-color: #c8d6d3;
+  background: #fff;
+  color: #40514e;
+}
+
+.kg-swal-button-secondary:hover {
+  background: #f3f8f7;
+}
+
+.kg-swal-toast {
+  padding: 1rem 1.25rem;
+}
+
+.kg-swal-toast .kg-swal-title {
+  font-size: 1rem;
+}
+
+@media (max-width: 479px) {
+  .kg-swal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .kg-swal-button {
+    width: 100%;
+  }
+}
+
 .kg-alert-danger {
   border-color: #dc2626;
   background: #fef2f2;

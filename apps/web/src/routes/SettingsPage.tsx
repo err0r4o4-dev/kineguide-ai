@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Trash2
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
@@ -18,6 +18,7 @@ import { LanguageButton } from '@/components/LanguageButton'
 import { PageHeader } from '@/components/PageHeader'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
+import { confirmNotification, showError, showSuccess } from '@/lib/notification'
 import {
   deleteAccount,
   deleteAuthIdentity,
@@ -31,15 +32,10 @@ export function SettingsPage() {
   const { t } = useTranslation()
   const auth = useAuth()
   const navigate = useNavigate()
-  const [search] = useSearchParams()
+  const [search, setSearch] = useSearchParams()
   const client = useQueryClient()
   const linkedProvider = search.get('linked')
-  const [message, setMessage] = useState(
-    linkedProvider
-      ? t('settings.connectDone', { provider: providerLabel(linkedProvider) })
-      : ''
-  )
-  const [identityError, setIdentityError] = useState('')
+  const notifiedLinkRef = useRef(false)
   const providers = useQuery({
     queryKey: ['auth-providers'],
     queryFn: getOAuthProviders,
@@ -51,33 +47,58 @@ export function SettingsPage() {
   })
   const connect = useMutation({
     mutationFn: startAuthIdentityLink,
-    onMutate: () => setIdentityError(''),
     onSuccess: (authorizationURL) => window.location.assign(authorizationURL),
-    onError: () => setIdentityError(t('settings.identityFailed'))
+    onError: () =>
+      void showError(t('settings.identityFailed'), t('common.close'))
   })
   const disconnect = useMutation({
     mutationFn: deleteAuthIdentity,
-    onMutate: () => setIdentityError(''),
     onSuccess: async () => {
-      setMessage(t('settings.disconnectDone'))
       await client.invalidateQueries({ queryKey: ['auth-identities'] })
+      void showSuccess(t('settings.disconnectDone'))
     },
     onError: (error) => {
       const code = isAxiosError(error) ? error.response?.data?.error?.code : ''
-      setIdentityError(
+      void showError(
         t(
           code === 'LAST_LOGIN_METHOD'
             ? 'settings.lastLoginMethod'
             : 'settings.identityFailed'
-        )
+        ),
+        t('common.close')
       )
     }
   })
+  const accountDeletion = useMutation({
+    mutationFn: deleteAccount,
+    onSuccess: () => {
+      void showSuccess(t('settings.deleted'))
+      auth.clearSession()
+      navigate('/', { replace: true })
+    },
+    onError: () => void showError(t('settings.deleteFailed'), t('common.close'))
+  })
+
+  useEffect(() => {
+    if (!linkedProvider || notifiedLinkRef.current) return
+    notifiedLinkRef.current = true
+    void showSuccess(
+      t('settings.connectDone', { provider: providerLabel(linkedProvider) })
+    )
+    const nextSearch = new URLSearchParams(search)
+    nextSearch.delete('linked')
+    setSearch(nextSearch, { replace: true })
+  }, [linkedProvider, search, setSearch, t])
+
   const remove = async () => {
-    if (!window.confirm(t('settings.deleteConfirm'))) return
-    await deleteAccount()
-    auth.clearSession()
-    navigate('/', { replace: true })
+    const confirmed = await confirmNotification({
+      title: t('settings.delete'),
+      text: t('settings.deleteConfirm'),
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      danger: true
+    })
+    if (confirmed) accountDeletion.mutate()
   }
   return (
     <div>
@@ -153,11 +174,6 @@ export function SettingsPage() {
                 })}
             </div>
           )}
-          {identityError && (
-            <p className="kg-alert-danger mt-4" role="alert">
-              {identityError}
-            </p>
-          )}
         </article>
         <article className="kg-card p-5 sm:p-7">
           <DatabaseZap aria-hidden="true" className="text-teal-700" />
@@ -201,6 +217,7 @@ export function SettingsPage() {
           </h2>
           <button
             className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800"
+            disabled={accountDeletion.isPending}
             onClick={() => void remove()}
             type="button"
           >
@@ -209,11 +226,6 @@ export function SettingsPage() {
           </button>
         </article>
       </section>
-      {message && (
-        <p className="kg-alert-success mt-5" role="status">
-          {message}
-        </p>
-      )}
     </div>
   )
 }

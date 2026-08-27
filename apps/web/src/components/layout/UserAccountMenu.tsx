@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 
 import { useAuth } from '@/features/auth/AuthContext'
+import { confirmNotification } from '@/lib/notification'
 
 export function UserAccountMenu() {
   const { t } = useTranslation()
@@ -40,7 +41,13 @@ export function UserAccountMenu() {
   }, [])
 
   const logout = async () => {
-    if (!window.confirm(t('account.logoutConfirm'))) return
+    const confirmed = await confirmNotification({
+      title: t('account.logoutTitle'),
+      text: t('account.logoutConfirm'),
+      confirmText: t('auth.signOut'),
+      cancelText: t('common.cancel')
+    })
+    if (!confirmed) return
     await auth.logout()
     navigate('/')
   }

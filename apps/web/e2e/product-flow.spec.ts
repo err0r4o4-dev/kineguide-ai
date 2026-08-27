@@ -192,6 +192,9 @@ test('new user completes consent and structured onboarding', async ({
   await expect(
     page.getByRole('heading', { name: 'แผนกิจกรรมสาธิต 7 วัน' })
   ).toBeVisible()
+  await expect(
+    page.getByRole('alert', { name: 'บันทึกแบบประเมินแล้ว' })
+  ).toBeVisible()
   await expect(page.getByText('ไม่ได้ปรับตามอาการของคุณ')).toBeVisible()
   await expect(
     page.getByRole('link', { name: 'ดูรายละเอียดกิจกรรม' }).first()
@@ -218,7 +221,7 @@ test('new user completes consent and structured onboarding', async ({
   ).toHaveAttribute('href', '/app/chat')
   await page.getByRole('link', { name: 'เริ่มคุยกับ AI' }).click()
   await expect(
-    page.getByRole('heading', { name: 'คุยกับ KineGuide AI' })
+    page.getByRole('heading', { name: 'ผู้ช่วย KineGuide AI' })
   ).toBeVisible()
   await page.getByRole('button', { name: 'เริ่มบทสนทนาใหม่' }).click()
   await page.getByLabel('ข้อความถึง KineGuide AI').fill('สวัสดี')
