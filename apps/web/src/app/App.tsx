@@ -9,6 +9,7 @@ import { SystemLoading } from '@/components/SystemState'
 import { AuthProvider } from '@/features/auth/AuthProvider'
 import { ConsentRoute } from '@/features/auth/ConsentRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
+import { isBrowserRefresh } from '@/lib/navigation'
 import { NotFoundPage } from '@/routes/NotFoundPage'
 
 const LandingPage = lazy(() =>
@@ -170,5 +171,5 @@ export function App() {
 }
 
 function AppLoading() {
-  return <SystemLoading />
+  return isBrowserRefresh() ? null : <SystemLoading />
 }

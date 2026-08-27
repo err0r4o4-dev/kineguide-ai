@@ -4,19 +4,26 @@ import {
   ChartNoAxesCombined,
   ShieldCheck
 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
+import { finishBrowserRefresh, isBrowserRefresh } from '@/lib/navigation'
 
 export function LandingPage() {
   const { t } = useTranslation()
   const auth = useAuth()
+  const suppressRefreshLoading = isBrowserRefresh()
+
+  useEffect(() => {
+    if (auth.ready) finishBrowserRefresh()
+  }, [auth.ready])
 
   if (!auth.ready) {
-    return <SystemLoading />
+    return suppressRefreshLoading ? null : <SystemLoading />
   }
 
   const features = [

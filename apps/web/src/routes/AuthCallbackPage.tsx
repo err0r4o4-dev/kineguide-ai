@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useSearchParams } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 
-import { Brand } from '@/components/Brand'
+import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
-import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import { minimumLoadingDurationMs } from '@/lib/minimumLoadingDuration'
+import { showError } from '@/lib/notification'
 
 const errorTranslation: Record<string, string> = {
   cancelled: 'auth.socialCancelled',
@@ -56,39 +56,16 @@ export function AuthCallbackPage() {
   ])
 
   const visibleError = error || (sessionError ? 'session_failed' : '')
-  const visibleProvider = provider === 'facebook' ? 'facebook' : 'google'
 
-  return (
-    <main className="grid min-h-screen place-items-center bg-kg-canvas p-4">
-      <section className="kg-card w-full max-w-md p-7 text-center sm:p-10">
-        <div className="flex justify-center">
-          <Brand compact />
-        </div>
-        <h1 className="mt-7 text-2xl font-bold text-slate-950">
-          {t('auth.callbackTitle')}
-        </h1>
-        {visibleError ? (
-          <>
-            <p className="kg-alert-danger mt-5 text-left" role="alert">
-              {t(errorTranslation[visibleError] ?? 'auth.socialFailed')}
-            </p>
-            <Link className="kg-button-secondary mt-6" to="/login">
-              {t('auth.backToLogin')}
-            </Link>
-          </>
-        ) : (
-          <div className="mt-7" role="status" aria-live="polite">
-            <span className="relative mx-auto grid size-14 place-items-center rounded-full bg-slate-50 ring-1 ring-slate-200">
-              <ProviderIcon provider={visibleProvider} />
-              <span
-                aria-hidden="true"
-                className="absolute -inset-1 animate-spin rounded-full border-2 border-teal-600 border-r-transparent motion-reduce:animate-none"
-              />
-            </span>
-            <p className="mt-4 text-slate-600">{t('auth.socialLoading')}</p>
-          </div>
-        )}
-      </section>
-    </main>
-  )
+  useEffect(() => {
+    if (!visibleError) return
+    void showError(
+      t(errorTranslation[visibleError] ?? 'auth.socialFailed'),
+      t('common.close')
+    )
+    navigate('/login', { replace: true })
+  }, [navigate, t, visibleError])
+
+  if (visibleError) return null
+  return <SystemLoading />
 }

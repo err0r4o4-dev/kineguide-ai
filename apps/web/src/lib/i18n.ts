@@ -120,7 +120,7 @@ const th = {
     or: 'หรือ',
     google: 'เข้าสู่ระบบด้วย Google',
     facebook: 'เข้าสู่ระบบด้วย Facebook',
-    socialLoading: 'กำลังไปยังหน้าลงชื่อเข้าใช้…',
+    socialLoading: 'กำลังเชื่อมต่อบัญชี {{provider}}',
     socialFailed: 'ไม่สามารถเข้าสู่ระบบด้วยบัญชีภายนอกได้ กรุณาลองอีกครั้ง',
     socialCancelled: 'ยกเลิกการเข้าสู่ระบบแล้ว',
     socialEmailRequired:
@@ -538,7 +538,7 @@ const en: typeof th = {
     or: 'OR',
     google: 'Sign in with Google',
     facebook: 'Sign in with Facebook',
-    socialLoading: 'Opening the sign-in provider…',
+    socialLoading: 'Connecting {{provider}} account',
     socialFailed: 'Unable to sign in with the external account. Try again.',
     socialCancelled: 'Social sign-in was cancelled.',
     socialEmailRequired:

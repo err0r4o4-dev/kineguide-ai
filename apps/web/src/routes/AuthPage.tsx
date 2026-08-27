@@ -226,39 +226,40 @@ export function AuthPage() {
               <div className="mt-4 flex justify-center gap-3">
                 {enabledProviders.map(({ provider }) => (
                   <button
-                    aria-label={t(`auth.${provider}`)}
+                    aria-label={
+                      socialProvider === provider
+                        ? t('auth.socialLoading', {
+                            provider: providerDisplayName(provider)
+                          })
+                        : t(`auth.${provider}`)
+                    }
+                    aria-live="polite"
                     className="grid min-h-11 min-w-14 place-items-center rounded-lg border border-slate-200 bg-slate-50 px-4 transition-colors hover:border-slate-300 hover:bg-white disabled:opacity-60"
                     disabled={socialProvider !== null}
                     key={provider}
                     onClick={() => beginSocialSignIn(provider)}
                     type="button"
                   >
-                    <span className="relative grid size-6 place-items-center">
-                      <span
-                        className={
-                          socialProvider === provider ? 'opacity-20' : undefined
-                        }
-                      >
-                        <ProviderIcon provider={provider} />
-                      </span>
-                      {socialProvider === provider && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute inset-0 animate-spin rounded-full border-2 border-teal-600 border-r-transparent motion-reduce:animate-none"
-                        />
-                      )}
+                    <span
+                      className={
+                        socialProvider === provider
+                          ? 'animate-spin motion-reduce:animate-none'
+                          : undefined
+                      }
+                      role={socialProvider === provider ? 'status' : undefined}
+                      aria-label={
+                        socialProvider === provider
+                          ? t('auth.socialLoading', {
+                              provider: providerDisplayName(provider)
+                            })
+                          : undefined
+                      }
+                    >
+                      <ProviderIcon provider={provider} />
                     </span>
                   </button>
                 ))}
               </div>
-              {socialProvider && (
-                <p
-                  className="mt-3 text-center text-sm text-slate-600"
-                  role="status"
-                >
-                  {t('auth.socialLoading')}
-                </p>
-              )}
             </section>
           )}
           <p className="mt-6 text-center text-sm text-slate-600">
@@ -278,6 +279,10 @@ export function AuthPage() {
       </div>
     </main>
   )
+}
+
+function providerDisplayName(provider: OAuthProvider) {
+  return provider === 'google' ? 'Google' : 'Facebook'
 }
 
 function requestedAppPath(state: unknown) {

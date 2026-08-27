@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
+import { afterEach, vi } from 'vitest'
 
 import { Brand } from '@/components/Brand'
 import { AuthContext, type AuthContextValue } from '@/features/auth/AuthContext'
@@ -17,6 +18,27 @@ const guestAuth: AuthContextValue = {
 }
 
 describe('LandingPage', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('does not show the loading page while restoring a session after refresh', () => {
+    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+      { type: 'reload' } as PerformanceNavigationTiming
+    ])
+
+    const { container } = render(
+      <AuthContext.Provider value={{ ...guestAuth, ready: false }}>
+        <MemoryRouter>
+          <LandingPage />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    )
+
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    expect(container).toBeEmptyDOMElement()
+  })
+
   it('explains the camera boundary before sign in', () => {
     render(
       <AuthContext.Provider value={guestAuth}>

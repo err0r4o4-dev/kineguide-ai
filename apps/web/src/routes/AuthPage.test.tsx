@@ -61,6 +61,40 @@ describe('AuthPage social sign in', () => {
     expect(screen.getByText('หรือ')).toBeInTheDocument()
   })
 
+  it('shows loading on the Google logo without replacing the login page', async () => {
+    const user = userEvent.setup()
+    const navigationError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined)
+    vi.mocked(product.getOAuthProviders).mockResolvedValue({
+      providers: [{ provider: 'google', enabled: true }]
+    })
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    })
+
+    render(
+      <QueryClientProvider client={client}>
+        <AuthContext.Provider value={auth}>
+          <MemoryRouter initialEntries={['/login']}>
+            <AuthPage />
+          </MemoryRouter>
+        </AuthContext.Provider>
+      </QueryClientProvider>
+    )
+
+    await user.click(
+      await screen.findByRole('button', { name: 'เข้าสู่ระบบด้วย Google' })
+    )
+
+    expect(
+      screen.getByRole('status', { name: 'กำลังเชื่อมต่อบัญชี Google' })
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'ยินดีต้อนรับ' })).toBeVisible()
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    navigationError.mockRestore()
+  })
+
   it('submits email login without validating the hidden display name', async () => {
     const user = userEvent.setup()
     vi.mocked(product.getOAuthProviders).mockResolvedValue({ providers: [] })
