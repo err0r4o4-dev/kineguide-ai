@@ -5,7 +5,7 @@ import {
   ShieldCheck
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Link, Navigate } from 'react-router'
+import { Link } from 'react-router'
 
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -21,8 +21,6 @@ export function LandingPage() {
       </main>
     )
   }
-
-  if (auth.user) return <Navigate replace to="/app" />
 
   const features = [
     {

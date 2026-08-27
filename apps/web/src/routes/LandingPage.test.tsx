@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 
+import { Brand } from '@/components/Brand'
 import { AuthContext, type AuthContextValue } from '@/features/auth/AuthContext'
 import '@/lib/i18n'
 import { LandingPage } from './LandingPage'
@@ -34,7 +36,9 @@ describe('LandingPage', () => {
     )
   })
 
-  it('redirects an authenticated visitor to the app home', async () => {
+  it('lets an authenticated visitor use the brand to open the public landing page', async () => {
+    const user = userEvent.setup()
+
     render(
       <AuthContext.Provider
         value={{
@@ -47,17 +51,21 @@ describe('LandingPage', () => {
           }
         }}
       >
-        <MemoryRouter initialEntries={['/']}>
+        <MemoryRouter initialEntries={['/app']}>
           <Routes>
             <Route element={<LandingPage />} path="/" />
-            <Route element={<h1>หน้าหลักของฉัน</h1>} path="/app" />
+            <Route element={<Brand />} path="/app" />
           </Routes>
         </MemoryRouter>
       </AuthContext.Provider>
     )
 
+    await user.click(screen.getByRole('link', { name: 'KineGuide AI' }))
+
     expect(
-      await screen.findByRole('heading', { name: 'หน้าหลักของฉัน' })
+      await screen.findByRole('heading', {
+        name: 'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ'
+      })
     ).toBeInTheDocument()
   })
 })
