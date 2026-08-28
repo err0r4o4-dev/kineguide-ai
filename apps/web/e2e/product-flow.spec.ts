@@ -293,6 +293,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     if (message.type() === 'error') runtimeErrors.push(message.text())
   })
   let signedIn = false
+  let dashboardFails = false
   let refreshRequests = 0
   const user = {
     id: '3356dcec-f826-41f1-8dba-f434b74e75c8',
@@ -409,6 +410,18 @@ test('login, hard refresh, and every authenticated navigation target stay consis
       return
     }
     if (url.endsWith('/dashboard')) {
+      if (dashboardFails) {
+        await route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: 'SERVICE_UNAVAILABLE',
+              message: 'Synthetic dashboard failure'
+            }
+          }
+        })
+        return
+      }
       await route.fulfill({
         json: {
           completed_sessions: 0,
@@ -536,4 +549,34 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     goal: 'understand'
   })
   expect(runtimeErrors).toEqual([])
+  runtimeErrors.length = 0
+
+  dashboardFails = true
+  await page.goto('/app')
+  await expect(
+    page.getByRole('heading', { name: 'ไม่สามารถโหลดข้อมูลได้' })
+  ).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'เมนูหลัก' })).toHaveCount(
+    0
+  )
+  await expect(page.getByRole('button', { name: /^เมนูบัญชี/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'ลองอีกครั้ง' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'กลับหน้าหลัก' })).toBeVisible()
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true)
+  }
+  expect(runtimeErrors.length).toBeGreaterThan(0)
+  expect(runtimeErrors.every((message) => message.includes('503'))).toBe(true)
+
+  dashboardFails = false
+  await page.getByRole('button', { name: 'ลองอีกครั้ง' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'สวัสดี ผู้ใช้ทดสอบ' })
+  ).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'เมนูหลัก' })).toBeVisible()
 })

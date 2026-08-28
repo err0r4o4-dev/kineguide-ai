@@ -175,11 +175,17 @@ function LoadingStep({
   )
 }
 
-export function SystemError({ retry }: { retry(): void }) {
+export function SystemError({
+  fullScreen = false,
+  retry
+}: {
+  fullScreen?: boolean
+  retry(): void
+}) {
   const { t } = useTranslation()
   return (
     <section
-      className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-10 text-center"
+      className={`flex flex-col items-center justify-center px-4 py-10 text-center ${fullScreen ? 'min-h-screen' : 'min-h-[70vh]'}`}
       role="alert"
     >
       <PoseOrbit error />

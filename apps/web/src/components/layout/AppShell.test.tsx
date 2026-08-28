@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
+import { QueryError } from '@/components/QueryState'
 import i18n from '@/lib/i18n'
 import { AppShell } from './AppShell'
 
@@ -138,5 +139,47 @@ describe('AppShell', () => {
 
     expect(menuButton).toHaveAttribute('aria-expanded', 'false')
     expect(menuButton).toHaveFocus()
+  })
+
+  it('replaces the entire shell when route data cannot be loaded', async () => {
+    await i18n.changeLanguage('th')
+    const retry = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/app']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route
+              index
+              element={
+                <>
+                  <h1>เนื้อหาหน้าหลักเดิม</h1>
+                  <QueryError retry={retry} />
+                </>
+              }
+            />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'ไม่สามารถโหลดข้อมูลได้' })
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('navigation', { name: 'เมนูหลัก' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^เมนูบัญชี/ })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('เนื้อหาหน้าหลักเดิม')).not.toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: 'ลองอีกครั้ง' }))
+    expect(retry).toHaveBeenCalledOnce()
+    expect(screen.getByRole('link', { name: 'กลับหน้าหลัก' })).toHaveAttribute(
+      'href',
+      '/'
+    )
   })
 })
