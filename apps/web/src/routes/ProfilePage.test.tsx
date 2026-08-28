@@ -95,6 +95,9 @@ describe('ProfilePage', () => {
       'href',
       '/onboarding'
     )
+    expect(
+      screen.queryByRole('link', { name: 'เปิดการแจ้งเตือน' })
+    ).not.toBeInTheDocument()
 
     expect(
       screen.getByRole('heading', { name: 'ข้อมูลร่างกาย' })

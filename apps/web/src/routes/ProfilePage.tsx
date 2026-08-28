@@ -3,7 +3,6 @@ import {
   Accessibility,
   Activity,
   ArrowRight,
-  Bell,
   CalendarDays,
   Check,
   CircleCheck,
@@ -73,19 +72,10 @@ export function ProfilePage() {
     <div className="pb-4">
       <PageHeader
         actions={
-          <>
-            <Link
-              aria-label={t('profile.notifications')}
-              className="kg-icon-button"
-              to="/app/notifications"
-            >
-              <Bell aria-hidden="true" size={20} />
-            </Link>
-            <Link className="kg-button-primary" to="/onboarding">
-              <Pencil aria-hidden="true" size={17} />
-              {t('profile.edit')}
-            </Link>
-          </>
+          <Link className="kg-button-primary" to="/onboarding">
+            <Pencil aria-hidden="true" size={17} />
+            {t('profile.edit')}
+          </Link>
         }
         subtitle={t('profile.subtitle')}
         title={t('profile.title')}

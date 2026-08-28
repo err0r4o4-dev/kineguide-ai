@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Activity,
-  Bell,
   CalendarDays,
   Check,
   ChevronLeft,
@@ -321,12 +320,6 @@ export function HealthProfileOnboardingPage() {
           </div>
           <div className="flex items-center gap-2 self-end min-[480px]:self-auto">
             <LanguageButton />
-            <span
-              className="grid size-11 place-items-center rounded-full text-slate-700"
-              aria-hidden="true"
-            >
-              <Bell size={22} />
-            </span>
           </div>
         </header>
 
