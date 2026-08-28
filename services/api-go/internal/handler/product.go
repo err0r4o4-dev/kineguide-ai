@@ -64,6 +64,9 @@ func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.
 	secured.DELETE("/consents/current", api.revokeConsent)
 	secured.GET("/assessments/latest", api.latestAssessment)
 	secured.POST("/assessments", api.saveAssessment)
+	secured.GET("/health-profile", api.getHealthProfile)
+	secured.PUT("/health-profile", api.putHealthProfile)
+	secured.DELETE("/health-profile", api.deleteHealthProfile)
 	secured.GET("/exercises", api.listExercises)
 	secured.GET("/exercises/:slug", api.getExercise)
 	secured.GET("/activity-plan", api.activityPlan)
@@ -446,6 +449,49 @@ func (a *productAPI) latestAssessment(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"assessment": assessment})
 }
 
+func (a *productAPI) getHealthProfile(c *gin.Context) {
+	profile, err := a.store.HealthProfile(c.Request.Context(), c.GetString(userIDKey))
+	if errors.Is(err, product.ErrNotFound) {
+		c.JSON(http.StatusOK, gin.H{"profile": nil})
+		return
+	}
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load the health profile.")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"profile": profile})
+}
+
+func (a *productAPI) putHealthProfile(c *gin.Context) {
+	consent, err := a.store.LatestConsent(c.Request.Context(), c.GetString(userIDKey))
+	if err != nil || !consent.IsActive() || consent.PolicyVersion != product.CurrentConsentPolicyVersion || !consent.SessionSummaryStorage {
+		writeError(c, http.StatusForbidden, "CONSENT_REQUIRED", "Active consent is required before storing a health profile.")
+		return
+	}
+	var profile product.HealthProfile
+	if err := c.ShouldBindJSON(&profile); err != nil || !validHealthProfile(profile) {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Please review every required health-profile field.")
+		return
+	}
+	profile.UserID = c.GetString(userIDKey)
+	profile.ProfileStorageConsent = false
+	profile.ConsentVersion = product.HealthProfileConsentVersion
+	profile, err = a.store.SaveHealthProfile(c.Request.Context(), profile)
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to save the health profile.")
+		return
+	}
+	c.JSON(http.StatusOK, profile)
+}
+
+func (a *productAPI) deleteHealthProfile(c *gin.Context) {
+	if err := a.store.DeleteHealthProfile(c.Request.Context(), c.GetString(userIDKey)); err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to delete the health profile.")
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 func (a *productAPI) listExercises(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"exercises": product.Exercises})
 }
@@ -557,6 +603,56 @@ func validAssessment(a product.Assessment) bool {
 		oneOf(a.DurationBand, "lt_week", "one_to_four_weeks", "gt_four_weeks", "unsure") &&
 		oneOf(a.DailyImpact, "none", "some", "much", "prefer_not_to_say") &&
 		oneOf(a.Goal, "understand", "camera_demo", "track_activity")
+}
+
+func validHealthProfile(profile product.HealthProfile) bool {
+	birthDate, err := time.Parse("2006-01-02", profile.BirthDate)
+	if err != nil || birthDate.After(time.Now().UTC()) || !profile.ProfileStorageConsent {
+		return false
+	}
+	if !oneOf(profile.Sex, "female", "male", "unspecified") || profile.HeightCM <= 0 || profile.HeightCM > 300 || profile.WeightKG <= 0 || profile.WeightKG > 500 {
+		return false
+	}
+	if !validUniqueValues(profile.CareAreas, "lower_back", "knee", "shoulder", "general_mobility", "prefer_not_to_say") ||
+		!oneOf(profile.AssistiveDevice, "none", "cane", "walker", "wheelchair", "other") ||
+		!validUniqueValues(profile.WarningSigns, "chest_pain", "shortness_of_breath", "dizziness_or_fainting", "weakness_or_severe_fatigue", "severe_pain", "none") ||
+		!validUniqueValues(profile.Goals, "strength", "balance_fall_prevention", "flexibility", "daily_activity", "progress") ||
+		!oneOf(profile.ActivityLevel, "low", "moderate", "regular") ||
+		!oneOf(profile.PreferredTime, "morning", "afternoon", "evening") ||
+		!validUniqueValues(profile.Equipment, "chair", "mat", "resistance_band", "none") ||
+		!oneOf(profile.CameraPreference, "front", "rear") || len([]rune(profile.Notes)) > 300 {
+		return false
+	}
+	return exclusiveNone(profile.WarningSigns) && exclusiveNone(profile.Equipment)
+}
+
+func validUniqueValues(values []string, options ...string) bool {
+	if len(values) == 0 {
+		return false
+	}
+	seen := make(map[string]struct{}, len(values))
+	for _, value := range values {
+		if !oneOf(value, options...) {
+			return false
+		}
+		if _, exists := seen[value]; exists {
+			return false
+		}
+		seen[value] = struct{}{}
+	}
+	return true
+}
+
+func exclusiveNone(values []string) bool {
+	if len(values) == 1 {
+		return true
+	}
+	for _, value := range values {
+		if value == "none" {
+			return false
+		}
+	}
+	return true
 }
 
 func oneOf(value string, options ...string) bool {

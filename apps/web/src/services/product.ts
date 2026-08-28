@@ -36,6 +36,86 @@ export interface Consent {
   revoked_at: string | null
 }
 
+export type AssessmentConcernArea =
+  'lower_back' | 'knee' | 'shoulder' | 'general_mobility' | 'prefer_not_to_say'
+export type AssessmentDurationBand =
+  'lt_week' | 'one_to_four_weeks' | 'gt_four_weeks' | 'unsure'
+export type AssessmentDailyImpact =
+  'none' | 'some' | 'much' | 'prefer_not_to_say'
+export type AssessmentGoal = 'understand' | 'camera_demo' | 'track_activity'
+
+export interface AssessmentInput {
+  concern_area: AssessmentConcernArea
+  duration_band: AssessmentDurationBand
+  daily_impact: AssessmentDailyImpact
+  goal: AssessmentGoal
+}
+
+export interface Assessment extends AssessmentInput {
+  id: string
+  status: 'captured_not_evaluated'
+  created_at: string
+  retention_until: string
+}
+
+export type HealthProfileSex = 'female' | 'male' | 'unspecified'
+export type HealthProfileCareArea =
+  'lower_back' | 'knee' | 'shoulder' | 'general_mobility' | 'prefer_not_to_say'
+export type HealthProfileAssistiveDevice =
+  'none' | 'cane' | 'walker' | 'wheelchair' | 'other'
+export type HealthProfileWarningSign =
+  | 'chest_pain'
+  | 'shortness_of_breath'
+  | 'dizziness_or_fainting'
+  | 'weakness_or_severe_fatigue'
+  | 'severe_pain'
+  | 'none'
+export type HealthProfileGoal =
+  | 'strength'
+  | 'balance_fall_prevention'
+  | 'flexibility'
+  | 'daily_activity'
+  | 'progress'
+export type HealthProfileActivityLevel = 'low' | 'moderate' | 'regular'
+export type HealthProfilePreferredTime = 'morning' | 'afternoon' | 'evening'
+export type HealthProfileEquipment =
+  'chair' | 'mat' | 'resistance_band' | 'none'
+export type HealthProfileCameraPreference = 'front' | 'rear'
+
+export interface HealthProfileInput {
+  birth_date: string
+  sex: HealthProfileSex
+  height_cm: number
+  weight_kg: number
+  track_weight: boolean
+  care_areas: HealthProfileCareArea[]
+  recent_injury: boolean
+  clinician_managed: boolean
+  assistive_device: HealthProfileAssistiveDevice
+  warning_signs: HealthProfileWarningSign[]
+  goals: HealthProfileGoal[]
+  activity_level: HealthProfileActivityLevel
+  preferred_time: HealthProfilePreferredTime
+  equipment: HealthProfileEquipment[]
+  camera_preference: HealthProfileCameraPreference
+  activity_notifications: boolean
+  notes: string
+  profile_storage_consent: true
+}
+
+export interface HealthProfile extends Omit<
+  HealthProfileInput,
+  'profile_storage_consent'
+> {
+  id: string
+  status: 'captured_not_evaluated'
+  consent_version: 'health-profile-v1'
+  consented_at: string
+  created_at: string
+  updated_at: string
+  retention_until: string
+}
+
 export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
 
 export interface Exercise {
@@ -152,6 +232,11 @@ export async function deleteAccount() {
   await http.delete('/me')
 }
 
+export async function getCurrentUser(signal?: AbortSignal) {
+  const response = await http.get<User>('/me', { signal })
+  return response.data
+}
+
 export async function getConsent(signal?: AbortSignal) {
   const response = await http.get<{ consent: Consent | null }>(
     '/consents/current',
@@ -211,6 +296,36 @@ export async function sendConversationMessage(
 
 export async function revokeConsent() {
   await http.delete('/consents/current')
+}
+
+export async function getLatestAssessment(signal?: AbortSignal) {
+  const response = await http.get<{ assessment: Assessment | null }>(
+    '/assessments/latest',
+    { signal }
+  )
+  return response.data.assessment
+}
+
+export async function saveAssessment(input: AssessmentInput) {
+  const response = await http.post<Assessment>('/assessments', input)
+  return response.data
+}
+
+export async function getHealthProfile(signal?: AbortSignal) {
+  const response = await http.get<{ profile: HealthProfile | null }>(
+    '/health-profile',
+    { signal }
+  )
+  return response.data.profile
+}
+
+export async function saveHealthProfile(input: HealthProfileInput) {
+  const response = await http.put<HealthProfile>('/health-profile', input)
+  return response.data
+}
+
+export async function deleteHealthProfile() {
+  await http.delete('/health-profile')
 }
 
 export async function getExercises(signal?: AbortSignal) {

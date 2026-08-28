@@ -342,7 +342,7 @@ export function ChatPage() {
                   <label className="sr-only" htmlFor="chat-message">
                     {t('chat.messageLabel')}
                   </label>
-                  <div className="flex items-end gap-2 rounded-2xl border border-kg-border bg-white p-2 shadow-sm focus-within:border-kg-primary focus-within:ring-4 focus-within:ring-teal-100">
+                  <div className="flex items-end gap-2 rounded-2xl border-none bg-white p-2 shadow-sm focus-within:ring-0 focus-within:ring-offset-0">
                     <textarea
                       aria-describedby="chat-composer-hint"
                       className="max-h-36 min-h-11 min-w-0 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-kg-ink outline-none placeholder:text-slate-400"

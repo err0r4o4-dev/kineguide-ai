@@ -23,7 +23,9 @@ import {
   deleteAccount,
   deleteAuthIdentity,
   getAuthIdentities,
+  getConsent,
   getOAuthProviders,
+  revokeConsent,
   startAuthIdentityLink,
   type OAuthProvider
 } from '@/services/product'
@@ -44,6 +46,10 @@ export function SettingsPage() {
   const identities = useQuery({
     queryKey: ['auth-identities'],
     queryFn: ({ signal }) => getAuthIdentities(signal)
+  })
+  const consent = useQuery({
+    queryKey: ['consent'],
+    queryFn: ({ signal }) => getConsent(signal)
   })
   const connect = useMutation({
     mutationFn: startAuthIdentityLink,
@@ -78,6 +84,16 @@ export function SettingsPage() {
     },
     onError: () => void showError(t('settings.deleteFailed'), t('common.close'))
   })
+  const consentRevocation = useMutation({
+    mutationFn: revokeConsent,
+    onSuccess: () => {
+      client.removeQueries()
+      client.setQueryData(['consent'], null)
+      void showSuccess(t('settings.revokeDone'))
+      navigate('/consent', { replace: true })
+    },
+    onError: () => void showError(t('settings.revokeFailed'), t('common.close'))
+  })
 
   useEffect(() => {
     if (!linkedProvider || notifiedLinkRef.current) return
@@ -99,6 +115,16 @@ export function SettingsPage() {
       danger: true
     })
     if (confirmed) accountDeletion.mutate()
+  }
+  const withdrawConsent = async () => {
+    const confirmed = await confirmNotification({
+      title: t('settings.revoke'),
+      text: t('settings.revokeConfirm'),
+      confirmText: t('settings.revokeConfirmAction'),
+      cancelText: t('common.cancel'),
+      danger: true
+    })
+    if (confirmed) consentRevocation.mutate()
   }
   return (
     <div>
@@ -182,9 +208,44 @@ export function SettingsPage() {
             {t('settings.retention')}
           </p>
         </article>
+        <article className="kg-card p-5 sm:p-7">
+          <ShieldCheck aria-hidden="true" className="text-teal-700" />
+          <h2 className="mt-4 text-xl font-bold">{t('settings.consent')}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            {t('settings.consentBody')}
+          </p>
+          {consent.isLoading && <QueryLoading />}
+          {consent.isError && (
+            <div className="mt-4">
+              <QueryError retry={() => void consent.refetch()} />
+            </div>
+          )}
+          {consent.data && (
+            <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm leading-6 text-slate-700">
+                {t('settings.consentActive', {
+                  version: consent.data.policy_version
+                })}
+              </p>
+              <button
+                className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                disabled={consentRevocation.isPending}
+                onClick={() => void withdrawConsent()}
+                type="button"
+              >
+                {t('settings.revoke')}
+              </button>
+            </div>
+          )}
+          {!consent.isLoading && !consent.isError && !consent.data && (
+            <p className="mt-4 text-sm text-slate-600">
+              {t('settings.noActiveConsent')}
+            </p>
+          )}
+        </article>
         <Link
           className="kg-card flex min-h-24 items-center gap-4 p-5 no-underline transition hover:border-teal-300 hover:bg-teal-50 sm:p-6"
-          to="/app/camera"
+          to="/app/exercises"
         >
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
             <Camera aria-hidden="true" size={21} />

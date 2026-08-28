@@ -5,6 +5,7 @@ import "time"
 const (
 	CurrentConsentPolicyVersion = "prototype-v3"
 	RetentionUntilDeleted       = "until_deleted"
+	HealthProfileConsentVersion = "health-profile-v1"
 )
 
 type User struct {
@@ -63,6 +64,35 @@ type Assessment struct {
 	Status         string    `json:"status"`
 	CreatedAt      time.Time `json:"created_at"`
 	RetentionUntil time.Time `json:"retention_until"`
+}
+
+type HealthProfile struct {
+	ID                    string    `json:"id"`
+	UserID                string    `json:"-"`
+	BirthDate             string    `json:"birth_date"`
+	Sex                   string    `json:"sex"`
+	HeightCM              float64   `json:"height_cm"`
+	WeightKG              float64   `json:"weight_kg"`
+	TrackWeight           bool      `json:"track_weight"`
+	CareAreas             []string  `json:"care_areas"`
+	RecentInjury          bool      `json:"recent_injury"`
+	ClinicianManaged      bool      `json:"clinician_managed"`
+	AssistiveDevice       string    `json:"assistive_device"`
+	WarningSigns          []string  `json:"warning_signs"`
+	Goals                 []string  `json:"goals"`
+	ActivityLevel         string    `json:"activity_level"`
+	PreferredTime         string    `json:"preferred_time"`
+	Equipment             []string  `json:"equipment"`
+	CameraPreference      string    `json:"camera_preference"`
+	ActivityNotifications bool      `json:"activity_notifications"`
+	Notes                 string    `json:"notes"`
+	ProfileStorageConsent bool      `json:"profile_storage_consent,omitempty"`
+	Status                string    `json:"status"`
+	ConsentVersion        string    `json:"consent_version"`
+	ConsentedAt           time.Time `json:"consented_at"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
+	RetentionUntil        time.Time `json:"retention_until"`
 }
 
 type Exercise struct {

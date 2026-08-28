@@ -31,6 +31,9 @@ type Store interface {
 	RevokeConsent(context.Context, string) error
 	SaveAssessment(context.Context, Assessment) (Assessment, error)
 	LatestAssessment(context.Context, string) (Assessment, error)
+	SaveHealthProfile(context.Context, HealthProfile) (HealthProfile, error)
+	HealthProfile(context.Context, string) (HealthProfile, error)
+	DeleteHealthProfile(context.Context, string) error
 	CreateSession(context.Context, Session) (Session, error)
 	UpdateSession(context.Context, Session) (Session, error)
 	SessionByID(context.Context, string, string) (Session, error)

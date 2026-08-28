@@ -7,8 +7,7 @@ import {
   Clock3,
   Flame,
   MessageCircle,
-  Play,
-  Video
+  Play
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -22,12 +21,13 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
 import { getDashboard, type ExerciseSession } from '@/services/product'
 
-const ranges = [7, 30, 90] as const
+const dayInMilliseconds = 86_400_000
+const illustrationPath = '/dashboard-sit-to-stand.png'
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
   const auth = useAuth()
-  const [range, setRange] = useState<(typeof ranges)[number]>(7)
+  const [range] = useState(7)
   const [today] = useState(() => new Date())
   const query = useQuery({
     queryKey: ['dashboard'],
@@ -42,7 +42,7 @@ export function DashboardPage() {
       (query.data?.recent_sessions ?? []).filter(
         (session) =>
           new Date(session.started_at).getTime() >=
-          today.getTime() - range * 86_400_000
+          today.getTime() - range * dayInMilliseconds
       ),
     [query.data?.recent_sessions, range, today]
   )
@@ -64,36 +64,11 @@ export function DashboardPage() {
 
       {query.data && (
         <>
-          <section className="mt-7 grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,1fr)]">
+          <section className="mt-7 grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.95fr)]">
             <TodayActivity />
 
-            <div className="grid gap-5">
-              <article className="rounded-[1.25rem] border border-teal-200 bg-teal-50/60 p-5 sm:p-6">
-                <div className="flex gap-4">
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-teal-700 text-white shadow-sm">
-                    <MessageCircle aria-hidden="true" size={23} />
-                  </span>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-bold text-slate-950">
-                      {t('dashboard.aiTitle')}
-                    </h2>
-                    <p className="mt-1 text-sm leading-6 text-slate-700">
-                      {t('dashboard.aiBody')}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">
-                      {t('dashboard.aiBoundary')}
-                    </p>
-                    <Link
-                      className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl font-bold text-teal-800 no-underline hover:text-teal-950"
-                      to="/app/chat"
-                    >
-                      {t('dashboard.aiStart')}
-                      <ArrowRight aria-hidden="true" size={17} />
-                    </Link>
-                  </div>
-                </div>
-              </article>
-
+            <div className="grid gap-4 xl:grid-rows-[minmax(0,1fr)_auto]">
+              <AiAssistantCard />
               <div
                 aria-label={t('dashboard.activitySummary')}
                 className="kg-card grid grid-cols-3 divide-x divide-slate-200 overflow-hidden"
@@ -118,12 +93,12 @@ export function DashboardPage() {
             </div>
           </section>
 
-          <section className="mt-5 grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.08fr)_minmax(22rem,1fr)]">
+          <section className="mt-4 grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(19rem,1fr)]">
             <WeeklyActivity
               language={language}
-              onRangeChange={setRange}
               range={range}
               sessions={visibleSessions}
+              today={today}
             />
             <RecentActivity sessions={query.data.recent_sessions} />
           </section>
@@ -139,34 +114,34 @@ function TodayActivity() {
   const { t } = useTranslation()
 
   return (
-    <article className="kg-card overflow-hidden p-5 sm:p-6">
+    <article className="kg-card flex min-h-full flex-col overflow-hidden p-5 sm:p-6">
       <div className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
-          <CalendarCheck2 aria-hidden="true" size={20} />
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
+          <CalendarCheck2 aria-hidden="true" size={18} />
         </span>
-        <h2 className="text-xl font-bold text-slate-950">
+        <h2 className="text-lg font-bold text-slate-950 sm:text-xl">
           {t('dashboard.today')}
         </h2>
       </div>
 
-      <div className="mt-5 grid gap-6 md:grid-cols-[minmax(11rem,0.85fr)_minmax(0,1fr)] md:items-center">
-        <div className="grid min-h-52 place-items-center rounded-2xl border border-teal-100 bg-teal-50/70 px-5 text-center text-teal-800">
-          <div>
-            <span className="mx-auto grid size-16 place-items-center rounded-full bg-white shadow-sm ring-1 ring-inset ring-teal-100">
-              <Video aria-hidden="true" size={31} />
-            </span>
-            <p className="mt-4 font-bold">{t('camera.secure')}</p>
-            <p className="mt-1 text-xs leading-5 text-slate-600">
-              {t('camera.instructions')}
-            </p>
-          </div>
+      <div className="mt-4 grid flex-1 gap-6 md:grid-cols-[minmax(0,1.12fr)_minmax(13rem,0.88fr)] md:items-center">
+        <div className="grid min-h-52 place-items-center overflow-hidden rounded-2xl bg-[#f3f9f8] sm:min-h-64">
+          <img
+            alt={t('dashboard.todayIllustrationAlt')}
+            className="h-full max-h-72 w-full object-contain"
+            decoding="async"
+            height="1024"
+            loading="eager"
+            src={illustrationPath}
+            width="1536"
+          />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <h3 className="text-2xl font-bold leading-tight text-slate-950">
             {t('dashboard.todayName')}
           </h3>
-          <p className="mt-2 font-semibold text-slate-700">
+          <p className="mt-2 text-sm font-semibold text-slate-700">
             {t('dashboard.todayProgress')}
           </p>
           <div
@@ -174,23 +149,55 @@ function TodayActivity() {
             aria-valuemax={7}
             aria-valuemin={0}
             aria-valuenow={1}
-            className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"
+            className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"
             role="progressbar"
           >
             <span className="block h-full w-[14%] rounded-full bg-teal-700" />
           </div>
-          <p className="mt-4 text-sm leading-6 text-slate-600">
+          <p className="mt-4 text-xs leading-5 text-slate-500">
             {t('common.pendingReview')}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link className="kg-button-primary" to="/app/camera">
-              <Play aria-hidden="true" size={18} />
+            <Link className="kg-button-primary" to="/app/exercises">
+              <Play aria-hidden="true" size={17} />
               {t('plan.start')}
             </Link>
             <Link className="kg-button-secondary" to="/app/exercises">
               {t('dashboard.viewDetails')}
             </Link>
           </div>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function AiAssistantCard() {
+  const { t } = useTranslation()
+
+  return (
+    <article className="kg-card flex items-center p-5 sm:p-6">
+      <div className="flex gap-3.5">
+        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-700 text-white shadow-sm">
+          <MessageCircle aria-hidden="true" size={21} />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-base font-bold text-slate-950 sm:text-lg">
+            {t('dashboard.aiTitle')}
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            {t('dashboard.aiBody')}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            {t('dashboard.aiBoundary')}
+          </p>
+          <Link
+            className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-xl px-2 text-sm font-bold !text-kg-primary no-underline transition-colors hover:bg-teal-50 hover:!text-kg-primary-strong"
+            to="/app/chat"
+          >
+            {t('dashboard.aiStart')}
+            <ArrowRight aria-hidden="true" size={17} />
+          </Link>
         </div>
       </div>
     </article>
@@ -207,62 +214,46 @@ function DashboardStat({
   value: string
 }) {
   return (
-    <div className="grid min-w-0 place-items-center px-2 py-5 text-center sm:px-4">
-      <Icon aria-hidden="true" className="text-teal-700" size={24} />
-      <p className="mt-2 text-xs font-medium leading-5 text-slate-500 sm:text-sm">
+    <div className="grid min-w-0 place-items-center px-2 py-4 text-center sm:px-4">
+      <p className="text-[0.7rem] font-medium leading-5 text-slate-500 sm:text-xs">
         {label}
       </p>
-      <p className="mt-1 break-all text-xl font-bold tabular-nums text-slate-950 sm:text-2xl">
-        {value}
-      </p>
+      <div className="mt-1 flex min-w-0 items-center justify-center gap-1.5">
+        <Icon aria-hidden="true" className="shrink-0 text-teal-700" size={19} />
+        <p className="whitespace-nowrap text-lg font-bold tabular-nums text-slate-950 sm:text-2xl">
+          {value}
+        </p>
+      </div>
     </div>
   )
 }
 
 function WeeklyActivity({
   language,
-  onRangeChange,
   range,
-  sessions
+  sessions,
+  today
 }: {
   language: 'th' | 'en'
-  onRangeChange: (range: (typeof ranges)[number]) => void
-  range: (typeof ranges)[number]
+  range: number
   sessions: ExerciseSession[]
+  today: Date
 }) {
   const { t } = useTranslation()
-  const maximum = Math.max(
-    ...sessions.map(({ elapsed_seconds }) => elapsed_seconds),
-    1
+  const points = useMemo(
+    () => buildChartPoints(sessions, range, today),
+    [range, sessions, today]
   )
+  const maximum = Math.max(...points.map(({ seconds }) => seconds), 1)
 
   return (
     <article className="kg-card p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
-            <BarChart3 aria-hidden="true" size={20} />
-          </span>
-          <h2 className="text-xl font-bold text-slate-950">
+          <BarChart3 aria-hidden="true" className="text-teal-700" size={21} />
+          <h2 className="text-lg font-bold text-slate-950 sm:text-xl">
             {t('dashboard.weekly')}
           </h2>
-        </div>
-        <div
-          aria-label={t('dashboard.range')}
-          className="grid grid-cols-3 overflow-hidden rounded-xl border border-slate-200"
-          role="group"
-        >
-          {ranges.map((value) => (
-            <button
-              aria-pressed={range === value}
-              className={`min-h-10 border-r border-slate-200 px-3 text-sm font-semibold last:border-r-0 ${range === value ? 'bg-teal-700 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-              key={value}
-              onClick={() => onRangeChange(value)}
-              type="button"
-            >
-              {t('dashboard.rangeDays', { count: value })}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -272,46 +263,100 @@ function WeeklyActivity({
             count: sessions.length,
             range
           })}
-          className="mt-7 flex h-52 items-end gap-3 border-b border-slate-200 px-1"
+          className="relative mt-6 h-56"
           role="img"
         >
-          {sessions
-            .slice(0, 7)
-            .reverse()
-            .map((session) => (
-              <div
-                className="flex h-full min-w-0 flex-1 flex-col justify-end text-center"
-                key={session.id}
-              >
-                <span className="text-xs font-semibold tabular-nums text-slate-700">
-                  {Math.max(1, Math.round(session.elapsed_seconds / 60))}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-2 bottom-12 flex flex-col justify-between"
+          >
+            {[60, 40, 20, 0].map((value) => (
+              <span className="flex items-center gap-2" key={value}>
+                <span className="w-6 text-right text-[0.65rem] tabular-nums text-slate-400">
+                  {value}
                 </span>
-                <span
-                  aria-hidden="true"
-                  className="mx-auto mt-1 w-full max-w-8 rounded-t-md bg-teal-700"
-                  style={{
-                    height: `${Math.max(12, (session.elapsed_seconds / maximum) * 78)}%`
-                  }}
-                />
-                <span className="mt-2 truncate text-xs text-slate-500">
-                  {new Intl.DateTimeFormat(
-                    language === 'th' ? 'th-TH' : 'en-GB',
-                    { weekday: 'short', day: 'numeric' }
-                  ).format(new Date(session.started_at))}
-                </span>
-              </div>
+                <span className="h-px flex-1 border-t border-dashed border-slate-200" />
+              </span>
             ))}
+          </div>
+          <div className="absolute inset-x-8 top-2 bottom-0 flex items-end gap-2 sm:gap-4">
+            {points.map((point) => {
+              const minutes = Math.round(point.seconds / 60)
+              const height =
+                point.seconds === 0
+                  ? '0%'
+                  : `${Math.max(12, (point.seconds / maximum) * 84)}%`
+
+              return (
+                <div
+                  className="flex h-full min-w-0 flex-1 flex-col justify-end text-center"
+                  key={point.startedAt.toISOString()}
+                >
+                  <div className="flex min-h-40 flex-1 flex-col justify-end">
+                    {point.seconds > 0 && (
+                      <span className="mb-1 text-[0.7rem] font-semibold tabular-nums text-slate-700">
+                        {minutes}
+                      </span>
+                    )}
+                    <span
+                      aria-hidden="true"
+                      className="mx-auto w-full max-w-8 rounded-t bg-teal-700"
+                      style={{ height }}
+                    />
+                  </div>
+                  <span className="mt-2 truncate text-[0.7rem] font-medium text-slate-600">
+                    {new Intl.DateTimeFormat(
+                      language === 'th' ? 'th-TH' : 'en-GB',
+                      { weekday: 'narrow' }
+                    ).format(point.startedAt)}
+                  </span>
+                  <span className="truncate text-[0.65rem] text-slate-400">
+                    {new Intl.DateTimeFormat(
+                      language === 'th' ? 'th-TH' : 'en-GB',
+                      { day: 'numeric', month: 'short' }
+                    ).format(point.startedAt)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
       ) : (
-        <div className="grid min-h-52 place-items-center text-center text-sm text-slate-500">
+        <div className="grid min-h-56 place-items-center text-center text-sm text-slate-500">
           {t('dashboard.noRecent')}
         </div>
       )}
-      <p className="mt-4 text-xs leading-5 text-slate-500">
+      <p className="mt-3 text-xs leading-5 text-slate-500">
         {t('dashboard.manual')}
       </p>
     </article>
   )
+}
+
+function buildChartPoints(
+  sessions: ExerciseSession[],
+  range: number,
+  today: Date
+) {
+  const end = new Date(today)
+  end.setHours(24, 0, 0, 0)
+  const start = new Date(end.getTime() - range * dayInMilliseconds)
+  const bucketDuration = (range * dayInMilliseconds) / 7
+  const points = Array.from({ length: 7 }, (_, index) => ({
+    seconds: 0,
+    startedAt: new Date(start.getTime() + index * bucketDuration)
+  }))
+
+  sessions.forEach((session) => {
+    const startedAt = new Date(session.started_at).getTime()
+    const bucket = Math.min(
+      6,
+      Math.floor((startedAt - start.getTime()) / bucketDuration)
+    )
+    if (bucket >= 0) points[bucket].seconds += session.elapsed_seconds
+  })
+
+  return points
 }
 
 function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
@@ -320,7 +365,7 @@ function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
   return (
     <article className="kg-card p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-slate-950">
+        <h2 className="text-lg font-bold text-slate-950 sm:text-xl">
           {t('dashboard.recent')}
         </h2>
         <Link
@@ -331,31 +376,39 @@ function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
           <ArrowRight aria-hidden="true" size={16} />
         </Link>
       </div>
-      <div className="mt-3 divide-y divide-slate-100">
+      <div className="mt-2 divide-y divide-slate-100">
         {sessions.slice(0, 4).map((session) => (
           <Link
-            className="flex min-h-16 items-center gap-3 rounded-xl px-1 py-3 no-underline hover:bg-slate-50 sm:px-2"
+            className="flex min-h-[4.75rem] items-center gap-3 rounded-xl px-1 py-3 no-underline hover:bg-slate-50 sm:px-2"
             key={session.id}
             to={`/app/sessions/${session.id}/summary`}
           >
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
-              <CheckCircle2 aria-hidden="true" size={18} />
+            <span className="size-11 shrink-0 overflow-hidden rounded-full bg-teal-50 ring-1 ring-inset ring-teal-100">
+              <img
+                alt=""
+                className="h-full w-full object-cover"
+                decoding="async"
+                loading="lazy"
+                src={illustrationPath}
+              />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold text-slate-900">
-                {session.exercise_slug}
+                {session.exercise_slug === 'sit-to-stand-demo'
+                  ? t('dashboard.todayName')
+                  : session.exercise_slug}
               </span>
-              <span className="mt-0.5 block text-xs text-slate-500 sm:text-sm">
+              <span className="mt-0.5 block text-xs text-slate-500">
                 {formatDate(session.started_at, i18n.resolvedLanguage ?? 'th')}
               </span>
             </span>
-            <span className="hidden text-sm tabular-nums text-slate-500 sm:block">
+            <span className="text-xs tabular-nums text-slate-500 sm:text-sm">
               {formatDuration(session.elapsed_seconds)}
             </span>
             <ArrowRight
               aria-hidden="true"
               className="shrink-0 text-slate-400"
-              size={17}
+              size={16}
             />
           </Link>
         ))}

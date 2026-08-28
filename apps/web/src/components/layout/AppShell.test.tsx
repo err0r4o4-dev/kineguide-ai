@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
+import { QueryError } from '@/components/QueryState'
 import i18n from '@/lib/i18n'
 import { AppShell } from './AppShell'
 
@@ -77,7 +78,7 @@ describe('AppShell', () => {
     ).toBeInTheDocument()
     expect(
       screen.getByRole('menuitem', {
-        name: 'การแจ้งเตือน 3 รายการยังไม่ได้อ่าน'
+        name: 'การแจ้งเตือน 0 รายการยังไม่ได้อ่าน'
       })
     ).toHaveAttribute('href', '/app/notifications')
     expect(
@@ -93,7 +94,7 @@ describe('AppShell', () => {
     ).toHaveFocus()
   })
 
-  it('shows the unread notification count on the account menu button', async () => {
+  it('does not claim unread notifications when no event source is connected', async () => {
     await i18n.changeLanguage('th')
     render(
       <MemoryRouter initialEntries={['/app']}>
@@ -106,13 +107,33 @@ describe('AppShell', () => {
     )
 
     const accountButton = screen.getAllByRole('button', {
-      name: 'เมนูบัญชี มีการแจ้งเตือนที่ยังไม่ได้อ่าน 3 รายการ'
+      name: 'เมนูบัญชี'
     })[0]
 
-    expect(accountButton).toHaveTextContent('3')
+    expect(accountButton).not.toHaveTextContent('3')
     expect(
       within(accountButton).getByTestId('account-notification-bell')
     ).toBeInTheDocument()
+  })
+
+  it('identifies the active destination in the account menu', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/app/settings']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route element={<h1>การตั้งค่า</h1>} path="settings" />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0])
+
+    expect(
+      screen.getByRole('menuitem', { name: 'ตั้งค่าและความเป็นส่วนตัว' })
+    ).toHaveAttribute('aria-current', 'page')
   })
 
   it('uses one menu toggle and dismisses the mobile navigation with Escape', async () => {
@@ -138,5 +159,47 @@ describe('AppShell', () => {
 
     expect(menuButton).toHaveAttribute('aria-expanded', 'false')
     expect(menuButton).toHaveFocus()
+  })
+
+  it('replaces the entire shell when route data cannot be loaded', async () => {
+    await i18n.changeLanguage('th')
+    const retry = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/app']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route
+              index
+              element={
+                <>
+                  <h1>เนื้อหาหน้าหลักเดิม</h1>
+                  <QueryError retry={retry} />
+                </>
+              }
+            />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'ไม่สามารถโหลดข้อมูลได้' })
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('navigation', { name: 'เมนูหลัก' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^เมนูบัญชี/ })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('เนื้อหาหน้าหลักเดิม')).not.toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: 'ลองอีกครั้ง' }))
+    expect(retry).toHaveBeenCalledOnce()
+    expect(screen.getByRole('link', { name: 'กลับหน้าหลัก' })).toHaveAttribute(
+      'href',
+      '/'
+    )
   })
 })

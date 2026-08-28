@@ -356,6 +356,67 @@ func (p *Postgres) LatestAssessment(ctx context.Context, userID string) (product
 	return assessment, mapError(err)
 }
 
+func (p *Postgres) SaveHealthProfile(ctx context.Context, profile product.HealthProfile) (product.HealthProfile, error) {
+	err := p.pool.QueryRow(ctx, `
+		INSERT INTO health_profiles
+			(user_id, birth_date, sex, height_cm, weight_kg, track_weight, care_areas,
+			 recent_injury, clinician_managed, assistive_device, warning_signs, goals,
+			 activity_level, preferred_time, equipment, camera_preference, activity_notifications, notes, consent_version)
+		VALUES ($1, $2::date, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+		ON CONFLICT (user_id) DO UPDATE SET
+			birth_date = EXCLUDED.birth_date, sex = EXCLUDED.sex,
+			height_cm = EXCLUDED.height_cm, weight_kg = EXCLUDED.weight_kg,
+			track_weight = EXCLUDED.track_weight, care_areas = EXCLUDED.care_areas,
+			recent_injury = EXCLUDED.recent_injury, clinician_managed = EXCLUDED.clinician_managed,
+			assistive_device = EXCLUDED.assistive_device, warning_signs = EXCLUDED.warning_signs,
+			goals = EXCLUDED.goals, activity_level = EXCLUDED.activity_level,
+			preferred_time = EXCLUDED.preferred_time, equipment = EXCLUDED.equipment,
+			camera_preference = EXCLUDED.camera_preference, activity_notifications = EXCLUDED.activity_notifications,
+			notes = EXCLUDED.notes,
+			consent_version = EXCLUDED.consent_version, consented_at = now(), updated_at = now(),
+			retention_until = now() + interval '365 days'
+		RETURNING id::text, user_id::text, birth_date::text, sex, height_cm, weight_kg,
+		          track_weight, care_areas, recent_injury, clinician_managed, assistive_device,
+		          warning_signs, goals, activity_level, preferred_time, equipment,
+		          camera_preference, activity_notifications, notes, status, consent_version, consented_at,
+		          created_at, updated_at, retention_until`,
+		profile.UserID, profile.BirthDate, profile.Sex, profile.HeightCM, profile.WeightKG,
+		profile.TrackWeight, profile.CareAreas, profile.RecentInjury, profile.ClinicianManaged,
+		profile.AssistiveDevice, profile.WarningSigns, profile.Goals, profile.ActivityLevel,
+		profile.PreferredTime, profile.Equipment, profile.CameraPreference, profile.ActivityNotifications, profile.Notes,
+		profile.ConsentVersion).
+		Scan(&profile.ID, &profile.UserID, &profile.BirthDate, &profile.Sex, &profile.HeightCM,
+			&profile.WeightKG, &profile.TrackWeight, &profile.CareAreas, &profile.RecentInjury,
+			&profile.ClinicianManaged, &profile.AssistiveDevice, &profile.WarningSigns,
+			&profile.Goals, &profile.ActivityLevel, &profile.PreferredTime, &profile.Equipment,
+			&profile.CameraPreference, &profile.ActivityNotifications, &profile.Notes, &profile.Status, &profile.ConsentVersion,
+			&profile.ConsentedAt, &profile.CreatedAt, &profile.UpdatedAt, &profile.RetentionUntil)
+	return profile, mapError(err)
+}
+
+func (p *Postgres) HealthProfile(ctx context.Context, userID string) (product.HealthProfile, error) {
+	var profile product.HealthProfile
+	err := p.pool.QueryRow(ctx, `
+		SELECT id::text, user_id::text, birth_date::text, sex, height_cm, weight_kg,
+		       track_weight, care_areas, recent_injury, clinician_managed, assistive_device,
+		       warning_signs, goals, activity_level, preferred_time, equipment,
+		       camera_preference, activity_notifications, notes, status, consent_version, consented_at,
+		       created_at, updated_at, retention_until
+		FROM health_profiles WHERE user_id = $1`, userID).
+		Scan(&profile.ID, &profile.UserID, &profile.BirthDate, &profile.Sex, &profile.HeightCM,
+			&profile.WeightKG, &profile.TrackWeight, &profile.CareAreas, &profile.RecentInjury,
+			&profile.ClinicianManaged, &profile.AssistiveDevice, &profile.WarningSigns,
+			&profile.Goals, &profile.ActivityLevel, &profile.PreferredTime, &profile.Equipment,
+			&profile.CameraPreference, &profile.ActivityNotifications, &profile.Notes, &profile.Status, &profile.ConsentVersion,
+			&profile.ConsentedAt, &profile.CreatedAt, &profile.UpdatedAt, &profile.RetentionUntil)
+	return profile, mapError(err)
+}
+
+func (p *Postgres) DeleteHealthProfile(ctx context.Context, userID string) error {
+	_, err := p.pool.Exec(ctx, `DELETE FROM health_profiles WHERE user_id = $1`, userID)
+	return err
+}
+
 func (p *Postgres) CreateSession(ctx context.Context, session product.Session) (product.Session, error) {
 	err := p.pool.QueryRow(ctx, `
 		INSERT INTO exercise_sessions (user_id, exercise_slug, camera_used)

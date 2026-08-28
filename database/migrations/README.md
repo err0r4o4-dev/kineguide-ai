@@ -7,3 +7,5 @@ Migration `000003` stores only the provider name and provider-scoped subject nee
 Migration `000004` adds explicit AI-chat storage consent plus account-owned conversations and messages. Conversation rows cascade from account deletion, expire after 30 days, and are removed by the Go API retention worker. Python and the browser never receive database access.
 
 Migration `000005` changes AI-chat retention to `until_deleted`, removes automatic chat expiry fields, and keeps physical deletion through the existing account and conversation cascades. Its down migration restores a 30-day deadline without deleting rows during rollback. Python and the browser still never receive database access.
+
+Migration `000006` adds one account-owned health profile containing the bounded fields collected by first-login onboarding. The record stores `health-profile-v1` consent, uses a 365-day retention deadline, and is removed by explicit profile deletion or the existing account cascade. Values remain self-reported and `captured_not_evaluated`; they are not sent to the AI service or used to select activities.

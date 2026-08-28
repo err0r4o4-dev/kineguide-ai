@@ -93,7 +93,7 @@ describe('ConsentPage language selector', () => {
     })
   })
 
-  it('opens the app dashboard after consent is saved', async () => {
+  it('opens health-profile setup after consent is saved', async () => {
     const user = userEvent.setup()
     vi.mocked(product.saveConsent).mockResolvedValue({
       camera_processing: true,
@@ -114,7 +114,7 @@ describe('ConsentPage language selector', () => {
         <MemoryRouter initialEntries={['/consent']}>
           <Routes>
             <Route path="/consent" element={<ConsentPage />} />
-            <Route path="/app" element={<h1>แดชบอร์ด</h1>} />
+            <Route path="/onboarding" element={<h1>ตั้งค่าโปรไฟล์สุขภาพ</h1>} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -128,7 +128,7 @@ describe('ConsentPage language selector', () => {
     )
 
     expect(
-      await screen.findByRole('heading', { name: 'แดชบอร์ด' })
+      await screen.findByRole('heading', { name: 'ตั้งค่าโปรไฟล์สุขภาพ' })
     ).toBeInTheDocument()
   })
 })

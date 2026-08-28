@@ -55,25 +55,6 @@ export function PlanPage() {
 
   return (
     <div>
-      <div
-        className="mb-8 inline-flex gap-1 rounded-xl border border-slate-200 bg-white p-1"
-        role="tablist"
-        aria-label={t('nav.plan')}
-      >
-        <Link
-          aria-current="page"
-          className="rounded-lg bg-teal-50 px-4 py-2.5 text-sm font-bold text-teal-800 no-underline"
-          to="/app/plan"
-        >
-          {t('plan.title')}
-        </Link>
-        <Link
-          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 no-underline hover:bg-slate-50"
-          to="/app/exercises"
-        >
-          {t('exercises.title')}
-        </Link>
-      </div>
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div>
           <div className="flex items-center gap-3">

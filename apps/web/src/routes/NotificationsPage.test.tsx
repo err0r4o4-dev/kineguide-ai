@@ -7,9 +7,8 @@ import i18n from '@/lib/i18n'
 import { NotificationsPage } from './NotificationsPage'
 
 describe('NotificationsPage', () => {
-  it('filters unread items and marks every notification as read', async () => {
+  it('shows a truthful empty state instead of fabricated runtime events', async () => {
     await i18n.changeLanguage('th')
-    const user = userEvent.setup()
     render(
       <MemoryRouter>
         <NotificationProvider>
@@ -22,17 +21,16 @@ describe('NotificationsPage', () => {
       screen.getByRole('heading', { name: 'การแจ้งเตือน', level: 1 })
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: 'ยังไม่ได้อ่าน 3' })
-    ).toHaveAttribute('aria-pressed', 'false')
-
-    await user.click(screen.getByRole('button', { name: 'ยังไม่ได้อ่าน 3' }))
-    expect(screen.getAllByTestId('notification-item')).toHaveLength(3)
-
-    await user.click(screen.getByRole('button', { name: 'อ่านทั้งหมดแล้ว' }))
-    expect(screen.getByText('ไม่มีการแจ้งเตือนในหมวดนี้')).toBeInTheDocument()
-    expect(
       screen.getByRole('button', { name: 'ยังไม่ได้อ่าน 0' })
-    ).toBeInTheDocument()
+    ).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.queryByTestId('notification-item')).not.toBeInTheDocument()
+    expect(screen.getByText('ยังไม่มีการแจ้งเตือนจริง')).toBeInTheDocument()
+    expect(
+      screen.getByText(/ระบบจะไม่สร้างเหตุการณ์ตัวอย่างแทนข้อมูลจริง/)
+    ).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: 'อ่านทั้งหมดแล้ว' })
+    ).toBeDisabled()
   })
 
   it('lets the user change each notification preference', async () => {
