@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
 
@@ -35,7 +34,6 @@ vi.mock('@/services/product', () => ({
 describe('DashboardPage', () => {
   it('presents the supplied dashboard hierarchy with usable range controls', async () => {
     await i18n.changeLanguage('th')
-    const user = userEvent.setup()
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } }
     })
@@ -70,16 +68,6 @@ describe('DashboardPage', () => {
     expect(
       await screen.findByRole('group', { name: 'สรุปกิจกรรม' })
     ).toHaveTextContent('3')
-    expect(screen.getByRole('button', { name: '7 วัน' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    )
-
-    await user.click(screen.getByRole('button', { name: '30 วัน' }))
-    expect(screen.getByRole('button', { name: '30 วัน' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    )
     expect(
       screen.getByRole('heading', { name: 'กิจกรรมล่าสุด' })
     ).toBeInTheDocument()

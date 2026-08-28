@@ -209,6 +209,124 @@ const th = {
       'ข้อมูลอาการเป็นข้อมูลละเอียดอ่อน คุณสามารถถอน consent และลบบัญชีได้เสมอ',
     failed: 'ไม่สามารถบันทึก consent ได้'
   },
+  healthProfile: {
+    title: 'ตั้งค่าโปรไฟล์สุขภาพ',
+    subtitle:
+      'กรอกข้อมูลเพื่อจัดเก็บให้คุณทบทวนและแก้ไข ข้อมูลนี้ไม่ใช้วินิจฉัย เลือกการรักษา หรือปรับแผนกิจกรรมอัตโนมัติ',
+    progress: 'ขั้นตอนการตั้งค่าโปรไฟล์สุขภาพ',
+    optional: 'ไม่บังคับ — สามารถเลือกไม่ระบุได้',
+    select: 'เลือกคำตอบ',
+    reviewData: 'ตรวจสอบข้อมูล',
+    saveProfile: 'บันทึกโปรไฟล์',
+    saveFailed: 'ไม่สามารถบันทึกโปรไฟล์สุขภาพได้ กรุณาลองอีกครั้ง',
+    privateFooter:
+      'ข้อมูลสุขภาพจะใช้ตามความยินยอมของคุณ เก็บไม่เกิน 365 วัน และคุณสามารถแก้ไขหรือลบได้',
+    steps: {
+      basics: 'ข้อมูลพื้นฐาน',
+      safety: 'สุขภาพและความปลอดภัย',
+      goals: 'เป้าหมาย',
+      review: 'ตรวจสอบ'
+    },
+    basics: {
+      title: 'ข้อมูลพื้นฐาน',
+      body: 'ข้อมูลที่คุณกรอกเองสำหรับแสดงผลและทบทวนในบัญชีนี้',
+      birthDate: 'วัน เดือน ปีเกิด',
+      sex: 'เพศกำเนิด',
+      height: 'ส่วนสูง',
+      weight: 'น้ำหนักปัจจุบัน',
+      trackWeight: 'บันทึกน้ำหนักนี้ไว้ในโปรไฟล์',
+      trackWeightBody: 'ระบบยังไม่สร้างประวัติน้ำหนักหรือแปลผลแนวโน้ม',
+      preview: 'ตัวอย่างข้อมูลที่คำนวณ',
+      age: 'อายุ',
+      previewNotice:
+        'ค่าที่แสดงเป็นการคำนวณทั่วไป ไม่ใช่การวินิจฉัยหรือคำแนะนำทางการแพทย์'
+    },
+    safety: {
+      title: 'สุขภาพและความปลอดภัย',
+      body: 'บันทึกคำตอบที่คุณรายงานเอง ระบบไม่ประเมินความเหมาะสมในการทำกิจกรรม',
+      careAreas: 'บริเวณที่ต้องการดูแล (เลือกได้หลายข้อ)',
+      recentInjury: 'มีการบาดเจ็บหรือผ่าตัดในช่วง 6 เดือนที่ผ่านมา',
+      clinicianManaged: 'เคยให้ผู้เชี่ยวชาญดูแลเรื่องการเคลื่อนไหวนี้หรือไม่',
+      assistiveDevice: 'ใช้อุปกรณ์ช่วยเดินหรือไม่',
+      warningTitle: 'ข้อมูลอาการปัจจุบัน',
+      warningBody: 'เลือกคำตอบที่ตรงกับคุณในขณะนี้',
+      notEvaluated:
+        'ระบบบันทึกคำตอบเท่านั้นและไม่ตัดสินว่าคุณพร้อมทำกิจกรรมหรือไม่ หากกังวลเรื่องอาการ โปรดติดต่อบุคลากรทางการแพทย์'
+    },
+    goals: {
+      title: 'เป้าหมายและรูปแบบการใช้งาน',
+      body: 'เลือกข้อมูลที่ตรงกับคุณ ข้อมูลนี้ยังไม่ถูกนำไปสร้างแผนเฉพาะบุคคล',
+      yourGoals: 'เป้าหมายของคุณ',
+      activityLevel: 'ระดับกิจกรรมปัจจุบัน',
+      preferredTime: 'เวลาที่สะดวก',
+      equipment: 'อุปกรณ์ที่มี',
+      camera: 'การใช้งานกล้อง',
+      notes: 'สิ่งที่ต้องการให้ระบบบันทึกไว้',
+      notesPlaceholder:
+        'เช่น ข้อจำกัดด้านเวลา การเข้าถึง หรือข้อมูลที่ต้องการจำไว้'
+    },
+    review: {
+      title: 'ตรวจสอบข้อมูล',
+      body: 'ตรวจสอบก่อนบันทึก คุณสามารถกลับไปแก้ไขแต่ละส่วนได้',
+      edit: 'แก้ไข',
+      consentTitle: 'ความยินยอมและความเป็นส่วนตัว',
+      storageConsent: 'ฉันยินยอมให้จัดเก็บข้อมูลโปรไฟล์สุขภาพในบัญชีนี้',
+      retention:
+        'จัดเก็บไม่เกิน 365 วัน และลบก่อนกำหนดได้โดยลบโปรไฟล์หรือลบบัญชี',
+      noDiagnosisConsent:
+        'ฉันเข้าใจว่าข้อมูลนี้ไม่ผ่านการวินิจฉัยหรือประเมินโดยระบบ',
+      noPersonalization:
+        'ข้อมูลจะไม่ถูกส่งให้ AI และยังไม่ใช้เลือกหรือปรับแผนกิจกรรม',
+      notifications: 'การแจ้งเตือนกิจกรรม',
+      notificationsBody:
+        'บันทึกความต้องการไว้ก่อน ระบบยังไม่ขอสิทธิ์เบราว์เซอร์หรือส่งการแจ้งเตือนจริง'
+    },
+    validation: {
+      required: 'กรุณากรอกหรือเลือกคำตอบในช่องนี้',
+      consent: 'กรุณายืนยันทั้งสองข้อก่อนบันทึก'
+    },
+    units: {
+      cm: 'ซม.',
+      kg: 'กก.',
+      yearsValue: '{{value}} ปี'
+    },
+    options: {
+      female: 'หญิง',
+      male: 'ชาย',
+      unspecified: 'ไม่ประสงค์ระบุ',
+      lower_back: 'หลังส่วนล่าง',
+      knee: 'เข่า',
+      shoulder: 'หัวไหล่',
+      general_mobility: 'การเคลื่อนไหวทั่วไป',
+      prefer_not_to_say: 'ไม่ประสงค์ระบุบริเวณ',
+      none: 'ไม่มี',
+      cane: 'ไม้เท้า',
+      walker: 'อุปกรณ์ช่วยเดิน',
+      wheelchair: 'รถเข็น',
+      other: 'อื่น ๆ',
+      chest_pain: 'เจ็บหน้าอก',
+      shortness_of_breath: 'หายใจลำบาก',
+      dizziness_or_fainting: 'เวียนศีรษะหรือเป็นลม',
+      weakness_or_severe_fatigue: 'อ่อนแรงหรืออ่อนล้ามาก',
+      severe_pain: 'ปวดรุนแรง',
+      strength: 'เพิ่มความแข็งแรง',
+      balance_fall_prevention: 'ฝึกสมดุลและการป้องกันการล้ม',
+      flexibility: 'เพิ่มความยืดหยุ่น',
+      daily_activity: 'การเคลื่อนไหวในชีวิตประจำวัน',
+      progress: 'ติดตามกิจกรรมของฉัน',
+      low: 'น้อย',
+      moderate: 'ปานกลาง',
+      regular: 'สม่ำเสมอ',
+      morning: 'เช้า',
+      afternoon: 'กลางวัน',
+      evening: 'เย็น',
+      chair: 'เก้าอี้',
+      mat: 'เสื่อ',
+      resistance_band: 'ยางยืด',
+      front: 'กล้องหน้า — ตั้งอุปกรณ์ไว้ด้านหน้า',
+      rear: 'กล้องหลัง — ใช้เมื่ออุปกรณ์รองรับ'
+    }
+  },
   chat: {
     title: 'ผู้ช่วย KineGuide AI',
     subtitle:
@@ -378,7 +496,15 @@ const th = {
     subtitle: 'ข้อมูลบัญชีพื้นฐาน',
     name: 'ชื่อที่ใช้แสดง',
     email: 'อีเมล',
-    joined: 'สร้างบัญชีเมื่อ'
+    joined: 'สร้างบัญชีเมื่อ',
+    healthTitle: 'โปรไฟล์สุขภาพ',
+    healthBody:
+      'ทบทวน แก้ไข หรือลบข้อมูลสุขภาพที่คุณกรอกไว้ ข้อมูลนี้ไม่ใช้วินิจฉัยหรือสร้างแผนเฉพาะบุคคล',
+    healthEdit: 'ทบทวนและแก้ไข',
+    healthDelete: 'ลบโปรไฟล์สุขภาพ',
+    healthDeleteConfirm:
+      'ลบข้อมูลโปรไฟล์สุขภาพทั้งหมดออกจากบัญชีนี้หรือไม่? การดำเนินการนี้ย้อนกลับไม่ได้',
+    healthDeleteFailed: 'ไม่สามารถลบโปรไฟล์สุขภาพได้ กรุณาลองอีกครั้ง'
   },
   settings: {
     title: 'ตั้งค่าและความเป็นส่วนตัว',
@@ -640,6 +766,126 @@ const en: typeof th = {
       'Symptom data is sensitive. You may withdraw consent and delete your account at any time.',
     failed: 'Unable to save consent.'
   },
+  healthProfile: {
+    title: 'Set up your health profile',
+    subtitle:
+      'Enter information for you to review and correct. It is not used to diagnose, choose treatment, or automatically personalize an activity plan.',
+    progress: 'Health-profile setup progress',
+    optional: 'Optional — prefer not to say is available',
+    select: 'Choose an answer',
+    reviewData: 'Review information',
+    saveProfile: 'Save profile',
+    saveFailed: 'Unable to save your health profile. Please try again.',
+    privateFooter:
+      'Health information is used under your consent, retained for no more than 365 days, and can be corrected or deleted.',
+    steps: {
+      basics: 'Basic information',
+      safety: 'Health and safety',
+      goals: 'Goals',
+      review: 'Review'
+    },
+    basics: {
+      title: 'Basic information',
+      body: 'Self-reported information displayed for review in this account.',
+      birthDate: 'Date of birth',
+      sex: 'Sex at birth',
+      height: 'Height',
+      weight: 'Current weight',
+      trackWeight: 'Keep this weight in my profile',
+      trackWeightBody: 'No weight history or trend interpretation is created.',
+      preview: 'Calculated information preview',
+      age: 'Age',
+      previewNotice:
+        'Displayed values are general calculations, not a diagnosis or medical advice.'
+    },
+    safety: {
+      title: 'Health and safety',
+      body: 'Store your self-reported answers. The system does not assess activity suitability.',
+      careAreas: 'Areas you want to care for (select all that apply)',
+      recentInjury: 'Injury or surgery in the past 6 months',
+      clinicianManaged:
+        'Has a professional managed this movement concern before?',
+      assistiveDevice: 'Do you use a mobility aid?',
+      warningTitle: 'Current symptom information',
+      warningBody: 'Choose the answers that match you right now.',
+      notEvaluated:
+        'The system only stores these answers and does not decide whether you are ready for activity. Contact a qualified clinician if you are concerned.'
+    },
+    goals: {
+      title: 'Goals and usage preferences',
+      body: 'Choose what fits you. This information is not yet used to create a personalized plan.',
+      yourGoals: 'Your goals',
+      activityLevel: 'Current activity level',
+      preferredTime: 'Convenient time',
+      equipment: 'Available equipment',
+      camera: 'Camera use',
+      notes: 'Information you want the system to remember',
+      notesPlaceholder:
+        'For example, time, accessibility, or context you want to remember'
+    },
+    review: {
+      title: 'Review your information',
+      body: 'Check before saving. You can return to edit each section.',
+      edit: 'Edit',
+      consentTitle: 'Consent and privacy',
+      storageConsent:
+        'I consent to storing this health-profile information in my account.',
+      retention:
+        'Retained for up to 365 days and removable earlier by deleting the profile or account.',
+      noDiagnosisConsent:
+        'I understand that the system does not diagnose or evaluate this information.',
+      noPersonalization:
+        'The data is not sent to AI and is not yet used to choose or personalize activities.',
+      notifications: 'Activity notifications',
+      notificationsBody:
+        'Save this preference only. The system does not request browser permission or send notifications yet.'
+    },
+    validation: {
+      required: 'Enter or choose an answer for this field.',
+      consent: 'Confirm both statements before saving.'
+    },
+    units: {
+      cm: 'cm',
+      kg: 'kg',
+      yearsValue: '{{value}} years'
+    },
+    options: {
+      female: 'Female',
+      male: 'Male',
+      unspecified: 'Prefer not to say',
+      lower_back: 'Lower back',
+      knee: 'Knee',
+      shoulder: 'Shoulder',
+      general_mobility: 'General mobility',
+      prefer_not_to_say: 'Prefer not to name an area',
+      none: 'None',
+      cane: 'Cane',
+      walker: 'Walker',
+      wheelchair: 'Wheelchair',
+      other: 'Other',
+      chest_pain: 'Chest pain',
+      shortness_of_breath: 'Shortness of breath',
+      dizziness_or_fainting: 'Dizziness or fainting',
+      weakness_or_severe_fatigue: 'Weakness or severe fatigue',
+      severe_pain: 'Severe pain',
+      strength: 'Increase strength',
+      balance_fall_prevention: 'Balance and fall prevention',
+      flexibility: 'Improve flexibility',
+      daily_activity: 'Daily movement',
+      progress: 'Track my activity',
+      low: 'Low',
+      moderate: 'Moderate',
+      regular: 'Regular',
+      morning: 'Morning',
+      afternoon: 'Afternoon',
+      evening: 'Evening',
+      chair: 'Chair',
+      mat: 'Mat',
+      resistance_band: 'Resistance band',
+      front: 'Front camera — device placed in front',
+      rear: 'Rear camera — where supported'
+    }
+  },
   chat: {
     title: 'KineGuide AI assistant',
     subtitle:
@@ -811,7 +1057,15 @@ const en: typeof th = {
     subtitle: 'Basic account information',
     name: 'Display name',
     email: 'Email',
-    joined: 'Joined'
+    joined: 'Joined',
+    healthTitle: 'Health profile',
+    healthBody:
+      'Review, correct, or delete your self-reported health information. It is not used to diagnose or create a personalized plan.',
+    healthEdit: 'Review and edit',
+    healthDelete: 'Delete health profile',
+    healthDeleteConfirm:
+      'Delete all health-profile information from this account? This cannot be undone.',
+    healthDeleteFailed: 'Unable to delete the health profile. Please try again.'
   },
   settings: {
     title: 'Settings and privacy',

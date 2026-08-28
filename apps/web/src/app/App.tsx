@@ -8,6 +8,7 @@ import { PwaUpdateNotice } from '@/components/PwaUpdateNotice'
 import { SystemLoading } from '@/components/SystemState'
 import { AuthProvider } from '@/features/auth/AuthProvider'
 import { ConsentRoute } from '@/features/auth/ConsentRoute'
+import { HealthProfileRoute } from '@/features/auth/HealthProfileRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { finishRouteRefresh, isRouteRefresh } from '@/lib/navigation'
 import { NotFoundPage } from '@/routes/NotFoundPage'
@@ -33,6 +34,11 @@ const StatusPage = lazy(() =>
 const ConsentPage = lazy(() =>
   import('@/routes/ConsentPage').then((module) => ({
     default: module.ConsentPage
+  }))
+)
+const HealthProfileOnboardingPage = lazy(() =>
+  import('@/routes/HealthProfileOnboardingPage').then((module) => ({
+    default: module.HealthProfileOnboardingPage
   }))
 )
 const DashboardPage = lazy(() =>
@@ -117,29 +123,41 @@ const router = createBrowserRouter([
         element: <ConsentRoute />,
         children: [
           {
-            path: '/app',
-            element: <AppShell />,
+            path: '/onboarding',
+            element: <HealthProfileOnboardingPage />
+          },
+          {
+            element: <HealthProfileRoute />,
             children: [
-              { index: true, element: <DashboardPage /> },
-              { path: 'chat', element: <ChatPage /> },
-              { path: 'plan', element: <PlanPage /> },
-              { path: 'exercises', element: <ExerciseLibraryPage /> },
-              { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
-              { path: 'exercises/:slug/setup', element: <CameraSetupPage /> },
-              { path: 'sessions/:id/live', element: <LiveSessionPage /> },
               {
-                path: 'sessions/:id/summary',
-                element: <SessionSummaryPage />
-              },
-              {
-                path: 'history',
-                element: <Navigate replace to="/app/progress" />
-              },
-              { path: 'progress', element: <ProgressPage /> },
-              { path: 'profile', element: <ProfilePage /> },
-              { path: 'notifications', element: <NotificationsPage /> },
-              { path: 'settings', element: <SettingsPage /> },
-              { path: 'help', element: <HelpPage /> }
+                path: '/app',
+                element: <AppShell />,
+                children: [
+                  { index: true, element: <DashboardPage /> },
+                  { path: 'chat', element: <ChatPage /> },
+                  { path: 'plan', element: <PlanPage /> },
+                  { path: 'exercises', element: <ExerciseLibraryPage /> },
+                  { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
+                  {
+                    path: 'exercises/:slug/setup',
+                    element: <CameraSetupPage />
+                  },
+                  { path: 'sessions/:id/live', element: <LiveSessionPage /> },
+                  {
+                    path: 'sessions/:id/summary',
+                    element: <SessionSummaryPage />
+                  },
+                  {
+                    path: 'history',
+                    element: <Navigate replace to="/app/progress" />
+                  },
+                  { path: 'progress', element: <ProgressPage /> },
+                  { path: 'profile', element: <ProfilePage /> },
+                  { path: 'notifications', element: <NotificationsPage /> },
+                  { path: 'settings', element: <SettingsPage /> },
+                  { path: 'help', element: <HelpPage /> }
+                ]
+              }
             ]
           }
         ]

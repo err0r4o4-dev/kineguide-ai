@@ -17,6 +17,8 @@ tags:
     description: Versioned consent records and withdrawal.
   - name: Assessment
     description: Bounded structured answers without clinical interpretation.
+  - name: Health Profile
+    description: Account-owned self-reported profile data stored without clinical interpretation.
   - name: Exercises
     description: Non-prescriptive movement demos pending clinical review.
   - name: Sessions
@@ -311,6 +313,53 @@ paths:
             application/json: { schema: { $ref: "#/components/schemas/Assessment" } }
         "403": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+  /v1/health-profile:
+    get:
+      operationId: getHealthProfile
+      tags: [Health Profile]
+      summary: Get the authenticated account's health profile
+      description: Returns the latest account-owned profile or null. Values are self-reported and are not a diagnosis, eligibility decision, or treatment recommendation.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Account-owned health profile or null.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [profile]
+                properties:
+                  profile: { anyOf: [{ $ref: "#/components/schemas/HealthProfile" }, { type: "null" }] }
+        "401": { $ref: "#/components/responses/Error" }
+    put:
+      operationId: putHealthProfile
+      tags: [Health Profile]
+      summary: Create or replace the authenticated account's health profile
+      description: Idempotently stores bounded self-reported values for 365 days under health-profile-v1 consent. The profile is not used to personalize the current demo plan or make clinical decisions.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/HealthProfileRequest" }
+      responses:
+        "200":
+          description: Profile created or replaced without evaluation.
+          content:
+            application/json: { schema: { $ref: "#/components/schemas/HealthProfile" } }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteHealthProfile
+      tags: [Health Profile]
+      summary: Delete the authenticated account's health profile
+      description: Idempotently removes the account-owned profile before its retention deadline.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Profile removed or already absent. }
+        "401": { $ref: "#/components/responses/Error" }
   /v1/exercises:
     get:
       operationId: listMovementDemos
@@ -686,6 +735,76 @@ components:
         goal: { type: string, enum: [understand, camera_demo, track_activity] }
         status: { type: string, const: captured_not_evaluated }
         created_at: { type: string, format: date-time }
+        retention_until: { type: string, format: date-time }
+    HealthProfileRequest:
+      type: object
+      additionalProperties: false
+      required: [birth_date, sex, height_cm, weight_kg, track_weight, care_areas, recent_injury, clinician_managed, assistive_device, warning_signs, goals, activity_level, preferred_time, equipment, camera_preference, activity_notifications, notes, profile_storage_consent]
+      properties:
+        birth_date: { type: string, format: date, description: Self-reported birth date used to display age only. }
+        sex: { type: string, enum: [female, male, unspecified], description: Optional self-description; unspecified is always available. }
+        height_cm: { type: number, exclusiveMinimum: 0, maximum: 300, description: Self-reported height in centimetres. }
+        weight_kg: { type: number, exclusiveMinimum: 0, maximum: 500, description: Self-reported weight in kilograms. }
+        track_weight: { type: boolean, description: Preference to keep the current weight available for later review; no weight-history series is created. }
+        care_areas:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, enum: [lower_back, knee, shoulder, general_mobility, prefer_not_to_say] }
+        recent_injury: { type: boolean, description: Self-reported recent injury; not interpreted by the API. }
+        clinician_managed: { type: boolean, description: Whether a professional has previously managed the user's movement concern. }
+        assistive_device: { type: string, enum: [none, cane, walker, wheelchair, other] }
+        warning_signs:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: Self-reported current concerns. `none` must not be combined with another value; the API stores but does not interpret these answers.
+          items: { type: string, enum: [chest_pain, shortness_of_breath, dizziness_or_fainting, weakness_or_severe_fatigue, severe_pain, none] }
+        goals:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, enum: [strength, balance_fall_prevention, flexibility, daily_activity, progress] }
+        activity_level: { type: string, enum: [low, moderate, regular] }
+        preferred_time: { type: string, enum: [morning, afternoon, evening] }
+        equipment:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: "`none` must not be combined with another value."
+          items: { type: string, enum: [chair, mat, resistance_band, none] }
+        camera_preference: { type: string, enum: [front, rear], description: Browser-camera facing preference only; no media is uploaded or stored. }
+        activity_notifications: { type: boolean, description: Stored notification preference only; saving it does not request browser permission or schedule a notification. }
+        notes: { type: string, maxLength: 300, description: Optional user-entered context. This may contain health information and is never sent to the AI service. }
+        profile_storage_consent: { type: boolean, const: true, description: Explicit health-profile-v1 consent to retain this account-owned profile for up to 365 days. }
+    HealthProfile:
+      type: object
+      additionalProperties: false
+      required: [id, birth_date, sex, height_cm, weight_kg, track_weight, care_areas, recent_injury, clinician_managed, assistive_device, warning_signs, goals, activity_level, preferred_time, equipment, camera_preference, activity_notifications, notes, status, consent_version, consented_at, created_at, updated_at, retention_until]
+      properties:
+        id: { type: string, format: uuid }
+        birth_date: { type: string, format: date }
+        sex: { type: string, enum: [female, male, unspecified] }
+        height_cm: { type: number, description: Centimetres. }
+        weight_kg: { type: number, description: Kilograms. }
+        track_weight: { type: boolean }
+        care_areas: { type: array, items: { type: string, enum: [lower_back, knee, shoulder, general_mobility, prefer_not_to_say] } }
+        recent_injury: { type: boolean }
+        clinician_managed: { type: boolean }
+        assistive_device: { type: string, enum: [none, cane, walker, wheelchair, other] }
+        warning_signs: { type: array, description: Stored self-report without interpretation., items: { type: string, enum: [chest_pain, shortness_of_breath, dizziness_or_fainting, weakness_or_severe_fatigue, severe_pain, none] } }
+        goals: { type: array, items: { type: string, enum: [strength, balance_fall_prevention, flexibility, daily_activity, progress] } }
+        activity_level: { type: string, enum: [low, moderate, regular] }
+        preferred_time: { type: string, enum: [morning, afternoon, evening] }
+        equipment: { type: array, items: { type: string, enum: [chair, mat, resistance_band, none] } }
+        camera_preference: { type: string, enum: [front, rear] }
+        activity_notifications: { type: boolean }
+        notes: { type: string, maxLength: 300 }
+        status: { type: string, const: captured_not_evaluated }
+        consent_version: { type: string, const: health-profile-v1 }
+        consented_at: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
         retention_until: { type: string, format: date-time }
     Exercise:
       type: object

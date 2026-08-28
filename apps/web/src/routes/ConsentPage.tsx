@@ -46,7 +46,7 @@ export function ConsentPage() {
       queryClient.setQueryData(['consent'], consent)
       setLoadingComplete(true)
       await waitForLoadingCompletion()
-      navigate('/app', { replace: true })
+      navigate('/onboarding', { replace: true })
     } catch {
       setError(t('consent.failed'))
     } finally {

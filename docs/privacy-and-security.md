@@ -14,4 +14,6 @@ AI chat requires a separate consent flag under policy `prototype-v3`. Account-ow
 
 Social sign-in stores only the provider name and provider-scoped subject linked to the KineGuide user. Provider access tokens are processed transiently by the Go API and discarded. Client secrets remain in server environment configuration, callback errors are intentionally generic, and account deletion cascades to social identities.
 
+First-login health-profile storage requires explicit `health-profile-v1` consent in addition to the active base consent. The Go API stores bounded self-reported profile values for up to 365 days and returns them only to the authenticated owner. The profile screen provides correction and deletion; account deletion also removes the row. Health-profile notes and structured values are not sent to the AI service, do not personalize the current demo plan, and must not appear in logs. Production export, backup-expiry, and scheduled retention enforcement remain release blockers.
+
 This repository is not a claim of HIPAA, GDPR, PDPA, medical-device, or other regulatory compliance. Formal legal, security, and clinical review is required before real-world use.
