@@ -9,7 +9,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
 
 import { useAuth } from '@/features/auth/AuthContext'
 import { useNotifications } from '@/features/notifications/NotificationContext'
@@ -60,10 +60,10 @@ export function UserAccountMenu() {
       {open && (
         <div
           aria-label={t('account.menu')}
-          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-20 w-full min-w-52 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_8px_24px_rgb(15_23_42_/_0.12)]"
+          className="absolute bottom-[calc(100%+1rem)] left-0 z-20 w-full min-w-56 overflow-hidden rounded-[1.25rem] border border-kg-border bg-kg-surface p-3 shadow-[0_16px_40px_rgb(20_35_33_/_0.12)]"
           role="menu"
         >
-          <p className="px-2.5 pb-1 pt-1 text-[10px] font-bold text-slate-500">
+          <p className="px-3 pb-2 pt-1 text-sm font-bold text-slate-700">
             {t('account.account')}
           </p>
           <MenuLink
@@ -88,8 +88,8 @@ export function UserAccountMenu() {
             to="/app/notifications"
             onClick={() => setOpen(false)}
           />
-          <div className="my-1 border-t border-slate-200" />
-          <p className="px-2.5 pb-1 pt-1 text-[10px] font-bold text-slate-500">
+          <div className="mx-1 my-2 border-t border-kg-border" />
+          <p className="px-3 pb-2 pt-1 text-sm font-bold text-slate-500">
             {t('account.system')}
           </p>
           <MenuLink
@@ -99,12 +99,12 @@ export function UserAccountMenu() {
             onClick={() => setOpen(false)}
           />
           <button
-            className="flex min-h-10 w-full items-center gap-2 rounded-lg px-2.5 text-left text-xs font-semibold text-red-700 hover:bg-red-50"
+            className="mt-2 flex min-h-12 w-full items-center gap-3 border-t border-kg-border px-3 pt-2 text-left text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
             onClick={() => void logout()}
             role="menuitem"
             type="button"
           >
-            <LogOut aria-hidden="true" size={15} />
+            <LogOut aria-hidden="true" className="shrink-0" size={21} />
             {t('auth.signOut')}
           </button>
         </div>
@@ -117,19 +117,19 @@ export function UserAccountMenu() {
             ? t('account.menuWithUnread', { count: unreadCount })
             : t('account.menu')
         }
-        className="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2 text-left hover:bg-slate-50"
+        className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-teal-100 bg-teal-50/60 px-3 text-left transition-colors hover:border-teal-200 hover:bg-teal-50"
         onClick={() => setOpen((current) => !current)}
         ref={triggerRef}
         type="button"
       >
         <span
-          className="relative grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-bold text-teal-800"
+          className="relative grid size-11 shrink-0 place-items-center rounded-full bg-white text-sm font-bold text-teal-800 shadow-sm"
           aria-hidden="true"
         >
           {initials(auth.user?.display_name)}
-          <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-white bg-emerald-500" />
+          <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-white bg-emerald-500" />
         </span>
-        <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-700">
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
           {label}
         </span>
         <div className="relative flex items-center justify-center pl-1">
@@ -137,12 +137,12 @@ export function UserAccountMenu() {
             aria-hidden="true"
             className="shrink-0 text-slate-600"
             data-testid="account-notification-bell"
-            size={18}
+            size={21}
           />
           {unreadCount > 0 && (
             <span
               aria-hidden="true"
-              className="absolute -right-1.5 -top-1 grid min-w-4 place-items-center rounded-full bg-teal-700 px-1 py-0.5 text-[9px] font-bold leading-none text-white tabular-nums"
+              className="absolute -right-2 -top-2 grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
             >
               {unreadCount}
             </span>
@@ -151,7 +151,7 @@ export function UserAccountMenu() {
         <ChevronUp
           aria-hidden="true"
           className={`shrink-0 text-slate-600 transition-transform ${open ? '' : 'rotate-180'}`}
-          size={15}
+          size={18}
         />
       </button>
     </div>
@@ -174,24 +174,26 @@ function MenuLink({
   ariaLabel?: string
 }) {
   return (
-    <Link
+    <NavLink
       aria-label={ariaLabel}
-      className="flex min-h-10 items-center gap-2 rounded-lg px-2.5 text-xs font-medium text-slate-700 no-underline hover:bg-slate-50"
+      className={({ isActive }) =>
+        `flex min-h-12 items-center gap-3 rounded-xl px-3 text-sm font-medium no-underline transition-colors ${isActive ? 'bg-kg-soft text-teal-950' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'}`
+      }
       onClick={onClick}
       role="menuitem"
       to={to}
     >
-      <Icon aria-hidden="true" size={15} />
+      <Icon aria-hidden="true" className="shrink-0 text-teal-900" size={21} />
       <span className="flex-1">{label}</span>
       {badge !== undefined && badge > 0 && (
         <span
           aria-hidden="true"
-          className="grid min-w-5 place-items-center rounded-full bg-teal-700 px-1.5 text-[10px] font-bold leading-5 text-white tabular-nums"
+          className="grid min-w-6 place-items-center rounded-full bg-teal-700 px-1.5 text-xs font-bold leading-6 text-white tabular-nums"
         >
           {badge}
         </span>
       )}
-    </Link>
+    </NavLink>
   )
 }
 

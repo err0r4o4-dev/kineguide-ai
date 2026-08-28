@@ -116,6 +116,26 @@ describe('AppShell', () => {
     ).toBeInTheDocument()
   })
 
+  it('identifies the active destination in the account menu', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/app/settings']}>
+        <Routes>
+          <Route element={<AppShell />} path="/app">
+            <Route element={<h1>การตั้งค่า</h1>} path="settings" />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0])
+
+    expect(
+      screen.getByRole('menuitem', { name: 'ตั้งค่าและความเป็นส่วนตัว' })
+    ).toHaveAttribute('aria-current', 'page')
+  })
+
   it('uses one menu toggle and dismisses the mobile navigation with Escape', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
