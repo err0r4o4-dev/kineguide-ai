@@ -60,7 +60,7 @@ describe('DashboardPage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'เริ่มกิจกรรม' })).toHaveAttribute(
       'href',
-      '/app/camera'
+      '/app/exercises'
     )
     expect(screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })).toHaveClass(
       '!text-kg-primary'

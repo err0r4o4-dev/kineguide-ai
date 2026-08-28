@@ -77,7 +77,7 @@ describe('AppShell', () => {
     ).toBeInTheDocument()
     expect(
       screen.getByRole('menuitem', {
-        name: 'การแจ้งเตือน 3 รายการยังไม่ได้อ่าน'
+        name: 'การแจ้งเตือน 0 รายการยังไม่ได้อ่าน'
       })
     ).toHaveAttribute('href', '/app/notifications')
     expect(
@@ -93,7 +93,7 @@ describe('AppShell', () => {
     ).toHaveFocus()
   })
 
-  it('shows the unread notification count on the account menu button', async () => {
+  it('does not claim unread notifications when no event source is connected', async () => {
     await i18n.changeLanguage('th')
     render(
       <MemoryRouter initialEntries={['/app']}>
@@ -106,10 +106,10 @@ describe('AppShell', () => {
     )
 
     const accountButton = screen.getAllByRole('button', {
-      name: 'เมนูบัญชี มีการแจ้งเตือนที่ยังไม่ได้อ่าน 3 รายการ'
+      name: 'เมนูบัญชี'
     })[0]
 
-    expect(accountButton).toHaveTextContent('3')
+    expect(accountButton).not.toHaveTextContent('3')
     expect(
       within(accountButton).getByTestId('account-notification-bell')
     ).toBeInTheDocument()

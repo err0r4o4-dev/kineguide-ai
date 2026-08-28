@@ -158,7 +158,7 @@ function TodayActivity() {
             {t('common.pendingReview')}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link className="kg-button-primary" to="/app/camera">
+            <Link className="kg-button-primary" to="/app/exercises">
               <Play aria-hidden="true" size={17} />
               {t('plan.start')}
             </Link>

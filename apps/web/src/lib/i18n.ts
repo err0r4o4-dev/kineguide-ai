@@ -92,8 +92,9 @@ const th = {
     markOneRead: 'ทำเครื่องหมาย {{title}} ว่าอ่านแล้ว',
     unreadStatus: 'มีการแจ้งเตือนที่ยังไม่ได้อ่าน {{count}} รายการ',
     last30Days: '30 วันที่ผ่านมา',
-    empty: 'ไม่มีการแจ้งเตือนในหมวดนี้',
-    emptyBody: 'ลองเลือกหมวดอื่นหรือกลับมาตรวจสอบภายหลัง',
+    empty: 'ยังไม่มีการแจ้งเตือนจริง',
+    emptyBody:
+      'ยังไม่ได้เชื่อมบริการจัดเก็บการแจ้งเตือน ระบบจะไม่สร้างเหตุการณ์ตัวอย่างแทนข้อมูลจริง',
     summary: 'สรุปการแจ้งเตือน',
     preferences: 'การตั้งค่าการแจ้งเตือน',
     manageSettings: 'จัดการการตั้งค่าทั้งหมด',
@@ -492,11 +493,46 @@ const th = {
     chart: 'กิจกรรมล่าสุด'
   },
   profile: {
-    title: 'โปรไฟล์',
-    subtitle: 'ข้อมูลบัญชีพื้นฐาน',
+    title: 'โปรไฟล์สุขภาพ',
+    subtitle:
+      'ข้อมูลสุขภาพที่คุณบันทึกไว้สำหรับทบทวนและจัดการ ไม่ใช้วินิจฉัยหรือสร้างแผนเฉพาะบุคคล',
+    loading: 'กำลังโหลดข้อมูลโปรไฟล์สุขภาพ…',
+    edit: 'แก้ไขข้อมูล',
+    notifications: 'เปิดการแจ้งเตือน',
     name: 'ชื่อที่ใช้แสดง',
     email: 'อีเมล',
     joined: 'สร้างบัญชีเมื่อ',
+    accountProtected: 'บัญชี KineGuide ที่ลงชื่อเข้าใช้แล้ว',
+    completeness: 'ความสมบูรณ์ของแบบฟอร์ม',
+    complete: 'ครบถ้วน',
+    bodyData: 'ข้อมูลร่างกาย',
+    bmi: 'BMI',
+    selfReportedNotice:
+      'ข้อมูลที่คุณรายงานเองและค่าคำนวณทั่วไป ไม่ใช่การวินิจฉัย',
+    goals: 'เป้าหมายของฉัน',
+    goalsBoundary: 'บันทึกเพื่อให้คุณทบทวน ยังไม่ใช้สร้างแผนเฉพาะบุคคล',
+    movementContext: 'ข้อจำกัดและบริบทการเคลื่อนไหว',
+    recentInjuryReported: 'รายงานการบาดเจ็บหรือผ่าตัดในช่วง 6 เดือนที่ผ่านมา',
+    noRecentInjuryReported:
+      'ไม่ได้รายงานการบาดเจ็บหรือผ่าตัดในช่วง 6 เดือนที่ผ่านมา',
+    assistiveDeviceReported: 'รายงานการใช้อุปกรณ์ช่วยเดิน: {{device}}',
+    noAssistiveDeviceReported: 'ไม่ได้รายงานอุปกรณ์ช่วยเดิน',
+    safetyData: 'ข้อมูลความปลอดภัย',
+    lastReviewed: 'อัปเดตคำตอบล่าสุด',
+    noWarningsReported: 'คุณรายงานว่าไม่มีข้อมูลอาการเตือนในแบบฟอร์มล่าสุด',
+    warningsReported:
+      'คุณได้บันทึกข้อมูลอาการไว้ในแบบฟอร์มล่าสุด โปรดทบทวนคำตอบหรือติดต่อบุคลากรทางการแพทย์หากกังวล',
+    notEvaluated: 'ระบบบันทึกคำตอบเท่านั้นและไม่ประเมินความพร้อมในการทำกิจกรรม',
+    dataUse: 'การใช้ข้อมูล',
+    dataUseBody:
+      'ใช้เพื่อให้คุณทบทวนและจัดการข้อมูลในบัญชีนี้ ยังไม่ใช้เลือกหรือปรับแผนกิจกรรม',
+    retention: 'กำหนดเก็บข้อมูลถึง {{date}} และลบก่อนกำหนดได้',
+    privacySettings: 'ตั้งค่าและความเป็นส่วนตัว',
+    latestWeight: 'ข้อมูลน้ำหนักล่าสุด',
+    noWeightHistory:
+      'ยังไม่มีประวัติแนวโน้มน้ำหนัก ระบบจะแสดงเฉพาะค่าล่าสุดโดยไม่แปลผล',
+    updateMeasurement: 'อัปเดตข้อมูล',
+    reviewAssessment: 'ทบทวนแบบประเมินเบื้องต้น',
     healthTitle: 'โปรไฟล์สุขภาพ',
     healthBody:
       'ทบทวน แก้ไข หรือลบข้อมูลสุขภาพที่คุณกรอกไว้ ข้อมูลนี้ไม่ใช้วินิจฉัยหรือสร้างแผนเฉพาะบุคคล',
@@ -505,6 +541,43 @@ const th = {
     healthDeleteConfirm:
       'ลบข้อมูลโปรไฟล์สุขภาพทั้งหมดออกจากบัญชีนี้หรือไม่? การดำเนินการนี้ย้อนกลับไม่ได้',
     healthDeleteFailed: 'ไม่สามารถลบโปรไฟล์สุขภาพได้ กรุณาลองอีกครั้ง'
+  },
+  assessment: {
+    title: 'แบบประเมินข้อมูลเบื้องต้น',
+    subtitle: 'ทบทวนและบันทึกคำตอบแบบมีโครงสร้างในบัญชีของคุณ',
+    boundary:
+      'ระบบบันทึกคำตอบเท่านั้นและไม่ประเมิน วินิจฉัย หรือแนะนำการรักษา หากกังวลเกี่ยวกับอาการ โปรดติดต่อบุคลากรทางการแพทย์ที่มีคุณสมบัติเหมาะสม',
+    loading: 'กำลังโหลดคำตอบล่าสุด…',
+    formTitle: 'คำตอบที่รายงานด้วยตนเอง',
+    formBody: 'เลือกหนึ่งคำตอบในแต่ละหัวข้อ คุณสามารถกลับมาแก้ไขได้',
+    concernArea: 'บริเวณที่ต้องการบันทึก',
+    duration: 'ช่วงเวลาที่สังเกตข้อมูลนี้',
+    dailyImpact: 'ผลต่อกิจวัตรประจำวัน',
+    goal: 'สิ่งที่ต้องการใช้ระบบช่วย',
+    required: 'กรุณาเลือกหนึ่งคำตอบ',
+    save: 'บันทึกคำตอบ',
+    saving: 'กำลังบันทึก…',
+    saved: 'บันทึกคำตอบแล้วโดยไม่มีการประเมินผล',
+    saveFailed: 'ไม่สามารถบันทึกคำตอบได้ กรุณาลองอีกครั้ง',
+    retention:
+      'จัดเก็บตาม consent สำหรับ session summary และกำหนดเก็บไม่เกิน 365 วัน หรือลบพร้อมบัญชี',
+    options: {
+      lower_back: 'หลังส่วนล่าง',
+      knee: 'เข่า',
+      shoulder: 'ไหล่',
+      general_mobility: 'การเคลื่อนไหวทั่วไป',
+      prefer_not_to_say: 'ไม่ต้องการระบุ',
+      lt_week: 'น้อยกว่า 1 สัปดาห์',
+      one_to_four_weeks: '1–4 สัปดาห์',
+      gt_four_weeks: 'มากกว่า 4 สัปดาห์',
+      unsure: 'ไม่แน่ใจ',
+      none: 'ไม่กระทบ',
+      some: 'กระทบบางส่วน',
+      much: 'กระทบมาก',
+      understand: 'ทำความเข้าใจข้อมูล',
+      camera_demo: 'ทดลองกิจกรรมด้วยกล้อง',
+      track_activity: 'บันทึกความสม่ำเสมอของกิจกรรม'
+    }
   },
   settings: {
     title: 'ตั้งค่าและความเป็นส่วนตัว',
@@ -521,6 +594,14 @@ const th = {
     retention:
       'session summary และข้อมูลบัญชีที่เกี่ยวข้องตั้ง retention ไว้ 365 วัน และสามารถลบก่อนกำหนดด้วยการลบบัญชี',
     revokeDone: 'ถอน consent แล้ว',
+    consentBody:
+      'ตรวจสอบสถานะ consent ที่ใช้กับกล้อง การเก็บ session summary และ AI chat',
+    consentActive: 'มี consent ที่ใช้งานอยู่ เวอร์ชัน {{version}}',
+    noActiveConsent: 'ไม่มี consent ที่ใช้งานอยู่',
+    revokeConfirm:
+      'ถอน consent ที่ใช้งานอยู่หรือไม่? ฟังก์ชันที่ต้องใช้ consent จะหยุดจนกว่าคุณจะให้ consent ใหม่ ข้อมูลเดิมยังคงอยู่ตามนโยบาย retention และลบได้ด้วยการลบบัญชี',
+    revokeConfirmAction: 'ยืนยันการถอน',
+    revokeFailed: 'ไม่สามารถถอน consent ได้ กรุณาลองอีกครั้ง',
     connectedAccounts: 'บัญชีที่เชื่อมต่อ',
     connectedAccountsBody:
       'เชื่อม Google หรือ Facebook เพื่อใช้เป็นวิธีเข้าสู่ระบบ โดยระบบไม่เก็บ token ของผู้ให้บริการ',
@@ -648,8 +729,9 @@ const en: typeof th = {
     markOneRead: 'Mark {{title}} as read',
     unreadStatus: '{{count}} unread notifications',
     last30Days: 'Past 30 days',
-    empty: 'No notifications in this category',
-    emptyBody: 'Choose another category or check again later.',
+    empty: 'No real notifications yet',
+    emptyBody:
+      'Notification storage is not connected. The system will not invent sample events in place of real data.',
     summary: 'Notification summary',
     preferences: 'Notification preferences',
     manageSettings: 'Manage all settings',
@@ -1053,11 +1135,49 @@ const en: typeof th = {
     chart: 'Recent activity'
   },
   profile: {
-    title: 'Profile',
-    subtitle: 'Basic account information',
+    title: 'Health profile',
+    subtitle:
+      'Health information you saved for review and management. It is not used for diagnosis or a personalized plan.',
+    loading: 'Loading health-profile information…',
+    edit: 'Edit information',
+    notifications: 'Open notifications',
     name: 'Display name',
     email: 'Email',
     joined: 'Joined',
+    accountProtected: 'Signed-in KineGuide account',
+    completeness: 'Form completeness',
+    complete: 'Complete',
+    bodyData: 'Body information',
+    bmi: 'BMI',
+    selfReportedNotice:
+      'Self-reported information and general calculations, not a diagnosis.',
+    goals: 'My goals',
+    goalsBoundary:
+      'Saved for your review and not yet used to create a personalized plan.',
+    movementContext: 'Movement limitations and context',
+    recentInjuryReported: 'Injury or surgery in the past 6 months reported',
+    noRecentInjuryReported:
+      'No injury or surgery in the past 6 months reported',
+    assistiveDeviceReported: 'Mobility aid reported: {{device}}',
+    noAssistiveDeviceReported: 'No mobility aid reported',
+    safetyData: 'Safety information',
+    lastReviewed: 'Answers last updated',
+    noWarningsReported:
+      'You reported no warning-sign information in the latest form.',
+    warningsReported:
+      'You saved symptom information in the latest form. Review your answers or contact a qualified clinician if concerned.',
+    notEvaluated:
+      'The system stores these answers and does not assess readiness for activity.',
+    dataUse: 'Data use',
+    dataUseBody:
+      'Used for you to review and manage in this account. It is not yet used to choose or personalize activities.',
+    retention: 'Scheduled for retention until {{date}} and removable earlier.',
+    privacySettings: 'Settings and privacy',
+    latestWeight: 'Latest weight information',
+    noWeightHistory:
+      'No weight trend history is available. Only the latest value is shown without interpretation.',
+    updateMeasurement: 'Update information',
+    reviewAssessment: 'Review initial assessment',
     healthTitle: 'Health profile',
     healthBody:
       'Review, correct, or delete your self-reported health information. It is not used to diagnose or create a personalized plan.',
@@ -1066,6 +1186,44 @@ const en: typeof th = {
     healthDeleteConfirm:
       'Delete all health-profile information from this account? This cannot be undone.',
     healthDeleteFailed: 'Unable to delete the health profile. Please try again.'
+  },
+  assessment: {
+    title: 'Initial information assessment',
+    subtitle: 'Review and save bounded structured answers in your account.',
+    boundary:
+      'The system only stores answers and does not assess, diagnose, or recommend treatment. Contact a qualified healthcare professional if you are concerned about symptoms.',
+    loading: 'Loading the latest answers…',
+    formTitle: 'Self-reported answers',
+    formBody:
+      'Choose one answer for each topic. You can return to revise them.',
+    concernArea: 'Area to record',
+    duration: 'How long you have noticed this information',
+    dailyImpact: 'Effect on daily activities',
+    goal: 'What you want the system to help with',
+    required: 'Choose one answer.',
+    save: 'Save answers',
+    saving: 'Saving…',
+    saved: 'Answers saved without evaluation',
+    saveFailed: 'Unable to save the answers. Please try again.',
+    retention:
+      'Stored under session-summary consent for no more than 365 days, or removed with account deletion.',
+    options: {
+      lower_back: 'Lower back',
+      knee: 'Knee',
+      shoulder: 'Shoulder',
+      general_mobility: 'General mobility',
+      prefer_not_to_say: 'Prefer not to say',
+      lt_week: 'Less than 1 week',
+      one_to_four_weeks: '1–4 weeks',
+      gt_four_weeks: 'More than 4 weeks',
+      unsure: 'Unsure',
+      none: 'No impact',
+      some: 'Some impact',
+      much: 'Much impact',
+      understand: 'Understand my information',
+      camera_demo: 'Try a camera demonstration',
+      track_activity: 'Track activity consistency'
+    }
   },
   settings: {
     title: 'Settings and privacy',
@@ -1081,6 +1239,14 @@ const en: typeof th = {
     retention:
       'Session summaries and related account records have a 365-day retention target and can be removed earlier by deleting the account.',
     revokeDone: 'Consent withdrawn',
+    consentBody:
+      'Review the consent used for camera processing, session-summary storage, and AI chat.',
+    consentActive: 'Active consent version {{version}}',
+    noActiveConsent: 'No active consent',
+    revokeConfirm:
+      'Withdraw the active consent? Features that require consent will stop until you consent again. Existing data remains subject to the retention policy and can be removed by deleting the account.',
+    revokeConfirmAction: 'Confirm withdrawal',
+    revokeFailed: 'Unable to withdraw consent. Please try again.',
     connectedAccounts: 'Connected accounts',
     connectedAccountsBody:
       'Connect Google or Facebook as a sign-in method. Provider tokens are not stored.',

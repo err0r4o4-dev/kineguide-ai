@@ -89,6 +89,11 @@ const ProfilePage = lazy(() =>
     default: module.ProfilePage
   }))
 )
+const AssessmentPage = lazy(() =>
+  import('@/routes/AssessmentPage').then((module) => ({
+    default: module.AssessmentPage
+  }))
+)
 const SettingsPage = lazy(() =>
   import('@/routes/SettingsPage').then((module) => ({
     default: module.SettingsPage
@@ -153,6 +158,7 @@ const router = createBrowserRouter([
                   },
                   { path: 'progress', element: <ProgressPage /> },
                   { path: 'profile', element: <ProfilePage /> },
+                  { path: 'assessment', element: <AssessmentPage /> },
                   { path: 'notifications', element: <NotificationsPage /> },
                   { path: 'settings', element: <SettingsPage /> },
                   { path: 'help', element: <HelpPage /> }

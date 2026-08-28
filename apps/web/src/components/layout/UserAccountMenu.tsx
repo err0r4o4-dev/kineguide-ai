@@ -148,7 +148,7 @@ export function UserAccountMenu() {
             </span>
           )}
         </div>
-         <ChevronUp
+        <ChevronUp
           aria-hidden="true"
           className={`shrink-0 text-slate-600 transition-transform ${open ? '' : 'rotate-180'}`}
           size={15}

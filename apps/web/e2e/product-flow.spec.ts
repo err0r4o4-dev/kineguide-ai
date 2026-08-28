@@ -269,6 +269,9 @@ test('new user completes consent and structured onboarding', async ({
     page.getByRole('link', { name: 'เริ่มคุยกับ AI' })
   ).toHaveAttribute('href', '/app/chat')
   await expect(
+    page.getByRole('link', { name: 'เริ่มกิจกรรม' })
+  ).toHaveAttribute('href', '/app/exercises')
+  await expect(
     page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
   ).toHaveAttribute('href', '/app/chat')
   await page.getByRole('link', { name: 'เริ่มคุยกับ AI' }).click()
@@ -338,9 +341,11 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     updated_at: '2026-08-24T12:02:00Z',
     retention_until: '2027-08-24T12:02:00Z'
   }
+  let savedAssessmentRequest: Record<string, string> | undefined
 
   await page.route('http://localhost:8080/v1/**', async (route) => {
     const url = route.request().url()
+    const method = route.request().method()
     if (url.endsWith('/auth/refresh')) {
       refreshRequests += 1
       await route.fulfill(
@@ -366,12 +371,37 @@ test('login, hard refresh, and every authenticated navigation target stay consis
       await route.fulfill({ json: { identities: [] } })
       return
     }
+    if (url.endsWith('/me')) {
+      await route.fulfill({ json: user })
+      return
+    }
     if (url.endsWith('/consents/current')) {
       await route.fulfill({ json: { consent } })
       return
     }
     if (url.endsWith('/health-profile')) {
       await route.fulfill({ json: { profile: healthProfile } })
+      return
+    }
+    if (url.endsWith('/assessments/latest')) {
+      await route.fulfill({ json: { assessment: null } })
+      return
+    }
+    if (url.endsWith('/assessments') && method === 'POST') {
+      savedAssessmentRequest = route.request().postDataJSON() as Record<
+        string,
+        string
+      >
+      await route.fulfill({
+        status: 201,
+        json: {
+          id: '5d449152-b9e3-4143-936c-d857594a892f',
+          ...savedAssessmentRequest,
+          status: 'captured_not_evaluated',
+          created_at: '2026-08-28T10:00:00Z',
+          retention_until: '2027-08-28T10:00:00Z'
+        }
+      })
       return
     }
     if (url.endsWith('/conversations')) {
@@ -462,5 +492,48 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     await expect(page).toHaveURL(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   }
+
+  await page.getByRole('button', { name: 'เมนูบัญชี' }).click()
+  await page.getByRole('menuitem', { name: 'โปรไฟล์' }).click()
+  await expect(page).toHaveURL('/app/profile')
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'โปรไฟล์สุขภาพ' })
+  ).toBeVisible()
+  await expect(page.getByText(user.email)).toBeVisible()
+  await expect(page.getByRole('link', { name: 'แก้ไขข้อมูล' })).toBeVisible()
+
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 })
+    if (width < 1024) {
+      await expect(page.locator('#app-navigation')).toHaveCSS(
+        'translate',
+        '-100%'
+      )
+    }
+    await expect(
+      page.getByRole('heading', { name: 'ข้อมูลร่างกาย' })
+    ).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true)
+  }
+  await page.getByRole('link', { name: 'ทบทวนแบบประเมินเบื้องต้น' }).click()
+  await expect(page).toHaveURL('/app/assessment')
+  await page.getByRole('radio', { name: 'หลังส่วนล่าง' }).check()
+  await page.getByRole('radio', { name: '1–4 สัปดาห์' }).check()
+  await page.getByRole('radio', { name: 'กระทบบางส่วน' }).check()
+  await page.getByRole('radio', { name: 'ทำความเข้าใจข้อมูล' }).check()
+  await page.getByRole('button', { name: 'บันทึกคำตอบ' }).click()
+  await expect(
+    page.getByText('บันทึกคำตอบแล้วโดยไม่มีการประเมินผล')
+  ).toBeVisible()
+  expect(savedAssessmentRequest).toEqual({
+    concern_area: 'lower_back',
+    duration_band: 'one_to_four_weeks',
+    daily_impact: 'some',
+    goal: 'understand'
+  })
   expect(runtimeErrors).toEqual([])
 })

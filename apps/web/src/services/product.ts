@@ -36,6 +36,28 @@ export interface Consent {
   revoked_at: string | null
 }
 
+export type AssessmentConcernArea =
+  'lower_back' | 'knee' | 'shoulder' | 'general_mobility' | 'prefer_not_to_say'
+export type AssessmentDurationBand =
+  'lt_week' | 'one_to_four_weeks' | 'gt_four_weeks' | 'unsure'
+export type AssessmentDailyImpact =
+  'none' | 'some' | 'much' | 'prefer_not_to_say'
+export type AssessmentGoal = 'understand' | 'camera_demo' | 'track_activity'
+
+export interface AssessmentInput {
+  concern_area: AssessmentConcernArea
+  duration_band: AssessmentDurationBand
+  daily_impact: AssessmentDailyImpact
+  goal: AssessmentGoal
+}
+
+export interface Assessment extends AssessmentInput {
+  id: string
+  status: 'captured_not_evaluated'
+  created_at: string
+  retention_until: string
+}
+
 export type HealthProfileSex = 'female' | 'male' | 'unspecified'
 export type HealthProfileCareArea =
   'lower_back' | 'knee' | 'shoulder' | 'general_mobility' | 'prefer_not_to_say'
@@ -210,6 +232,11 @@ export async function deleteAccount() {
   await http.delete('/me')
 }
 
+export async function getCurrentUser(signal?: AbortSignal) {
+  const response = await http.get<User>('/me', { signal })
+  return response.data
+}
+
 export async function getConsent(signal?: AbortSignal) {
   const response = await http.get<{ consent: Consent | null }>(
     '/consents/current',
@@ -269,6 +296,19 @@ export async function sendConversationMessage(
 
 export async function revokeConsent() {
   await http.delete('/consents/current')
+}
+
+export async function getLatestAssessment(signal?: AbortSignal) {
+  const response = await http.get<{ assessment: Assessment | null }>(
+    '/assessments/latest',
+    { signal }
+  )
+  return response.data.assessment
+}
+
+export async function saveAssessment(input: AssessmentInput) {
+  const response = await http.post<Assessment>('/assessments', input)
+  return response.data
 }
 
 export async function getHealthProfile(signal?: AbortSignal) {
