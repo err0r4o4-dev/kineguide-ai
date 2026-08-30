@@ -41,7 +41,10 @@ const CONNECTIONS = [
 const SVG_SCALE = 100
 // A stricter display gate suppresses unstable self-occluded side-view points.
 // It does not change pose classification or exercise feedback.
-const DISPLAY_VISIBILITY_GATE = 0.65
+const DISPLAY_VISIBILITY_GATE = 0.5
+// Pose landmarks 0-10 are a coarse face approximation. The dedicated face
+// mesh below owns facial rendering so these marks are intentionally omitted.
+const FIRST_BODY_LANDMARK = 11
 
 const HAND_CONNECTIONS = [
   [0, 1],
@@ -142,6 +145,9 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
     >
       <g data-overlay="body">
         {CONNECTIONS.map(([start, end]) => {
+          if (start < FIRST_BODY_LANDMARK || end < FIRST_BODY_LANDMARK) {
+            return null
+          }
           const from = landmarks[start]
           const to = landmarks[end]
           if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
@@ -169,10 +175,12 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
           )
         })}
         {landmarks.map((landmark, index) =>
+          index >= FIRST_BODY_LANDMARK &&
           (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
             <circle
               cx={landmark.x * SVG_SCALE}
               cy={landmark.y * SVG_SCALE}
+              data-body-landmark={index}
               fill={unreliable.has(index) ? '#fbbf24' : bodyStroke}
               key={index}
               r="0.45"

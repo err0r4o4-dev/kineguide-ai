@@ -56,13 +56,24 @@ describe('PoseOverlay', () => {
       landmarks:
         snapshot.landmarks?.map((landmark, index) => ({
           ...landmark,
-          visibility: index === 1 ? 0.6 : landmark.visibility
+          visibility: index === 11 ? 0.4 : landmark.visibility
         })) ?? null
     }
     const { container } = render(<PoseOverlay snapshot={sideViewSnapshot} />)
     const body = container.querySelector('[data-overlay="body"]')
 
-    expect(body?.querySelector('[data-body-connection="0-1"]')).toBeNull()
-    expect(body?.querySelector('[data-body-connection="1-2"]')).toBeNull()
+    expect(body?.querySelector('[data-body-connection="11-12"]')).toBeNull()
+    expect(body?.querySelector('[data-body-connection="11-13"]')).toBeNull()
+  })
+
+  it('does not draw coarse pose marks over the detailed face mesh', () => {
+    const { container } = render(<PoseOverlay snapshot={snapshot} />)
+    const body = container.querySelector('[data-overlay="body"]')
+
+    expect(body?.querySelector('[data-body-landmark="0"]')).toBeNull()
+    expect(body?.querySelector('[data-body-landmark="9"]')).toBeNull()
+    expect(body?.querySelector('[data-body-landmark="10"]')).toBeNull()
+    expect(body?.querySelector('[data-body-landmark="11"]')).toBeInTheDocument()
+    expect(body?.querySelector('[data-body-connection="9-10"]')).toBeNull()
   })
 })
