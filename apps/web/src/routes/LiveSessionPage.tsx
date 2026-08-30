@@ -13,8 +13,8 @@ import { useNavigate, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { useCamera } from '@/features/camera/useCamera'
+import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
-import { PoseOverlay } from '@/features/pose/PoseOverlay'
 import { researchProfileForExercise } from '@/features/pose/poseResearchProfiles'
 import {
   usePoseTracking,
@@ -100,14 +100,11 @@ export function LiveSessionPage() {
       <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="kg-card overflow-hidden bg-black">
           <div className="relative aspect-video">
-            <video
-              aria-label={t('camera.visibility')}
-              className="h-full w-full object-contain [transform:scaleX(-1)]"
-              muted
-              playsInline
-              ref={camera.videoRef}
+            <CameraPoseLayer
+              label={t('camera.visibility')}
+              snapshot={pose}
+              videoRef={camera.videoRef}
             />
-            <PoseOverlay snapshot={pose} video={camera.videoRef.current} />
             {camera.state === 'ready' && (
               <div
                 aria-hidden="true"

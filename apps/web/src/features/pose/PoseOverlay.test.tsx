@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react'
 
 import { PoseOverlay } from './PoseOverlay'
-import { calculateContainRect } from './poseOverlayGeometry'
 import type { PoseTrackingSnapshot } from './usePoseTracking'
 
 const landmarks = Array.from({ length: 33 }, (_, index) => ({
@@ -32,19 +31,27 @@ const snapshot: PoseTrackingSnapshot = {
 }
 
 describe('PoseOverlay', () => {
-  it('centers a 4:3 camera image inside a 16:9 preview', () => {
-    expect(calculateContainRect(640, 480, 1280, 720)).toEqual({
-      x: 12.5,
-      y: 0,
-      width: 75,
-      height: 100
-    })
-    expect(calculateContainRect(0, 0, 0, 0)).toEqual({
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100
-    })
+  it('uses the camera frame as its native coordinate system', () => {
+    const video = {
+      videoWidth: 640,
+      videoHeight: 480,
+      clientWidth: 1280,
+      clientHeight: 720
+    } as HTMLVideoElement
+    const { container } = render(
+      <PoseOverlay snapshot={snapshot} video={video} />
+    )
+    const svg = container.querySelector('svg')
+
+    expect(svg).toHaveAttribute('viewBox', '0 0 640 480')
+    expect(svg).toHaveAttribute('preserveAspectRatio', 'xMidYMid meet')
+    expect(svg).not.toHaveClass('[transform:scaleX(-1)]')
+    expect(
+      container.querySelector('[data-body-landmark="11"]')
+    ).toHaveAttribute('cx', '448')
+    expect(
+      container.querySelector('[data-overlay-content="true"]')
+    ).not.toBeInTheDocument()
   })
 
   it('draws the body with the same compact line style as face and hands', () => {

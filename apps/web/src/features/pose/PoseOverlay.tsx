@@ -1,5 +1,4 @@
 import type { PoseTrackingSnapshot } from './usePoseTracking'
-import { calculateContainRect } from './poseOverlayGeometry'
 
 const CONNECTIONS = [
   [0, 1],
@@ -39,7 +38,7 @@ const CONNECTIONS = [
   [28, 32]
 ] as const
 
-const SVG_SCALE = 100
+const FALLBACK_FRAME_SIZE = 100
 // A stricter display gate suppresses unstable self-occluded side-view points.
 // It does not change pose classification or exercise feedback.
 const DISPLAY_VISIBILITY_GATE = 0.5
@@ -92,11 +91,15 @@ const FACE_FEATURES = [
 
 function LandmarkLines({
   connections,
+  frameHeight,
+  frameWidth,
   landmarks,
   stroke,
   width
 }: {
   connections: readonly (readonly [number, number])[]
+  frameHeight: number
+  frameWidth: number
   landmarks: readonly { x: number; y: number }[]
   stroke: string
   width: number
@@ -111,11 +114,11 @@ function LandmarkLines({
         stroke={stroke}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={width}
-        x1={from.x * SVG_SCALE}
-        x2={to.x * SVG_SCALE}
-        y1={from.y * SVG_SCALE}
-        y2={to.y * SVG_SCALE}
+        strokeWidth={(width * frameHeight) / 100}
+        x1={from.x * frameWidth}
+        x2={to.x * frameWidth}
+        y1={from.y * frameHeight}
+        y2={to.y * frameHeight}
       />
     )
   })
@@ -142,29 +145,18 @@ export function PoseOverlay({
 
   const bodyStroke = status === 'ready' ? '#5eead4' : '#fbbf24'
   const unreliable = new Set(unreliableLandmarks)
-  const content = calculateContainRect(
-    video?.videoWidth ?? 0,
-    video?.videoHeight ?? 0,
-    video?.clientWidth ?? 0,
-    video?.clientHeight ?? 0
-  )
+  const frameWidth = video?.videoWidth || FALLBACK_FRAME_SIZE
+  const frameHeight = video?.videoHeight || FALLBACK_FRAME_SIZE
+  const unit = frameHeight / 100
 
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full [transform:scaleX(-1)]"
-      preserveAspectRatio="none"
-      viewBox="0 0 100 100"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      preserveAspectRatio="xMidYMid meet"
+      viewBox={`0 0 ${frameWidth} ${frameHeight}`}
     >
-      <svg
-        data-overlay-content="true"
-        height={content.height}
-        preserveAspectRatio="none"
-        viewBox="0 0 100 100"
-        width={content.width}
-        x={content.x}
-        y={content.y}
-      >
+      <g>
         <g data-overlay="body">
           {CONNECTIONS.map(([start, end]) => {
             if (start < FIRST_BODY_LANDMARK || end < FIRST_BODY_LANDMARK) {
@@ -188,11 +180,11 @@ export function PoseOverlay({
                 stroke={bodyStroke}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="0.72"
-                x1={from.x * SVG_SCALE}
-                x2={to.x * SVG_SCALE}
-                y1={from.y * SVG_SCALE}
-                y2={to.y * SVG_SCALE}
+                strokeWidth={0.72 * unit}
+                x1={from.x * frameWidth}
+                x2={to.x * frameWidth}
+                y1={from.y * frameHeight}
+                y2={to.y * frameHeight}
               />
             )
           })}
@@ -200,14 +192,14 @@ export function PoseOverlay({
             index >= FIRST_BODY_LANDMARK &&
             (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
               <circle
-                cx={landmark.x * SVG_SCALE}
-                cy={landmark.y * SVG_SCALE}
+                cx={landmark.x * frameWidth}
+                cy={landmark.y * frameHeight}
                 data-body-landmark={index}
                 fill={unreliable.has(index) ? '#fbbf24' : bodyStroke}
                 key={index}
-                r="0.45"
+                r={0.45 * unit}
                 stroke="#f8fafc"
-                strokeWidth="0.18"
+                strokeWidth={0.18 * unit}
               />
             ) : null
           )}
@@ -220,6 +212,8 @@ export function PoseOverlay({
             {FACE_FEATURES.map((connections, index) => (
               <LandmarkLines
                 connections={connections}
+                frameHeight={frameHeight}
+                frameWidth={frameWidth}
                 key={index}
                 landmarks={faceLandmarks}
                 stroke={
@@ -234,13 +228,13 @@ export function PoseOverlay({
               const point = faceLandmarks[index]
               return point ? (
                 <circle
-                  cx={point.x * SVG_SCALE}
-                  cy={point.y * SVG_SCALE}
+                  cx={point.x * frameWidth}
+                  cy={point.y * frameHeight}
                   fill="#f8fafc"
                   key={index}
-                  r="0.48"
+                  r={0.48 * unit}
                   stroke="#0f766e"
-                  strokeWidth="0.22"
+                  strokeWidth={0.22 * unit}
                 />
               ) : null
             })}
@@ -251,29 +245,33 @@ export function PoseOverlay({
             <g data-overlay="hand" key={index}>
               <LandmarkLines
                 connections={HAND_CONNECTIONS}
+                frameHeight={frameHeight}
+                frameWidth={frameWidth}
                 landmarks={hand}
                 stroke="#0f172a"
                 width={1.35}
               />
               <LandmarkLines
                 connections={HAND_CONNECTIONS}
+                frameHeight={frameHeight}
+                frameWidth={frameWidth}
                 landmarks={hand}
                 stroke="#5eead4"
                 width={0.72}
               />
               {hand.map((point, pointIndex) => (
                 <circle
-                  cx={point.x * SVG_SCALE}
-                  cy={point.y * SVG_SCALE}
+                  cx={point.x * frameWidth}
+                  cy={point.y * frameHeight}
                   fill="#f8fafc"
                   key={pointIndex}
-                  r="0.45"
+                  r={0.45 * unit}
                 />
               ))}
             </g>
           ) : null
         )}
-      </svg>
+      </g>
     </svg>
   )
 }
