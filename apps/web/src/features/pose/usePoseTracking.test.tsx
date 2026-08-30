@@ -41,9 +41,29 @@ describe('usePoseTracking', () => {
     }
     const createAdapter = vi.fn(async () => adapter)
     const videoRef = { current: video } as RefObject<HTMLVideoElement>
+    const canvas = document.createElement('canvas')
+    const context = {
+      setTransform: vi.fn(),
+      clearRect: vi.fn(),
+      drawImage: vi.fn()
+    }
+    vi.spyOn(canvas, 'getContext').mockReturnValue(
+      context as unknown as CanvasRenderingContext2D
+    )
+    Object.defineProperties(video, {
+      videoWidth: { value: 640 },
+      videoHeight: { value: 480 }
+    })
+    const canvasRef = { current: canvas } as RefObject<HTMLCanvasElement>
 
     const { result, unmount } = renderHook(() =>
-      usePoseTracking(videoRef, true, 'sit-to-stand-demo', createAdapter)
+      usePoseTracking(
+        videoRef,
+        canvasRef,
+        true,
+        'sit-to-stand-demo',
+        createAdapter
+      )
     )
 
     await waitFor(() => expect(result.current.status).toBe('no_pose'))
@@ -51,6 +71,7 @@ describe('usePoseTracking', () => {
     act(() => nextFrame?.(67))
     expect(result.current.status).toBe('ready')
     expect(adapter.detect).toHaveBeenCalledOnce()
+    expect(adapter.detect).toHaveBeenCalledWith(canvas, 67)
 
     unmount()
     expect(cancelFrame).toHaveBeenCalledWith(17)
@@ -78,8 +99,17 @@ describe('usePoseTracking', () => {
     const videoRef = {
       current: document.createElement('video')
     } as RefObject<HTMLVideoElement>
+    const canvasRef = {
+      current: document.createElement('canvas')
+    } as RefObject<HTMLCanvasElement>
     const { unmount } = renderHook(() =>
-      usePoseTracking(videoRef, true, 'seated-knee-demo', createAdapter)
+      usePoseTracking(
+        videoRef,
+        canvasRef,
+        true,
+        'seated-knee-demo',
+        createAdapter
+      )
     )
 
     unmount()

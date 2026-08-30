@@ -89,6 +89,24 @@ describe('PoseOverlay', () => {
     expect(body?.querySelector('[data-body-connection="11-13"]')).toBeNull()
   })
 
+  it('draws reliable partial landmarks while the camera needs adjustment', () => {
+    const { container } = render(
+      <PoseOverlay
+        snapshot={{
+          ...snapshot,
+          status: 'adjust_camera',
+          unreliableLandmarks: [11]
+        }}
+      />
+    )
+    const body = container.querySelector('[data-overlay="body"]')
+
+    expect(container.querySelector('svg')).toBeInTheDocument()
+    expect(body?.querySelector('[data-body-landmark="11"]')).toBeNull()
+    expect(body?.querySelector('[data-body-landmark="12"]')).toBeInTheDocument()
+    expect(body?.querySelector('[data-body-connection="11-12"]')).toBeNull()
+  })
+
   it('does not draw coarse pose marks over the detailed face mesh', () => {
     const { container } = render(<PoseOverlay snapshot={snapshot} />)
     const body = container.querySelector('[data-overlay="body"]')

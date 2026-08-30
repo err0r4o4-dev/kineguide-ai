@@ -1,9 +1,11 @@
 import type { PoseLandmark } from './poseGeometry'
 
 export interface PoseAdapter {
-  detect(video: HTMLVideoElement, timestampMs: number): PoseDetectionResult
+  detect(frame: PoseFrameSource, timestampMs: number): PoseDetectionResult
   close(): void
 }
+
+export type PoseFrameSource = HTMLVideoElement | HTMLCanvasElement
 
 export interface BlinkEstimate {
   left: number
@@ -99,16 +101,16 @@ export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
   let safetyPoses: PoseLandmark[][] = []
 
   return {
-    detect(video, timestampMs) {
+    detect(frame, timestampMs) {
       if (shouldRunSafetyPose(lastSafetyTimestamp, timestampMs)) {
-        const poseResult = poseLandmarker.detectForVideo(video, timestampMs)
+        const poseResult = poseLandmarker.detectForVideo(frame, timestampMs)
         safetyPoses = poseResult.landmarks.map((pose) =>
           pose.map(({ x, y, z, visibility }) => ({ x, y, z, visibility }))
         )
         lastSafetyTimestamp = timestampMs
       }
       const holisticResult = holisticLandmarker.detectForVideo(
-        video,
+        frame,
         timestampMs
       )
       const blendshapes = holisticResult.faceBlendshapes[0]?.categories ?? []

@@ -28,12 +28,14 @@ export function LiveSessionPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
+  const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
   const query = useQuery({
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal)
   })
   const pose = usePoseTracking(
     camera.videoRef,
+    cameraCanvasRef,
     camera.state === 'ready',
     query.data?.exercise_slug ?? '',
     createMediaPipePoseAdapter
@@ -101,6 +103,7 @@ export function LiveSessionPage() {
         <div className="kg-card overflow-hidden bg-black">
           <div className="relative aspect-video">
             <CameraPoseLayer
+              canvasRef={cameraCanvasRef}
               label={t('camera.visibility')}
               snapshot={pose}
               videoRef={camera.videoRef}

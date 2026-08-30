@@ -23,6 +23,7 @@ describe('CameraPoseLayer', () => {
   it('mirrors the video and pose overlay together exactly once', () => {
     const { container } = render(
       <CameraPoseLayer
+        canvasRef={createRef<HTMLCanvasElement>()}
         label="Camera preview"
         snapshot={snapshot}
         videoRef={createRef<HTMLVideoElement>()}
@@ -30,9 +31,13 @@ describe('CameraPoseLayer', () => {
     )
     const layer = container.querySelector('[data-camera-pose-layer]')
     const video = layer?.querySelector('video')
+    const canvas = layer?.querySelector('canvas')
     const overlay = layer?.querySelector('svg')
 
-    expect(layer).toHaveClass('[transform:scaleX(-1)]')
+    expect(layer).not.toHaveClass('[transform:scaleX(-1)]')
+    expect(canvas).toHaveAccessibleName('Camera preview')
+    expect(canvas?.parentElement).toBe(layer)
+    expect(video).toHaveAttribute('aria-hidden', 'true')
     expect(video).not.toHaveClass('[transform:scaleX(-1)]')
     expect(overlay).not.toHaveClass('[transform:scaleX(-1)]')
     expect(video?.parentElement).toBe(layer)

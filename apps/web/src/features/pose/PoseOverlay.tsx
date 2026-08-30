@@ -141,7 +141,8 @@ export function PoseOverlay({
     status,
     unreliableLandmarks
   } = snapshot
-  if (!landmarks || !bounds) return null
+  const canDisplayPartialPose = status === 'ready' || status === 'adjust_camera'
+  if (!canDisplayPartialPose || !landmarks || !bounds) return null
 
   const bodyStroke = status === 'ready' ? '#5eead4' : '#fbbf24'
   const unreliable = new Set(unreliableLandmarks)
@@ -190,12 +191,13 @@ export function PoseOverlay({
           })}
           {landmarks.map((landmark, index) =>
             index >= FIRST_BODY_LANDMARK &&
+            !unreliable.has(index) &&
             (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
               <circle
                 cx={landmark.x * frameWidth}
                 cy={landmark.y * frameHeight}
                 data-body-landmark={index}
-                fill={unreliable.has(index) ? '#fbbf24' : bodyStroke}
+                fill={bodyStroke}
                 key={index}
                 r={0.45 * unit}
                 stroke="#f8fafc"
