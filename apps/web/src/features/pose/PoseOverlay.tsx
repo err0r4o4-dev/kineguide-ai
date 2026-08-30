@@ -38,6 +38,8 @@ const CONNECTIONS = [
   [28, 32]
 ] as const
 
+const SVG_SCALE = 100
+
 export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
   const { bounds, landmarks, status, unreliableLandmarks } = snapshot
   if (!landmarks || !bounds) return null
@@ -51,19 +53,18 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 h-full w-full [transform:scaleX(-1)]"
       preserveAspectRatio="none"
-      viewBox="0 0 1 1"
+      viewBox="0 0 100 100"
     >
       <rect
         fill="none"
-        height={bounds.height}
-        rx="0.025"
+        height={bounds.height * SVG_SCALE}
+        rx="2.5"
         stroke={stroke}
-        strokeDasharray={isReady ? undefined : '0.018 0.012'}
-        strokeWidth="0.008"
-        vectorEffect="non-scaling-stroke"
-        width={bounds.width}
-        x={bounds.x}
-        y={bounds.y}
+        strokeDasharray={isReady ? undefined : '2 1.5'}
+        strokeWidth="1.25"
+        width={bounds.width * SVG_SCALE}
+        x={bounds.x * SVG_SCALE}
+        y={bounds.y * SVG_SCALE}
       />
       {CONNECTIONS.map(([start, end]) => {
         const from = landmarks[start]
@@ -76,26 +77,24 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
             key={`${start}-${end}`}
             stroke={stroke}
             strokeLinecap="round"
-            strokeWidth="0.007"
-            vectorEffect="non-scaling-stroke"
-            x1={from.x}
-            x2={to.x}
-            y1={from.y}
-            y2={to.y}
+            strokeWidth="2"
+            x1={from.x * SVG_SCALE}
+            x2={to.x * SVG_SCALE}
+            y1={from.y * SVG_SCALE}
+            y2={to.y * SVG_SCALE}
           />
         )
       })}
       {landmarks.map((landmark, index) =>
         (landmark.visibility ?? 0) >= 0.5 ? (
           <circle
-            cx={landmark.x}
-            cy={landmark.y}
+            cx={landmark.x * SVG_SCALE}
+            cy={landmark.y * SVG_SCALE}
             fill={unreliable.has(index) ? '#fbbf24' : '#f8fafc'}
             key={index}
-            r="0.009"
+            r="1.15"
             stroke={stroke}
-            strokeWidth="0.004"
-            vectorEffect="non-scaling-stroke"
+            strokeWidth="0.65"
           />
         ) : null
       )}
