@@ -73,6 +73,24 @@ describe('PoseOverlay', () => {
     ).toBeInTheDocument()
   })
 
+  it('separates upper, middle, and lower tracking regions', () => {
+    const { container } = render(<PoseOverlay snapshot={snapshot} />)
+    const upper = container.querySelector('[data-overlay-region="upper"]')
+    const middle = container.querySelector('[data-overlay-region="middle"]')
+    const lower = container.querySelector('[data-overlay-region="lower"]')
+
+    expect(upper?.querySelector('[data-overlay="face"]')).toBeInTheDocument()
+    expect(middle?.querySelector('[data-overlay="hand"]')).toBeInTheDocument()
+    expect(
+      middle?.querySelector('[data-body-connection="11-13"]')
+    ).toBeInTheDocument()
+    expect(middle?.querySelector('[data-body-connection="23-25"]')).toBeNull()
+    expect(
+      lower?.querySelector('[data-body-connection="23-25"]')
+    ).toBeInTheDocument()
+    expect(lower?.querySelector('[data-body-connection="11-13"]')).toBeNull()
+  })
+
   it('does not connect body landmarks that are unreliable in a side view', () => {
     const sideViewSnapshot = {
       ...snapshot,
