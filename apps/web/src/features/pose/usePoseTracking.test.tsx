@@ -27,7 +27,13 @@ describe('usePoseTracking', () => {
     const video = document.createElement('video')
     Object.defineProperty(video, 'readyState', { value: 2 })
     const adapter: PoseAdapter = {
-      detect: vi.fn(() => [visiblePose()]),
+      detect: vi.fn(() => ({
+        poses: [visiblePose()],
+        faceLandmarks: null,
+        leftHandLandmarks: null,
+        rightHandLandmarks: null,
+        blink: null
+      })),
       close: vi.fn()
     }
     const createAdapter = vi.fn(async () => adapter)
@@ -53,7 +59,13 @@ describe('usePoseTracking', () => {
   it('closes an adapter that resolves after unmount', async () => {
     let resolveAdapter: ((adapter: PoseAdapter) => void) | undefined
     const adapter: PoseAdapter = {
-      detect: vi.fn(() => []),
+      detect: vi.fn(() => ({
+        poses: [],
+        faceLandmarks: null,
+        leftHandLandmarks: null,
+        rightHandLandmarks: null,
+        blink: null
+      })),
       close: vi.fn()
     }
     const createAdapter = () =>

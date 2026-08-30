@@ -472,9 +472,9 @@ const th = {
     stop: 'หยุด session',
     estimate:
       'โครงกระดูกช่วยตรวจว่าร่างกายอยู่ในเฟรมเท่านั้น ยังไม่มีคะแนนความถูกต้องหรือการแก้ท่า เพราะไม่มี clinical thresholds ที่ผ่านการอนุมัติ',
-    poseTitle: 'การตรวจจับโครงกระดูก',
-    poseIdle: 'เปิดกล้องเพื่อเริ่มตรวจจับโครงกระดูก',
-    poseLoading: 'กำลังโหลดโมเดลตรวจจับบนอุปกรณ์นี้',
+    poseTitle: 'การตรวจจับร่างกาย ใบหน้า และมือ',
+    poseIdle: 'เปิดกล้องเพื่อเริ่มตรวจจับจุดร่างกาย ใบหน้า และมือ',
+    poseLoading: 'กำลังโหลดโมเดลตรวจจับร่างกาย ใบหน้า และมือบนอุปกรณ์นี้',
     poseReady: 'ตรวจพบจุดสำคัญที่ต้องใช้สำหรับท่านี้',
     poseAdjust: 'มองเห็นจุดสำคัญไม่ครบ กรุณาปรับตำแหน่งกล้อง',
     poseMissing: 'ยังไม่พบร่างกายในภาพ',
@@ -485,7 +485,7 @@ const th = {
     poseUnavailable: 'โมเดลยังใช้งานไม่ได้ขณะออฟไลน์ คุณยังนับด้วยตนเองได้',
     poseError: 'ไม่สามารถเริ่มการตรวจจับได้ คุณยังนับด้วยตนเองได้',
     posePrivacy:
-      'ภาพและจุดโครงกระดูกประมวลผลชั่วคราวในเบราว์เซอร์และไม่ถูกอัปโหลด',
+      'ภาพ จุดร่างกาย ใบหน้า มือ และค่าประมาณการกะพริบตาประมวลผลชั่วคราวในเบราว์เซอร์ ไม่ถูกอัปโหลดหรือบันทึก และไม่ใช่การตรวจสุขภาพ',
     poseResearchMethod: 'วิธีเปรียบเทียบจากงานวิจัย',
     poseResearchPending:
       'มีโครง cosine similarity และ DTW สำหรับท่าไหล่มุมหน้า แต่ยังไม่แสดงผลถูกหรือผิดจนกว่าจะมีลำดับอ้างอิงที่นักกายภาพอนุมัติ',
@@ -1134,9 +1134,9 @@ const en: typeof th = {
     stop: 'Stop session',
     estimate:
       'The skeleton checks whether the body is visible in frame. No correctness score or form correction is provided because approved clinical thresholds are not available.',
-    poseTitle: 'Skeleton detection',
-    poseIdle: 'Turn on the camera to start skeleton detection',
-    poseLoading: 'Loading the on-device pose model',
+    poseTitle: 'Body, face, and hand detection',
+    poseIdle: 'Turn on the camera to detect body, face, and hand landmarks',
+    poseLoading: 'Loading body, face, and hand models on this device',
     poseReady: 'Required landmarks for this movement are visible',
     poseAdjust: 'Some required landmarks are not visible. Adjust the camera',
     poseMissing: 'No body detected in the preview yet',
@@ -1149,7 +1149,7 @@ const en: typeof th = {
     poseError:
       'Skeleton detection could not start. Manual counting is still available',
     posePrivacy:
-      'Frames and skeleton landmarks are processed temporarily in this browser and are not uploaded.',
+      'Frames, body, face, hand, and estimated blink landmarks are processed temporarily in this browser, are not uploaded or saved, and are not a health assessment.',
     poseResearchMethod: 'Research comparison method',
     poseResearchPending:
       'Cosine similarity and DTW are prepared for the front-view shoulder activity, but no correct/incorrect result is shown without a physiotherapist-approved reference sequence.',

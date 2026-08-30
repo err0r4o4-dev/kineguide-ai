@@ -1,6 +1,11 @@
 import { useEffect, useState, type RefObject } from 'react'
 
-import type { PoseAdapter, PoseAdapterFactory } from './poseAdapter'
+import type {
+  BlinkEstimate,
+  PoseAdapter,
+  PoseAdapterFactory
+} from './poseAdapter'
+import type { PoseLandmark } from './poseGeometry'
 import { classifyPoseFrame, type ClassifiedPoseFrame } from './poseGeometry'
 
 export type PoseTrackingStatus =
@@ -19,6 +24,10 @@ export interface PoseTrackingSnapshot extends Omit<
   'status'
 > {
   status: PoseTrackingStatus
+  faceLandmarks: PoseLandmark[] | null
+  leftHandLandmarks: PoseLandmark[] | null
+  rightHandLandmarks: PoseLandmark[] | null
+  blink: BlinkEstimate | null
 }
 
 const EMPTY_FRAME: ClassifiedPoseFrame = {
@@ -27,6 +36,13 @@ const EMPTY_FRAME: ClassifiedPoseFrame = {
   bounds: null,
   unreliableLandmarks: []
 }
+
+const EMPTY_DETAILS = {
+  faceLandmarks: null,
+  leftHandLandmarks: null,
+  rightHandLandmarks: null,
+  blink: null
+} as const
 
 const INFERENCE_INTERVAL_MS = 125
 
@@ -38,12 +54,13 @@ export function usePoseTracking(
 ) {
   const [snapshot, setSnapshot] = useState<PoseTrackingSnapshot>({
     ...EMPTY_FRAME,
+    ...EMPTY_DETAILS,
     status: 'idle'
   })
 
   useEffect(() => {
     if (!active) {
-      setSnapshot({ ...EMPTY_FRAME, status: 'idle' })
+      setSnapshot({ ...EMPTY_FRAME, ...EMPTY_DETAILS, status: 'idle' })
       return
     }
 
@@ -66,20 +83,29 @@ export function usePoseTracking(
       ) {
         lastInference = timestamp
         try {
-          setSnapshot(
-            classifyPoseFrame(adapter.detect(video, timestamp), exerciseSlug)
-          )
+          const result = adapter.detect(video, timestamp)
+          setSnapshot({
+            ...classifyPoseFrame(result.poses, exerciseSlug),
+            faceLandmarks: result.faceLandmarks,
+            leftHandLandmarks: result.leftHandLandmarks,
+            rightHandLandmarks: result.rightHandLandmarks,
+            blink: result.blink
+          })
         } catch {
           adapter.close()
           adapter = null
-          setSnapshot({ ...EMPTY_FRAME, status: 'error' })
+          setSnapshot({ ...EMPTY_FRAME, ...EMPTY_DETAILS, status: 'error' })
           return
         }
       }
       schedule()
     }
 
-    setSnapshot({ ...EMPTY_FRAME, status: 'loading_model' })
+    setSnapshot({
+      ...EMPTY_FRAME,
+      ...EMPTY_DETAILS,
+      status: 'loading_model'
+    })
     void createAdapter()
       .then((createdAdapter) => {
         if (cancelled) {
@@ -87,13 +113,14 @@ export function usePoseTracking(
           return
         }
         adapter = createdAdapter
-        setSnapshot({ ...EMPTY_FRAME, status: 'no_pose' })
+        setSnapshot({ ...EMPTY_FRAME, ...EMPTY_DETAILS, status: 'no_pose' })
         schedule()
       })
       .catch(() => {
         if (!cancelled) {
           setSnapshot({
             ...EMPTY_FRAME,
+            ...EMPTY_DETAILS,
             status: navigator.onLine ? 'error' : 'unavailable'
           })
         }
