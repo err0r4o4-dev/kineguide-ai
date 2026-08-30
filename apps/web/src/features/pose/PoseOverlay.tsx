@@ -127,8 +127,7 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
   } = snapshot
   if (!landmarks || !bounds) return null
 
-  const isReady = status === 'ready'
-  const stroke = isReady ? '#34d399' : '#fbbf24'
+  const bodyStroke = status === 'ready' ? '#5eead4' : '#fbbf24'
   const unreliable = new Set(unreliableLandmarks)
 
   return (
@@ -138,61 +137,41 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
       preserveAspectRatio="none"
       viewBox="0 0 100 100"
     >
-      {CONNECTIONS.map(([start, end]) => {
-        const from = landmarks[start]
-        const to = landmarks[end]
-        if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
-          return null
-        }
-        const x1 = from.x * SVG_SCALE
-        const x2 = to.x * SVG_SCALE
-        const y1 = from.y * SVG_SCALE
-        const y2 = to.y * SVG_SCALE
-        return (
-          <g key={`${start}-${end}`}>
+      <g data-overlay="body">
+        {CONNECTIONS.map(([start, end]) => {
+          const from = landmarks[start]
+          const to = landmarks[end]
+          if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
+            return null
+          }
+          return (
             <line
-              opacity="0.6"
-              stroke="#0f172a"
+              key={`${start}-${end}`}
+              stroke={bodyStroke}
               strokeLinecap="round"
-              strokeWidth="2.6"
-              x1={x1}
-              x2={x2}
-              y1={y1}
-              y2={y2}
+              strokeLinejoin="round"
+              strokeWidth="0.72"
+              x1={from.x * SVG_SCALE}
+              x2={to.x * SVG_SCALE}
+              y1={from.y * SVG_SCALE}
+              y2={to.y * SVG_SCALE}
             />
-            <line
-              stroke={stroke}
-              strokeLinecap="round"
-              strokeWidth="1.35"
-              x1={x1}
-              x2={x2}
-              y1={y1}
-              y2={y2}
-            />
-          </g>
-        )
-      })}
-      {landmarks.map((landmark, index) =>
-        (landmark.visibility ?? 0) >= 0.5 ? (
-          <g key={index}>
+          )
+        })}
+        {landmarks.map((landmark, index) =>
+          (landmark.visibility ?? 0) >= 0.5 ? (
             <circle
               cx={landmark.x * SVG_SCALE}
               cy={landmark.y * SVG_SCALE}
-              fill="#0f172a"
-              opacity="0.65"
-              r="1.25"
+              fill={unreliable.has(index) ? '#fbbf24' : bodyStroke}
+              key={index}
+              r="0.45"
+              stroke="#f8fafc"
+              strokeWidth="0.18"
             />
-            <circle
-              cx={landmark.x * SVG_SCALE}
-              cy={landmark.y * SVG_SCALE}
-              fill={unreliable.has(index) ? '#fbbf24' : '#f8fafc'}
-              r="0.72"
-              stroke={stroke}
-              strokeWidth="0.4"
-            />
-          </g>
-        ) : null
-      )}
+          ) : null
+        )}
+      </g>
       {faceLandmarks && (
         <g
           data-blink={blink?.detected ? 'detected' : 'open'}

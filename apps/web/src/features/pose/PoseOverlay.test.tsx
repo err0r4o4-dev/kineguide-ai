@@ -31,7 +31,7 @@ const snapshot: PoseTrackingSnapshot = {
 }
 
 describe('PoseOverlay', () => {
-  it('draws layered skeleton lines without a body bounding box', () => {
+  it('draws the body with the same compact line style as face and hands', () => {
     const { container } = render(<PoseOverlay snapshot={snapshot} />)
     const svg = container.querySelector('svg')
     const lines = container.querySelectorAll('line')
@@ -39,8 +39,9 @@ describe('PoseOverlay', () => {
     expect(svg).toHaveAttribute('viewBox', '0 0 100 100')
     expect(container.querySelector('rect')).not.toBeInTheDocument()
     expect(lines.length).toBeGreaterThan(40)
-    expect(lines[0]).toHaveAttribute('stroke-width', '2.6')
-    expect(lines[1]).toHaveAttribute('stroke-width', '1.35')
+    expect(container.querySelector('[data-overlay="body"]')).toBeInTheDocument()
+    expect(lines[0]).toHaveAttribute('stroke', '#5eead4')
+    expect(lines[0]).toHaveAttribute('stroke-width', '0.72')
     expect(lines[0]).not.toHaveAttribute('vector-effect')
     expect(container.querySelector('[data-overlay="face"]')).toBeInTheDocument()
     expect(container.querySelectorAll('[data-overlay="hand"]')).toHaveLength(2)
