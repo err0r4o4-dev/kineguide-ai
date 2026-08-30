@@ -13,6 +13,12 @@ import { useNavigate, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { useCamera } from '@/features/camera/useCamera'
+import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
+import { PoseOverlay } from '@/features/pose/PoseOverlay'
+import {
+  usePoseTracking,
+  type PoseTrackingStatus
+} from '@/features/pose/usePoseTracking'
 import { formatDuration } from '@/lib/format'
 import { getSession, updateSession } from '@/services/product'
 
@@ -25,6 +31,12 @@ export function LiveSessionPage() {
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal)
   })
+  const pose = usePoseTracking(
+    camera.videoRef,
+    camera.state === 'ready',
+    query.data?.exercise_slug ?? '',
+    createMediaPipePoseAdapter
+  )
   const [seconds, setSeconds] = useState(0)
   const [reps, setReps] = useState(0)
   const [running, setRunning] = useState(true)
@@ -83,14 +95,23 @@ export function LiveSessionPage() {
       </header>
       <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="kg-card overflow-hidden bg-black">
-          <div className="relative aspect-[4/3]">
+          <div className="relative aspect-video">
             <video
               aria-label={t('camera.visibility')}
-              className="h-full w-full object-cover [transform:scaleX(-1)]"
+              className="h-full w-full object-contain [transform:scaleX(-1)]"
               muted
               playsInline
               ref={camera.videoRef}
             />
+            <PoseOverlay snapshot={pose} />
+            {camera.state === 'ready' && (
+              <div
+                aria-hidden="true"
+                className={`absolute left-3 top-3 max-w-[calc(100%-1.5rem)] rounded-xl border px-3 py-2 text-xs font-semibold shadow-sm sm:left-4 sm:top-4 ${poseStatusClass(pose.status)}`}
+              >
+                {t(poseStatusKey(pose.status))}
+              </div>
+            )}
             {camera.state !== 'ready' && (
               <div className="absolute inset-0 grid place-items-center text-white">
                 <button
@@ -103,7 +124,7 @@ export function LiveSessionPage() {
                 </button>
               </div>
             )}
-            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-3 rounded-2xl bg-white/95 p-2 shadow-lg shadow-slate-950/15 backdrop-blur">
+            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-3 rounded-2xl bg-white/95 p-2 shadow-lg shadow-slate-950/15 backdrop-blur sm:bottom-5">
               <button
                 aria-label={running ? t('session.pause') : t('session.resume')}
                 className="kg-icon-button"
@@ -129,6 +150,19 @@ export function LiveSessionPage() {
           </div>
         </div>
         <aside className="space-y-5">
+          <article aria-live="polite" className="kg-card p-5" role="status">
+            <p className="text-sm font-semibold text-slate-950">
+              {t('session.poseTitle')}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {camera.state === 'ready'
+                ? t(poseStatusKey(pose.status))
+                : t('session.poseIdle')}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              {t('session.posePrivacy')}
+            </p>
+          </article>
           <article className="kg-card p-6 text-center">
             <p className="text-sm uppercase tracking-wide text-slate-500">
               {t('session.reps')}
@@ -179,4 +213,30 @@ export function LiveSessionPage() {
       </section>
     </div>
   )
+}
+
+function poseStatusKey(status: PoseTrackingStatus) {
+  const keys: Record<PoseTrackingStatus, string> = {
+    idle: 'session.poseIdle',
+    loading_model: 'session.poseLoading',
+    ready: 'session.poseReady',
+    adjust_camera: 'session.poseAdjust',
+    no_pose: 'session.poseMissing',
+    unavailable: 'session.poseUnavailable',
+    error: 'session.poseError'
+  }
+  return keys[status]
+}
+
+function poseStatusClass(status: PoseTrackingStatus) {
+  if (status === 'ready') {
+    return 'border-emerald-200 bg-emerald-50/95 text-emerald-900'
+  }
+  if (status === 'adjust_camera') {
+    return 'border-amber-200 bg-amber-50/95 text-amber-950'
+  }
+  if (status === 'error' || status === 'unavailable') {
+    return 'border-red-200 bg-red-50/95 text-red-900'
+  }
+  return 'border-slate-200 bg-white/95 text-slate-800'
 }

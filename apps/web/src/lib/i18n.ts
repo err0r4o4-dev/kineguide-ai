@@ -450,6 +450,8 @@ const th = {
     visibility: 'มองเห็นภาพตัวอย่าง',
     model: 'Pose model',
     unavailable: 'ยังไม่โหลด—session นี้ใช้การนับด้วยตนเอง',
+    modelPending:
+      'เมื่อเริ่ม live session เบราว์เซอร์จะดาวน์โหลดไฟล์โมเดลจากผู้ให้บริการภายนอก โดยไม่ส่งภาพกล้อง',
     granted: 'ได้รับอนุญาต',
     waiting: 'รอการอนุญาต',
     denied: 'ไม่สามารถเปิดกล้องได้',
@@ -469,7 +471,17 @@ const th = {
     finish: 'เสร็จสิ้น',
     stop: 'หยุด session',
     estimate:
-      'ไม่มี AI form score หรือการแก้ท่าในเวอร์ชันนี้ เนื่องจากยังไม่มี clinical thresholds ที่ผ่านการอนุมัติ',
+      'โครงกระดูกช่วยตรวจว่าร่างกายอยู่ในเฟรมเท่านั้น ยังไม่มีคะแนนความถูกต้องหรือการแก้ท่า เพราะไม่มี clinical thresholds ที่ผ่านการอนุมัติ',
+    poseTitle: 'การตรวจจับโครงกระดูก',
+    poseIdle: 'เปิดกล้องเพื่อเริ่มตรวจจับโครงกระดูก',
+    poseLoading: 'กำลังโหลดโมเดลตรวจจับบนอุปกรณ์นี้',
+    poseReady: 'ตรวจพบจุดสำคัญที่ต้องใช้สำหรับท่านี้',
+    poseAdjust: 'มองเห็นจุดสำคัญไม่ครบ กรุณาปรับตำแหน่งกล้อง',
+    poseMissing: 'ยังไม่พบร่างกายในภาพ',
+    poseUnavailable: 'โมเดลยังใช้งานไม่ได้ขณะออฟไลน์ คุณยังนับด้วยตนเองได้',
+    poseError: 'ไม่สามารถเริ่มการตรวจจับได้ คุณยังนับด้วยตนเองได้',
+    posePrivacy:
+      'ภาพและจุดโครงกระดูกประมวลผลชั่วคราวในเบราว์เซอร์และไม่ถูกอัปโหลด',
     summary: 'สรุป session',
     completed: 'บันทึก session แล้ว',
     elapsed: 'เวลาที่ใช้',
@@ -1092,6 +1104,8 @@ const en: typeof th = {
     visibility: 'Preview visible',
     model: 'Pose model',
     unavailable: 'Not loaded—this session uses manual counting',
+    modelPending:
+      'When the live session starts, the browser downloads model files from external providers without sending camera frames',
     granted: 'Granted',
     waiting: 'Waiting',
     denied: 'Unable to open camera',
@@ -1111,7 +1125,19 @@ const en: typeof th = {
     finish: 'Finish',
     stop: 'Stop session',
     estimate:
-      'No AI form score or correction is provided because approved clinical thresholds are not available.',
+      'The skeleton checks whether the body is visible in frame. No correctness score or form correction is provided because approved clinical thresholds are not available.',
+    poseTitle: 'Skeleton detection',
+    poseIdle: 'Turn on the camera to start skeleton detection',
+    poseLoading: 'Loading the on-device pose model',
+    poseReady: 'Required landmarks for this movement are visible',
+    poseAdjust: 'Some required landmarks are not visible. Adjust the camera',
+    poseMissing: 'No body detected in the preview yet',
+    poseUnavailable:
+      'The model is unavailable while offline. Manual counting is still available',
+    poseError:
+      'Skeleton detection could not start. Manual counting is still available',
+    posePrivacy:
+      'Frames and skeleton landmarks are processed temporarily in this browser and are not uploaded.',
     summary: 'Session summary',
     completed: 'Session saved',
     elapsed: 'Elapsed time',

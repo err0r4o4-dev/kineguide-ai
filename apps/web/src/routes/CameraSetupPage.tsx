@@ -129,7 +129,7 @@ export function CameraSetupPage() {
               icon={Cpu}
               ok={false}
               label={t('camera.model')}
-              detail={t('camera.unavailable')}
+              detail={t('camera.modelPending')}
             />
           </div>
           {denied && (
