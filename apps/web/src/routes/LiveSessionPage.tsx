@@ -107,7 +107,7 @@ export function LiveSessionPage() {
               playsInline
               ref={camera.videoRef}
             />
-            <PoseOverlay snapshot={pose} />
+            <PoseOverlay snapshot={pose} video={camera.videoRef.current} />
             {camera.state === 'ready' && (
               <div
                 aria-hidden="true"

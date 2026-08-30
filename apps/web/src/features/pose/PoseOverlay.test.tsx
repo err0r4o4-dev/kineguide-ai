@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react'
 
 import { PoseOverlay } from './PoseOverlay'
+import { calculateContainRect } from './poseOverlayGeometry'
 import type { PoseTrackingSnapshot } from './usePoseTracking'
 
 const landmarks = Array.from({ length: 33 }, (_, index) => ({
@@ -31,6 +32,21 @@ const snapshot: PoseTrackingSnapshot = {
 }
 
 describe('PoseOverlay', () => {
+  it('centers a 4:3 camera image inside a 16:9 preview', () => {
+    expect(calculateContainRect(640, 480, 1280, 720)).toEqual({
+      x: 12.5,
+      y: 0,
+      width: 75,
+      height: 100
+    })
+    expect(calculateContainRect(0, 0, 0, 0)).toEqual({
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100
+    })
+  })
+
   it('draws the body with the same compact line style as face and hands', () => {
     const { container } = render(<PoseOverlay snapshot={snapshot} />)
     const svg = container.querySelector('svg')

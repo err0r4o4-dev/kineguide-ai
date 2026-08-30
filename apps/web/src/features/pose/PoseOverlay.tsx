@@ -1,4 +1,5 @@
 import type { PoseTrackingSnapshot } from './usePoseTracking'
+import { calculateContainRect } from './poseOverlayGeometry'
 
 const CONNECTIONS = [
   [0, 1],
@@ -120,7 +121,13 @@ function LandmarkLines({
   })
 }
 
-export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
+export function PoseOverlay({
+  snapshot,
+  video = null
+}: {
+  snapshot: PoseTrackingSnapshot
+  video?: HTMLVideoElement | null
+}) {
   const {
     blink,
     bounds,
@@ -135,6 +142,12 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
 
   const bodyStroke = status === 'ready' ? '#5eead4' : '#fbbf24'
   const unreliable = new Set(unreliableLandmarks)
+  const content = calculateContainRect(
+    video?.videoWidth ?? 0,
+    video?.videoHeight ?? 0,
+    video?.clientWidth ?? 0,
+    video?.clientHeight ?? 0
+  )
 
   return (
     <svg
@@ -143,114 +156,124 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
       preserveAspectRatio="none"
       viewBox="0 0 100 100"
     >
-      <g data-overlay="body">
-        {CONNECTIONS.map(([start, end]) => {
-          if (start < FIRST_BODY_LANDMARK || end < FIRST_BODY_LANDMARK) {
-            return null
-          }
-          const from = landmarks[start]
-          const to = landmarks[end]
-          if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
-            return null
-          }
-          if (
-            (from.visibility ?? 0) < DISPLAY_VISIBILITY_GATE ||
-            (to.visibility ?? 0) < DISPLAY_VISIBILITY_GATE
-          ) {
-            return null
-          }
-          return (
-            <line
-              data-body-connection={`${start}-${end}`}
-              key={`${start}-${end}`}
-              stroke={bodyStroke}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="0.72"
-              x1={from.x * SVG_SCALE}
-              x2={to.x * SVG_SCALE}
-              y1={from.y * SVG_SCALE}
-              y2={to.y * SVG_SCALE}
-            />
-          )
-        })}
-        {landmarks.map((landmark, index) =>
-          index >= FIRST_BODY_LANDMARK &&
-          (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
-            <circle
-              cx={landmark.x * SVG_SCALE}
-              cy={landmark.y * SVG_SCALE}
-              data-body-landmark={index}
-              fill={unreliable.has(index) ? '#fbbf24' : bodyStroke}
-              key={index}
-              r="0.45"
-              stroke="#f8fafc"
-              strokeWidth="0.18"
-            />
-          ) : null
-        )}
-      </g>
-      {faceLandmarks && (
-        <g
-          data-blink={blink?.detected ? 'detected' : 'open'}
-          data-overlay="face"
-        >
-          {FACE_FEATURES.map((connections, index) => (
-            <LandmarkLines
-              connections={connections}
-              key={index}
-              landmarks={faceLandmarks}
-              stroke={
-                blink?.detected && (index === 1 || index === 2)
-                  ? '#fbbf24'
-                  : '#5eead4'
-              }
-              width={index === 0 ? 0.55 : 0.4}
-            />
-          ))}
-          {[1, 4, 33, 133, 263, 362].map((index) => {
-            const point = faceLandmarks[index]
-            return point ? (
+      <svg
+        data-overlay-content="true"
+        height={content.height}
+        preserveAspectRatio="none"
+        viewBox="0 0 100 100"
+        width={content.width}
+        x={content.x}
+        y={content.y}
+      >
+        <g data-overlay="body">
+          {CONNECTIONS.map(([start, end]) => {
+            if (start < FIRST_BODY_LANDMARK || end < FIRST_BODY_LANDMARK) {
+              return null
+            }
+            const from = landmarks[start]
+            const to = landmarks[end]
+            if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
+              return null
+            }
+            if (
+              (from.visibility ?? 0) < DISPLAY_VISIBILITY_GATE ||
+              (to.visibility ?? 0) < DISPLAY_VISIBILITY_GATE
+            ) {
+              return null
+            }
+            return (
+              <line
+                data-body-connection={`${start}-${end}`}
+                key={`${start}-${end}`}
+                stroke={bodyStroke}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="0.72"
+                x1={from.x * SVG_SCALE}
+                x2={to.x * SVG_SCALE}
+                y1={from.y * SVG_SCALE}
+                y2={to.y * SVG_SCALE}
+              />
+            )
+          })}
+          {landmarks.map((landmark, index) =>
+            index >= FIRST_BODY_LANDMARK &&
+            (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
               <circle
-                cx={point.x * SVG_SCALE}
-                cy={point.y * SVG_SCALE}
-                fill="#f8fafc"
+                cx={landmark.x * SVG_SCALE}
+                cy={landmark.y * SVG_SCALE}
+                data-body-landmark={index}
+                fill={unreliable.has(index) ? '#fbbf24' : bodyStroke}
                 key={index}
-                r="0.48"
-                stroke="#0f766e"
-                strokeWidth="0.22"
+                r="0.45"
+                stroke="#f8fafc"
+                strokeWidth="0.18"
               />
             ) : null
-          })}
+          )}
         </g>
-      )}
-      {[leftHandLandmarks, rightHandLandmarks].map((hand, index) =>
-        hand ? (
-          <g data-overlay="hand" key={index}>
-            <LandmarkLines
-              connections={HAND_CONNECTIONS}
-              landmarks={hand}
-              stroke="#0f172a"
-              width={1.35}
-            />
-            <LandmarkLines
-              connections={HAND_CONNECTIONS}
-              landmarks={hand}
-              stroke="#5eead4"
-              width={0.72}
-            />
-            {hand.map((point, pointIndex) => (
-              <circle
-                cx={point.x * SVG_SCALE}
-                cy={point.y * SVG_SCALE}
-                fill="#f8fafc"
-                key={pointIndex}
-                r="0.45"
+        {faceLandmarks && (
+          <g
+            data-blink={blink?.detected ? 'detected' : 'open'}
+            data-overlay="face"
+          >
+            {FACE_FEATURES.map((connections, index) => (
+              <LandmarkLines
+                connections={connections}
+                key={index}
+                landmarks={faceLandmarks}
+                stroke={
+                  blink?.detected && (index === 1 || index === 2)
+                    ? '#fbbf24'
+                    : '#5eead4'
+                }
+                width={index === 0 ? 0.55 : 0.4}
               />
             ))}
+            {[1, 4, 33, 133, 263, 362].map((index) => {
+              const point = faceLandmarks[index]
+              return point ? (
+                <circle
+                  cx={point.x * SVG_SCALE}
+                  cy={point.y * SVG_SCALE}
+                  fill="#f8fafc"
+                  key={index}
+                  r="0.48"
+                  stroke="#0f766e"
+                  strokeWidth="0.22"
+                />
+              ) : null
+            })}
           </g>
-        ) : null
-      )}
+        )}
+        {[leftHandLandmarks, rightHandLandmarks].map((hand, index) =>
+          hand ? (
+            <g data-overlay="hand" key={index}>
+              <LandmarkLines
+                connections={HAND_CONNECTIONS}
+                landmarks={hand}
+                stroke="#0f172a"
+                width={1.35}
+              />
+              <LandmarkLines
+                connections={HAND_CONNECTIONS}
+                landmarks={hand}
+                stroke="#5eead4"
+                width={0.72}
+              />
+              {hand.map((point, pointIndex) => (
+                <circle
+                  cx={point.x * SVG_SCALE}
+                  cy={point.y * SVG_SCALE}
+                  fill="#f8fafc"
+                  key={pointIndex}
+                  r="0.45"
+                />
+              ))}
+            </g>
+          ) : null
+        )}
+      </svg>
     </svg>
   )
 }
