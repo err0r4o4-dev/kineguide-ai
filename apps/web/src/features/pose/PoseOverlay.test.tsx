@@ -125,6 +125,36 @@ describe('PoseOverlay', () => {
     expect(body?.querySelector('[data-body-connection="11-12"]')).toBeNull()
   })
 
+  it('colors each region as soon as that region is technically clear', () => {
+    const { container } = render(
+      <PoseOverlay
+        snapshot={{
+          ...snapshot,
+          status: 'adjust_camera',
+          unreliableLandmarks: [25],
+          landmarks:
+            snapshot.landmarks?.map((landmark, index) => ({
+              ...landmark,
+              visibility: index === 25 ? 0.1 : landmark.visibility
+            })) ?? null
+        }}
+      />
+    )
+    const upper = container.querySelector('[data-overlay-region="upper"]')
+    const middle = container.querySelector('[data-overlay-region="middle"]')
+    const lower = container.querySelector('[data-overlay-region="lower"]')
+
+    expect(upper).toHaveAttribute('data-confidence', 'clear')
+    expect(middle).toHaveAttribute('data-confidence', 'clear')
+    expect(lower).toHaveAttribute('data-confidence', 'partial')
+    expect(
+      middle?.querySelector('[data-body-connection="11-13"]')
+    ).toHaveAttribute('stroke', '#5eead4')
+    expect(
+      lower?.querySelector('[data-body-connection="24-26"]')
+    ).toHaveAttribute('stroke', '#fbbf24')
+  })
+
   it('does not draw coarse pose marks over the detailed face mesh', () => {
     const { container } = render(<PoseOverlay snapshot={snapshot} />)
     const body = container.querySelector('[data-overlay="body"]')

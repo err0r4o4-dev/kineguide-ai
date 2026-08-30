@@ -36,6 +36,10 @@ const FALLBACK_FRAME_SIZE = 100
 // A stricter display gate suppresses unstable self-occluded side-view points.
 // It does not change pose classification or exercise feedback.
 const DISPLAY_VISIBILITY_GATE = 0.5
+// Regional confidence is display-only. These landmarks confirm that a region
+// is technically visible; they do not indicate exercise correctness.
+const MIDDLE_CLARITY_LANDMARKS = [11, 12, 13, 14, 15, 16, 23, 24] as const
+const LOWER_CLARITY_LANDMARKS = [23, 24, 25, 26, 27, 28] as const
 // Pose landmarks 0-10 are a coarse face approximation. The dedicated face
 // mesh below owns facial rendering so these marks are intentionally omitted.
 const FIRST_MIDDLE_LANDMARK = 11
@@ -85,6 +89,31 @@ const FACE_FEATURES = [
   chain([168, 6, 197, 195, 5, 4, 1, 2]),
   chain([98, 97, 2, 326, 327])
 ] as const
+
+function isRegionClear(
+  indices: readonly number[],
+  landmarks: readonly {
+    x: number
+    y: number
+    visibility?: number
+  }[],
+  unreliable: ReadonlySet<number>
+) {
+  return indices.every((index) => {
+    const landmark = landmarks[index]
+    return Boolean(
+      landmark &&
+      !unreliable.has(index) &&
+      Number.isFinite(landmark.x) &&
+      Number.isFinite(landmark.y) &&
+      landmark.x >= 0 &&
+      landmark.x <= 1 &&
+      landmark.y >= 0 &&
+      landmark.y <= 1 &&
+      (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE
+    )
+  })
+}
 
 function LandmarkLines({
   connections,
@@ -216,8 +245,19 @@ export function PoseOverlay({
   const canDisplayPartialPose = status === 'ready' || status === 'adjust_camera'
   if (!canDisplayPartialPose || !landmarks || !bounds) return null
 
-  const bodyStroke = status === 'ready' ? '#5eead4' : '#fbbf24'
   const unreliable = new Set(unreliableLandmarks)
+  const middleClear = isRegionClear(
+    MIDDLE_CLARITY_LANDMARKS,
+    landmarks,
+    unreliable
+  )
+  const lowerClear = isRegionClear(
+    LOWER_CLARITY_LANDMARKS,
+    landmarks,
+    unreliable
+  )
+  const middleStroke = middleClear ? '#5eead4' : '#fbbf24'
+  const lowerStroke = lowerClear ? '#5eead4' : '#fbbf24'
   const frameWidth = video?.videoWidth || FALLBACK_FRAME_SIZE
   const frameHeight = video?.videoHeight || FALLBACK_FRAME_SIZE
   const unit = frameHeight / 100
@@ -230,7 +270,11 @@ export function PoseOverlay({
       viewBox={`0 0 ${frameWidth} ${frameHeight}`}
     >
       <g>
-        <g data-overlay="body" data-overlay-region="middle">
+        <g
+          data-confidence={middleClear ? 'clear' : 'partial'}
+          data-overlay="body"
+          data-overlay-region="middle"
+        >
           <BodyRegion
             connections={MIDDLE_BODY_CONNECTIONS}
             firstLandmark={FIRST_MIDDLE_LANDMARK}
@@ -238,7 +282,7 @@ export function PoseOverlay({
             frameWidth={frameWidth}
             landmarks={landmarks}
             lastLandmark={LAST_MIDDLE_LANDMARK}
-            stroke={bodyStroke}
+            stroke={middleStroke}
             unreliable={unreliable}
             unit={unit}
           />
@@ -274,7 +318,11 @@ export function PoseOverlay({
             ) : null
           )}
         </g>
-        <g data-overlay="body-lower" data-overlay-region="lower">
+        <g
+          data-confidence={lowerClear ? 'clear' : 'partial'}
+          data-overlay="body-lower"
+          data-overlay-region="lower"
+        >
           <BodyRegion
             connections={LOWER_BODY_CONNECTIONS}
             firstLandmark={FIRST_LOWER_LANDMARK}
@@ -282,12 +330,15 @@ export function PoseOverlay({
             frameWidth={frameWidth}
             landmarks={landmarks}
             lastLandmark={LAST_LOWER_LANDMARK}
-            stroke={bodyStroke}
+            stroke={lowerStroke}
             unreliable={unreliable}
             unit={unit}
           />
         </g>
-        <g data-overlay-region="upper">
+        <g
+          data-confidence={faceLandmarks ? 'clear' : 'unavailable'}
+          data-overlay-region="upper"
+        >
           {faceLandmarks && (
             <g
               data-blink={blink?.detected ? 'detected' : 'open'}
