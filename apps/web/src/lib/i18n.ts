@@ -478,10 +478,18 @@ const th = {
     poseReady: 'ตรวจพบจุดสำคัญที่ต้องใช้สำหรับท่านี้',
     poseAdjust: 'มองเห็นจุดสำคัญไม่ครบ กรุณาปรับตำแหน่งกล้อง',
     poseMissing: 'ยังไม่พบร่างกายในภาพ',
+    poseMultiple:
+      'พบมากกว่าหนึ่งคนในภาพ ระบบจึงไม่เลือกหรือติดตามบุคคลใด กรุณาให้เหลือผู้ใช้เพียงคนเดียวในเฟรม',
+    poseUnsupportedExercise:
+      'ท่านี้ยังไม่มีรูปแบบสังเกตด้วยกล้องที่ผ่านการกำหนด ระบบจึงไม่ประเมินการเคลื่อนไหว',
     poseUnavailable: 'โมเดลยังใช้งานไม่ได้ขณะออฟไลน์ คุณยังนับด้วยตนเองได้',
     poseError: 'ไม่สามารถเริ่มการตรวจจับได้ คุณยังนับด้วยตนเองได้',
     posePrivacy:
       'ภาพและจุดโครงกระดูกประมวลผลชั่วคราวในเบราว์เซอร์และไม่ถูกอัปโหลด',
+    poseResearchMethod: 'วิธีเปรียบเทียบจากงานวิจัย',
+    poseResearchPending:
+      'มีโครง cosine similarity และ DTW สำหรับท่าไหล่มุมหน้า แต่ยังไม่แสดงผลถูกหรือผิดจนกว่าจะมีลำดับอ้างอิงที่นักกายภาพอนุมัติ',
+    poseResearchSource: 'อ่านงานวิจัยต้นทาง (เปิดแท็บใหม่)',
     summary: 'สรุป session',
     completed: 'บันทึก session แล้ว',
     elapsed: 'เวลาที่ใช้',
@@ -1132,12 +1140,20 @@ const en: typeof th = {
     poseReady: 'Required landmarks for this movement are visible',
     poseAdjust: 'Some required landmarks are not visible. Adjust the camera',
     poseMissing: 'No body detected in the preview yet',
+    poseMultiple:
+      'More than one person is visible. The system will not select or track anyone until only one person remains in frame.',
+    poseUnsupportedExercise:
+      'This activity has no defined camera-observation profile, so movement is not assessed.',
     poseUnavailable:
       'The model is unavailable while offline. Manual counting is still available',
     poseError:
       'Skeleton detection could not start. Manual counting is still available',
     posePrivacy:
       'Frames and skeleton landmarks are processed temporarily in this browser and are not uploaded.',
+    poseResearchMethod: 'Research comparison method',
+    poseResearchPending:
+      'Cosine similarity and DTW are prepared for the front-view shoulder activity, but no correct/incorrect result is shown without a physiotherapist-approved reference sequence.',
+    poseResearchSource: 'Read the source study (opens a new tab)',
     summary: 'Session summary',
     completed: 'Session saved',
     elapsed: 'Elapsed time',

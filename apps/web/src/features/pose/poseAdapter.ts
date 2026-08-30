@@ -23,7 +23,9 @@ export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
   const landmarker = await PoseLandmarker.createFromOptions(files, {
     baseOptions: { modelAssetPath: MODEL_URL },
     runningMode: 'VIDEO',
-    numPoses: 1,
+    // A second pose is detected only so the UI can refuse an ambiguous frame.
+    // KineGuide never selects or assesses one person from a group.
+    numPoses: 2,
     minPoseDetectionConfidence: 0.5,
     minPosePresenceConfidence: 0.5,
     minTrackingConfidence: 0.5,

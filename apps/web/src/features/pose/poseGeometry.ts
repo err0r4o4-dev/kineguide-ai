@@ -12,7 +12,12 @@ export interface PoseBounds {
   height: number
 }
 
-export type PoseFrameStatus = 'ready' | 'adjust_camera' | 'no_pose'
+export type PoseFrameStatus =
+  | 'ready'
+  | 'adjust_camera'
+  | 'no_pose'
+  | 'multiple_poses'
+  | 'unsupported_exercise'
 
 export interface ClassifiedPoseFrame {
   status: PoseFrameStatus
@@ -32,8 +37,6 @@ const REQUIRED_LANDMARKS: Record<string, readonly number[]> = {
   'seated-knee-demo': [23, 24, 25, 26, 27, 28],
   'shoulder-movement-demo': [11, 12, 13, 14, 15, 16]
 }
-
-const DEFAULT_REQUIRED_LANDMARKS = [11, 12, 23, 24, 25, 26, 27, 28]
 
 function clamp(value: number) {
   return Math.min(1, Math.max(0, value))
@@ -73,6 +76,24 @@ export function classifyPoseFrame(
   poses: readonly PoseLandmark[][],
   exerciseSlug: string
 ): ClassifiedPoseFrame {
+  if (!Object.hasOwn(REQUIRED_LANDMARKS, exerciseSlug)) {
+    return {
+      status: 'unsupported_exercise',
+      landmarks: null,
+      bounds: null,
+      unreliableLandmarks: []
+    }
+  }
+
+  if (poses.length > 1) {
+    return {
+      status: 'multiple_poses',
+      landmarks: null,
+      bounds: null,
+      unreliableLandmarks: []
+    }
+  }
+
   const landmarks = poses[0]
   if (!landmarks) {
     return {
@@ -83,8 +104,7 @@ export function classifyPoseFrame(
     }
   }
 
-  const required =
-    REQUIRED_LANDMARKS[exerciseSlug] ?? DEFAULT_REQUIRED_LANDMARKS
+  const required = REQUIRED_LANDMARKS[exerciseSlug]
   const unreliableLandmarks = required.filter((index) => {
     const landmark = landmarks[index]
     return (

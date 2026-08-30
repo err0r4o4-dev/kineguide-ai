@@ -50,4 +50,21 @@ describe('pose geometry', () => {
       unreliableLandmarks: []
     })
   })
+
+  it('refuses to observe movement when more than one person is visible', () => {
+    const result = classifyPoseFrame(
+      [syntheticPose(), syntheticPose()],
+      'sit-to-stand-demo'
+    )
+
+    expect(result.status).toBe('multiple_poses')
+    expect(result.landmarks).toBeNull()
+  })
+
+  it('does not imply support for an exercise without an approved observation profile', () => {
+    const result = classifyPoseFrame([syntheticPose()], 'unknown-exercise')
+
+    expect(result.status).toBe('unsupported_exercise')
+    expect(result.landmarks).toBeNull()
+  })
 })
