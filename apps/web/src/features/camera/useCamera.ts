@@ -3,6 +3,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export type CameraState =
   'idle' | 'requesting' | 'ready' | 'denied' | 'unsupported' | 'error'
 
+export const CAMERA_CONSTRAINTS: MediaTrackConstraints = {
+  facingMode: 'user',
+  width: { ideal: 960 },
+  height: { ideal: 540 },
+  frameRate: { ideal: 30, max: 30 }
+}
+
 export function stopMediaStream(stream: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop())
 }
@@ -29,11 +36,7 @@ export function useCamera() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
-        video: {
-          facingMode: 'user',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
+        video: CAMERA_CONSTRAINTS
       })
       streamRef.current = stream
       if (videoRef.current) {

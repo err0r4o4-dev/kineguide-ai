@@ -5,6 +5,12 @@ import type {
   PoseAdapter,
   PoseAdapterFactory
 } from './poseAdapter'
+import { HOLISTIC_INTERVAL_MS } from './poseAdapter'
+import {
+  cancelPoseFrame,
+  schedulePoseFrame,
+  type PoseFrameHandle
+} from './poseFrameScheduler'
 import type { PoseLandmark } from './poseGeometry'
 import { classifyPoseFrame, type ClassifiedPoseFrame } from './poseGeometry'
 import { smoothLandmarks } from './poseSmoothing'
@@ -45,8 +51,6 @@ const EMPTY_DETAILS = {
   blink: null
 } as const
 
-const INFERENCE_INTERVAL_MS = 125
-
 export function usePoseTracking(
   videoRef: RefObject<HTMLVideoElement | null>,
   active: boolean,
@@ -66,9 +70,10 @@ export function usePoseTracking(
     }
 
     let adapter: PoseAdapter | null = null
-    let animationFrame = 0
+    let scheduledFrame: PoseFrameHandle | null = null
+    let scheduledVideo: HTMLVideoElement | null = null
     let cancelled = false
-    let lastInference = 0
+    let lastInference = Number.NEGATIVE_INFINITY
     let previousPose: PoseLandmark[] | null = null
     let previousFace: PoseLandmark[] | null = null
     let previousLeftHand: PoseLandmark[] | null = null
@@ -82,7 +87,8 @@ export function usePoseTracking(
     }
 
     const schedule = () => {
-      animationFrame = window.requestAnimationFrame(processFrame)
+      scheduledVideo = videoRef.current
+      scheduledFrame = schedulePoseFrame(scheduledVideo, processFrame)
     }
     const processFrame = (timestamp: number) => {
       if (cancelled) return
@@ -91,7 +97,7 @@ export function usePoseTracking(
         adapter &&
         video &&
         video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
-        timestamp - lastInference >= INFERENCE_INTERVAL_MS
+        timestamp - lastInference + 0.5 >= HOLISTIC_INTERVAL_MS
       ) {
         lastInference = timestamp
         try {
@@ -159,7 +165,7 @@ export function usePoseTracking(
     return () => {
       cancelled = true
       clearSmoothingHistory()
-      window.cancelAnimationFrame(animationFrame)
+      cancelPoseFrame(scheduledVideo, scheduledFrame)
       adapter?.close()
     }
   }, [active, createAdapter, exerciseSlug, videoRef])

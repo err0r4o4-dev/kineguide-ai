@@ -21,6 +21,19 @@ export interface PoseDetectionResult {
 
 export type PoseAdapterFactory = () => Promise<PoseAdapter>
 
+export const HOLISTIC_INTERVAL_MS = 1000 / 15
+export const SAFETY_POSE_INTERVAL_MS = 1000 / 5
+
+export function shouldRunSafetyPose(
+  lastSafetyTimestamp: number | null,
+  timestampMs: number
+) {
+  return (
+    lastSafetyTimestamp === null ||
+    timestampMs - lastSafetyTimestamp >= SAFETY_POSE_INTERVAL_MS
+  )
+}
+
 const MEDIAPIPE_VERSION = '1.0.1'
 const WASM_BASE_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`
 const POSE_MODEL_URL =
@@ -82,10 +95,18 @@ export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
     poseLandmarker.close()
     throw error
   }
+  let lastSafetyTimestamp: number | null = null
+  let safetyPoses: PoseLandmark[][] = []
 
   return {
     detect(video, timestampMs) {
-      const poseResult = poseLandmarker.detectForVideo(video, timestampMs)
+      if (shouldRunSafetyPose(lastSafetyTimestamp, timestampMs)) {
+        const poseResult = poseLandmarker.detectForVideo(video, timestampMs)
+        safetyPoses = poseResult.landmarks.map((pose) =>
+          pose.map(({ x, y, z, visibility }) => ({ x, y, z, visibility }))
+        )
+        lastSafetyTimestamp = timestampMs
+      }
       const holisticResult = holisticLandmarker.detectForVideo(
         video,
         timestampMs
@@ -99,9 +120,19 @@ export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
           ?.score ?? 0
 
       return {
-        poses: poseResult.landmarks.map((pose) =>
-          pose.map(({ x, y, z, visibility }) => ({ x, y, z, visibility }))
-        ),
+        // Multi-person detection remains authoritative. With exactly one
+        // person, the faster Holistic pose drives the display landmarks.
+        poses:
+          safetyPoses.length === 1
+            ? holisticResult.poseLandmarks.map((pose) =>
+                pose.map(({ x, y, z, visibility }) => ({
+                  x,
+                  y,
+                  z,
+                  visibility
+                }))
+              )
+            : safetyPoses,
         faceLandmarks: copyLandmarks(holisticResult.faceLandmarks[0]),
         leftHandLandmarks: copyLandmarks(holisticResult.leftHandLandmarks[0]),
         rightHandLandmarks: copyLandmarks(holisticResult.rightHandLandmarks[0]),

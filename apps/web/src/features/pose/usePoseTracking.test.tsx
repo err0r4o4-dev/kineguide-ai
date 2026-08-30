@@ -26,6 +26,9 @@ describe('usePoseTracking', () => {
       .mockImplementation(() => undefined)
     const video = document.createElement('video')
     Object.defineProperty(video, 'readyState', { value: 2 })
+    Object.defineProperty(video, 'requestVideoFrameCallback', {
+      value: undefined
+    })
     const adapter: PoseAdapter = {
       detect: vi.fn(() => ({
         poses: [visiblePose()],
@@ -45,7 +48,7 @@ describe('usePoseTracking', () => {
 
     await waitFor(() => expect(result.current.status).toBe('no_pose'))
     expect(nextFrame).toBeDefined()
-    act(() => nextFrame?.(125))
+    act(() => nextFrame?.(67))
     expect(result.current.status).toBe('ready')
     expect(adapter.detect).toHaveBeenCalledOnce()
 

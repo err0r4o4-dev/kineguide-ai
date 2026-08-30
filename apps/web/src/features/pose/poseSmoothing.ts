@@ -1,16 +1,13 @@
 import type { PoseLandmark } from './poseGeometry'
 
-// Display-only exponential smoothing. Classification continues to use the raw
-// current frame so visual history cannot become a clinical or safety decision.
-const DISPLAY_SMOOTHING_ALPHA = 0.45
+// Display-only adaptive smoothing. Small changes are damped while larger real
+// movements are followed quickly. Classification continues to use raw frames.
+const MIN_DISPLAY_ALPHA = 0.35
+const MAX_DISPLAY_ALPHA = 0.85
+const MOTION_GAIN = 6.25
 
-function blend(previous: number, current: number) {
-  return Number(
-    (
-      previous * (1 - DISPLAY_SMOOTHING_ALPHA) +
-      current * DISPLAY_SMOOTHING_ALPHA
-    ).toFixed(4)
-  )
+function blend(previous: number, current: number, alpha: number) {
+  return Number((previous * (1 - alpha) + current * alpha).toFixed(4))
 }
 
 export function smoothLandmarks(
@@ -25,14 +22,25 @@ export function smoothLandmarks(
   return current.map((landmark, index) => {
     const before = previous[index]
     if (!before) return { ...landmark }
+    const displacement = Math.hypot(
+      landmark.x - before.x,
+      landmark.y - before.y
+    )
+    const alpha = Math.min(
+      MAX_DISPLAY_ALPHA,
+      Math.max(
+        MIN_DISPLAY_ALPHA,
+        MIN_DISPLAY_ALPHA + displacement * MOTION_GAIN
+      )
+    )
     return {
       ...landmark,
-      x: blend(before.x, landmark.x),
-      y: blend(before.y, landmark.y),
+      x: blend(before.x, landmark.x, alpha),
+      y: blend(before.y, landmark.y, alpha),
       z:
         before.z === undefined || landmark.z === undefined
           ? landmark.z
-          : blend(before.z, landmark.z)
+          : blend(before.z, landmark.z, alpha)
     }
   })
 }
