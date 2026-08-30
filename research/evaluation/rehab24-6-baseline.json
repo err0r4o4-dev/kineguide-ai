@@ -1,0 +1,149 @@
+{
+  "dataset": "REHAB24-6",
+  "dataset_doi": "10.5281/zenodo.13305826",
+  "method": "front-view normalized 2D skeleton standardized 5-nearest-neighbor baseline",
+  "release_status": "research_only",
+  "examples_after_quality_filter": 371,
+  "exercises": {
+    "arm-abduction": {
+      "examples": 58,
+      "evaluation": "leave-one-subject-out cross-validation",
+      "evaluated_person_ids": [
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9
+      ],
+      "confusion_matrix": {
+        "tp": 20,
+        "tn": 9,
+        "fp": 16,
+        "fn": 13
+      },
+      "accuracy": 0.5,
+      "sensitivity": 0.6060606060606061,
+      "specificity": 0.36
+    },
+    "arm-vw": {
+      "examples": 62,
+      "evaluation": "leave-one-subject-out cross-validation",
+      "evaluated_person_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "confusion_matrix": {
+        "tp": 26,
+        "tn": 8,
+        "fp": 24,
+        "fn": 4
+      },
+      "accuracy": 0.5483870967741935,
+      "sensitivity": 0.8666666666666667,
+      "specificity": 0.25
+    },
+    "table-push-up": {
+      "examples": 91,
+      "evaluation": "leave-one-subject-out cross-validation",
+      "evaluated_person_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10
+      ],
+      "confusion_matrix": {
+        "tp": 39,
+        "tn": 27,
+        "fp": 19,
+        "fn": 6
+      },
+      "accuracy": 0.7252747252747253,
+      "sensitivity": 0.8666666666666667,
+      "specificity": 0.5869565217391305
+    },
+    "standing-leg-abduction": {
+      "examples": 52,
+      "evaluation": "leave-one-subject-out cross-validation",
+      "evaluated_person_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "confusion_matrix": {
+        "tp": 31,
+        "tn": 3,
+        "fp": 14,
+        "fn": 4
+      },
+      "accuracy": 0.6538461538461539,
+      "sensitivity": 0.8857142857142857,
+      "specificity": 0.17647058823529413
+    },
+    "lunge": {
+      "examples": 56,
+      "evaluation": "leave-one-subject-out cross-validation",
+      "evaluated_person_ids": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "confusion_matrix": {
+        "tp": 7,
+        "tn": 14,
+        "fp": 11,
+        "fn": 24
+      },
+      "accuracy": 0.375,
+      "sensitivity": 0.22580645161290322,
+      "specificity": 0.56
+    },
+    "squat": {
+      "examples": 52,
+      "evaluation": "leave-one-subject-out cross-validation",
+      "evaluated_person_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "confusion_matrix": {
+        "tp": 30,
+        "tn": 1,
+        "fp": 15,
+        "fn": 6
+      },
+      "accuracy": 0.5961538461538461,
+      "sensitivity": 0.8333333333333334,
+      "specificity": 0.0625
+    }
+  }
+}

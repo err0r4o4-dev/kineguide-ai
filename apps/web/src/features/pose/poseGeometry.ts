@@ -35,7 +35,15 @@ const BOUNDS_PADDING = 0.05
 const REQUIRED_LANDMARKS: Record<string, readonly number[]> = {
   'sit-to-stand-demo': [11, 12, 23, 24, 25, 26, 27, 28],
   'seated-knee-demo': [23, 24, 25, 26, 27, 28],
-  'shoulder-movement-demo': [11, 12, 13, 14, 15, 16]
+  'shoulder-movement-demo': [11, 12, 13, 14, 15, 16],
+  'arm-abduction-research-demo': [11, 12, 13, 14, 15, 16, 23, 24],
+  'arm-vw-research-demo': [11, 12, 13, 14, 15, 16, 23, 24],
+  'table-push-up-research-demo': [
+    11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28
+  ],
+  'standing-leg-abduction-research-demo': [23, 24, 25, 26, 27, 28],
+  'lunge-research-demo': [11, 12, 23, 24, 25, 26, 27, 28],
+  'squat-research-demo': [11, 12, 23, 24, 25, 26, 27, 28]
 }
 
 function clamp(value: number) {

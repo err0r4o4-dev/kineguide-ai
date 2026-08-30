@@ -23,14 +23,21 @@ describe('pose geometry', () => {
     expect(bounds).toEqual({ x: 0, y: 0.05, width: 0.85, height: 0.95 })
   })
 
-  it.each(['sit-to-stand-demo', 'seated-knee-demo', 'shoulder-movement-demo'])(
-    'accepts a technically visible pose for %s',
-    (exerciseSlug) => {
-      expect(classifyPoseFrame([syntheticPose()], exerciseSlug).status).toBe(
-        'ready'
-      )
-    }
-  )
+  it.each([
+    'sit-to-stand-demo',
+    'seated-knee-demo',
+    'shoulder-movement-demo',
+    'arm-abduction-research-demo',
+    'arm-vw-research-demo',
+    'table-push-up-research-demo',
+    'standing-leg-abduction-research-demo',
+    'lunge-research-demo',
+    'squat-research-demo'
+  ])('accepts a technically visible pose for %s', (exerciseSlug) => {
+    expect(classifyPoseFrame([syntheticPose()], exerciseSlug).status).toBe(
+      'ready'
+    )
+  })
 
   it('asks for camera adjustment when a required landmark is unreliable', () => {
     const pose = syntheticPose()
