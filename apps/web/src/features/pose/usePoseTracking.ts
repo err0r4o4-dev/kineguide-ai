@@ -7,6 +7,7 @@ import type {
 } from './poseAdapter'
 import type { PoseLandmark } from './poseGeometry'
 import { classifyPoseFrame, type ClassifiedPoseFrame } from './poseGeometry'
+import { smoothLandmarks } from './poseSmoothing'
 
 export type PoseTrackingStatus =
   | 'idle'
@@ -68,6 +69,17 @@ export function usePoseTracking(
     let animationFrame = 0
     let cancelled = false
     let lastInference = 0
+    let previousPose: PoseLandmark[] | null = null
+    let previousFace: PoseLandmark[] | null = null
+    let previousLeftHand: PoseLandmark[] | null = null
+    let previousRightHand: PoseLandmark[] | null = null
+
+    const clearSmoothingHistory = () => {
+      previousPose = null
+      previousFace = null
+      previousLeftHand = null
+      previousRightHand = null
+    }
 
     const schedule = () => {
       animationFrame = window.requestAnimationFrame(processFrame)
@@ -84,11 +96,29 @@ export function usePoseTracking(
         lastInference = timestamp
         try {
           const result = adapter.detect(video, timestamp)
+          const classified = classifyPoseFrame(result.poses, exerciseSlug)
+          if (!classified.landmarks) {
+            clearSmoothingHistory()
+            setSnapshot({ ...classified, ...EMPTY_DETAILS })
+            schedule()
+            return
+          }
+          previousPose = smoothLandmarks(previousPose, classified.landmarks)
+          previousFace = smoothLandmarks(previousFace, result.faceLandmarks)
+          previousLeftHand = smoothLandmarks(
+            previousLeftHand,
+            result.leftHandLandmarks
+          )
+          previousRightHand = smoothLandmarks(
+            previousRightHand,
+            result.rightHandLandmarks
+          )
           setSnapshot({
-            ...classifyPoseFrame(result.poses, exerciseSlug),
-            faceLandmarks: result.faceLandmarks,
-            leftHandLandmarks: result.leftHandLandmarks,
-            rightHandLandmarks: result.rightHandLandmarks,
+            ...classified,
+            landmarks: previousPose,
+            faceLandmarks: previousFace,
+            leftHandLandmarks: previousLeftHand,
+            rightHandLandmarks: previousRightHand,
             blink: result.blink
           })
         } catch {
@@ -128,6 +158,7 @@ export function usePoseTracking(
 
     return () => {
       cancelled = true
+      clearSmoothingHistory()
       window.cancelAnimationFrame(animationFrame)
       adapter?.close()
     }

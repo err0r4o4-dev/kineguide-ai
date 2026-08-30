@@ -49,4 +49,20 @@ describe('PoseOverlay', () => {
       container.querySelector('[data-blink="detected"]')
     ).toBeInTheDocument()
   })
+
+  it('does not connect body landmarks that are unreliable in a side view', () => {
+    const sideViewSnapshot = {
+      ...snapshot,
+      landmarks:
+        snapshot.landmarks?.map((landmark, index) => ({
+          ...landmark,
+          visibility: index === 1 ? 0.6 : landmark.visibility
+        })) ?? null
+    }
+    const { container } = render(<PoseOverlay snapshot={sideViewSnapshot} />)
+    const body = container.querySelector('[data-overlay="body"]')
+
+    expect(body?.querySelector('[data-body-connection="0-1"]')).toBeNull()
+    expect(body?.querySelector('[data-body-connection="1-2"]')).toBeNull()
+  })
 })

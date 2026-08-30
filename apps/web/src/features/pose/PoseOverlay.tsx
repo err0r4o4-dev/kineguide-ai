@@ -39,6 +39,9 @@ const CONNECTIONS = [
 ] as const
 
 const SVG_SCALE = 100
+// A stricter display gate suppresses unstable self-occluded side-view points.
+// It does not change pose classification or exercise feedback.
+const DISPLAY_VISIBILITY_GATE = 0.65
 
 const HAND_CONNECTIONS = [
   [0, 1],
@@ -144,8 +147,15 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
           if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
             return null
           }
+          if (
+            (from.visibility ?? 0) < DISPLAY_VISIBILITY_GATE ||
+            (to.visibility ?? 0) < DISPLAY_VISIBILITY_GATE
+          ) {
+            return null
+          }
           return (
             <line
+              data-body-connection={`${start}-${end}`}
               key={`${start}-${end}`}
               stroke={bodyStroke}
               strokeLinecap="round"
@@ -159,7 +169,7 @@ export function PoseOverlay({ snapshot }: { snapshot: PoseTrackingSnapshot }) {
           )
         })}
         {landmarks.map((landmark, index) =>
-          (landmark.visibility ?? 0) >= 0.5 ? (
+          (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
             <circle
               cx={landmark.x * SVG_SCALE}
               cy={landmark.y * SVG_SCALE}
