@@ -502,7 +502,11 @@ const th = {
     subtitle: 'เฉพาะ session summary ที่คุณอนุญาตให้จัดเก็บ',
     empty: 'ยังไม่มีประวัติ',
     completed: 'เสร็จสิ้น',
-    stopped: 'หยุดก่อนเสร็จ'
+    stopped: 'หยุดก่อนเสร็จ',
+    pagination: 'การแบ่งหน้าประวัติกิจกรรม',
+    previousPage: 'หน้าก่อนหน้า',
+    nextPage: 'หน้าถัดไป',
+    pageStatus: 'หน้า {{page}} จาก {{total}}'
   },
   progress: {
     title: 'ความก้าวหน้าด้านกิจกรรม',
@@ -1166,7 +1170,11 @@ const en: typeof th = {
     subtitle: 'Only session summaries you consented to store',
     empty: 'No history yet',
     completed: 'Completed',
-    stopped: 'Stopped early'
+    stopped: 'Stopped early',
+    pagination: 'Activity history pagination',
+    previousPage: 'Previous page',
+    nextPage: 'Next page',
+    pageStatus: 'Page {{page}} of {{total}}'
   },
   progress: {
     title: 'Activity progress',
