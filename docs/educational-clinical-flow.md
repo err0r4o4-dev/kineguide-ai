@@ -17,6 +17,10 @@ The placeholders deliberately contain no symptom, red-flag, contraindication, tr
 
 ## End-to-end data flow
 
+The account-scoped chat recognizes explicit requests to view movements and returns the full
+pending-review demonstration list from the Go-owned catalog. This deterministic response does not
+require an LLM token and does not select or rank a movement from the user's symptom text.
+
 ```text
 Active prototype consent
   -> React requests localized mock catalog from Go
@@ -80,4 +84,3 @@ Landmark extraction remains in React because repository privacy architecture req
 ## Required physiotherapist review before production
 
 A qualified, authorized reviewer must provide and approve each locale-specific record, including intended population, exact question wording, answer semantics, escalation action, exercise purpose, contraindications, stop conditions, evidence citations, review identity/time, and version. The team must then add deterministic tests for every approved rule, perform usability and safety evaluation with synthetic cases first, complete privacy/legal review, and release approved content separately from code.
-

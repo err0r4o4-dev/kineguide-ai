@@ -360,10 +360,6 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 	if !a.requireAIChatConsent(c) {
 		return
 	}
-	if a.chatAI == nil {
-		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable.")
-		return
-	}
 	var request struct {
 		Content string `json:"content"`
 	}
@@ -385,6 +381,15 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load the conversation.")
 		return
 	}
+	assistantContent, isEducationalMovementRequest := product.EducationalExerciseChatResponse(conversation.Locale, request.Content)
+	if isEducationalMovementRequest {
+		a.saveConversationExchange(c, conversation.ID, request.Content, assistantContent)
+		return
+	}
+	if a.chatAI == nil {
+		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable.")
+		return
+	}
 	history, err := a.store.ListMessages(c.Request.Context(), c.GetString(userIDKey), conversation.ID, 20)
 	if err != nil {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load conversation context.")
@@ -401,7 +406,11 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable. Please try again.")
 		return
 	}
-	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversation.ID, request.Content, generated.Message)
+	a.saveConversationExchange(c, conversation.ID, request.Content, generated.Message)
+}
+
+func (a *productAPI) saveConversationExchange(c *gin.Context, conversationID, userContent, assistantContent string) {
+	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversationID, userContent, assistantContent)
 	if errors.Is(err, product.ErrNotFound) {
 		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
 		return

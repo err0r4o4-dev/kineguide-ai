@@ -122,6 +122,61 @@ func TestChatCreatesAccountScopedConversationAndStoresSuccessfulExchange(t *test
 	assert.Len(t, store.saved, 2)
 }
 
+func TestChatListsPendingMovementDemonstrationsWithoutCallingAI(t *testing.T) {
+	tests := []struct {
+		name        string
+		locale      string
+		content     string
+		wantTitle   string
+		wantPending string
+	}{
+		{
+			name:        "Thai request",
+			locale:      "th",
+			content:     "ฉันปวดหลัง มีท่าอะไรแนะนำบ้าง",
+			wantTitle:   "สาธิตการลุกนั่งจากเก้าอี้",
+			wantPending: "รอตรวจสอบโดยผู้เชี่ยวชาญ",
+		},
+		{
+			name:        "English request",
+			locale:      "en",
+			content:     "Can you recommend an exercise?",
+			wantTitle:   "Sit-to-stand movement demo",
+			wantPending: "Pending professional review",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			conversationID := "864cb7ae-64dd-4db4-8200-12b44e5bcab1"
+			store := &chatStore{
+				consent: product.Consent{
+					ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true,
+				},
+				conversation: product.Conversation{
+					ID: conversationID, UserID: chatTestUserID, Locale: test.locale,
+				},
+			}
+			chatAI := &stubChatAI{err: errors.New("provider should not be called")}
+			router := chatRouter(t, store, chatAI)
+
+			response := httptest.NewRecorder()
+			router.ServeHTTP(response, authenticatedChatRequest(
+				t, http.MethodPost, "/v1/conversations/"+conversationID+"/messages",
+				`{"content":"`+test.content+`"}`,
+			))
+
+			require.Equal(t, http.StatusCreated, response.Code)
+			require.Len(t, store.saved, 2)
+			assert.Contains(t, store.saved[1].Content, test.wantTitle)
+			assert.Contains(t, store.saved[1].Content, test.wantPending)
+			assert.NotContains(t, store.saved[1].Content, "เหมาะกับอาการของคุณ")
+			assert.NotContains(t, store.saved[1].Content, "treat")
+			assert.Zero(t, chatAI.calls)
+		})
+	}
+}
+
 func TestChatRequiresCurrentRetentionConsentPolicy(t *testing.T) {
 	store := &chatStore{consent: product.Consent{ID: "consent", PolicyVersion: "prototype-v2", AIChatStorage: true}}
 	router := chatRouter(t, store, &stubChatAI{})

@@ -625,8 +625,11 @@ paths:
       tags: [Conversations]
       summary: Generate and persist one user/assistant exchange
       description: >-
-        Requires explicit AI-chat storage consent. If the internal AI dependency is unavailable,
-        neither the submitted message nor an assistant response is persisted.
+        Requires explicit AI-chat storage consent. Requests to view movement demonstrations are
+        answered deterministically from the pending-review educational catalog without selecting
+        an exercise for a symptom or calling the AI provider. Other messages use the internal AI
+        dependency; if it is unavailable, neither the submitted message nor an assistant response
+        is persisted.
       security: [{ bearerAuth: [] }]
       parameters: [{ $ref: "#/components/parameters/ConversationID" }]
       requestBody:

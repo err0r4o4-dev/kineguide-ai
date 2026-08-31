@@ -131,6 +131,10 @@ describe('ChatPage', () => {
     const textbox = await screen.findByRole('textbox', {
       name: 'ข้อความถึง KineGuide AI'
     })
+    expect(textbox).toHaveAttribute(
+      'placeholder',
+      'ลองพิมพ์: มีท่าสาธิตอะไรแนะนำบ้าง'
+    )
     expect(
       screen.queryByRole('link', { name: 'เริ่มประเมิน' })
     ).not.toBeInTheDocument()
