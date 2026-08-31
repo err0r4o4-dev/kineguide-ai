@@ -17,7 +17,8 @@ services:
     build:
       context: .
       dockerfile: services/api-go/Dockerfile.dev
-    mem_limit: 768m
+    # A cold Go build of Gin's codec dependency exceeds 768 MB on Docker Desktop.
+    mem_limit: 1536m
     volumes:
       - ./services/api-go:/workspace/services/api-go:ro
 

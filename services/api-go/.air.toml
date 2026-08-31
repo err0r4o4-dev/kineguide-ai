@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "/tmp/air"
 
 [build]
-cmd = "go build -p=2 -o /tmp/air/api ./cmd/server"
+cmd = "go build -p=1 -o /tmp/air/api ./cmd/server"
 entrypoint = ["/tmp/air/api"]
 include_ext = ["go"]
 include_dir = ["cmd", "db", "internal"]
