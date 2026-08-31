@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { Camera, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
+import { ExerciseIllustration } from '@/features/exercises/ExerciseIllustration'
 import { getExercises } from '@/services/product'
 
 export function ExerciseLibraryPage() {
@@ -79,8 +80,11 @@ export function ExerciseLibraryPage() {
         <section className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((exercise) => (
             <article className="kg-card overflow-hidden" key={exercise.slug}>
-              <div className="grid aspect-[16/9] place-items-center border-b border-slate-200 bg-slate-50 text-teal-700">
-                <Camera aria-hidden="true" size={54} />
+              <div className="grid aspect-[16/9] place-items-center overflow-hidden border-b border-slate-200 bg-slate-50 text-teal-700">
+                <ExerciseIllustration
+                  className="size-full object-cover"
+                  slug={exercise.slug}
+                />
               </div>
               <div className="p-6">
                 <span className="rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">

@@ -427,6 +427,8 @@ const th = {
     start: 'เริ่มทดสอบกล้อง',
     empty: 'ไม่พบรายการที่ตรงกับการค้นหา',
     review: 'รอ clinical review',
+    sitToStandImageAlt: 'ภาพตัวอย่างสาธิตการลุกนั่งจากเก้าอี้ 3 จังหวะ',
+    shoulderImageAlt: 'ภาพตัวอย่างสาธิตการเคลื่อนไหวหัวไหล่ 3 จังหวะ',
     what: 'ระบบจะทำอะไร',
     whatBody:
       'เปิดกล้องหลังได้รับอนุญาต แสดงภาพในอุปกรณ์ และให้คุณบันทึกจำนวนครั้งด้วยตนเอง',
@@ -1093,6 +1095,9 @@ const en: typeof th = {
     start: 'Test camera',
     empty: 'No matching demos',
     review: 'Clinical review pending',
+    sitToStandImageAlt:
+      'Three-stage illustration of the sit-to-stand movement demo',
+    shoulderImageAlt: 'Three-stage illustration of the shoulder movement demo',
     what: 'What the system does',
     whatBody:
       'Opens the camera after permission, keeps the preview on-device, and lets you record counts manually.',
