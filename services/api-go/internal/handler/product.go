@@ -406,7 +406,19 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable. Please try again.")
 		return
 	}
-	a.saveConversationExchange(c, conversation.ID, request.Content, generated.Message)
+	assistantContent = generated.Message
+	if generated.ToolRequest != nil {
+		switch *generated.ToolRequest {
+		case "list_pending_movement_demonstrations":
+			assistantContent, _ = product.EducationalExerciseChatResponse(conversation.Locale, "show exercise")
+		case "list_pending_evidence":
+			assistantContent = product.PendingEvidenceChatResponse(conversation.Locale)
+		default:
+			writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat requested an unsupported action.")
+			return
+		}
+	}
+	a.saveConversationExchange(c, conversation.ID, request.Content, assistantContent)
 }
 
 func (a *productAPI) saveConversationExchange(c *gin.Context, conversationID, userContent, assistantContent string) {

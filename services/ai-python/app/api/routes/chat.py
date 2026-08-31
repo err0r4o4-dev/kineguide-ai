@@ -29,4 +29,5 @@ async def create_chat_response(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content=response.model_dump(),
         )
-    return ChatResponse(status="completed", message=result.message)
+    tool_request = result.data.get("tool_request") if result.data else None
+    return ChatResponse(status="completed", message=result.message, tool_request=tool_request)

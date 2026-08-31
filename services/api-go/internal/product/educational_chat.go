@@ -40,6 +40,22 @@ func EducationalExerciseChatResponse(locale, message string) (string, bool) {
 	return response.String(), true
 }
 
+// PendingEvidenceChatResponse lists bibliographic records without interpreting
+// them or promoting them to clinically approved content.
+func PendingEvidenceChatResponse(locale string) string {
+	catalog := BuildEducationalClinicalCatalog(locale)
+	var response strings.Builder
+	if normalizeEducationalLocale(locale) == "en" {
+		response.WriteString("References recorded for professional review (not clinically approved):\n\n")
+	} else {
+		response.WriteString("เอกสารที่บันทึกไว้เพื่อรอผู้เชี่ยวชาญตรวจสอบ (ยังไม่ผ่านการอนุมัติทางคลินิก):\n\n")
+	}
+	for index, reference := range catalog.ClinicalReferences {
+		fmt.Fprintf(&response, "%d. %s\n", index+1, reference.Title)
+	}
+	return response.String()
+}
+
 func requestsMovementDemonstrations(message string) bool {
 	normalized := strings.ToLower(strings.TrimSpace(message))
 	movementTerms := []string{"ท่า", "ออกกำลังกาย", "exercise", "movement"}

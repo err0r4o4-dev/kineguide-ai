@@ -482,6 +482,9 @@ const th = {
     live: 'Live session สาธิต',
     timer: 'เวลา',
     reps: 'จำนวนครั้งที่บันทึกเอง',
+    automaticTechnicalCount: 'จำนวนรอบการเคลื่อนไหวอัตโนมัติ (เชิงเทคนิค)',
+    automaticTechnicalBoundary:
+      'นับเฉพาะลำดับการยก-ลดที่กล้องสังเกตได้ ไม่ใช่คะแนนความถูกต้อง ไม่ใช่คำสั่งรักษา และยังไม่บันทึกในประวัติ',
     addRep: 'เพิ่ม 1 ครั้ง',
     undo: 'ย้อนกลับ 1 ครั้ง',
     startCamera: 'เปิดกล้องสำหรับ session',
@@ -1185,6 +1188,9 @@ const en: typeof th = {
     live: 'Live demo session',
     timer: 'Time',
     reps: 'Manually recorded count',
+    automaticTechnicalCount: 'Automatic movement cycles (technical)',
+    automaticTechnicalBoundary:
+      'Counts only an observable raise-lower sequence. It is not a correctness score or treatment direction and is not saved to history yet.',
     addRep: 'Add one',
     undo: 'Undo one',
     startCamera: 'Turn on camera for session',

@@ -48,3 +48,18 @@ func TestDemoStopPlaceholderStopsEducationalFlow(t *testing.T) {
 	assert.Empty(t, result.Exercises)
 	assert.True(t, result.DemoOnly)
 }
+
+func TestEvidenceRecordsRemainPendingAndCannotEnterProduction(t *testing.T) {
+	catalog := BuildEducationalClinicalCatalog("th")
+
+	require.NotEmpty(t, catalog.ClinicalReferences)
+	for _, reference := range catalog.ClinicalReferences {
+		assert.Equal(t, ReviewPendingClinical, reference.ReviewStatus)
+		assert.True(t, reference.DemoOnly)
+		assert.True(t, reference.NotForClinicalUse)
+		assert.Nil(t, reference.ReviewedBy)
+		assert.Nil(t, reference.ReviewedAt)
+		assert.Empty(t, reference.SourceReferences)
+		assert.False(t, EligibleForProductionClinicalFlow(reference.ClinicalMetadata))
+	}
+}

@@ -26,8 +26,9 @@ type ChatRequest struct {
 }
 
 type ChatResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
+	Status      string  `json:"status"`
+	Message     string  `json:"message"`
+	ToolRequest *string `json:"tool_request"`
 }
 
 type TechnicalPoseRequest struct {
@@ -104,6 +105,9 @@ func (c *Client) Respond(ctx context.Context, input ChatRequest) (ChatResponse, 
 	}
 	if result.Status != "completed" || result.Message == "" || len([]rune(result.Message)) > 4000 {
 		return ChatResponse{}, errors.New("invalid AI chat response")
+	}
+	if result.ToolRequest != nil && *result.ToolRequest != "list_pending_movement_demonstrations" && *result.ToolRequest != "list_pending_evidence" {
+		return ChatResponse{}, errors.New("invalid AI chat tool request")
 	}
 	return result, nil
 }

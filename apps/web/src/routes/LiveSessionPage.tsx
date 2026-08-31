@@ -7,7 +7,7 @@ import {
   Play,
   Square
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 
@@ -16,6 +16,7 @@ import { useCamera } from '@/features/camera/useCamera'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
 import { researchProfileForExercise } from '@/features/pose/poseResearchProfiles'
+import { createTechnicalRepetitionCounter } from '@/features/pose/technicalRepetitionCounter'
 import {
   usePoseTracking,
   type PoseTrackingStatus
@@ -47,6 +48,12 @@ export function LiveSessionPage() {
   const researchProfile = researchProfileForExercise(
     query.data?.exercise_slug ?? ''
   )
+  const repetitionCounter = useMemo(
+    () => createTechnicalRepetitionCounter(query.data?.exercise_slug ?? ''),
+    [query.data?.exercise_slug]
+  )
+  const [automaticCount, setAutomaticCount] = useState(0)
+  const [automaticAvailable, setAutomaticAvailable] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [reps, setReps] = useState(0)
   const [running, setRunning] = useState(true)
@@ -76,6 +83,12 @@ export function LiveSessionPage() {
     )
     return () => window.clearInterval(timer)
   }, [running])
+  useEffect(() => {
+    const frameStatus = pose.status === 'ready' ? 'ready' : 'no_pose'
+    const result = repetitionCounter.update(frameStatus, pose.landmarks)
+    setAutomaticCount(result.count)
+    setAutomaticAvailable(result.available)
+  }, [pose.landmarks, pose.status, repetitionCounter])
   const finish = async (status: 'completed' | 'stopped') => {
     setSaving(true)
     setRunning(false)
@@ -236,6 +249,19 @@ export function LiveSessionPage() {
             )}
           </article>
           <article className="kg-card p-6 text-center">
+            <div className="mb-6 rounded-xl border border-sky-200 bg-sky-50 p-4 text-left">
+              <p className="text-sm font-semibold text-sky-950">
+                {t('session.automaticTechnicalCount')}
+              </p>
+              <p className="mt-1 text-3xl font-bold tabular-nums text-sky-900">
+                {automaticAvailable
+                  ? automaticCount
+                  : t('session.notAvailable')}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-sky-900">
+                {t('session.automaticTechnicalBoundary')}
+              </p>
+            </div>
             <p className="text-sm uppercase tracking-wide text-slate-500">
               {t('session.reps')}
             </p>

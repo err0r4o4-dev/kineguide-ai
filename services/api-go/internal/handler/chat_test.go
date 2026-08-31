@@ -188,6 +188,23 @@ func TestChatRequiresCurrentRetentionConsentPolicy(t *testing.T) {
 	assert.Contains(t, response.Body.String(), `"code":"AI_CHAT_CONSENT_REQUIRED"`)
 }
 
+func TestChatExecutesOnlyPendingEvidenceTool(t *testing.T) {
+	tool := "list_pending_evidence"
+	conversationID := "864cb7ae-64dd-4db4-8200-12b44e5bcab1"
+	store := &chatStore{
+		consent:      product.Consent{ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true},
+		conversation: product.Conversation{ID: conversationID, UserID: chatTestUserID, Locale: "th"},
+	}
+	router := chatRouter(t, store, &stubChatAI{response: ai.ChatResponse{Status: "completed", Message: "ignored", ToolRequest: &tool}})
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations/"+conversationID+"/messages", `{"content":"ขอดูหลักฐาน"}`))
+
+	require.Equal(t, http.StatusCreated, response.Code)
+	require.Len(t, store.saved, 2)
+	assert.Contains(t, store.saved[1].Content, "ยังไม่ผ่านการอนุมัติทางคลินิก")
+	assert.Contains(t, store.saved[1].Content, "PMID 25780258")
+}
+
 func TestChatRequiresExplicitStorageConsent(t *testing.T) {
 	store := &chatStore{consent: product.Consent{ID: "consent", AIChatStorage: false}}
 	chatAI := &stubChatAI{}

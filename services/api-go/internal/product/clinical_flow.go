@@ -84,6 +84,28 @@ type ClinicalReference struct {
 	URL   *string `json:"url"`
 }
 
+func referenceURL(value string) *string { return &value }
+
+func pendingClinicalReferences(locale string) []ClinicalReference {
+	items := []struct{ id, title, url string }{
+		{"evidence-pmid-25780258", "Neck and shoulder stretching among office workers (PMID 25780258)", "https://pubmed.ncbi.nlm.nih.gov/25780258/"},
+		{"evidence-jphys-2023-0176", "Self-administered stretching versus motor control exercise for chronic non-specific low back pain", "https://doi.org/10.1016/j.jphys.2023.02.016"},
+		{"evidence-pmc-9824820", "Physiotherapy Exercise Classification with Single-Camera Pose Detection", "https://pmc.ncbi.nlm.nih.gov/articles/PMC9824820/"},
+		{"evidence-pmc-10781250", "A Machine Learning App for Monitoring Physical Therapy at Home", "https://pmc.ncbi.nlm.nih.gov/articles/PMC10781250/"},
+		{"evidence-offistretch", "OffiStretch: camera-based real-time feedback for daily stretching exercises", "https://doi.org/10.1007/s00371-024-03450-y"},
+		{"evidence-pmc-12749503", "Real-time Action Scoring System", "https://pmc.ncbi.nlm.nih.gov/articles/PMC12749503/"},
+		{"evidence-who-low-back-pain", "WHO guideline for non-surgical management of chronic primary low back pain", "https://www.who.int/publications/i/item/9789240081789"},
+		{"evidence-nice-ng59", "NICE guideline NG59: Low back pain and sciatica", "https://www.nice.org.uk/guidance/ng59"},
+		{"evidence-jospt-neck-2017", "Neck Pain Clinical Practice Guideline", "https://doi.org/10.2519/jospt.2017.0302"},
+		{"evidence-jospt-rotator-cuff-2025", "Rotator Cuff Tendinopathy Clinical Practice Guideline", "https://doi.org/10.2519/jospt.2025.13182"},
+	}
+	result := make([]ClinicalReference, 0, len(items))
+	for _, item := range items {
+		result = append(result, ClinicalReference{ClinicalMetadata: pendingMetadata(item.id, locale), Title: item.title, URL: referenceURL(item.url)})
+	}
+	return result
+}
+
 type EducationalClinicalCatalog struct {
 	ReviewWorkflow     []ReviewStatus                `json:"reviewWorkflow"`
 	ScreeningQuestions []ScreeningQuestion           `json:"screeningQuestions"`
@@ -170,7 +192,7 @@ func BuildEducationalClinicalCatalog(locale string) EducationalClinicalCatalog {
 			ClinicalMetadata: pendingMetadata("demo-stop-condition-placeholder-v1", locale),
 			TriggerOptionID:  "demo-stop-selected", Label: placeholderLabel,
 		}},
-		ClinicalReferences: []ClinicalReference{},
+		ClinicalReferences: pendingClinicalReferences(locale),
 	}
 }
 func EligibleForProductionClinicalFlow(metadata ClinicalMetadata) bool {

@@ -23,3 +23,6 @@ class ChatResponse(BaseModel):
 
     status: Literal["completed", "unavailable"]
     message: str = Field(min_length=1, max_length=4000)
+    tool_request: (
+        Literal["list_pending_movement_demonstrations", "list_pending_evidence"] | None
+    ) = None
