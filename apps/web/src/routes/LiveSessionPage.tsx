@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   Camera,
   CircleMinus,
@@ -21,7 +21,11 @@ import {
   type PoseTrackingStatus
 } from '@/features/pose/usePoseTracking'
 import { formatDuration } from '@/lib/format'
-import { getSession, updateSession } from '@/services/product'
+import {
+  getSession,
+  getTechnicalPoseFeedback,
+  updateSession
+} from '@/services/product'
 
 export function LiveSessionPage() {
   const { id = '' } = useParams()
@@ -48,6 +52,14 @@ export function LiveSessionPage() {
   const [running, setRunning] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const technicalFeedback = useMutation({
+    mutationFn: () =>
+      getTechnicalPoseFeedback(id, {
+        pose_status: pose.status,
+        landmark_visibility:
+          pose.landmarks?.map(({ visibility = 0 }) => visibility) ?? []
+      })
+  })
   const initialized = useRef(false)
   useEffect(() => {
     if (query.data && !initialized.current) {
@@ -166,6 +178,44 @@ export function LiveSessionPage() {
             <p className="mt-2 text-xs leading-5 text-slate-500">
               {t('session.posePrivacy')}
             </p>
+            <button
+              className="kg-button-secondary mt-4 w-full"
+              disabled={camera.state !== 'ready' || technicalFeedback.isPending}
+              onClick={() => technicalFeedback.mutate()}
+              type="button"
+            >
+              {technicalFeedback.isPending
+                ? t('common.loading')
+                : t('session.technicalCheck')}
+            </button>
+            {technicalFeedback.data && (
+              <div className="mt-4 border-t border-slate-200 pt-4 text-xs leading-5 text-slate-600">
+                <p className="font-semibold text-slate-800">
+                  {t('session.technicalResult')}
+                </p>
+                <p className="mt-1">
+                  {t(
+                    `session.technicalFeedback.${technicalFeedback.data.camera_feedback}`
+                  )}
+                </p>
+                <p className="mt-1">
+                  {t('session.technicalConfidence', {
+                    value:
+                      technicalFeedback.data.confidence_score === null
+                        ? t('session.notAvailable')
+                        : Math.round(
+                            technicalFeedback.data.confidence_score * 100
+                          )
+                  })}
+                </p>
+                <p className="mt-1">{t('session.phaseUnavailable')}</p>
+              </div>
+            )}
+            {technicalFeedback.isError && (
+              <p className="kg-alert-danger mt-4" role="alert">
+                {t('session.technicalFailed')}
+              </p>
+            )}
             {researchProfile && (
               <div className="mt-4 border-t border-slate-200 pt-4">
                 <p className="text-xs font-semibold text-slate-800">

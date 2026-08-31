@@ -126,6 +126,80 @@ export interface Exercise {
   review_status: 'pending_clinical_review'
 }
 
+export type ClinicalReviewStatus =
+  'draft' | 'pending_clinical_review' | 'approved' | 'rejected' | 'archived'
+
+export interface ClinicalMetadata {
+  id: string
+  version: string
+  locale: 'th' | 'en'
+  reviewStatus: ClinicalReviewStatus
+  demoOnly: boolean
+  notForClinicalUse: boolean
+  reviewedBy: string | null
+  reviewedAt: string | null
+  sourceReferences: string[]
+  lastUpdatedAt: string
+}
+
+export interface ScreeningQuestion extends ClinicalMetadata {
+  prompt: string
+  options: Array<{ id: string; label: string }>
+}
+
+export interface RedFlagPlaceholder extends ClinicalMetadata {
+  triggerOptionId: string
+  label: string
+}
+
+export interface EducationalExercise extends ClinicalMetadata {
+  slug: string
+  title: string
+  description: string
+}
+
+export interface ClinicalPlaceholder extends ClinicalMetadata {
+  label: string
+  triggerOptionId?: string
+}
+
+export interface ClinicalReference extends ClinicalMetadata {
+  title: string
+  url: string | null
+}
+
+export interface EducationalClinicalCatalog {
+  reviewWorkflow: ClinicalReviewStatus[]
+  screeningQuestions: ScreeningQuestion[]
+  redFlags: RedFlagPlaceholder[]
+  exercises: EducationalExercise[]
+  contraindications: ClinicalPlaceholder[]
+  stopConditions: ClinicalPlaceholder[]
+  clinicalReferences: ClinicalReference[]
+}
+
+export interface EducationalScreeningResult {
+  outcome: 'stopped_demo_placeholder' | 'demo_exercises_available'
+  message: string
+  demoOnly: true
+  notForClinicalUse: true
+  exercises: EducationalExercise[]
+}
+
+export interface TechnicalPoseFeedback {
+  status: 'completed'
+  movement_phase: 'unavailable'
+  repetition_count: null
+  confidence_score: number | null
+  camera_feedback:
+    | 'waiting_for_camera'
+    | 'camera_ready'
+    | 'adjust_camera'
+    | 'multiple_people_detected'
+    | 'unsupported_exercise'
+    | 'technical_analysis_unavailable'
+}
+
 export interface ActivityPlanDay {
   day: number
   exercises: Exercise[]
@@ -335,6 +409,28 @@ export async function getExercises(signal?: AbortSignal) {
   return response.data.exercises
 }
 
+export async function getEducationalClinicalCatalog(
+  locale: 'th' | 'en',
+  signal?: AbortSignal
+) {
+  const response = await http.get<EducationalClinicalCatalog>(
+    '/educational-clinical-flow/catalog',
+    { params: { locale }, signal }
+  )
+  return response.data
+}
+
+export async function evaluateEducationalScreening(input: {
+  locale: 'th' | 'en'
+  answers: Array<{ questionId: string; optionId: string }>
+}) {
+  const response = await http.post<EducationalScreeningResult>(
+    '/educational-clinical-flow/evaluate',
+    input
+  )
+  return response.data
+}
+
 export async function getExercise(slug: string, signal?: AbortSignal) {
   const response = await http.get<Exercise>(`/exercises/${slug}`, { signal })
   return response.data
@@ -383,5 +479,19 @@ export async function updateSession(
   >
 ) {
   const response = await http.patch<ExerciseSession>(`/sessions/${id}`, input)
+  return response.data
+}
+
+export async function getTechnicalPoseFeedback(
+  id: string,
+  input: {
+    pose_status: string
+    landmark_visibility: number[]
+  }
+) {
+  const response = await http.post<TechnicalPoseFeedback>(
+    `/sessions/${id}/technical-feedback`,
+    input
+  )
   return response.data
 }

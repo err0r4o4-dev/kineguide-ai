@@ -27,10 +27,15 @@ type ChatResponder interface {
 	Respond(context.Context, ai.ChatRequest) (ai.ChatResponse, error)
 }
 
+type TechnicalPoseResponder interface {
+	TechnicalPoseFeedback(context.Context, ai.TechnicalPoseRequest) (ai.TechnicalPoseResponse, error)
+}
+
 type Dependencies struct {
 	Database       Pinger
 	AI             Pinger
 	ChatAI         ChatResponder
+	TechnicalAI    TechnicalPoseResponder
 	Store          product.Store
 	Signer         *security.TokenSigner
 	OAuthProviders map[string]oauthprovider.Provider
@@ -77,7 +82,7 @@ func NewRouter(cfg config.Config, dependencies Dependencies, logger *slog.Logger
 	router.GET(apiV1Prefix+"/system/status", systemStatusHandler(cfg.Version, dependencies))
 	router.GET("/openapi.json", openAPIHandler)
 	router.GET("/docs", docsHandler)
-	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders, dependencies.ChatAI)
+	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders, dependencies.ChatAI, dependencies.TechnicalAI)
 	return router
 }
 
