@@ -1,0 +1,382 @@
+import type { PoseTrackingSnapshot } from './usePoseTracking'
+
+const MIDDLE_BODY_CONNECTIONS = [
+  [11, 12],
+  [11, 13],
+  [13, 15],
+  [15, 17],
+  [15, 19],
+  [15, 21],
+  [17, 19],
+  [12, 14],
+  [14, 16],
+  [16, 18],
+  [16, 20],
+  [16, 22],
+  [18, 20],
+  [11, 23],
+  [12, 24],
+  [23, 24]
+] as const
+
+const LOWER_BODY_CONNECTIONS = [
+  [23, 25],
+  [24, 26],
+  [25, 27],
+  [26, 28],
+  [27, 29],
+  [28, 30],
+  [29, 31],
+  [30, 32],
+  [27, 31],
+  [28, 32]
+] as const
+
+const FALLBACK_FRAME_SIZE = 100
+// A stricter display gate suppresses unstable self-occluded side-view points.
+// It does not change pose classification or exercise feedback.
+const DISPLAY_VISIBILITY_GATE = 0.5
+// Regional confidence is display-only. These landmarks confirm that a region
+// is technically visible; they do not indicate exercise correctness.
+const MIDDLE_CLARITY_LANDMARKS = [11, 12, 13, 14, 15, 16, 23, 24] as const
+const LOWER_CLARITY_LANDMARKS = [23, 24, 25, 26, 27, 28] as const
+// Pose landmarks 0-10 are a coarse face approximation. The dedicated face
+// mesh below owns facial rendering so these marks are intentionally omitted.
+const FIRST_MIDDLE_LANDMARK = 11
+const LAST_MIDDLE_LANDMARK = 22
+const FIRST_LOWER_LANDMARK = 23
+const LAST_LOWER_LANDMARK = 32
+
+const HAND_CONNECTIONS = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 4],
+  [0, 5],
+  [5, 6],
+  [6, 7],
+  [7, 8],
+  [5, 9],
+  [9, 10],
+  [10, 11],
+  [11, 12],
+  [9, 13],
+  [13, 14],
+  [14, 15],
+  [15, 16],
+  [13, 17],
+  [17, 18],
+  [18, 19],
+  [19, 20],
+  [0, 17]
+] as const
+
+function chain(indices: readonly number[]) {
+  return indices.slice(1).map((end, index) => [indices[index], end] as const)
+}
+
+const FACE_FEATURES = [
+  chain([
+    10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379,
+    378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127,
+    162, 21, 54, 103, 67, 109, 10
+  ]),
+  chain([33, 160, 158, 133, 153, 144, 33]),
+  chain([362, 385, 387, 263, 373, 380, 362]),
+  chain([70, 63, 105, 66, 107]),
+  chain([336, 296, 334, 293, 300]),
+  chain([61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 61]),
+  chain([168, 6, 197, 195, 5, 4, 1, 2]),
+  chain([98, 97, 2, 326, 327])
+] as const
+
+function isRegionClear(
+  indices: readonly number[],
+  landmarks: readonly {
+    x: number
+    y: number
+    visibility?: number
+  }[],
+  unreliable: ReadonlySet<number>
+) {
+  return indices.every((index) => {
+    const landmark = landmarks[index]
+    return Boolean(
+      landmark &&
+      !unreliable.has(index) &&
+      Number.isFinite(landmark.x) &&
+      Number.isFinite(landmark.y) &&
+      landmark.x >= 0 &&
+      landmark.x <= 1 &&
+      landmark.y >= 0 &&
+      landmark.y <= 1 &&
+      (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE
+    )
+  })
+}
+
+function LandmarkLines({
+  connections,
+  frameHeight,
+  frameWidth,
+  landmarks,
+  stroke,
+  width
+}: {
+  connections: readonly (readonly [number, number])[]
+  frameHeight: number
+  frameWidth: number
+  landmarks: readonly { x: number; y: number }[]
+  stroke: string
+  width: number
+}) {
+  return connections.map(([start, end]) => {
+    const from = landmarks[start]
+    const to = landmarks[end]
+    if (!from || !to) return null
+    return (
+      <line
+        key={`${start}-${end}`}
+        stroke={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={(width * frameHeight) / 100}
+        x1={from.x * frameWidth}
+        x2={to.x * frameWidth}
+        y1={from.y * frameHeight}
+        y2={to.y * frameHeight}
+      />
+    )
+  })
+}
+
+function BodyRegion({
+  connections,
+  firstLandmark,
+  frameHeight,
+  frameWidth,
+  landmarks,
+  lastLandmark,
+  stroke,
+  unreliable,
+  unit
+}: {
+  connections: readonly (readonly [number, number])[]
+  firstLandmark: number
+  frameHeight: number
+  frameWidth: number
+  landmarks: readonly {
+    x: number
+    y: number
+    visibility?: number
+  }[]
+  lastLandmark: number
+  stroke: string
+  unreliable: ReadonlySet<number>
+  unit: number
+}) {
+  return (
+    <>
+      {connections.map(([start, end]) => {
+        const from = landmarks[start]
+        const to = landmarks[end]
+        if (!from || !to || unreliable.has(start) || unreliable.has(end)) {
+          return null
+        }
+        if (
+          (from.visibility ?? 0) < DISPLAY_VISIBILITY_GATE ||
+          (to.visibility ?? 0) < DISPLAY_VISIBILITY_GATE
+        ) {
+          return null
+        }
+        return (
+          <line
+            data-body-connection={`${start}-${end}`}
+            key={`${start}-${end}`}
+            stroke={stroke}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={0.72 * unit}
+            x1={from.x * frameWidth}
+            x2={to.x * frameWidth}
+            y1={from.y * frameHeight}
+            y2={to.y * frameHeight}
+          />
+        )
+      })}
+      {landmarks.map((landmark, index) =>
+        index >= firstLandmark &&
+        index <= lastLandmark &&
+        !unreliable.has(index) &&
+        (landmark.visibility ?? 0) >= DISPLAY_VISIBILITY_GATE ? (
+          <circle
+            cx={landmark.x * frameWidth}
+            cy={landmark.y * frameHeight}
+            data-body-landmark={index}
+            fill={stroke}
+            key={index}
+            r={0.45 * unit}
+            stroke="#f8fafc"
+            strokeWidth={0.18 * unit}
+          />
+        ) : null
+      )}
+    </>
+  )
+}
+
+export function PoseOverlay({
+  snapshot,
+  video = null
+}: {
+  snapshot: PoseTrackingSnapshot
+  video?: HTMLVideoElement | null
+}) {
+  const {
+    blink,
+    bounds,
+    faceLandmarks,
+    landmarks,
+    leftHandLandmarks,
+    rightHandLandmarks,
+    status,
+    unreliableLandmarks
+  } = snapshot
+  const canDisplayPartialPose = status === 'ready' || status === 'adjust_camera'
+  if (!canDisplayPartialPose || !landmarks || !bounds) return null
+
+  const unreliable = new Set(unreliableLandmarks)
+  const middleClear = isRegionClear(
+    MIDDLE_CLARITY_LANDMARKS,
+    landmarks,
+    unreliable
+  )
+  const lowerClear = isRegionClear(
+    LOWER_CLARITY_LANDMARKS,
+    landmarks,
+    unreliable
+  )
+  const middleStroke = middleClear ? '#5eead4' : '#fbbf24'
+  const lowerStroke = lowerClear ? '#5eead4' : '#fbbf24'
+  const frameWidth = video?.videoWidth || FALLBACK_FRAME_SIZE
+  const frameHeight = video?.videoHeight || FALLBACK_FRAME_SIZE
+  const unit = frameHeight / 100
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      preserveAspectRatio="xMidYMid meet"
+      viewBox={`0 0 ${frameWidth} ${frameHeight}`}
+    >
+      <g>
+        <g
+          data-confidence={middleClear ? 'clear' : 'partial'}
+          data-overlay="body"
+          data-overlay-region="middle"
+        >
+          <BodyRegion
+            connections={MIDDLE_BODY_CONNECTIONS}
+            firstLandmark={FIRST_MIDDLE_LANDMARK}
+            frameHeight={frameHeight}
+            frameWidth={frameWidth}
+            landmarks={landmarks}
+            lastLandmark={LAST_MIDDLE_LANDMARK}
+            stroke={middleStroke}
+            unreliable={unreliable}
+            unit={unit}
+          />
+          {[leftHandLandmarks, rightHandLandmarks].map((hand, index) =>
+            hand ? (
+              <g data-overlay="hand" key={index}>
+                <LandmarkLines
+                  connections={HAND_CONNECTIONS}
+                  frameHeight={frameHeight}
+                  frameWidth={frameWidth}
+                  landmarks={hand}
+                  stroke="#0f172a"
+                  width={1.35}
+                />
+                <LandmarkLines
+                  connections={HAND_CONNECTIONS}
+                  frameHeight={frameHeight}
+                  frameWidth={frameWidth}
+                  landmarks={hand}
+                  stroke="#5eead4"
+                  width={0.72}
+                />
+                {hand.map((point, pointIndex) => (
+                  <circle
+                    cx={point.x * frameWidth}
+                    cy={point.y * frameHeight}
+                    fill="#f8fafc"
+                    key={pointIndex}
+                    r={0.45 * unit}
+                  />
+                ))}
+              </g>
+            ) : null
+          )}
+        </g>
+        <g
+          data-confidence={lowerClear ? 'clear' : 'partial'}
+          data-overlay="body-lower"
+          data-overlay-region="lower"
+        >
+          <BodyRegion
+            connections={LOWER_BODY_CONNECTIONS}
+            firstLandmark={FIRST_LOWER_LANDMARK}
+            frameHeight={frameHeight}
+            frameWidth={frameWidth}
+            landmarks={landmarks}
+            lastLandmark={LAST_LOWER_LANDMARK}
+            stroke={lowerStroke}
+            unreliable={unreliable}
+            unit={unit}
+          />
+        </g>
+        <g
+          data-confidence={faceLandmarks ? 'clear' : 'unavailable'}
+          data-overlay-region="upper"
+        >
+          {faceLandmarks && (
+            <g
+              data-blink={blink?.detected ? 'detected' : 'open'}
+              data-overlay="face"
+            >
+              {FACE_FEATURES.map((connections, index) => (
+                <LandmarkLines
+                  connections={connections}
+                  frameHeight={frameHeight}
+                  frameWidth={frameWidth}
+                  key={index}
+                  landmarks={faceLandmarks}
+                  stroke={
+                    blink?.detected && (index === 1 || index === 2)
+                      ? '#fbbf24'
+                      : '#5eead4'
+                  }
+                  width={index === 0 ? 0.55 : 0.4}
+                />
+              ))}
+              {[1, 4, 33, 133, 263, 362].map((index) => {
+                const point = faceLandmarks[index]
+                return point ? (
+                  <circle
+                    cx={point.x * frameWidth}
+                    cy={point.y * frameHeight}
+                    fill="#f8fafc"
+                    key={index}
+                    r={0.48 * unit}
+                    stroke="#0f766e"
+                    strokeWidth={0.22 * unit}
+                  />
+                ) : null
+              })}
+            </g>
+          )}
+        </g>
+      </g>
+    </svg>
+  )
+}

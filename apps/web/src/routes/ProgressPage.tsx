@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import {
   CalendarCheck2,
+  ChevronLeft,
   ChevronRight,
   Clock3,
   Flame,
@@ -16,10 +17,13 @@ import { StatCard } from '@/components/StatCard'
 import { formatDate, formatDuration } from '@/lib/format'
 import { getDashboard, getSessions } from '@/services/product'
 
+const HISTORY_PAGE_SIZE = 10
+
 export function ProgressPage() {
   const { t, i18n } = useTranslation()
   const [range, setRange] = useState(7)
   const [search, setSearch] = useState('')
+  const [historyPage, setHistoryPage] = useState(1)
   const dashboard = useQuery({
     queryKey: ['dashboard'],
     queryFn: ({ signal }) => getDashboard(signal)
@@ -41,6 +45,15 @@ export function ProgressPage() {
               Date.now() - range * 86400000
         ),
     [range, search, sessions.data]
+  )
+  const historyPageCount = Math.max(
+    1,
+    Math.ceil(visibleSessions.length / HISTORY_PAGE_SIZE)
+  )
+  const currentHistoryPage = Math.min(historyPage, historyPageCount)
+  const paginatedSessions = visibleSessions.slice(
+    (currentHistoryPage - 1) * HISTORY_PAGE_SIZE,
+    currentHistoryPage * HISTORY_PAGE_SIZE
   )
 
   if (dashboard.isLoading || sessions.isLoading) return <QueryLoading />
@@ -83,7 +96,10 @@ export function ProgressPage() {
               <button
                 className={range === value ? 'kg-filter-active' : 'kg-filter'}
                 key={value}
-                onClick={() => setRange(value)}
+                onClick={() => {
+                  setRange(value)
+                  setHistoryPage(1)
+                }}
                 type="button"
               >
                 {value === 0
@@ -135,14 +151,17 @@ export function ProgressPage() {
             />
             <input
               className="min-h-11 rounded-xl border border-slate-300 bg-white pl-10 pr-3 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value)
+                setHistoryPage(1)
+              }}
               placeholder={t('exercises.search')}
               value={search}
             />
           </label>
         </div>
         <div className="divide-y divide-slate-100">
-          {visibleSessions.map((session) => (
+          {paginatedSessions.map((session) => (
             <Link
               className="flex items-center gap-3 p-4 no-underline hover:bg-slate-50 sm:px-6"
               key={session.id}
@@ -179,6 +198,37 @@ export function ProgressPage() {
             </p>
           )}
         </div>
+        {visibleSessions.length > HISTORY_PAGE_SIZE && (
+          <nav
+            aria-label={t('history.pagination')}
+            className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-4 py-3 sm:px-6"
+          >
+            <button
+              className="kg-button-secondary"
+              disabled={currentHistoryPage === 1}
+              onClick={() => setHistoryPage(currentHistoryPage - 1)}
+              type="button"
+            >
+              <ChevronLeft aria-hidden="true" size={18} />
+              {t('history.previousPage')}
+            </button>
+            <p aria-live="polite" className="text-sm text-slate-600">
+              {t('history.pageStatus', {
+                page: currentHistoryPage,
+                total: historyPageCount
+              })}
+            </p>
+            <button
+              className="kg-button-secondary"
+              disabled={currentHistoryPage === historyPageCount}
+              onClick={() => setHistoryPage(currentHistoryPage + 1)}
+              type="button"
+            >
+              {t('history.nextPage')}
+              <ChevronRight aria-hidden="true" size={18} />
+            </button>
+          </nav>
+        )}
       </section>
     </div>
   )

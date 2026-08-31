@@ -450,6 +450,8 @@ const th = {
     visibility: 'มองเห็นภาพตัวอย่าง',
     model: 'Pose model',
     unavailable: 'ยังไม่โหลด—session นี้ใช้การนับด้วยตนเอง',
+    modelPending:
+      'เมื่อเริ่ม live session เบราว์เซอร์จะดาวน์โหลดไฟล์โมเดลจากผู้ให้บริการภายนอก โดยไม่ส่งภาพกล้อง',
     granted: 'ได้รับอนุญาต',
     waiting: 'รอการอนุญาต',
     denied: 'ไม่สามารถเปิดกล้องได้',
@@ -469,7 +471,25 @@ const th = {
     finish: 'เสร็จสิ้น',
     stop: 'หยุด session',
     estimate:
-      'ไม่มี AI form score หรือการแก้ท่าในเวอร์ชันนี้ เนื่องจากยังไม่มี clinical thresholds ที่ผ่านการอนุมัติ',
+      'โครงกระดูกช่วยตรวจว่าร่างกายอยู่ในเฟรมเท่านั้น ยังไม่มีคะแนนความถูกต้องหรือการแก้ท่า เพราะไม่มี clinical thresholds ที่ผ่านการอนุมัติ',
+    poseTitle: 'การตรวจจับร่างกาย ใบหน้า และมือ',
+    poseIdle: 'เปิดกล้องเพื่อเริ่มตรวจจับจุดร่างกาย ใบหน้า และมือ',
+    poseLoading: 'กำลังโหลดโมเดลตรวจจับร่างกาย ใบหน้า และมือบนอุปกรณ์นี้',
+    poseReady: 'ตรวจพบจุดสำคัญที่ต้องใช้สำหรับท่านี้',
+    poseAdjust: 'มองเห็นจุดสำคัญไม่ครบ กรุณาปรับตำแหน่งกล้อง',
+    poseMissing: 'ยังไม่พบร่างกายในภาพ',
+    poseMultiple:
+      'พบมากกว่าหนึ่งคนในภาพ ระบบจึงไม่เลือกหรือติดตามบุคคลใด กรุณาให้เหลือผู้ใช้เพียงคนเดียวในเฟรม',
+    poseUnsupportedExercise:
+      'ท่านี้ยังไม่มีรูปแบบสังเกตด้วยกล้องที่ผ่านการกำหนด ระบบจึงไม่ประเมินการเคลื่อนไหว',
+    poseUnavailable: 'โมเดลยังใช้งานไม่ได้ขณะออฟไลน์ คุณยังนับด้วยตนเองได้',
+    poseError: 'ไม่สามารถเริ่มการตรวจจับได้ คุณยังนับด้วยตนเองได้',
+    posePrivacy:
+      'ภาพ จุดร่างกาย ใบหน้า มือ และค่าประมาณการกะพริบตาประมวลผลชั่วคราวในเบราว์เซอร์ ไม่ถูกอัปโหลดหรือบันทึก และไม่ใช่การตรวจสุขภาพ',
+    poseResearchMethod: 'วิธีเปรียบเทียบจากงานวิจัย',
+    poseResearchPending:
+      'มีโครง cosine similarity และ DTW สำหรับท่าไหล่มุมหน้า แต่ยังไม่แสดงผลถูกหรือผิดจนกว่าจะมีลำดับอ้างอิงที่นักกายภาพอนุมัติ',
+    poseResearchSource: 'อ่านงานวิจัยต้นทาง (เปิดแท็บใหม่)',
     summary: 'สรุป session',
     completed: 'บันทึก session แล้ว',
     elapsed: 'เวลาที่ใช้',
@@ -482,7 +502,11 @@ const th = {
     subtitle: 'เฉพาะ session summary ที่คุณอนุญาตให้จัดเก็บ',
     empty: 'ยังไม่มีประวัติ',
     completed: 'เสร็จสิ้น',
-    stopped: 'หยุดก่อนเสร็จ'
+    stopped: 'หยุดก่อนเสร็จ',
+    pagination: 'การแบ่งหน้าประวัติกิจกรรม',
+    previousPage: 'หน้าก่อนหน้า',
+    nextPage: 'หน้าถัดไป',
+    pageStatus: 'หน้า {{page}} จาก {{total}}'
   },
   progress: {
     title: 'ความก้าวหน้าด้านกิจกรรม',
@@ -1092,6 +1116,8 @@ const en: typeof th = {
     visibility: 'Preview visible',
     model: 'Pose model',
     unavailable: 'Not loaded—this session uses manual counting',
+    modelPending:
+      'When the live session starts, the browser downloads model files from external providers without sending camera frames',
     granted: 'Granted',
     waiting: 'Waiting',
     denied: 'Unable to open camera',
@@ -1111,7 +1137,27 @@ const en: typeof th = {
     finish: 'Finish',
     stop: 'Stop session',
     estimate:
-      'No AI form score or correction is provided because approved clinical thresholds are not available.',
+      'The skeleton checks whether the body is visible in frame. No correctness score or form correction is provided because approved clinical thresholds are not available.',
+    poseTitle: 'Body, face, and hand detection',
+    poseIdle: 'Turn on the camera to detect body, face, and hand landmarks',
+    poseLoading: 'Loading body, face, and hand models on this device',
+    poseReady: 'Required landmarks for this movement are visible',
+    poseAdjust: 'Some required landmarks are not visible. Adjust the camera',
+    poseMissing: 'No body detected in the preview yet',
+    poseMultiple:
+      'More than one person is visible. The system will not select or track anyone until only one person remains in frame.',
+    poseUnsupportedExercise:
+      'This activity has no defined camera-observation profile, so movement is not assessed.',
+    poseUnavailable:
+      'The model is unavailable while offline. Manual counting is still available',
+    poseError:
+      'Skeleton detection could not start. Manual counting is still available',
+    posePrivacy:
+      'Frames, body, face, hand, and estimated blink landmarks are processed temporarily in this browser, are not uploaded or saved, and are not a health assessment.',
+    poseResearchMethod: 'Research comparison method',
+    poseResearchPending:
+      'Cosine similarity and DTW are prepared for the front-view shoulder activity, but no correct/incorrect result is shown without a physiotherapist-approved reference sequence.',
+    poseResearchSource: 'Read the source study (opens a new tab)',
     summary: 'Session summary',
     completed: 'Session saved',
     elapsed: 'Elapsed time',
@@ -1124,7 +1170,11 @@ const en: typeof th = {
     subtitle: 'Only session summaries you consented to store',
     empty: 'No history yet',
     completed: 'Completed',
-    stopped: 'Stopped early'
+    stopped: 'Stopped early',
+    pagination: 'Activity history pagination',
+    previousPage: 'Previous page',
+    nextPage: 'Next page',
+    pageStatus: 'Page {{page}} of {{total}}'
   },
   progress: {
     title: 'Activity progress',
