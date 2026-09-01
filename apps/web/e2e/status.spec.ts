@@ -45,4 +45,12 @@ test('landing page explains privacy before authentication', async ({
   ).toBe(true)
   expect(backgrounds.hero).toBe('none')
   expect(backgrounds.footer).toBe('none')
+
+  const header = page.getByRole('banner')
+  const initialHeaderBox = await header.boundingBox()
+  expect(initialHeaderBox?.y).toBe(0)
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await expect(header).toBeInViewport()
+  const scrolledHeaderBox = await header.boundingBox()
+  expect(scrolledHeaderBox?.y).toBe(0)
 })

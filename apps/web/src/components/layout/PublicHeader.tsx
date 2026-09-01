@@ -10,7 +10,7 @@ export function PublicHeader() {
   const { t } = useTranslation()
   const auth = useAuth()
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 shadow-[0_6px_24px_rgb(15_23_42_/_4%)] backdrop-blur-lg">
+    <header className="kg-public-header sticky top-0 z-40 border-b border-white/70 bg-white/75 shadow-[0_6px_24px_rgb(15_23_42_/_4%)] backdrop-blur-xl">
       <a
         className="fixed left-4 top-3 z-50 -translate-y-24 rounded-lg bg-white px-4 py-2 font-semibold text-teal-800 shadow-lg transition-transform focus:translate-y-0"
         href="#main-content"

@@ -71,7 +71,7 @@ export function LandingPage() {
   ]
 
   return (
-    <div className="kg-landing-page min-h-screen overflow-hidden bg-kg-canvas">
+    <div className="kg-landing-page min-h-screen overflow-x-clip bg-kg-canvas">
       <PublicHeader />
       <main id="main-content">
         <section className="relative isolate overflow-hidden">
@@ -138,7 +138,7 @@ export function LandingPage() {
             </aside>
           </div>
           <div
-            className="mx-auto max-w-[90rem] rounded-[1.75rem] border border-white/80 bg-white/85 p-4 shadow-[0_18px_55px_rgb(15_23_42_/_5%)] backdrop-blur-sm sm:p-5 lg:rounded-[2rem]"
+            className="kg-landing-surface mx-auto max-w-[90rem] rounded-[1.75rem] p-4 sm:p-5 lg:rounded-[2rem]"
             id="features"
           >
             <h2 className="sr-only" id="features-title">
@@ -180,7 +180,7 @@ export function LandingPage() {
           className="px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-4"
           id="capabilities"
         >
-          <div className="mx-auto grid max-w-[90rem] gap-10 rounded-[1.75rem] border border-white/90 bg-white/85 p-7 shadow-[0_18px_55px_rgb(15_23_42_/_5%)] backdrop-blur-sm sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:rounded-[2rem]">
+          <div className="kg-landing-surface mx-auto grid max-w-[90rem] gap-10 rounded-[1.75rem] p-7 sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:rounded-[2rem]">
             <div className="relative flex min-h-[24rem] flex-col lg:min-h-0">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
