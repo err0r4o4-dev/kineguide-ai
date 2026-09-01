@@ -48,6 +48,10 @@ body {
   background-size: cover;
 }
 
+.kg-landing-content {
+  width: 70%;
+}
+
 .kg-public-header {
   isolation: isolate;
 }

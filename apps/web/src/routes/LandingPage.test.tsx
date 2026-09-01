@@ -66,7 +66,7 @@ describe('LandingPage', () => {
     )
   })
 
-  it('presents the compact public journey without the removed sections', () => {
+  it('presents one clear public journey from privacy through safety', () => {
     render(
       <AuthContext.Provider value={guestAuth}>
         <MemoryRouter>
@@ -79,14 +79,14 @@ describe('LandingPage', () => {
       screen.getByRole('heading', { name: 'สิ่งที่คุณทำได้ใน KineGuide AI' })
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
+    ).toBeInTheDocument()
     expect(
-      screen.queryByRole('heading', { name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('heading', { name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม' })
+    ).toBeInTheDocument()
     expect(
-      screen.queryByRole('heading', { name: 'ใช้งานอย่างปลอดภัย' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('heading', { name: 'ใช้งานอย่างปลอดภัย' })
+    ).toBeInTheDocument()
     expect(screen.getByText(/ไม่ใช่อุปกรณ์การแพทย์/)).toBeInTheDocument()
     expect(
       screen.queryByRole('link', { name: 'สถานะระบบ' })
@@ -102,25 +102,8 @@ describe('LandingPage', () => {
       screen.getByText(/ความเป็นส่วนตัวของคุณ คือสิ่งสำคัญที่สุดของเรา/)
     ).toBeInTheDocument()
     expect(
-      screen
-        .getAllByRole('link', { name: 'ดูวิธีการทำงาน' })
-        .every((link) => link.getAttribute('href') === '#features')
-    ).toBe(true)
-    expect(
-      screen.getByRole('link', {
-        name: 'ดูรายละเอียด กล้องทำงานในอุปกรณ์'
-      })
-    ).toHaveAttribute('href', '#capabilities')
-    expect(
-      screen.getByRole('link', {
-        name: 'ดูรายละเอียด ควบคุมข้อมูลของคุณ'
-      })
-    ).toHaveAttribute('href', '/register')
-    expect(
-      screen.getByRole('link', {
-        name: 'ดูรายละเอียด ติดตามกิจกรรมแบบไม่กล่าวอ้างทางคลินิก'
-      })
-    ).toHaveAttribute('href', '#capabilities')
+      screen.getByRole('link', { name: 'ดูวิธีการทำงาน' })
+    ).toHaveAttribute('href', '#how-it-works')
     expect(
       screen.queryByRole('link', { name: 'สร้างบัญชีเพื่อเริ่มต้น' })
     ).not.toBeInTheDocument()
@@ -143,13 +126,16 @@ describe('LandingPage', () => {
       })
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole('heading', {
+      screen.getByRole('heading', {
         name: 'Your data stays under your control'
       })
-    ).not.toBeInTheDocument()
+    ).toBeInTheDocument()
     expect(
-      screen.queryByRole('heading', { name: 'Get started in 3 steps' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('heading', { name: 'Get started in 3 steps' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Use the system safely' })
+    ).toBeInTheDocument()
     expect(screen.getByText(/not a medical device/i)).toBeInTheDocument()
   })
 
@@ -184,5 +170,41 @@ describe('LandingPage', () => {
         name: 'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ'
       })
     ).toBeInTheDocument()
+  })
+
+  it('opens each capability directly for an authenticated visitor', () => {
+    render(
+      <AuthContext.Provider
+        value={{
+          ...guestAuth,
+          user: {
+            id: '3356dcec-f826-41f1-8dba-f434b74e75c8',
+            email: 'student@example.com',
+            display_name: 'ผู้ใช้ทดสอบ',
+            created_at: '2026-08-24T12:00:00Z'
+          }
+        }}
+      >
+        <MemoryRouter>
+          <LandingPage />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('link', {
+        name: 'ดูรายละเอียด สำรวจท่าการเคลื่อนไหวสาธิต'
+      })
+    ).toHaveAttribute('href', '/app/exercises')
+    expect(
+      screen.getByRole('link', {
+        name: 'ดูรายละเอียด พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด'
+      })
+    ).toHaveAttribute('href', '/app/chat')
+    expect(
+      screen.getByRole('link', {
+        name: 'ดูรายละเอียด ทบทวนบันทึกกิจกรรม'
+      })
+    ).toHaveAttribute('href', '/app/progress')
   })
 })

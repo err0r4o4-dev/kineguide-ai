@@ -2,16 +2,19 @@ import {
   ArrowRight,
   Camera,
   ChartNoAxesCombined,
-  ChevronRight,
+  CircleUserRound,
   CirclePlay,
+  ClipboardCheck,
+  Database,
+  LayoutGrid,
   MessageCircle,
-  ShieldCheck
+  ShieldCheck,
+  TriangleAlert
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
-import { LogoMark } from '@/components/LogoMark'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -32,41 +35,58 @@ export function LandingPage() {
 
   const primaryPath = auth.user ? '/app' : '/register'
   const primaryLabel = t(auth.user ? 'nav.getStarted' : 'landing.start')
-  const features = [
+  const privacyPoints = [
     {
       icon: Camera,
-      title: t('landing.cameraTitle'),
-      body: t('landing.cameraBody'),
-      href: '#capabilities'
+      title: t('landing.localPrivacyTitle'),
+      body: t('landing.localPrivacyBody')
+    },
+    {
+      icon: ClipboardCheck,
+      title: t('landing.consentPrivacyTitle'),
+      body: t('landing.consentPrivacyBody')
+    },
+    {
+      icon: Database,
+      title: t('landing.storagePrivacyTitle'),
+      body: t('landing.storagePrivacyBody')
+    }
+  ]
+  const steps = [
+    {
+      icon: CircleUserRound,
+      title: t('landing.accountStepTitle'),
+      body: t('landing.accountStepBody')
     },
     {
       icon: ShieldCheck,
-      title: t('landing.consentTitle'),
-      body: t('landing.consentBody'),
-      href: primaryPath
+      title: t('landing.consentStepTitle'),
+      body: t('landing.consentStepBody')
     },
     {
-      icon: ChartNoAxesCombined,
-      title: t('landing.progressTitle'),
-      body: t('landing.progressBody'),
-      href: '#capabilities'
+      icon: LayoutGrid,
+      title: t('landing.exploreStepTitle'),
+      body: t('landing.exploreStepBody')
     }
   ]
   const capabilities = [
     {
       icon: Camera,
       title: t('landing.movementTitle'),
-      body: t('landing.movementBody')
+      body: t('landing.movementBody'),
+      href: auth.user ? '/app/exercises' : primaryPath
     },
     {
       icon: MessageCircle,
       title: t('landing.aiTitle'),
-      body: t('landing.aiBody')
+      body: t('landing.aiBody'),
+      href: auth.user ? '/app/chat' : primaryPath
     },
     {
       icon: ChartNoAxesCombined,
       title: t('landing.summaryTitle'),
-      body: t('landing.summaryBody')
+      body: t('landing.summaryBody'),
+      href: auth.user ? '/app/progress' : primaryPath
     }
   ]
 
@@ -75,7 +95,7 @@ export function LandingPage() {
       <PublicHeader />
       <main id="main-content">
         <section className="relative isolate overflow-hidden">
-          <div className="kg-landing-content mx-auto grid w-[70%] items-center gap-10 pb-8 pt-12 sm:pb-10 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:pb-6 lg:pt-12">
+          <div className="kg-landing-content mx-auto grid items-center gap-10 pb-10 pt-10 sm:pb-12 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:py-16">
             <div className="min-w-0 lg:py-2">
               <p className="inline-flex min-h-9 items-center rounded-xl border border-teal-100/80 bg-cyan-50/80 px-4 text-sm font-semibold text-teal-700 shadow-sm shadow-teal-900/[0.03]">
                 {t('landing.eyebrow')}
@@ -99,7 +119,7 @@ export function LandingPage() {
                   {primaryLabel}
                   <ArrowRight aria-hidden="true" size={19} />
                 </Link>
-                <a className="kg-landing-secondary-cta" href="#features">
+                <a className="kg-landing-secondary-cta" href="#how-it-works">
                   {t('landing.learn')}
                   <CirclePlay aria-hidden="true" size={20} />
                 </a>
@@ -137,38 +157,36 @@ export function LandingPage() {
               </div>
             </aside>
           </div>
-          <div
-            className="kg-landing-content kg-landing-surface mx-auto w-[70%] rounded-[1.75rem] p-4 sm:p-5 lg:rounded-[2rem]"
-            id="features"
-          >
-            <h2 className="sr-only" id="features-title">
-              {t('landing.features')}
-            </h2>
-            <div
-              aria-labelledby="features-title"
-              className="grid gap-4 md:grid-cols-3 lg:gap-5"
-            >
-              {features.map(({ icon: Icon, title, body, href }) => (
-                <article
-                  className="group relative min-h-48 rounded-[1.35rem] border border-slate-200/90 bg-white/95 p-5 pr-14 shadow-[0_8px_24px_rgb(15_23_42_/_4%)] transition-[transform,border-color,box-shadow] hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-[0_14px_34px_rgb(15_23_42_/_7%)]"
-                  key={title}
-                >
-                  <span className="grid size-11 place-items-center rounded-xl bg-kg-soft text-teal-700 ring-1 ring-inset ring-teal-100/70">
-                    <Icon aria-hidden="true" size={22} />
-                  </span>
-                  <h3 className="mt-4 text-base font-bold text-slate-900">
-                    {title}
-                  </h3>
+        </section>
+
+        <section aria-labelledby="privacy-title" className="pb-6 sm:pb-8">
+          <div className="kg-landing-content kg-landing-surface mx-auto rounded-[1.75rem] p-6 sm:p-8 lg:rounded-[2rem]">
+            <div className="max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
+                {t('landing.highlightsTitle')}
+              </p>
+              <h2
+                className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950 sm:text-4xl"
+                id="privacy-title"
+              >
+                {t('landing.privacyTitle')}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                {t('landing.privacyBody')}
+              </p>
+            </div>
+            <div className="mt-7 grid gap-5 md:grid-cols-3">
+              {privacyPoints.map(({ icon: Icon, title, body }) => (
+                <article className="border-t border-slate-200 pt-5" key={title}>
+                  <Icon
+                    aria-hidden="true"
+                    className="text-teal-700"
+                    size={24}
+                  />
+                  <h3 className="mt-3 font-bold text-slate-950">{title}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     {body}
                   </p>
-                  <a
-                    aria-label={t('landing.featureAction', { feature: title })}
-                    className="absolute bottom-5 right-5 grid size-11 place-items-center rounded-full bg-kg-soft text-teal-700 transition-colors group-hover:bg-teal-700 group-hover:text-white"
-                    href={href}
-                  >
-                    <ArrowRight aria-hidden="true" size={19} />
-                  </a>
                 </article>
               ))}
             </div>
@@ -176,78 +194,128 @@ export function LandingPage() {
         </section>
 
         <section
+          aria-labelledby="how-title"
+          className="scroll-mt-24 py-10 sm:py-14"
+          id="how-it-works"
+        >
+          <div className="kg-landing-content mx-auto">
+            <div className="max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
+                {t('landing.howEyebrow')}
+              </p>
+              <h2
+                className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950 sm:text-4xl"
+                id="how-title"
+              >
+                {t('landing.howTitle')}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                {t('landing.howBody')}
+              </p>
+            </div>
+            <ol className="mt-8 grid gap-4 lg:grid-cols-3">
+              {steps.map(({ icon: Icon, title, body }, index) => (
+                <li
+                  className="relative rounded-[1.25rem] border border-kg-border bg-white p-6"
+                  key={title}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="grid size-11 place-items-center rounded-xl bg-kg-soft text-teal-700">
+                      <Icon aria-hidden="true" size={22} />
+                    </span>
+                    <span className="text-sm font-bold tabular-nums text-teal-700">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold text-slate-950">
+                    {title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {body}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section
           aria-labelledby="capabilities-title"
-          className="py-5 sm:py-7 lg:py-4"
+          className="py-10 sm:py-14"
           id="capabilities"
         >
-          <div className="kg-landing-content kg-landing-surface mx-auto grid w-[70%] gap-10 rounded-[1.75rem] p-7 sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:rounded-[2rem]">
-            <div className="relative flex min-h-[24rem] flex-col lg:min-h-0">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
-                  {t('landing.capabilitiesEyebrow')}
-                </p>
-                <h2
-                  className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950 sm:text-4xl"
-                  id="capabilities-title"
-                >
-                  {t('landing.capabilitiesTitle')}
-                </h2>
-                <p className="mt-4 text-lg leading-8 text-slate-600">
-                  {t('landing.capabilitiesBody')}
-                </p>
-              </div>
-              <div
-                aria-hidden="true"
-                className="relative mt-auto hidden h-44 items-end justify-center overflow-hidden lg:flex"
+          <div className="kg-landing-content mx-auto">
+            <div className="max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
+                {t('landing.capabilitiesEyebrow')}
+              </p>
+              <h2
+                className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950 sm:text-4xl"
+                id="capabilities-title"
               >
-                <span className="absolute bottom-2 size-40 rounded-full bg-teal-50/80 blur-sm" />
-                <LogoMark className="relative mb-4 size-28 drop-shadow-[0_18px_19px_rgb(15_118_110_/_14%)]" />
-                <span className="absolute bottom-6 left-10 grid size-11 place-items-center rounded-2xl bg-teal-100 text-teal-600">
-                  <MessageCircle size={23} />
-                </span>
-                <span className="absolute bottom-6 right-8 flex h-14 items-end gap-1.5">
-                  <i className="h-5 w-3 rounded-t bg-teal-100" />
-                  <i className="h-9 w-3 rounded-t bg-teal-200" />
-                  <i className="h-14 w-3 rounded-t bg-teal-400/60" />
-                </span>
-              </div>
+                {t('landing.capabilitiesTitle')}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                {t('landing.capabilitiesBody')}
+              </p>
             </div>
-            <div className="divide-y divide-slate-200">
-              {capabilities.map(({ icon: Icon, title, body }, index) => (
+            <div className="mt-8 grid gap-4 lg:grid-cols-3">
+              {capabilities.map(({ icon: Icon, title, body, href }) => (
                 <article
-                  className="group grid grid-cols-[3.25rem_minmax(0,1fr)_2.75rem] items-start gap-4 py-4 first:pt-0 last:pb-0"
+                  className="flex min-h-64 flex-col rounded-[1.25rem] border border-kg-border bg-white p-6"
                   key={title}
                 >
                   <span className="grid size-12 place-items-center rounded-2xl bg-kg-soft text-teal-700">
-                    <Icon aria-hidden="true" size={22} />
+                    <Icon aria-hidden="true" size={23} />
                   </span>
-                  <div>
-                    <p className="text-xs font-bold tracking-[0.14em] text-teal-700">
-                      0{index + 1}
-                    </p>
-                    <h3 className="mt-1 text-base font-bold text-slate-900">
-                      {title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
-                      {body}
-                    </p>
-                  </div>
+                  <h3 className="mt-5 text-lg font-bold text-slate-950">
+                    {title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {body}
+                  </p>
                   <Link
                     aria-label={t('landing.featureAction', { feature: title })}
-                    className="mt-5 grid size-11 place-items-center rounded-full bg-kg-soft text-slate-800 transition-colors hover:bg-teal-700 hover:text-white"
-                    to={primaryPath}
+                    className="mt-auto inline-flex min-h-11 items-center gap-2 pt-5 font-bold !text-teal-800 no-underline"
+                    to={href}
                   >
-                    <ChevronRight aria-hidden="true" size={19} />
+                    {auth.user ? t('nav.getStarted') : t('landing.start')}
+                    <ArrowRight aria-hidden="true" size={18} />
                   </Link>
                 </article>
               ))}
             </div>
           </div>
         </section>
+
+        <section aria-labelledby="safety-title" className="py-10 sm:py-14">
+          <div className="kg-landing-content mx-auto grid gap-6 rounded-[1.75rem] border border-amber-200 bg-amber-50 p-6 sm:p-8 lg:grid-cols-[auto_1fr] lg:rounded-[2rem]">
+            <span className="grid size-12 place-items-center rounded-2xl bg-white text-amber-800 ring-1 ring-amber-200">
+              <TriangleAlert aria-hidden="true" size={24} />
+            </span>
+            <div>
+              <h2
+                className="text-2xl font-bold text-slate-950"
+                id="safety-title"
+              >
+                {t('landing.safetyTitle')}
+              </h2>
+              <p className="mt-3 leading-7 text-slate-700">
+                {t('common.noDiagnosis')}
+              </p>
+              <p className="mt-3 font-semibold leading-7 text-red-800">
+                {t('landing.safetyStop')}
+              </p>
+              <p className="mt-2 leading-7 text-slate-700">
+                {t('landing.safetyEmergency')}
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="border-t border-slate-200/70 bg-transparent">
-        <div className="kg-landing-content mx-auto flex w-[70%] flex-col gap-3 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="kg-landing-content mx-auto flex flex-col gap-3 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p>{t('landing.footerCopyright')}</p>
             <p className="mt-1 max-w-2xl leading-5 text-slate-500">
