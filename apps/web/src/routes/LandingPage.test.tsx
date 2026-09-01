@@ -1,11 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, vi } from 'vitest'
 
 import { Brand } from '@/components/Brand'
 import { AuthContext, type AuthContextValue } from '@/features/auth/AuthContext'
 import '@/lib/i18n'
+import i18n from '@/lib/i18n'
 import { LandingPage } from './LandingPage'
 
 const guestAuth: AuthContextValue = {
@@ -18,6 +19,10 @@ const guestAuth: AuthContextValue = {
 }
 
 describe('LandingPage', () => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('th')
+  })
+
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -52,10 +57,72 @@ describe('LandingPage', () => {
       'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ'
     )
     expect(screen.getByText(/ไม่อัปโหลดรูปหรือวิดีโอ/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/กล้องจะเริ่มหลังจากคุณเลือกเริ่มใช้งานและให้สิทธิ์/)
+    ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'เริ่มใช้งาน' })).toHaveAttribute(
       'href',
       '/register'
     )
+  })
+
+  it('presents the complete public journey and safety boundaries', () => {
+    render(
+      <AuthContext.Provider value={guestAuth}>
+        <MemoryRouter>
+          <LandingPage />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'สิ่งที่คุณทำได้ใน KineGuide AI' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'ใช้งานอย่างปลอดภัย' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/ไม่วินิจฉัยโรคหรือทดแทนบุคลากรทางการแพทย์/)
+    ).toBeInTheDocument()
+    expect(screen.getByText(/หยุดใช้งานทันทีหากรู้สึกเจ็บ/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'ดูวิธีการทำงาน' })
+    ).toHaveAttribute('href', '#how-it-works')
+  })
+
+  it('provides the same public journey and boundaries in English', async () => {
+    await i18n.changeLanguage('en')
+
+    render(
+      <AuthContext.Provider value={guestAuth}>
+        <MemoryRouter>
+          <LandingPage />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('heading', { name: 'Get started in 3 steps' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', {
+        name: 'What you can do in KineGuide AI'
+      })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', {
+        name: 'Your data stays under your control'
+      })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/Stop immediately if you feel pain/)
+    ).toBeInTheDocument()
   })
 
   it('lets an authenticated visitor use the brand to open the public landing page', async () => {

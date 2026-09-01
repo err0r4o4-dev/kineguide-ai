@@ -151,15 +151,72 @@ const th = {
       'ทดลองกล้องในอุปกรณ์ บันทึกกิจกรรมแบบย่อ และติดตามความสม่ำเสมอ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มใช้งาน',
     learn: 'ดูวิธีการทำงาน',
+    heroNote:
+      'คุณจะเห็นคำอธิบายและเลือกความยินยอมก่อนระบบขอสิทธิ์ใช้กล้องหรือจัดเก็บข้อมูล',
+    previewTitle: 'กล้องและการประมวลผลบนอุปกรณ์',
+    cameraPermissionNote:
+      'กล้องจะเริ่มหลังจากคุณเลือกเริ่มใช้งานและให้สิทธิ์เท่านั้น',
+    previewLocal: 'ภาพอยู่ในหน่วยความจำของเบราว์เซอร์',
+    previewControl: 'หยุดกล้องเมื่อออกจากหน้ากิจกรรม',
+    highlightsTitle: 'ออกแบบให้ชัดเจน ตั้งแต่ก่อนเริ่มใช้งาน',
+    highlightsBody:
+      'รู้ว่ากล้องทำงานเมื่อใด ข้อมูลใดถูกจัดเก็บ และผลลัพธ์แต่ละส่วนหมายถึงอะไร',
     cameraTitle: 'กล้องทำงานในอุปกรณ์',
     cameraBody:
       'ภาพจากกล้องอยู่ในหน่วยความจำของเบราว์เซอร์และไม่ถูกส่งไปยังเซิร์ฟเวอร์',
     consentTitle: 'ควบคุมข้อมูลของคุณ',
-    consentBody: 'ให้ ถอน และตรวจสอบ consent ได้จากหน้าตั้งค่า',
+    consentBody: 'อ่าน ให้ ถอน และตรวจสอบความยินยอมได้จากหน้าตั้งค่าของคุณ',
     progressTitle: 'ติดตามกิจกรรมแบบไม่กล่าวอ้างทางคลินิก',
-    progressBody: 'ดูเวลาและจำนวน session ที่คุณบันทึกด้วยตนเอง',
-    privacyTitle: 'ปลอดภัยและเป็นส่วนตัว',
-    privacyBody: 'จัดเก็บเฉพาะคำตอบแบบมีโครงสร้างและ session summary ที่จำเป็น',
+    progressBody:
+      'ดูเวลา จำนวนกิจกรรม และความสม่ำเสมอที่บันทึกไว้ โดยไม่ตีความว่าเป็นการฟื้นตัว',
+    howEyebrow: 'เริ่มต้นอย่างโปร่งใส',
+    howTitle: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน',
+    howBody:
+      'ทุกขั้นบอกวัตถุประสงค์ ขอบเขต และข้อมูลที่เกี่ยวข้องก่อนให้คุณตัดสินใจ',
+    accountStepTitle: 'สร้างบัญชีหรือเข้าสู่ระบบ',
+    accountStepBody:
+      'ใช้บัญชีของคุณเพื่อเข้าถึงพื้นที่ส่วนตัวและจัดการข้อมูลที่บันทึกไว้',
+    consentStepTitle: 'อ่านและเลือกความยินยอม',
+    consentStepBody:
+      'ตรวจสอบการใช้กล้อง การจัดเก็บสรุปกิจกรรม และ AI chat แยกตามวัตถุประสงค์',
+    exploreStepTitle: 'เลือกสิ่งที่ต้องการสำรวจ',
+    exploreStepBody:
+      'ดูท่าการเคลื่อนไหวสาธิต ทดลองกล้อง หรือบันทึกกิจกรรมตามที่คุณเลือก',
+    capabilitiesEyebrow: 'ขอบเขตของต้นแบบ',
+    capabilitiesTitle: 'สิ่งที่คุณทำได้ใน KineGuide AI',
+    capabilitiesBody:
+      'เครื่องมือสำหรับสำรวจ เรียนรู้ และบันทึกกิจกรรม ไม่ใช่แผนการรักษาเฉพาะบุคคล',
+    movementTitle: 'สำรวจท่าการเคลื่อนไหวสาธิต',
+    movementBody:
+      'ดูรายละเอียดกิจกรรมและทดลองการมองเห็นร่างกายผ่านกล้อง โดยระบบไม่ให้คะแนนความถูกต้องทางคลินิก',
+    aiTitle: 'พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด',
+    aiBody:
+      'ใช้เพื่อข้อมูลสนับสนุนทั่วไป คำตอบอาจไม่สมบูรณ์และไม่ใช้แทนคำแนะนำจากผู้เชี่ยวชาญ',
+    summaryTitle: 'ทบทวนบันทึกกิจกรรม',
+    summaryBody:
+      'ดูเวลา จำนวนกิจกรรม และประวัติที่คุณยินยอมให้จัดเก็บ โดยไม่สรุปผลการฟื้นตัว',
+    privacyTitle: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม',
+    privacyBody:
+      'ระบบลดข้อมูลตั้งแต่ต้น แยกความยินยอมตามวัตถุประสงค์ และให้คุณกลับมาจัดการข้อมูลได้',
+    localPrivacyTitle: 'ภาพกล้องไม่ออกจากอุปกรณ์',
+    localPrivacyBody:
+      'รูป วิดีโอ และเฟรมกล้องถูกประมวลผลชั่วคราวในเบราว์เซอร์และไม่ถูกอัปโหลด',
+    consentPrivacyTitle: 'เลือกและถอนความยินยอมได้',
+    consentPrivacyBody:
+      'ฟีเจอร์ที่ต้องใช้ข้อมูลจะเริ่มหลังคุณยอมรับ และหยุดเมื่อถอนความยินยอม',
+    storagePrivacyTitle: 'จัดเก็บเท่าที่จำเป็น',
+    storagePrivacyBody:
+      'บัญชีเก็บเฉพาะข้อมูลแบบมีโครงสร้างและสรุปกิจกรรมตามนโยบายที่แสดงในหน้าตั้งค่า',
+    safetyTitle: 'ใช้งานอย่างปลอดภัย',
+    safetyStop:
+      'หยุดใช้งานทันทีหากรู้สึกเจ็บ ไม่มั่นคง หรือกังวล และติดต่อบุคลากรทางการแพทย์ที่มีคุณสมบัติเหมาะสม',
+    safetyEmergency:
+      'หากเป็นเหตุฉุกเฉิน ให้ติดต่อบริการฉุกเฉินในพื้นที่ ระบบนี้ไม่มีคำแนะนำฉุกเฉิน',
+    finalTitle: 'พร้อมสำรวจระบบในขอบเขตที่ชัดเจน',
+    finalBody:
+      'เริ่มจากการสร้างบัญชี อ่านรายละเอียดความยินยอม แล้วเลือกฟีเจอร์ที่เหมาะกับสิ่งที่คุณต้องการสำรวจ',
+    finalAction: 'สร้างบัญชีเพื่อเริ่มต้น',
+    footerNav: 'ข้อมูลส่วนท้ายเว็บไซต์',
     footer:
       'โครงการต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์และไม่มีการรับรองด้านกฎระเบียบ'
   },
@@ -849,16 +906,72 @@ const en: typeof th = {
       'Try an on-device camera flow, save minimal activity summaries, and track consistency without uploading photos or video.',
     start: 'Get started',
     learn: 'How it works',
+    heroNote:
+      'You will see an explanation and choose consent before the system requests camera access or stores data.',
+    previewTitle: 'On-device camera and processing',
+    cameraPermissionNote:
+      'The camera starts only after you choose to begin and grant permission.',
+    previewLocal: 'Frames stay in browser memory',
+    previewControl: 'The camera stops when you leave the activity',
+    highlightsTitle: 'Clarity before you begin',
+    highlightsBody:
+      'Know when the camera runs, what data is stored, and what each result means.',
     cameraTitle: 'On-device camera',
     cameraBody:
       'Camera frames stay in browser memory and are never sent to the server.',
     consentTitle: 'Control your data',
-    consentBody: 'Give, withdraw, and review consent from settings.',
+    consentBody: 'Read, give, withdraw, and review consent from your settings.',
     progressTitle: 'Non-clinical activity tracking',
-    progressBody: 'Review time and sessions you recorded yourself.',
-    privacyTitle: 'Private by design',
+    progressBody:
+      'Review saved time, activity counts, and consistency without interpreting them as recovery.',
+    howEyebrow: 'A transparent start',
+    howTitle: 'Get started in 3 steps',
+    howBody:
+      'Each step explains its purpose, boundaries, and related data before you decide.',
+    accountStepTitle: 'Create an account or sign in',
+    accountStepBody:
+      'Use your account to enter a private workspace and manage the information you save.',
+    consentStepTitle: 'Read and choose consent',
+    consentStepBody:
+      'Review camera use, activity-summary storage, and AI chat as separate purposes.',
+    exploreStepTitle: 'Choose what to explore',
+    exploreStepBody:
+      'View movement demos, try the camera, or record an activity when you choose.',
+    capabilitiesEyebrow: 'Prototype boundaries',
+    capabilitiesTitle: 'What you can do in KineGuide AI',
+    capabilitiesBody:
+      'Tools for exploration, education, and activity records—not a personalized treatment plan.',
+    movementTitle: 'Explore movement demonstrations',
+    movementBody:
+      'Review activity details and try body visibility through the camera without a clinical correctness score.',
+    aiTitle: 'Talk with a bounded AI assistant',
+    aiBody:
+      'Use it for general support information. Answers may be incomplete and do not replace qualified advice.',
+    summaryTitle: 'Review activity records',
+    summaryBody:
+      'See time, activity counts, and history you agreed to store without a recovery interpretation.',
+    privacyTitle: 'Your data stays under your control',
     privacyBody:
-      'Only necessary structured answers and session summaries are stored.',
+      'The system minimizes data from the start, separates consent by purpose, and lets you return to manage saved information.',
+    localPrivacyTitle: 'Camera images stay on your device',
+    localPrivacyBody:
+      'Photos, video, and camera frames are processed temporarily in the browser and are not uploaded.',
+    consentPrivacyTitle: 'Choose and withdraw consent',
+    consentPrivacyBody:
+      'Data-dependent features start after you consent and stop when consent is withdrawn.',
+    storagePrivacyTitle: 'Store only what is necessary',
+    storagePrivacyBody:
+      'Your account stores only structured information and activity summaries under the policy shown in settings.',
+    safetyTitle: 'Use the system safely',
+    safetyStop:
+      'Stop immediately if you feel pain, unstable, or concerned, and contact a qualified healthcare professional.',
+    safetyEmergency:
+      'For an emergency, contact your local emergency service. This system does not provide emergency guidance.',
+    finalTitle: 'Ready to explore with clear boundaries?',
+    finalBody:
+      'Create an account, review consent details, and choose the feature that matches what you want to explore.',
+    finalAction: 'Create an account to begin',
+    footerNav: 'Website footer information',
     footer:
       'Educational prototype only. It is not a medical device and has no regulatory certification.'
   },

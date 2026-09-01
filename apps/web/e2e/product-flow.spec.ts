@@ -186,6 +186,18 @@ test('new user completes consent and structured onboarding', async ({
   })
 
   await page.goto('/')
+  await expect(
+    page.getByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
+  ).toBeVisible()
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 })
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true)
+  }
+  await page.setViewportSize({ width: 1280, height: 1000 })
   await page.getByRole('link', { name: 'เริ่มใช้งาน' }).click()
   await page.getByLabel('ชื่อที่ใช้แสดง').fill('ผู้ใช้ทดสอบ')
   await page.getByLabel('อีเมล').fill('student@example.com')
