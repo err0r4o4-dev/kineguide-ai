@@ -10,6 +10,12 @@ export function PublicHeader() {
   const auth = useAuth()
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-lg">
+      <a
+        className="fixed left-4 top-3 z-50 -translate-y-24 rounded-lg bg-white px-4 py-2 font-semibold text-teal-800 shadow-lg transition-transform focus:translate-y-0"
+        href="#main-content"
+      >
+        {t('common.skip')}
+      </a>
       <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <span className="sm:hidden">
           <Brand compact />

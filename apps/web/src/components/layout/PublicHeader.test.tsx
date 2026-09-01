@@ -34,6 +34,9 @@ describe('PublicHeader', () => {
   it('links the brand home and presents sign in to a guest', () => {
     renderHeader()
 
+    expect(
+      screen.getByRole('link', { name: 'ข้ามไปยังเนื้อหาหลัก' })
+    ).toHaveAttribute('href', '#main-content')
     for (const brandLink of screen.getAllByRole('link', {
       name: 'KineGuide AI'
     })) {
