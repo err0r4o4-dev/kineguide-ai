@@ -94,6 +94,24 @@ describe('LandingPage', () => {
     expect(
       screen.getByRole('link', { name: 'ดูวิธีการทำงาน' })
     ).toHaveAttribute('href', '#how-it-works')
+    expect(
+      screen.getByRole('link', {
+        name: 'ดูรายละเอียด กล้องทำงานในอุปกรณ์'
+      })
+    ).toHaveAttribute('href', '#how-it-works')
+    expect(
+      screen.getByRole('link', {
+        name: 'ดูรายละเอียด ควบคุมข้อมูลของคุณ'
+      })
+    ).toHaveAttribute('href', '#privacy')
+    expect(
+      screen.getByRole('link', {
+        name: 'ดูรายละเอียด ติดตามกิจกรรมแบบไม่กล่าวอ้างทางคลินิก'
+      })
+    ).toHaveAttribute('href', '#capabilities')
+    expect(
+      screen.getByRole('link', { name: 'สร้างบัญชีเพื่อเริ่มต้น' })
+    ).toHaveAttribute('href', '/register')
   })
 
   it('provides the same public journey and boundaries in English', async () => {

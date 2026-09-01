@@ -1,3 +1,4 @@
+import { CircleUserRound } from 'lucide-react'
 import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 
@@ -9,27 +10,31 @@ export function PublicHeader() {
   const { t } = useTranslation()
   const auth = useAuth()
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-lg">
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 shadow-[0_6px_24px_rgb(15_23_42_/_4%)] backdrop-blur-lg">
       <a
         className="fixed left-4 top-3 z-50 -translate-y-24 rounded-lg bg-white px-4 py-2 font-semibold text-teal-800 shadow-lg transition-transform focus:translate-y-0"
         href="#main-content"
       >
         {t('common.skip')}
       </a>
-      <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[4.75rem] max-w-7xl items-center justify-between gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-6 lg:px-8">
         <span className="sm:hidden">
-          <Brand compact />
+          <Brand compact prominent />
         </span>
         <span className="hidden sm:inline-flex">
-          <Brand />
+          <Brand prominent />
         </span>
         <nav aria-label={t('nav.public')} className="flex items-center gap-2">
-          <LanguageButton />
+          <LanguageButton appearance="public" />
           <Link
-            className="kg-button-primary h-11 whitespace-nowrap px-3 sm:px-4"
-            to={auth.user ? '/app' : '/login'}
+            aria-label={t('nav.getStarted')}
+            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-800 bg-teal-700 px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_22%)] transition-colors hover:bg-teal-800 sm:min-h-12 sm:rounded-2xl sm:px-5"
+            to={auth.user ? '/app' : '/register'}
           >
-            {t(auth.user ? 'nav.getStarted' : 'auth.signIn')}
+            <CircleUserRound aria-hidden="true" size={19} />
+            <span className="hidden min-[400px]:inline">
+              {t('nav.getStarted')}
+            </span>
           </Link>
         </nav>
       </div>

@@ -102,6 +102,118 @@ button:disabled {
   background: #f0fdfa;
 }
 
+.kg-landing-hero {
+  background:
+    radial-gradient(circle at 9% 74%, rgb(153 246 228 / 32%), transparent 25%),
+    radial-gradient(circle at 72% 86%, rgb(204 251 241 / 40%), transparent 24%),
+    radial-gradient(circle at 98% 12%, rgb(224 242 254 / 55%), transparent 30%),
+    linear-gradient(112deg, #f8ffff 0%, #f8fbfc 49%, #edf8fb 100%);
+}
+
+.kg-landing-camera-panel {
+  border: 1px solid rgb(255 255 255 / 88%);
+  border-radius: 2rem;
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 62%),
+    rgb(226 232 240 / 44%)
+  );
+  box-shadow:
+    0 20px 50px rgb(15 23 42 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 90%);
+  backdrop-filter: blur(20px);
+}
+
+.kg-landing-camera-screen {
+  background:
+    radial-gradient(circle at 18% 30%, rgb(94 234 212 / 20%), transparent 24%),
+    radial-gradient(circle at 78% 58%, rgb(15 118 110 / 18%), transparent 19%),
+    radial-gradient(circle at 48% 90%, rgb(148 163 184 / 16%), transparent 28%),
+    linear-gradient(145deg, rgb(255 255 255 / 68%), rgb(241 245 249 / 56%));
+  box-shadow: inset 0 0 45px rgb(255 255 255 / 38%);
+  backdrop-filter: blur(26px);
+}
+
+.kg-landing-primary-cta,
+.kg-landing-secondary-cta {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: 0.95rem;
+  padding: 0.75rem 1.35rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+  transition:
+    translate 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.kg-landing-primary-cta {
+  border: 1px solid #0f8b78;
+  background: #0f8b78;
+  color: white;
+  box-shadow:
+    0 8px 22px rgb(13 148 136 / 28%),
+    0 0 0 4px rgb(45 212 191 / 9%);
+}
+
+.kg-landing-primary-cta:hover {
+  background: #0f766e;
+  box-shadow:
+    0 11px 26px rgb(13 148 136 / 32%),
+    0 0 0 5px rgb(45 212 191 / 10%);
+  translate: 0 -1px;
+}
+
+.kg-landing-secondary-cta {
+  border: 1px solid #cbdad7;
+  background: rgb(255 255 255 / 82%);
+  color: #29413e;
+  box-shadow: 0 5px 16px rgb(15 23 42 / 5%);
+}
+
+.kg-landing-secondary-cta:hover {
+  border-color: #99c9c1;
+  background: white;
+  translate: 0 -1px;
+}
+
+.kg-landing-privacy-panel,
+.kg-landing-final {
+  background:
+    radial-gradient(circle at 15% 18%, rgb(45 212 191 / 15%), transparent 34%),
+    #0b6b63;
+}
+
+.kg-landing-final-cta {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid white;
+  border-radius: 0.8rem;
+  background: white;
+  padding: 0.75rem 1.25rem;
+  color: #0b5f59;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgb(4 47 46 / 14%);
+  transition:
+    background-color 150ms ease,
+    translate 150ms ease;
+}
+
+.kg-landing-final-cta:hover {
+  background: #f0fdfa;
+  translate: 0 -1px;
+}
+
 .kg-icon-button {
   min-width: 44px;
   border: 1px solid #d7e2df;
