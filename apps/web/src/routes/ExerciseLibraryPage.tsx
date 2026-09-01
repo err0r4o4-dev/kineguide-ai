@@ -57,8 +57,11 @@ export function ExerciseLibraryPage() {
       <div className="mt-7 flex flex-wrap gap-2">
         {[
           ['all', 'all'],
-          ['upper_body', 'upper'],
-          ['lower_body', 'lower']
+          ['neck', 'neck'],
+          ['shoulder', 'shoulder'],
+          ['lower_back', 'lower_back'],
+          ['knee', 'knee'],
+          ['hand', 'hand']
         ].map(([value, key]) => (
           <button
             className={category === value ? 'kg-filter-active' : 'kg-filter'}
@@ -96,9 +99,7 @@ export function ExerciseLibraryPage() {
                     : exercise.title_en}
                 </h2>
                 <p className="mt-2 text-sm text-slate-500">
-                  {exercise.category === 'upper_body'
-                    ? t('exercises.upper')
-                    : t('exercises.lower')}
+                  {t(`exercises.${exercise.category}`)}
                 </p>
                 <div className="mt-6 flex gap-3">
                   <Link

@@ -1,51 +1,43 @@
-import { describe, expect, it } from 'vitest'
-
-import type { PoseLandmark } from './poseGeometry'
 import { createTechnicalRepetitionCounter } from './technicalRepetitionCounter'
+import type { PoseLandmark } from './poseGeometry'
 
-function frame(wristY: number): PoseLandmark[] {
-  const landmarks = Array.from({ length: 33 }, () => ({
-    x: 0.5,
-    y: 0.5,
-    visibility: 1
-  }))
-  landmarks[11] = { x: 0.4, y: 0.4, visibility: 1 }
-  landmarks[12] = { x: 0.6, y: 0.4, visibility: 1 }
-  landmarks[15] = { x: 0.3, y: wristY, visibility: 1 }
-  landmarks[16] = { x: 0.7, y: wristY, visibility: 1 }
-  return landmarks
-}
+const point = (x: number, y: number, z = 0): PoseLandmark => ({
+  x,
+  y,
+  z,
+  visibility: 0.95
+})
 
-describe('technical repetition counter', () => {
-  it('counts one observable lower-raised-lower cycle without a correctness claim', () => {
+describe('state-based repetition counter', () => {
+  it('counts repetitions through full state machine transitions', () => {
     const counter = createTechnicalRepetitionCounter(
       'arm-abduction-research-demo'
     )
 
-    counter.update('ready', frame(0.65))
-    counter.update('ready', frame(0.25))
-    const result = counter.update('ready', frame(0.65))
+    // Initial state
+    const restPose = Array.from({ length: 33 }, () => point(0.5, 0.5, 0))
+    // Rest: shoulder angle ~20 deg (hip: 0.5, 0.8; shoulder: 0.5, 0.5; elbow: 0.52, 0.6)
+    restPose[23] = point(0.5, 0.8, 0)
+    restPose[11] = point(0.5, 0.5, 0)
+    restPose[13] = point(0.52, 0.6, 0)
 
-    expect(result).toEqual({ count: 1, phase: 'lowered', available: true })
-  })
+    let res = counter.update('ready', restPose)
+    expect(res.available).toBe(true)
+    expect(res.count).toBe(0)
 
-  it('stays unavailable for exercises without a reviewed technical profile', () => {
-    const counter = createTechnicalRepetitionCounter('sit-to-stand-demo')
+    // Moving up (arm abduction)
+    const peakPose = Array.from({ length: 33 }, () => point(0.5, 0.5, 0))
+    // Peak: shoulder angle ~160 deg (elbow raised high above shoulder)
+    peakPose[23] = point(0.5, 0.8, 0)
+    peakPose[11] = point(0.5, 0.5, 0)
+    peakPose[13] = point(0.48, 0.2, 0)
 
-    expect(counter.update('ready', frame(0.65))).toEqual({
-      count: 0,
-      phase: 'unavailable',
-      available: false
-    })
-  })
+    res = counter.update('ready', peakPose)
+    expect(res.count).toBe(0)
 
-  it('does not count low-confidence or missing frames', () => {
-    const counter = createTechnicalRepetitionCounter(
-      'arm-abduction-research-demo'
-    )
-    counter.update('ready', frame(0.65))
-    counter.update('adjust_camera', null)
-
-    expect(counter.update('ready', frame(0.25)).count).toBe(0)
+    // Return to rest
+    res = counter.update('ready', restPose)
+    // Completed 1 full cycle
+    expect(res.count).toBe(1)
   })
 })

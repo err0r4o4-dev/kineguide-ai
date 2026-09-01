@@ -495,6 +495,11 @@ const th = {
       'เลือกเพื่อทดลอง flow ของกล้อง เนื้อหายังไม่ใช่โปรแกรมกายภาพบำบัด',
     search: 'ค้นหาการสาธิต',
     all: 'ทั้งหมด',
+    neck: 'บริเวณคอ',
+    shoulder: 'บริเวณไหล่',
+    lower_back: 'บริเวณหลังช่วงล่าง',
+    knee: 'บริเวณเข่า',
+    hand: 'บริเวณมือ',
     upper: 'ช่วงบน',
     lower: 'ช่วงล่าง',
     details: 'ดูรายละเอียด',
@@ -590,7 +595,77 @@ const th = {
     elapsed: 'เวลาที่ใช้',
     backHome: 'กลับ Dashboard',
     viewHistory: 'ดูประวัติ',
-    saveFailed: 'ไม่สามารถบันทึก session ได้'
+    saveFailed: 'ไม่สามารถบันทึก session ได้',
+    accuracy: 'ความถูกต้องของท่าทาง',
+    accuracyScore: 'คะแนนความแม่นยำ',
+    accuracyExcellent: 'ยอดเยี่ยม (ตรงตามต้นฉบับ)',
+    accuracyGood: 'ดี (สอดคล้องกับต้นฉบับ)',
+    accuracyNeedsWork: 'ควรปรับปรุงท่าทาง',
+    accuracyIncorrect: 'ท่าทางยังไม่ถูกต้อง',
+    movementQuality: 'การวิเคราะห์ข้อต่อรายจุด',
+    referenceModelLoaded: 'โมเดลท่าต้นแบบ: พร้อมเปรียบเทียบ',
+    noReferenceModel: 'ยังไม่มี Reference Model สำหรับท่านี้',
+    manageReference: 'จัดการวิดีโอต้นแบบ',
+    jointStatus: {
+      leftShoulder: 'หัวไหล่ซ้าย',
+      rightShoulder: 'หัวไหล่ขวา',
+      leftElbow: 'ข้อศอกซ้าย',
+      rightElbow: 'ข้อศอกขวา',
+      leftHip: 'สะโพกซ้าย',
+      rightHip: 'สะโพกขวา',
+      leftKnee: 'หัวเข่าซ้าย',
+      rightKnee: 'หัวเข่าขวา',
+      leftAnkle: 'ข้อเท้าซ้าย',
+      rightAnkle: 'ข้อเท้าขวา'
+    },
+    feedback: {
+      formGood: '✓ ตำแหน่งข้อต่อและการเคลื่อนไหวถูกต้อง',
+      noMovementDetected: 'รอตรวจจับการเคลื่อนไหวของผู้ใช้',
+      jointError_leftShoulder:
+        '✗ องศาหัวไหล่ซ้ายต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointWarning_leftShoulder:
+        '⚠ ระวังตำแหน่งหัวไหล่ซ้าย เบี่ยงเบน {{degreeDiff}}°',
+      jointError_rightShoulder:
+        '✗ องศาหัวไหล่ขวาต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointWarning_rightShoulder:
+        '⚠ ระวังตำแหน่งหัวไหล่ขวา เบี่ยงเบน {{degreeDiff}}°',
+      jointError_leftElbow:
+        '✗ ข้อศอกซ้ายงอหรือกางต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointWarning_leftElbow: '⚠ ปรับมุมข้อศอกซ้ายเล็กน้อย {{degreeDiff}}°',
+      jointError_rightElbow:
+        '✗ ข้อศอกขวางอหรือกางต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointWarning_rightElbow: '⚠ ปรับมุมข้อศอกขวาเล็กน้อย {{degreeDiff}}°',
+      jointError_leftKnee: '✗ องศาหัวเข่าซ้ายต่างจากต้นแบบ {{degreeDiff}}°',
+      jointWarning_leftKnee:
+        '⚠ ควบคุมองศาหัวเข่าซ้าย เบี่ยงเบน {{degreeDiff}}°',
+      jointError_rightKnee: '✗ องศาหัวเข่าขวาต่างจากต้นแบบ {{degreeDiff}}°',
+      jointWarning_rightKnee:
+        '⚠ ควบคุมองศาหัวเข่าขวา เบี่ยงเบน {{degreeDiff}}°',
+      jointError_leftHip: '✗ มุมสะโพกซ้ายต่างจากต้นแบบ {{degreeDiff}}°',
+      jointWarning_leftHip: '⚠ ปรับมุมสะโพกซ้าย {{degreeDiff}}°',
+      jointError_rightHip: '✗ มุมสะโพกขวาต่างจากต้นแบบ {{degreeDiff}}°',
+      jointWarning_rightHip: '⚠ ปรับมุมสะโพกขวา {{degreeDiff}}°'
+    }
+  },
+  referenceManagement: {
+    title: 'จัดการวิดีโอท่าต้นแบบ (Reference Models)',
+    subtitle:
+      'นำเข้าวิดีโอท่ากายภาพที่ถูกต้องเพื่อสกัด Landmark และสร้าง Ground Truth Model',
+    uploadVideo: 'อัปโหลดคลิปวิดีโอต้นแบบ (.mp4 / .webm)',
+    chooseFile: 'เลือกไฟล์วิดีโอ',
+    selectExercise: 'เลือกท่ากายภาพ',
+    processButton: 'ประมวลผลและสร้าง Reference Model',
+    processing: 'กำลังประมวลผลวิดีโอด้วย MediaPipe Pose… ({{percent}}%)',
+    processSuccess: 'สร้าง Reference Model สำเร็จแล้ว!',
+    savedModels: 'โมเดลท่าต้นแบบที่บันทึกไว้ในระบบ',
+    noModels: 'ยังไม่มีการสร้าง Reference Model',
+    frames: 'จำนวนเฟรม',
+    duration: 'ความยาววิดีโอ',
+    exportJson: 'ดาวน์โหลด JSON',
+    deleteModel: 'ลบโมเดล',
+    aggregateTitle: 'รวมหลายวิดีโอต้นแบบ (Multi-video Consensus)',
+    aggregateDescription:
+      'ผสมผสานคลิปตัวอย่างมากกว่า 1 คนเพื่อลดปัญหาการจำเฉพาะบุคคล'
   },
   history: {
     title: 'ประวัติกิจกรรม',
@@ -1256,6 +1331,11 @@ const en: typeof th = {
     subtitle: 'Choose a camera-flow demo. This is not a physiotherapy program.',
     search: 'Search demos',
     all: 'All',
+    neck: 'Neck',
+    shoulder: 'Shoulder',
+    lower_back: 'Lower back',
+    knee: 'Knee',
+    hand: 'Hand',
     upper: 'Upper body',
     lower: 'Lower body',
     details: 'View details',
@@ -1355,7 +1435,75 @@ const en: typeof th = {
     elapsed: 'Elapsed time',
     backHome: 'Back to dashboard',
     viewHistory: 'View history',
-    saveFailed: 'Unable to save the session.'
+    saveFailed: 'Unable to save the session.',
+    accuracy: 'Movement Accuracy',
+    accuracyScore: 'Accuracy Score',
+    accuracyExcellent: 'Excellent (matches reference)',
+    accuracyGood: 'Good (consistent with reference)',
+    accuracyNeedsWork: 'Needs improvement',
+    accuracyIncorrect: 'Incorrect movement',
+    movementQuality: 'Joint Error Analysis',
+    referenceModelLoaded: 'Reference model active',
+    noReferenceModel: 'No reference model available for this exercise',
+    manageReference: 'Manage Reference Videos',
+    jointStatus: {
+      leftShoulder: 'Left Shoulder',
+      rightShoulder: 'Right Shoulder',
+      leftElbow: 'Left Elbow',
+      rightElbow: 'Right Elbow',
+      leftHip: 'Left Hip',
+      rightHip: 'Right Hip',
+      leftKnee: 'Left Knee',
+      rightKnee: 'Right Knee',
+      leftAnkle: 'Left Ankle',
+      rightAnkle: 'Right Ankle'
+    },
+    feedback: {
+      formGood: '✓ Joint positions and movement look good',
+      noMovementDetected: 'Waiting for movement detection',
+      jointError_leftShoulder:
+        '✗ Left shoulder angle differs by {{degreeDiff}}°',
+      jointWarning_leftShoulder:
+        '⚠ Watch left shoulder position (deviates by {{degreeDiff}}°)',
+      jointError_rightShoulder:
+        '✗ Right shoulder angle differs by {{degreeDiff}}°',
+      jointWarning_rightShoulder:
+        '⚠ Watch right shoulder position (deviates by {{degreeDiff}}°)',
+      jointError_leftElbow: '✗ Left elbow differs by {{degreeDiff}}°',
+      jointWarning_leftElbow: '⚠ Adjust left elbow angle by {{degreeDiff}}°',
+      jointError_rightElbow: '✗ Right elbow differs by {{degreeDiff}}°',
+      jointWarning_rightElbow: '⚠ Adjust right elbow angle by {{degreeDiff}}°',
+      jointError_leftKnee: '✗ Left knee angle differs by {{degreeDiff}}°',
+      jointWarning_leftKnee:
+        '⚠ Control left knee angle (deviates by {{degreeDiff}}°)',
+      jointError_rightKnee: '✗ Right knee angle differs by {{degreeDiff}}°',
+      jointWarning_rightKnee:
+        '⚠ Control right knee angle (deviates by {{degreeDiff}}°)',
+      jointError_leftHip: '✗ Left hip angle differs by {{degreeDiff}}°',
+      jointWarning_leftHip: '⚠ Adjust left hip angle ({{degreeDiff}}°)',
+      jointError_rightHip: '✗ Right hip angle differs by {{degreeDiff}}°',
+      jointWarning_rightHip: '⚠ Adjust right hip angle ({{degreeDiff}}°)'
+    }
+  },
+  referenceManagement: {
+    title: 'Reference Video Models',
+    subtitle:
+      'Import verified exercise videos to extract landmarks and create ground truth movement models',
+    uploadVideo: 'Upload Reference Video (.mp4 / .webm)',
+    chooseFile: 'Choose Video File',
+    selectExercise: 'Select Exercise',
+    processButton: 'Process & Generate Reference Model',
+    processing: 'Processing video with MediaPipe Pose… ({{percent}}%)',
+    processSuccess: 'Reference Model generated successfully!',
+    savedModels: 'Stored Reference Models',
+    noModels: 'No reference models created yet',
+    frames: 'Frames',
+    duration: 'Duration',
+    exportJson: 'Export JSON',
+    deleteModel: 'Delete Model',
+    aggregateTitle: 'Multi-video Consensus',
+    aggregateDescription:
+      'Combine multiple demonstrator clips to prevent single-person bias'
   },
   history: {
     title: 'Activity history',

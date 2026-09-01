@@ -33,6 +33,8 @@ export const TECHNICAL_VISIBILITY_GATE = 0.5
 const BOUNDS_PADDING = 0.05
 
 const REQUIRED_LANDMARKS: Record<string, readonly number[]> = {
+  'neck-flexion-demo': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  'neck-rotation-demo': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   'sit-to-stand-demo': [11, 12, 23, 24, 25, 26, 27, 28],
   'seated-knee-demo': [23, 24, 25, 26, 27, 28],
   'shoulder-movement-demo': [11, 12, 13, 14, 15, 16],
@@ -43,7 +45,8 @@ const REQUIRED_LANDMARKS: Record<string, readonly number[]> = {
   ],
   'standing-leg-abduction-research-demo': [23, 24, 25, 26, 27, 28],
   'lunge-research-demo': [11, 12, 23, 24, 25, 26, 27, 28],
-  'squat-research-demo': [11, 12, 23, 24, 25, 26, 27, 28]
+  'squat-research-demo': [11, 12, 23, 24, 25, 26, 27, 28],
+  'hand-wrist-demo': [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
 }
 
 function clamp(value: number) {

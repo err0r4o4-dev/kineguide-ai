@@ -2,17 +2,20 @@ import type { RefObject } from 'react'
 
 import { PoseOverlay } from './PoseOverlay'
 import type { PoseTrackingSnapshot } from './usePoseTracking'
+import type { JointError } from './exerciseFeatures'
 
 export function CameraPoseLayer({
   canvasRef,
   label,
   snapshot,
-  videoRef
+  videoRef,
+  jointErrors = []
 }: {
   canvasRef: RefObject<HTMLCanvasElement | null>
   label: string
   snapshot: PoseTrackingSnapshot
   videoRef: RefObject<HTMLVideoElement | null>
+  jointErrors?: JointError[]
 }) {
   return (
     <div className="absolute inset-0" data-camera-pose-layer="true">
@@ -29,7 +32,11 @@ export function CameraPoseLayer({
         ref={canvasRef}
         role="img"
       />
-      <PoseOverlay snapshot={snapshot} video={videoRef.current} />
+      <PoseOverlay
+        jointErrors={jointErrors}
+        snapshot={snapshot}
+        video={videoRef.current}
+      />
     </div>
   )
 }

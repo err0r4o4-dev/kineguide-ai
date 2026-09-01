@@ -104,15 +104,13 @@ type Exercise struct {
 }
 
 var Exercises = []Exercise{
-	{Slug: "sit-to-stand-demo", TitleTH: "สาธิตการลุกนั่งจากเก้าอี้", TitleEN: "Sit-to-stand movement demo", Category: "lower_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "seated-knee-demo", TitleTH: "สาธิตการเหยียดเข่าขณะนั่ง", TitleEN: "Seated knee movement demo", Category: "lower_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "shoulder-movement-demo", TitleTH: "สาธิตการเคลื่อนไหวหัวไหล่", TitleEN: "Shoulder movement demo", Category: "upper_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "arm-abduction-research-demo", TitleTH: "สาธิตการกางแขนด้านข้างเพื่อการวิจัย", TitleEN: "Arm abduction research demo", Category: "upper_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "arm-vw-research-demo", TitleTH: "สาธิตการเคลื่อนไหวแขนรูปตัว V และ W เพื่อการวิจัย", TitleEN: "Arm V-W research demo", Category: "upper_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "table-push-up-research-demo", TitleTH: "สาธิตการวิดพื้นกับโต๊ะเพื่อการวิจัย", TitleEN: "Table push-up research demo", Category: "upper_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "standing-leg-abduction-research-demo", TitleTH: "สาธิตการกางขาขณะยืนเพื่อการวิจัย", TitleEN: "Standing leg abduction research demo", Category: "lower_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "lunge-research-demo", TitleTH: "สาธิตท่าลันจ์เพื่อการวิจัย", TitleEN: "Lunge research demo", Category: "lower_body", ReviewStatus: "pending_clinical_review"},
-	{Slug: "squat-research-demo", TitleTH: "สาธิตท่าสควอตเพื่อการวิจัย", TitleEN: "Squat research demo", Category: "lower_body", ReviewStatus: "pending_clinical_review"},
+	{Slug: "neck-flexion-demo", TitleTH: "สาธิตการก้มและเงยคอ", TitleEN: "Neck flexion and extension demo", Category: "neck", ReviewStatus: "pending_clinical_review"},
+	{Slug: "neck-rotation-demo", TitleTH: "สาธิตการหันศีรษะซ้าย-ขวา", TitleEN: "Neck rotation demo", Category: "neck", ReviewStatus: "pending_clinical_review"},
+	{Slug: "shoulder-movement-demo", TitleTH: "สาธิตการเคลื่อนไหวหัวไหล่", TitleEN: "Shoulder movement demo", Category: "shoulder", ReviewStatus: "pending_clinical_review"},
+	{Slug: "arm-abduction-research-demo", TitleTH: "สาธิตการกางแขนด้านข้าง", TitleEN: "Arm abduction demo", Category: "shoulder", ReviewStatus: "pending_clinical_review"},
+	{Slug: "sit-to-stand-demo", TitleTH: "สาธิตการลุกนั่งจากเก้าอี้", TitleEN: "Sit-to-stand movement demo", Category: "lower_back", ReviewStatus: "pending_clinical_review"},
+	{Slug: "seated-knee-demo", TitleTH: "สาธิตการเหยียดเข่าขณะนั่ง", TitleEN: "Seated knee movement demo", Category: "knee", ReviewStatus: "pending_clinical_review"},
+	{Slug: "hand-wrist-demo", TitleTH: "สาธิตการเคลื่อนไหวมือและข้อมือ", TitleEN: "Hand and wrist movement demo", Category: "hand", ReviewStatus: "pending_clinical_review"},
 }
 
 func FindExercise(slug string) (Exercise, bool) {

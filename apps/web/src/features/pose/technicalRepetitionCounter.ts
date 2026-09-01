@@ -1,11 +1,17 @@
 import type { PoseFrameStatus, PoseLandmark } from './poseGeometry'
+import type { JointName } from './exerciseFeatures'
+import { extractJointAngles } from './exerciseFeatures'
+import { getExerciseConfig } from './referenceMovementModel'
 
-export type TechnicalMovementPhase =
-  'unavailable' | 'waiting' | 'lowered' | 'raised'
+export type MovementState =
+  'REST' | 'START' | 'MOVING' | 'PEAK' | 'RETURN' | 'COMPLETED'
 
-export interface TechnicalRepetitionResult {
+export interface StateRepetitionResult {
   count: number
-  phase: TechnicalMovementPhase
+  state: MovementState
+  currentAngle: number | null
+  targetPeakAngle: number | null
+  repProgressPercent: number // 0 - 100%
   available: boolean
 }
 
@@ -13,71 +19,132 @@ export interface TechnicalRepetitionCounter {
   update(
     status: PoseFrameStatus,
     landmarks: readonly PoseLandmark[] | null
-  ): TechnicalRepetitionResult
+  ): StateRepetitionResult
   reset(): void
-}
-
-const SUPPORTED_EXERCISE = 'arm-abduction-research-demo'
-
-function visible(landmark: PoseLandmark | undefined) {
-  return Boolean(
-    landmark && Number.isFinite(landmark.y) && (landmark.visibility ?? 0) >= 0.5
-  )
 }
 
 export function createTechnicalRepetitionCounter(
   exerciseSlug: string
 ): TechnicalRepetitionCounter {
-  const available = exerciseSlug === SUPPORTED_EXERCISE
+  const config = getExerciseConfig(exerciseSlug)
+  const available = Boolean(config.repCounting?.enabled)
+  const repConfig = config.repCounting
+
   let count = 0
-  let phase: TechnicalMovementPhase = available ? 'waiting' : 'unavailable'
-  let sawRaised = false
+  let state: MovementState = 'REST'
+  let repProgress = 0
+
+  const primaryJoint: JointName = repConfig?.primaryJoint || 'leftShoulder'
+  const restAngle = repConfig?.restAngle ?? 30
+  const peakAngle = repConfig?.peakAngle ?? 90
+  const threshold = repConfig?.threshold ?? 15
+  const isIncreasing = peakAngle > restAngle
 
   return {
-    update(status, landmarks) {
-      if (!available) return { count, phase: 'unavailable', available: false }
-      if (status !== 'ready' || !landmarks) {
-        phase = 'waiting'
-        sawRaised = false
-        return { count, phase, available: true }
+    update(status, landmarks): StateRepetitionResult {
+      if (!available || !repConfig) {
+        return {
+          count,
+          state: 'REST',
+          currentAngle: null,
+          targetPeakAngle: null,
+          repProgressPercent: 0,
+          available: false
+        }
       }
 
-      const leftShoulder = landmarks[11]
-      const rightShoulder = landmarks[12]
-      const leftWrist = landmarks[15]
-      const rightWrist = landmarks[16]
-      if (
-        !visible(leftShoulder) ||
-        !visible(rightShoulder) ||
-        !visible(leftWrist) ||
-        !visible(rightWrist)
-      ) {
-        phase = 'waiting'
-        sawRaised = false
-        return { count, phase, available: true }
+      if (status !== 'ready' || !landmarks || landmarks.length < 33) {
+        return {
+          count,
+          state,
+          currentAngle: null,
+          targetPeakAngle: peakAngle,
+          repProgressPercent: repProgress,
+          available: true
+        }
       }
 
-      // Image y grows downwards. This is a coarse observable phase transition,
-      // not a clinical angle, quality score, or claim that form is correct.
-      const isRaised =
-        leftWrist.y < leftShoulder.y && rightWrist.y < rightShoulder.y
-      const isLowered =
-        leftWrist.y > leftShoulder.y && rightWrist.y > rightShoulder.y
+      const angles = extractJointAngles(landmarks)
+      const currentAngle = angles[primaryJoint]
 
-      if (isRaised) {
-        phase = 'raised'
-        sawRaised = true
-      } else if (isLowered) {
-        if (sawRaised) count += 1
-        phase = 'lowered'
-        sawRaised = false
+      if (currentAngle === undefined || !Number.isFinite(currentAngle)) {
+        return {
+          count,
+          state,
+          currentAngle: null,
+          targetPeakAngle: peakAngle,
+          repProgressPercent: repProgress,
+          available: true
+        }
       }
-      return { count, phase, available: true }
+
+      // Calculate progress percentage between restAngle and peakAngle
+      const totalSpan = Math.abs(peakAngle - restAngle) || 1
+      const currentSpan = Math.abs(currentAngle - restAngle)
+      repProgress = Math.max(
+        0,
+        Math.min(100, Math.round((currentSpan / totalSpan) * 100))
+      )
+
+      const isAtRest = Math.abs(currentAngle - restAngle) <= threshold
+      const reachedPeak = isIncreasing
+        ? currentAngle >= peakAngle - threshold
+        : currentAngle <= peakAngle + threshold
+
+      // State machine logic: REST -> START -> MOVING -> PEAK -> RETURN -> COMPLETED -> REST
+      switch (state) {
+        case 'REST': {
+          if (!isAtRest) {
+            state = reachedPeak ? 'PEAK' : 'MOVING'
+          }
+          break
+        }
+        case 'START':
+        case 'MOVING': {
+          if (reachedPeak) {
+            state = 'PEAK'
+          } else if (isAtRest) {
+            state = 'REST'
+          }
+          break
+        }
+        case 'PEAK': {
+          if (!reachedPeak) {
+            state = 'RETURN'
+            if (isAtRest) {
+              count += 1
+              state = 'COMPLETED'
+            }
+          }
+          break
+        }
+        case 'RETURN': {
+          if (isAtRest) {
+            count += 1
+            state = 'COMPLETED'
+          }
+          break
+        }
+        case 'COMPLETED': {
+          state = isAtRest ? 'REST' : 'MOVING'
+          break
+        }
+      }
+
+      return {
+        count,
+        state,
+        currentAngle,
+        targetPeakAngle: peakAngle,
+        repProgressPercent: repProgress,
+        available: true
+      }
     },
+
     reset() {
       count = 0
-      phase = available ? 'waiting' : 'unavailable'
-      sawRaised = false
+      state = 'REST'
+      repProgress = 0
     }
   }
 }

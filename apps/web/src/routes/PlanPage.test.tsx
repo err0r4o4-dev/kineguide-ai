@@ -20,7 +20,7 @@ describe('PlanPage', () => {
       slug: 'sit-to-stand-demo',
       title_th: 'สาธิตการลุกนั่งจากเก้าอี้',
       title_en: 'Sit-to-stand movement demo',
-      category: 'lower_body',
+      category: 'lower_back',
       review_status: 'pending_clinical_review'
     }
     vi.mocked(product.getActivityPlan).mockResolvedValue({
