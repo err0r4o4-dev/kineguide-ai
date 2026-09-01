@@ -95,12 +95,12 @@ describe('LandingPage', () => {
       screen.queryByRole('heading', { name: 'การใช้งาน' })
     ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('navigation', { name: 'ข้อมูลส่วนท้ายเว็บไซต์' })
+      screen.queryByRole('navigation', { name: 'ข้อมูลส่วนท้ายเว็บไซต์' })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(/© 2026 KineGuide AI/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/ความเป็นส่วนตัวของคุณ คือสิ่งสำคัญที่สุดของเรา/)
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'เข้าสู่ระบบ' })).toHaveAttribute(
-      'href',
-      '/login'
-    )
     expect(
       screen
         .getAllByRole('link', { name: 'ดูวิธีการทำงาน' })

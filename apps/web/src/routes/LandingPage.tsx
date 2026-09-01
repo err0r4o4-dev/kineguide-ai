@@ -12,7 +12,6 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
-import { Brand } from '@/components/Brand'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -250,51 +249,21 @@ export function LandingPage() {
       </main>
 
       <footer className="border-t border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.4),#ffffff_38%)]">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
-          <div className="grid gap-5 md:grid-cols-[1.35fr_auto] md:items-center">
-            <div>
-              <Brand />
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                {t('landing.footer')}
-              </p>
-            </div>
-            <nav
-              aria-label={t('landing.footerNav')}
-              className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm font-medium text-slate-600 md:justify-end"
-            >
-              <a
-                className="inline-flex min-h-11 items-center hover:text-teal-700"
-                href="#features"
-              >
-                {t('landing.learn')}
-              </a>
-              <a
-                className="inline-flex min-h-11 items-center hover:text-teal-700"
-                href="#capabilities"
-              >
-                {t('landing.capabilitiesEyebrow')}
-              </a>
-              {!auth.user && (
-                <Link
-                  className="inline-flex min-h-11 items-center text-teal-700 hover:text-teal-900"
-                  to="/login"
-                >
-                  {t('auth.signIn')}
-                </Link>
-              )}
-            </nav>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-slate-200/80 pt-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <div>
             <p>{t('landing.footerCopyright')}</p>
-            <p className="inline-flex items-center gap-2 font-medium text-slate-600">
-              <ShieldCheck
-                aria-hidden="true"
-                className="text-teal-700"
-                size={17}
-              />
-              {t('landing.footerPrivacyNote')}
+            <p className="mt-1 max-w-2xl leading-5 text-slate-500">
+              {t('landing.footer')}
             </p>
           </div>
+          <p className="inline-flex items-center gap-2 font-medium text-slate-600">
+            <ShieldCheck
+              aria-hidden="true"
+              className="text-teal-700"
+              size={17}
+            />
+            {t('landing.footerPrivacyNote')}
+          </p>
         </div>
       </footer>
     </div>
