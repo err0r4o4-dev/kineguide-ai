@@ -1,12 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Upload,
-  Layers,
-  Trash2,
-  Download,
-  CheckCircle
-} from 'lucide-react'
+import { Upload, Layers, Trash2, Download, CheckCircle } from 'lucide-react'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
 import {
   processReferenceVideo,
@@ -59,9 +53,7 @@ export function ReferenceManagementPage() {
       if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (error) {
       console.error('Error processing reference video', error)
-      setFeedback(
-        error instanceof Error ? error.message : 'Processing failed'
-      )
+      setFeedback(error instanceof Error ? error.message : 'Processing failed')
     } finally {
       adapter?.close()
       setProcessing(false)

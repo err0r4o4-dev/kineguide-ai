@@ -8,7 +8,13 @@ export interface VideoProcessingProgress {
   currentFrame: number
   totalFrames: number
   progressPercent: number
-  status: 'idle' | 'loading_video' | 'extracting_landmarks' | 'generating_model' | 'completed' | 'error'
+  status:
+    | 'idle'
+    | 'loading_video'
+    | 'extracting_landmarks'
+    | 'generating_model'
+    | 'completed'
+    | 'error'
   errorMessage?: string
 }
 
@@ -27,7 +33,12 @@ export async function processReferenceVideo(
   adapter: PoseAdapter,
   options: ProcessVideoOptions
 ): Promise<ReferenceMovementModel> {
-  const { exerciseSlug, exerciseName = exerciseSlug, targetFps = 15, onProgress } = options
+  const {
+    exerciseSlug,
+    exerciseName = exerciseSlug,
+    targetFps = 15,
+    onProgress
+  } = options
   const config = getExerciseConfig(exerciseSlug)
 
   const videoUrl = URL.createObjectURL(videoFile)
@@ -72,7 +83,11 @@ export async function processReferenceVideo(
     status: 'extracting_landmarks'
   })
 
-  for (let currentTime = 0; currentTime < duration; currentTime += frameInterval) {
+  for (
+    let currentTime = 0;
+    currentTime < duration;
+    currentTime += frameInterval
+  ) {
     video.currentTime = currentTime
     await new Promise<void>((resolve) => {
       video.onseeked = () => resolve()
@@ -93,7 +108,10 @@ export async function processReferenceVideo(
     }
 
     frameIndex++
-    const progress = Math.min(90, 10 + Math.floor((frameIndex / estimatedTotalFrames) * 80))
+    const progress = Math.min(
+      90,
+      10 + Math.floor((frameIndex / estimatedTotalFrames) * 80)
+    )
     onProgress?.({
       currentFrame: frameIndex,
       totalFrames: estimatedTotalFrames,

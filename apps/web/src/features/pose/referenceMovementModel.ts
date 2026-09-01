@@ -56,7 +56,12 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
     slug: 'shoulder-movement-demo',
     name: 'Shoulder Retraction / Movement',
     requiredJoints: [11, 12, 13, 14, 15, 16],
-    importantAngles: ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow'],
+    importantAngles: [
+      'leftShoulder',
+      'rightShoulder',
+      'leftElbow',
+      'rightElbow'
+    ],
     similarityWeights: {
       landmark: 0.3,
       angle: 0.5,
@@ -148,7 +153,12 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
     slug: 'arm-abduction-research-demo',
     name: 'Arm Abduction',
     requiredJoints: [11, 12, 13, 14, 15, 16, 23, 24],
-    importantAngles: ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow'],
+    importantAngles: [
+      'leftShoulder',
+      'rightShoulder',
+      'leftElbow',
+      'rightElbow'
+    ],
     similarityWeights: {
       landmark: 0.3,
       angle: 0.5,
@@ -175,7 +185,14 @@ export function getExerciseConfig(exerciseSlug: string): ExerciseConfig {
       slug: exerciseSlug,
       name: exerciseSlug,
       requiredJoints: [11, 12, 13, 14, 15, 16, 23, 24, 25, 26],
-      importantAngles: ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftKnee', 'rightKnee'],
+      importantAngles: [
+        'leftShoulder',
+        'rightShoulder',
+        'leftElbow',
+        'rightElbow',
+        'leftKnee',
+        'rightKnee'
+      ],
       similarityWeights: {
         landmark: 0.3,
         angle: 0.5,
@@ -201,7 +218,9 @@ export function getExerciseConfig(exerciseSlug: string): ExerciseConfig {
  */
 const STORAGE_PREFIX = 'kineguide_ref_model_'
 
-export function saveReferenceModelToStorage(model: ReferenceMovementModel): void {
+export function saveReferenceModelToStorage(
+  model: ReferenceMovementModel
+): void {
   try {
     localStorage.setItem(
       `${STORAGE_PREFIX}${model.exerciseSlug}`,

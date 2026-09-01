@@ -10,7 +10,9 @@ const point = (x: number, y: number, z = 0): PoseLandmark => ({
 
 describe('state-based repetition counter', () => {
   it('counts repetitions through full state machine transitions', () => {
-    const counter = createTechnicalRepetitionCounter('arm-abduction-research-demo')
+    const counter = createTechnicalRepetitionCounter(
+      'arm-abduction-research-demo'
+    )
 
     // Initial state
     const restPose = Array.from({ length: 33 }, () => point(0.5, 0.5, 0))

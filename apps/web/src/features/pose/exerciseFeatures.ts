@@ -165,7 +165,11 @@ export function extractJointAngles(
 
   // 11: left_shoulder, 13: left_elbow, 15: left_wrist
   if (landmarks[11] && landmarks[13] && landmarks[15]) {
-    const leftElbow = calculateAngle(landmarks[11], landmarks[13], landmarks[15])
+    const leftElbow = calculateAngle(
+      landmarks[11],
+      landmarks[13],
+      landmarks[15]
+    )
     if (leftElbow !== null) angles.leftElbow = leftElbow
   }
 
@@ -207,11 +211,7 @@ export function extractJointAngles(
 
   // 12: right_shoulder, 24: right_hip, 26: right_knee (Hip angle)
   if (landmarks[12] && landmarks[24] && landmarks[26]) {
-    const rightHip = calculateAngle(
-      landmarks[12],
-      landmarks[24],
-      landmarks[26]
-    )
+    const rightHip = calculateAngle(landmarks[12], landmarks[24], landmarks[26])
     if (rightHip !== null) angles.rightHip = rightHip
   }
 

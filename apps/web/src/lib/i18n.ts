@@ -564,18 +564,26 @@ const th = {
     feedback: {
       formGood: '✓ ตำแหน่งข้อต่อและการเคลื่อนไหวถูกต้อง',
       noMovementDetected: 'รอตรวจจับการเคลื่อนไหวของผู้ใช้',
-      jointError_leftShoulder: '✗ องศาหัวไหล่ซ้ายต่างจากต้นฉบับ {{degreeDiff}}°',
-      jointWarning_leftShoulder: '⚠ ระวังตำแหน่งหัวไหล่ซ้าย เบี่ยงเบน {{degreeDiff}}°',
-      jointError_rightShoulder: '✗ องศาหัวไหล่ขวาต่างจากต้นฉบับ {{degreeDiff}}°',
-      jointWarning_rightShoulder: '⚠ ระวังตำแหน่งหัวไหล่ขวา เบี่ยงเบน {{degreeDiff}}°',
-      jointError_leftElbow: '✗ ข้อศอกซ้ายงอหรือกางต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointError_leftShoulder:
+        '✗ องศาหัวไหล่ซ้ายต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointWarning_leftShoulder:
+        '⚠ ระวังตำแหน่งหัวไหล่ซ้าย เบี่ยงเบน {{degreeDiff}}°',
+      jointError_rightShoulder:
+        '✗ องศาหัวไหล่ขวาต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointWarning_rightShoulder:
+        '⚠ ระวังตำแหน่งหัวไหล่ขวา เบี่ยงเบน {{degreeDiff}}°',
+      jointError_leftElbow:
+        '✗ ข้อศอกซ้ายงอหรือกางต่างจากต้นฉบับ {{degreeDiff}}°',
       jointWarning_leftElbow: '⚠ ปรับมุมข้อศอกซ้ายเล็กน้อย {{degreeDiff}}°',
-      jointError_rightElbow: '✗ ข้อศอกขวางอหรือกางต่างจากต้นฉบับ {{degreeDiff}}°',
+      jointError_rightElbow:
+        '✗ ข้อศอกขวางอหรือกางต่างจากต้นฉบับ {{degreeDiff}}°',
       jointWarning_rightElbow: '⚠ ปรับมุมข้อศอกขวาเล็กน้อย {{degreeDiff}}°',
       jointError_leftKnee: '✗ องศาหัวเข่าซ้ายต่างจากต้นแบบ {{degreeDiff}}°',
-      jointWarning_leftKnee: '⚠ ควบคุมองศาหัวเข่าซ้าย เบี่ยงเบน {{degreeDiff}}°',
+      jointWarning_leftKnee:
+        '⚠ ควบคุมองศาหัวเข่าซ้าย เบี่ยงเบน {{degreeDiff}}°',
       jointError_rightKnee: '✗ องศาหัวเข่าขวาต่างจากต้นแบบ {{degreeDiff}}°',
-      jointWarning_rightKnee: '⚠ ควบคุมองศาหัวเข่าขวา เบี่ยงเบน {{degreeDiff}}°',
+      jointWarning_rightKnee:
+        '⚠ ควบคุมองศาหัวเข่าขวา เบี่ยงเบน {{degreeDiff}}°',
       jointError_leftHip: '✗ มุมสะโพกซ้ายต่างจากต้นแบบ {{degreeDiff}}°',
       jointWarning_leftHip: '⚠ ปรับมุมสะโพกซ้าย {{degreeDiff}}°',
       jointError_rightHip: '✗ มุมสะโพกขวาต่างจากต้นแบบ {{degreeDiff}}°',
@@ -584,7 +592,8 @@ const th = {
   },
   referenceManagement: {
     title: 'จัดการวิดีโอท่าต้นแบบ (Reference Models)',
-    subtitle: 'นำเข้าวิดีโอท่ากายภาพที่ถูกต้องเพื่อสกัด Landmark และสร้าง Ground Truth Model',
+    subtitle:
+      'นำเข้าวิดีโอท่ากายภาพที่ถูกต้องเพื่อสกัด Landmark และสร้าง Ground Truth Model',
     uploadVideo: 'อัปโหลดคลิปวิดีโอต้นแบบ (.mp4 / .webm)',
     chooseFile: 'เลือกไฟล์วิดีโอ',
     selectExercise: 'เลือกท่ากายภาพ',
@@ -598,7 +607,8 @@ const th = {
     exportJson: 'ดาวน์โหลด JSON',
     deleteModel: 'ลบโมเดล',
     aggregateTitle: 'รวมหลายวิดีโอต้นแบบ (Multi-video Consensus)',
-    aggregateDescription: 'ผสมผสานคลิปตัวอย่างมากกว่า 1 คนเพื่อลดปัญหาการจำเฉพาะบุคคล'
+    aggregateDescription:
+      'ผสมผสานคลิปตัวอย่างมากกว่า 1 คนเพื่อลดปัญหาการจำเฉพาะบุคคล'
   },
   history: {
     title: 'ประวัติกิจกรรม',
@@ -1338,18 +1348,24 @@ const en: typeof th = {
     feedback: {
       formGood: '✓ Joint positions and movement look good',
       noMovementDetected: 'Waiting for movement detection',
-      jointError_leftShoulder: '✗ Left shoulder angle differs by {{degreeDiff}}°',
-      jointWarning_leftShoulder: '⚠ Watch left shoulder position (deviates by {{degreeDiff}}°)',
-      jointError_rightShoulder: '✗ Right shoulder angle differs by {{degreeDiff}}°',
-      jointWarning_rightShoulder: '⚠ Watch right shoulder position (deviates by {{degreeDiff}}°)',
+      jointError_leftShoulder:
+        '✗ Left shoulder angle differs by {{degreeDiff}}°',
+      jointWarning_leftShoulder:
+        '⚠ Watch left shoulder position (deviates by {{degreeDiff}}°)',
+      jointError_rightShoulder:
+        '✗ Right shoulder angle differs by {{degreeDiff}}°',
+      jointWarning_rightShoulder:
+        '⚠ Watch right shoulder position (deviates by {{degreeDiff}}°)',
       jointError_leftElbow: '✗ Left elbow differs by {{degreeDiff}}°',
       jointWarning_leftElbow: '⚠ Adjust left elbow angle by {{degreeDiff}}°',
       jointError_rightElbow: '✗ Right elbow differs by {{degreeDiff}}°',
       jointWarning_rightElbow: '⚠ Adjust right elbow angle by {{degreeDiff}}°',
       jointError_leftKnee: '✗ Left knee angle differs by {{degreeDiff}}°',
-      jointWarning_leftKnee: '⚠ Control left knee angle (deviates by {{degreeDiff}}°)',
+      jointWarning_leftKnee:
+        '⚠ Control left knee angle (deviates by {{degreeDiff}}°)',
       jointError_rightKnee: '✗ Right knee angle differs by {{degreeDiff}}°',
-      jointWarning_rightKnee: '⚠ Control right knee angle (deviates by {{degreeDiff}}°)',
+      jointWarning_rightKnee:
+        '⚠ Control right knee angle (deviates by {{degreeDiff}}°)',
       jointError_leftHip: '✗ Left hip angle differs by {{degreeDiff}}°',
       jointWarning_leftHip: '⚠ Adjust left hip angle ({{degreeDiff}}°)',
       jointError_rightHip: '✗ Right hip angle differs by {{degreeDiff}}°',
@@ -1358,7 +1374,8 @@ const en: typeof th = {
   },
   referenceManagement: {
     title: 'Reference Video Models',
-    subtitle: 'Import verified exercise videos to extract landmarks and create ground truth movement models',
+    subtitle:
+      'Import verified exercise videos to extract landmarks and create ground truth movement models',
     uploadVideo: 'Upload Reference Video (.mp4 / .webm)',
     chooseFile: 'Choose Video File',
     selectExercise: 'Select Exercise',
@@ -1372,7 +1389,8 @@ const en: typeof th = {
     exportJson: 'Export JSON',
     deleteModel: 'Delete Model',
     aggregateTitle: 'Multi-video Consensus',
-    aggregateDescription: 'Combine multiple demonstrator clips to prevent single-person bias'
+    aggregateDescription:
+      'Combine multiple demonstrator clips to prevent single-person bias'
   },
   history: {
     title: 'Activity history',

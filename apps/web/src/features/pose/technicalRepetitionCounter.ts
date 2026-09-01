@@ -4,12 +4,7 @@ import { extractJointAngles } from './exerciseFeatures'
 import { getExerciseConfig } from './referenceMovementModel'
 
 export type MovementState =
-  | 'REST'
-  | 'START'
-  | 'MOVING'
-  | 'PEAK'
-  | 'RETURN'
-  | 'COMPLETED'
+  'REST' | 'START' | 'MOVING' | 'PEAK' | 'RETURN' | 'COMPLETED'
 
 export interface StateRepetitionResult {
   count: number
@@ -86,7 +81,10 @@ export function createTechnicalRepetitionCounter(
       // Calculate progress percentage between restAngle and peakAngle
       const totalSpan = Math.abs(peakAngle - restAngle) || 1
       const currentSpan = Math.abs(currentAngle - restAngle)
-      repProgress = Math.max(0, Math.min(100, Math.round((currentSpan / totalSpan) * 100)))
+      repProgress = Math.max(
+        0,
+        Math.min(100, Math.round((currentSpan / totalSpan) * 100))
+      )
 
       const isAtRest = Math.abs(currentAngle - restAngle) <= threshold
       const reachedPeak = isIncreasing

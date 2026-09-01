@@ -1,12 +1,8 @@
 import type { ExerciseFeatures } from './exerciseFeatures'
 import { extractFrameFeatures } from './exerciseFeatures'
 import type { PoseLandmark } from './poseGeometry'
-import type {
-  DetailedMovementComparison
-} from './poseSimilarity'
-import {
-  evaluateMovementAgainstReference
-} from './poseSimilarity'
+import type { DetailedMovementComparison } from './poseSimilarity'
+import { evaluateMovementAgainstReference } from './poseSimilarity'
 import type { ReferenceMovementModel } from './referenceMovementModel'
 
 export interface RealTimeEvaluationResult {

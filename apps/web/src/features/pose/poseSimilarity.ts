@@ -171,11 +171,7 @@ export function dynamicTimeWarping(
     } else if (j === 1) {
       i--
     } else {
-      const minVal = Math.min(
-        dtw[i - 1][j - 1],
-        dtw[i - 1][j],
-        dtw[i][j - 1]
-      )
+      const minVal = Math.min(dtw[i - 1][j - 1], dtw[i - 1][j], dtw[i][j - 1])
       if (minVal === dtw[i - 1][j - 1]) {
         i--
         j--
@@ -310,7 +306,8 @@ export function evaluateMovementAgainstReference(
     }
   }
 
-  const config = referenceModel.config || getExerciseConfig(referenceModel.exerciseSlug)
+  const config =
+    referenceModel.config || getExerciseConfig(referenceModel.exerciseSlug)
   const importantAngles = config.importantAngles
 
   // Build feature vectors
@@ -322,7 +319,10 @@ export function evaluateMovementAgainstReference(
   )
 
   // 1. DTW Alignment
-  const { distance: dtwDist, path } = dynamicTimeWarping(refVectors, userVectors)
+  const { distance: dtwDist, path } = dynamicTimeWarping(
+    refVectors,
+    userVectors
+  )
 
   // Find the reference frame aligned with the most recent user frame
   const latestUserIndex = userSequence.length - 1
@@ -334,12 +334,16 @@ export function evaluateMovementAgainstReference(
     }
   }
 
-  const matchedRefFrame = referenceModel.features[matchedRefIndex] || referenceModel.features[0]
+  const matchedRefFrame =
+    referenceModel.features[matchedRefIndex] || referenceModel.features[0]
   const latestUserFrame = userSequence[latestUserIndex]
 
   // 2. Landmark Similarity (Cosine of normalized landmarks)
   let landmarkSim = 0
-  const pairedLen = Math.min(userSequence.length, referenceModel.features.length)
+  const pairedLen = Math.min(
+    userSequence.length,
+    referenceModel.features.length
+  )
   let landmarkSimSum = 0
   let validCount = 0
 
@@ -377,10 +381,16 @@ export function evaluateMovementAgainstReference(
 
   // 4. Temporal Similarity (Normalized DTW score: lower distance is better)
   const maxPossibleDtw = Math.max(1, userSequence.length * 2)
-  const temporalSimilarity = clampSimilarity(1 - Math.min(dtwDist, maxPossibleDtw) / maxPossibleDtw)
+  const temporalSimilarity = clampSimilarity(
+    1 - Math.min(dtwDist, maxPossibleDtw) / maxPossibleDtw
+  )
 
   // 5. Overall Score (0-100)
-  const weights = config.similarityWeights || { landmark: 0.3, angle: 0.5, temporal: 0.2 }
+  const weights = config.similarityWeights || {
+    landmark: 0.3,
+    angle: 0.5,
+    temporal: 0.2
+  }
   const rawScore =
     landmarkSim * weights.landmark +
     angleSimilarity * weights.angle +

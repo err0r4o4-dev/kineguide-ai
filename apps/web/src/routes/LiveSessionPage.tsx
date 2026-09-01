@@ -30,10 +30,7 @@ import {
   type PoseTrackingStatus
 } from '@/features/pose/usePoseTracking'
 import { formatDuration } from '@/lib/format'
-import {
-  getSession,
-  updateSession
-} from '@/services/product'
+import { getSession, updateSession } from '@/services/product'
 
 export function LiveSessionPage() {
   const { id = '' } = useParams()
@@ -107,11 +104,7 @@ export function LiveSessionPage() {
         userFeatures: null
       }
     }
-    return poseComparator.update(
-      pose.landmarks,
-      referenceModel,
-      Date.now()
-    )
+    return poseComparator.update(pose.landmarks, referenceModel, Date.now())
   }, [pose.landmarks, pose.status, poseComparator, referenceModel])
 
   useEffect(() => {
@@ -150,9 +143,7 @@ export function LiveSessionPage() {
     <div>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-teal-700">
-            {exerciseSlug}
-          </p>
+          <p className="text-sm font-semibold text-teal-700">{exerciseSlug}</p>
           <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950">
             {t('session.live')}
           </h1>
@@ -245,8 +236,12 @@ export function LiveSessionPage() {
               <div className="mt-3 space-y-3">
                 <div>
                   <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="text-slate-600">{t('session.accuracyScore')}</span>
-                    <span className="text-lg font-bold text-teal-800">{comp.overallScore}%</span>
+                    <span className="text-slate-600">
+                      {t('session.accuracyScore')}
+                    </span>
+                    <span className="text-lg font-bold text-teal-800">
+                      {comp.overallScore}%
+                    </span>
                   </div>
                   <div className="mt-1 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
@@ -264,7 +259,9 @@ export function LiveSessionPage() {
 
                 {/* Real-time Feedback Messages */}
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <p className="text-xs font-semibold text-slate-700">{t('session.movementQuality')}</p>
+                  <p className="text-xs font-semibold text-slate-700">
+                    {t('session.movementQuality')}
+                  </p>
                   <ul className="mt-2 space-y-1.5 text-xs">
                     {comp.feedbackMessages.map((msg, i) => (
                       <li
@@ -280,11 +277,16 @@ export function LiveSessionPage() {
                         {msg.status === 'correct' ? (
                           <CheckCircle className="mt-0.5 shrink-0" size={13} />
                         ) : msg.status === 'warning' ? (
-                          <AlertTriangle className="mt-0.5 shrink-0" size={13} />
+                          <AlertTriangle
+                            className="mt-0.5 shrink-0"
+                            size={13}
+                          />
                         ) : (
                           <XCircle className="mt-0.5 shrink-0" size={13} />
                         )}
-                        <span>{t(msg.messageKey, { degreeDiff: msg.degreeDiff })}</span>
+                        <span>
+                          {t(msg.messageKey, { degreeDiff: msg.degreeDiff })}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -292,7 +294,9 @@ export function LiveSessionPage() {
               </div>
             ) : (
               <div className="mt-3 rounded-xl border border-dashed border-slate-300 p-4 text-center text-xs text-slate-500">
-                {referenceModel ? t('session.feedback.noMovementDetected') : t('session.noReferenceModel')}
+                {referenceModel
+                  ? t('session.feedback.noMovementDetected')
+                  : t('session.noReferenceModel')}
               </div>
             )}
           </article>
@@ -305,7 +309,9 @@ export function LiveSessionPage() {
                   {t('session.automaticTechnicalCount')}
                 </p>
                 <span className="text-2xl font-bold tabular-nums text-sky-900">
-                  {automaticAvailable ? automaticCount : t('session.notAvailable')}
+                  {automaticAvailable
+                    ? automaticCount
+                    : t('session.notAvailable')}
                 </span>
               </div>
               {automaticAvailable && (
