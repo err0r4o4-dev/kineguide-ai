@@ -227,26 +227,26 @@ export function LandingPage() {
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.3fr_1fr] md:items-end lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-6 sm:px-6 md:grid-cols-[1.3fr_1fr] md:items-center lg:px-8">
           <div>
             <Brand />
-            <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
+            <p className="mt-2 max-w-xl text-xs leading-5 text-slate-600 sm:text-sm">
               {t('landing.footer')}
             </p>
           </div>
-          <nav
-            aria-label={t('landing.footerNav')}
-            className="flex flex-wrap gap-x-6 gap-y-3 text-sm md:justify-end"
-          >
-            <Link className="font-medium hover:text-teal-700" to="/status">
-              {t('status')}
-            </Link>
-            {!auth.user && (
-              <Link className="font-medium hover:text-teal-700" to="/login">
+          {!auth.user && (
+            <nav
+              aria-label={t('landing.footerNav')}
+              className="flex flex-wrap text-sm md:justify-end"
+            >
+              <Link
+                className="inline-flex min-h-11 items-center font-medium hover:text-teal-700"
+                to="/login"
+              >
                 {t('auth.signIn')}
               </Link>
-            )}
-          </nav>
+            </nav>
+          )}
         </div>
       </footer>
     </div>

@@ -89,6 +89,9 @@ describe('LandingPage', () => {
     ).not.toBeInTheDocument()
     expect(screen.getByText(/ไม่ใช่อุปกรณ์การแพทย์/)).toBeInTheDocument()
     expect(
+      screen.queryByRole('link', { name: 'สถานะระบบ' })
+    ).not.toBeInTheDocument()
+    expect(
       screen.getByRole('link', { name: 'ดูวิธีการทำงาน' })
     ).toHaveAttribute('href', '#features')
     expect(
