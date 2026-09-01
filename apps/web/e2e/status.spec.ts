@@ -47,8 +47,32 @@ test('landing page explains privacy before authentication', async ({
   expect(backgrounds.footer).toBe('none')
 
   const header = page.getByRole('banner')
+  const headerContent = header.locator(':scope > div')
   const initialHeaderBox = await header.boundingBox()
+  const initialHeaderContentBox = await headerContent.boundingBox()
   expect(initialHeaderBox?.y).toBe(0)
+  expect(initialHeaderBox?.height).toBeLessThanOrEqual(72)
+  expect(initialHeaderContentBox?.width).toBeCloseTo(
+    (await page.evaluate(() => window.innerWidth)) * 0.8,
+    0
+  )
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    const responsiveHeaderContentBox = await headerContent.boundingBox()
+    expect(responsiveHeaderContentBox?.width).toBeCloseTo(width * 0.8, 0)
+    const landingContentWidths = await page
+      .locator('.kg-landing-content')
+      .evaluateAll((elements) =>
+        elements.map((element) => element.getBoundingClientRect().width)
+      )
+    expect(landingContentWidths.length).toBeGreaterThanOrEqual(4)
+    for (const contentWidth of landingContentWidths) {
+      expect(contentWidth).toBeCloseTo(width * 0.8, 0)
+    }
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(width)
+  }
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
   await expect(header).toBeInViewport()
   const scrolledHeaderBox = await header.boundingBox()

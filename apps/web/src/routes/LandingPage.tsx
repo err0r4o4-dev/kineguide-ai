@@ -75,7 +75,7 @@ export function LandingPage() {
       <PublicHeader />
       <main id="main-content">
         <section className="relative isolate overflow-hidden">
-          <div className="mx-auto grid max-w-[90rem] items-center gap-10 px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:px-14 lg:pb-6 lg:pt-12">
+          <div className="kg-landing-content mx-auto grid w-4/5 items-center gap-10 pb-8 pt-12 sm:pb-10 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:pb-6 lg:pt-12">
             <div className="min-w-0 lg:py-2">
               <p className="inline-flex min-h-9 items-center rounded-xl border border-teal-100/80 bg-cyan-50/80 px-4 text-sm font-semibold text-teal-700 shadow-sm shadow-teal-900/[0.03]">
                 {t('landing.eyebrow')}
@@ -138,7 +138,7 @@ export function LandingPage() {
             </aside>
           </div>
           <div
-            className="kg-landing-surface mx-auto max-w-[90rem] rounded-[1.75rem] p-4 sm:p-5 lg:rounded-[2rem]"
+            className="kg-landing-content kg-landing-surface mx-auto w-4/5 rounded-[1.75rem] p-4 sm:p-5 lg:rounded-[2rem]"
             id="features"
           >
             <h2 className="sr-only" id="features-title">
@@ -177,10 +177,10 @@ export function LandingPage() {
 
         <section
           aria-labelledby="capabilities-title"
-          className="px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-4"
+          className="py-5 sm:py-7 lg:py-4"
           id="capabilities"
         >
-          <div className="kg-landing-surface mx-auto grid max-w-[90rem] gap-10 rounded-[1.75rem] p-7 sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:rounded-[2rem]">
+          <div className="kg-landing-content kg-landing-surface mx-auto grid w-4/5 gap-10 rounded-[1.75rem] p-7 sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:rounded-[2rem]">
             <div className="relative flex min-h-[24rem] flex-col lg:min-h-0">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
@@ -249,7 +249,7 @@ export function LandingPage() {
       </main>
 
       <footer className="border-t border-slate-200/70 bg-transparent">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div className="kg-landing-content mx-auto flex w-4/5 flex-col gap-3 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p>{t('landing.footerCopyright')}</p>
             <p className="mt-1 max-w-2xl leading-5 text-slate-500">

@@ -17,7 +17,7 @@ export function PublicHeader() {
       >
         {t('common.skip')}
       </a>
-      <div className="mx-auto flex min-h-[4.75rem] max-w-7xl items-center justify-between gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-16 w-4/5 items-center justify-between gap-3 sm:min-h-[4.375rem]">
         <span className="sm:hidden">
           <Brand compact prominent />
         </span>
@@ -28,13 +28,11 @@ export function PublicHeader() {
           <LanguageButton appearance="public" />
           <Link
             aria-label={t('nav.getStarted')}
-            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-800 bg-teal-700 px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_22%)] transition-colors hover:bg-teal-800 sm:min-h-12 sm:rounded-2xl sm:px-5"
+            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-800 bg-teal-700 px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_22%)] transition-colors hover:bg-teal-800 sm:px-4"
             to={auth.user ? '/app' : '/register'}
           >
             <CircleUserRound aria-hidden="true" size={19} />
-            <span className="hidden min-[400px]:inline">
-              {t('nav.getStarted')}
-            </span>
+            <span className="hidden sm:inline">{t('nav.getStarted')}</span>
           </Link>
         </nav>
       </div>
