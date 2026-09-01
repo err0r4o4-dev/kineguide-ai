@@ -17,7 +17,7 @@ export function PublicHeader() {
       >
         {t('common.skip')}
       </a>
-      <div className="mx-auto flex min-h-16 w-4/5 items-center justify-between gap-3 sm:min-h-[4.375rem]">
+      <div className="mx-auto flex min-h-16 w-[70%] items-center justify-between gap-3 sm:min-h-[4.375rem]">
         <span className="sm:hidden">
           <Brand compact prominent />
         </span>
