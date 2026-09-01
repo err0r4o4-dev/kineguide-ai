@@ -10,14 +10,14 @@ export function PublicHeader() {
   const { t } = useTranslation()
   const auth = useAuth()
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 shadow-[0_6px_24px_rgb(15_23_42_/_4%)] backdrop-blur-lg">
+    <header className="sticky top-0 z-40 px-2 pt-2 sm:px-4 sm:pt-3">
       <a
         className="fixed left-4 top-3 z-50 -translate-y-24 rounded-lg bg-white px-4 py-2 font-semibold text-teal-800 shadow-lg transition-transform focus:translate-y-0"
         href="#main-content"
       >
         {t('common.skip')}
       </a>
-      <div className="mx-auto flex min-h-[4.75rem] max-w-7xl items-center justify-between gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[4.75rem] max-w-[90rem] items-center justify-between gap-3 rounded-[1.4rem] border border-white/80 bg-white/90 px-4 shadow-[0_12px_38px_rgb(15_23_42_/_6%)] backdrop-blur-xl sm:min-h-[5.25rem] sm:gap-4 sm:rounded-[1.8rem] sm:px-7 lg:px-10">
         <span className="sm:hidden">
           <Brand compact prominent />
         </span>
@@ -28,7 +28,7 @@ export function PublicHeader() {
           <LanguageButton appearance="public" />
           <Link
             aria-label={t('nav.getStarted')}
-            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-800 bg-teal-700 px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_22%)] transition-colors hover:bg-teal-800 sm:min-h-12 sm:rounded-2xl sm:px-5"
+            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-600 bg-[linear-gradient(135deg,#078b7b,#19c89a)] px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_20%)] transition-[filter,translate] hover:brightness-95 sm:min-h-12 sm:rounded-2xl sm:px-6"
             to={auth.user ? '/app' : '/register'}
           >
             <CircleUserRound aria-hidden="true" size={19} />

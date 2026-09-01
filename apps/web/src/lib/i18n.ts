@@ -147,9 +147,8 @@ const th = {
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
     title:
       'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ',
-    titleAccent: 'สำรวจการเคลื่อนไหวอย่าง',
-    titleRest:
-      'มั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ',
+    titleAccent: 'ความเป็นส่วน\u2060ตัวของคุณ',
+    titleRest: 'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์ บันทึกกิจกรรมแบบย่อ และติดตามความสม่ำเสมอ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มใช้งาน',
@@ -222,6 +221,16 @@ const th = {
     finalAction: 'สร้างบัญชีเพื่อเริ่มต้น',
     footerNav: 'ข้อมูลส่วนท้ายเว็บไซต์',
     footerHow: 'ขั้นตอนการใช้งาน',
+    footerUsage: 'การใช้งาน',
+    footerTerms: 'เงื่อนไขการใช้งาน',
+    footerAbout: 'เกี่ยวกับเรา',
+    footerProject: 'เกี่ยวกับโครงการ',
+    footerTeam: 'ทีมพัฒนา',
+    footerContact: 'ติดต่อเรา',
+    footerSocial: 'ติดต่อเรา',
+    footerChannels: 'ช่องทางโซเชียลมีเดียของ KineGuide AI',
+    footerCopyright: '© 2026 KineGuide AI. All rights reserved.',
+    footerPrivacyNote: 'ความเป็นส่วนตัวของคุณ คือสิ่งสำคัญที่สุดของเรา',
     footer:
       'โครงการต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์และไม่มีการรับรองด้านกฎระเบียบ'
   },
@@ -907,8 +916,8 @@ const en: typeof th = {
     features: 'Features',
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
     title: 'Explore movement confidently with support that values your privacy',
-    titleAccent: 'Explore movement with',
-    titleRest: 'confidence and privacy-first support',
+    titleAccent: 'privacy-first support',
+    titleRest: 'Explore movement confidently with',
     subtitle:
       'Try an on-device camera flow, save minimal activity summaries, and track consistency without uploading photos or video.',
     start: 'Get started',
@@ -981,6 +990,16 @@ const en: typeof th = {
     finalAction: 'Create an account to begin',
     footerNav: 'Website footer information',
     footerHow: 'Getting started',
+    footerUsage: 'Using KineGuide',
+    footerTerms: 'Terms of use',
+    footerAbout: 'About us',
+    footerProject: 'About the project',
+    footerTeam: 'Development team',
+    footerContact: 'Contact us',
+    footerSocial: 'Follow us',
+    footerChannels: 'KineGuide AI social channels',
+    footerCopyright: '© 2026 KineGuide AI. All rights reserved.',
+    footerPrivacyNote: 'Your privacy is our highest priority',
     footer:
       'Educational prototype only. It is not a medical device and has no regulatory certification.'
   },
