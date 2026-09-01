@@ -2410,8 +2410,11 @@
           "category": {
             "type": "string",
             "enum": [
-              "lower_body",
-              "upper_body"
+              "neck",
+              "shoulder",
+              "lower_back",
+              "knee",
+              "hand"
             ]
           },
           "review_status": {

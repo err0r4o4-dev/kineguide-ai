@@ -216,11 +216,7 @@ function ExerciseCard({
       </div>
       <div className="flex flex-1 flex-col p-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-          {t(
-            exercise.category === 'lower_body'
-              ? 'exercises.lower'
-              : 'exercises.upper'
-          )}
+          {t(`exercises.${exercise.category}`)}
         </p>
         <h3 className="mt-2 text-lg font-bold">{title}</h3>
         <p className="mt-3 flex items-start gap-2 text-sm leading-6 text-slate-600">

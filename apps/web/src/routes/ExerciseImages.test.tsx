@@ -18,14 +18,14 @@ const exercises: product.Exercise[] = [
     slug: 'sit-to-stand-demo',
     title_th: 'สาธิตการลุกนั่งจากเก้าอี้',
     title_en: 'Sit-to-stand movement demo',
-    category: 'lower_body',
+    category: 'lower_back',
     review_status: 'pending_clinical_review'
   },
   {
     slug: 'shoulder-movement-demo',
     title_th: 'สาธิตการเคลื่อนไหวหัวไหล่',
     title_en: 'Shoulder movement demo',
-    category: 'upper_body',
+    category: 'shoulder',
     review_status: 'pending_clinical_review'
   }
 ]

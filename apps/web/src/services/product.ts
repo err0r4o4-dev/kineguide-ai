@@ -122,7 +122,7 @@ export interface Exercise {
   slug: string
   title_th: string
   title_en: string
-  category: 'lower_body' | 'upper_body'
+  category: 'neck' | 'shoulder' | 'lower_back' | 'knee' | 'hand'
   review_status: 'pending_clinical_review'
 }
 

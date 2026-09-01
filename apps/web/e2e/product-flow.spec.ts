@@ -89,21 +89,21 @@ test('new user completes consent and structured onboarding', async ({
           slug: 'sit-to-stand-demo',
           title_th: 'สาธิตการลุกนั่งจากเก้าอี้',
           title_en: 'Sit-to-stand movement demo',
-          category: 'lower_body',
+          category: 'lower_back',
           review_status: 'pending_clinical_review'
         },
         {
           slug: 'seated-knee-demo',
           title_th: 'สาธิตการเหยียดเข่าขณะนั่ง',
           title_en: 'Seated knee movement demo',
-          category: 'lower_body',
+          category: 'knee',
           review_status: 'pending_clinical_review'
         },
         {
           slug: 'shoulder-movement-demo',
           title_th: 'สาธิตการเคลื่อนไหวหัวไหล่',
           title_en: 'Shoulder movement demo',
-          category: 'upper_body',
+          category: 'shoulder',
           review_status: 'pending_clinical_review'
         }
       ]

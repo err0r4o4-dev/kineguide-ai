@@ -886,7 +886,7 @@ components:
         slug: { type: string }
         title_th: { type: string }
         title_en: { type: string }
-        category: { type: string, enum: [lower_body, upper_body] }
+        category: { type: string, enum: [neck, shoulder, lower_back, knee, hand] }
         review_status: { type: string, const: pending_clinical_review }
     ClinicalReviewStatus:
       type: string

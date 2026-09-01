@@ -80,11 +80,7 @@ export function ExerciseDetailPage() {
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
                 <p className="text-xs text-slate-500">{t('nav.plan')}</p>
                 <p className="mt-1 font-bold text-slate-900">
-                  {t(
-                    query.data.category === 'lower_body'
-                      ? 'exercises.lower'
-                      : 'exercises.upper'
-                  )}
+                  {t(`exercises.${query.data.category}`)}
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
