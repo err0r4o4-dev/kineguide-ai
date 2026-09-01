@@ -102,6 +102,7 @@ export function ChatPage() {
         ['conversation-messages', selectedID],
         (current) => [...(current ?? []), ...exchange]
       )
+      void queryClient.invalidateQueries({ queryKey: ['conversations'] })
       form.reset()
     }
   })

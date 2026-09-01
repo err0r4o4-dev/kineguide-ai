@@ -291,17 +291,21 @@ func (p *Postgres) ListMessages(ctx context.Context, userID, conversationID stri
 	return messages, rows.Err()
 }
 
-func (p *Postgres) SaveConversationExchange(ctx context.Context, userID, conversationID, userContent, assistantContent string) ([]product.Message, error) {
+func (p *Postgres) SaveConversationExchange(ctx context.Context, userID, conversationID, title, userContent, assistantContent string) ([]product.Message, error) {
 	tx, err := p.pool.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback(ctx) //nolint:errcheck
 	var lockedConversationID string
+	var hasMessages bool
 	if err := tx.QueryRow(ctx, `
-		SELECT id::text FROM conversations
-		WHERE id = $1 AND user_id = $2
-		FOR UPDATE`, conversationID, userID).Scan(&lockedConversationID); err != nil {
+		SELECT c.id::text, EXISTS (
+			SELECT 1 FROM conversation_messages m WHERE m.conversation_id = c.id
+		)
+		FROM conversations c
+		WHERE c.id = $1 AND c.user_id = $2
+		FOR UPDATE`, conversationID, userID).Scan(&lockedConversationID, &hasMessages); err != nil {
 		return nil, mapError(err)
 	}
 	messages := make([]product.Message, 0, 2)
@@ -319,7 +323,10 @@ func (p *Postgres) SaveConversationExchange(ctx context.Context, userID, convers
 		}
 		messages = append(messages, message)
 	}
-	if _, err := tx.Exec(ctx, `UPDATE conversations SET updated_at = now() WHERE id = $1`, conversationID); err != nil {
+	if _, err := tx.Exec(ctx, `
+		UPDATE conversations
+		SET title = CASE WHEN $2 THEN title ELSE $3 END, updated_at = now()
+		WHERE id = $1`, conversationID, hasMessages, title); err != nil {
 		return nil, err
 	}
 	if err := tx.Commit(ctx); err != nil {

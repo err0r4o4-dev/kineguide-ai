@@ -144,9 +144,20 @@ describe('ChatPage', () => {
     expect(
       screen.queryByRole('link', { name: 'ฝึกด้วยกล้อง' })
     ).not.toBeInTheDocument()
+    vi.mocked(product.getConversations).mockResolvedValue([
+      {
+        id: '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
+        title: 'สวัสดี',
+        locale: 'th',
+        created_at: '2026-08-26T00:00:00Z',
+        updated_at: '2026-08-26T00:00:02Z',
+        retention_policy: 'until_deleted'
+      }
+    ])
     await user.type(textbox, 'สวัสดี{Enter}')
 
     expect(await screen.findByText('คำตอบจำลองที่ปลอดภัย')).toBeInTheDocument()
+    expect((await screen.findAllByText('สวัสดี')).length).toBeGreaterThan(0)
     expect(product.sendConversationMessage).toHaveBeenCalledWith(
       '864cb7ae-64dd-4db4-8200-12b44e5bcab1',
       { content: 'สวัสดี' }

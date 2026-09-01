@@ -422,7 +422,8 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 }
 
 func (a *productAPI) saveConversationExchange(c *gin.Context, conversationID, userContent, assistantContent string) {
-	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversationID, userContent, assistantContent)
+	title := product.ConversationTitle(userContent)
+	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversationID, title, userContent, assistantContent)
 	if errors.Is(err, product.ErrNotFound) {
 		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
 		return
