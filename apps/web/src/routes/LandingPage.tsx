@@ -4,12 +4,9 @@ import {
   ChartNoAxesCombined,
   ChevronRight,
   CirclePlay,
-  Facebook,
   HeartPulse,
-  Instagram,
   MessageCircle,
-  ShieldCheck,
-  Youtube
+  ShieldCheck
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -252,74 +249,42 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="mt-2 border-t border-slate-200/80 bg-white/55 backdrop-blur-sm">
-        <div className="mx-auto max-w-[90rem] px-5 py-4 sm:px-8 lg:px-14">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr] lg:gap-8">
+      <footer className="border-t border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.4),#ffffff_38%)]">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
+          <div className="grid gap-5 md:grid-cols-[1.35fr_auto] md:items-center">
             <div>
               <Brand />
-              <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
                 {t('landing.footer')}
               </p>
             </div>
-            <nav aria-labelledby="footer-usage-title">
-              <h2 className="font-bold text-slate-900" id="footer-usage-title">
-                {t('landing.footerUsage')}
-              </h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                <li>
-                  <a className="hover:text-teal-700" href="#features">
-                    {t('landing.learn')}
-                  </a>
-                </li>
-                <li>
-                  <a className="hover:text-teal-700" href="#capabilities">
-                    {t('landing.capabilitiesTitle')}
-                  </a>
-                </li>
-                {!auth.user && (
-                  <li>
-                    <Link className="hover:text-teal-700" to="/login">
-                      {t('auth.signIn')}
-                    </Link>
-                  </li>
-                )}
-                <li>{t('landing.footerTerms')}</li>
-              </ul>
-            </nav>
-            <section aria-labelledby="footer-about-title">
-              <h2 className="font-bold text-slate-900" id="footer-about-title">
-                {t('landing.footerAbout')}
-              </h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                <li>{t('landing.footerProject')}</li>
-                <li>{t('landing.footerTeam')}</li>
-                <li>{t('landing.footerContact')}</li>
-              </ul>
-            </section>
-            <section aria-labelledby="footer-social-title">
-              <h2 className="font-bold text-slate-900" id="footer-social-title">
-                {t('landing.footerSocial')}
-              </h2>
-              <div
-                aria-label={t('landing.footerChannels')}
-                className="mt-3 flex flex-wrap gap-2"
-                role="img"
+            <nav
+              aria-label={t('landing.footerNav')}
+              className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm font-medium text-slate-600 md:justify-end"
+            >
+              <a
+                className="inline-flex min-h-11 items-center hover:text-teal-700"
+                href="#features"
               >
-                {[MessageCircle, Facebook, Instagram, Youtube].map(
-                  (Icon, index) => (
-                    <span
-                      aria-hidden="true"
-                      className="grid size-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-800 shadow-sm"
-                      key={index}
-                    >
-                      <Icon size={17} />
-                    </span>
-                  )
-                )}
-              </div>
-            </section>
+                {t('landing.learn')}
+              </a>
+              <a
+                className="inline-flex min-h-11 items-center hover:text-teal-700"
+                href="#capabilities"
+              >
+                {t('landing.capabilitiesEyebrow')}
+              </a>
+              {!auth.user && (
+                <Link
+                  className="inline-flex min-h-11 items-center text-teal-700 hover:text-teal-900"
+                  to="/login"
+                >
+                  {t('auth.signIn')}
+                </Link>
+              )}
+            </nav>
           </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-5 flex flex-col gap-3 border-t border-slate-200/80 pt-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
             <p>{t('landing.footerCopyright')}</p>
             <p className="inline-flex items-center gap-2 font-medium text-slate-600">
               <ShieldCheck

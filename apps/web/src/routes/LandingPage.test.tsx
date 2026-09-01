@@ -92,13 +92,10 @@ describe('LandingPage', () => {
       screen.queryByRole('link', { name: 'สถานะระบบ' })
     ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: 'การใช้งาน' })
-    ).toBeInTheDocument()
+      screen.queryByRole('heading', { name: 'การใช้งาน' })
+    ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: 'เกี่ยวกับเรา' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'ติดต่อเรา' })
+      screen.getByRole('navigation', { name: 'ข้อมูลส่วนท้ายเว็บไซต์' })
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'เข้าสู่ระบบ' })).toHaveAttribute(
       'href',
