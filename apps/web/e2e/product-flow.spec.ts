@@ -187,7 +187,7 @@ test('new user completes consent and structured onboarding', async ({
 
   await page.goto('/')
   await expect(
-    page.getByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
+    page.getByRole('heading', { name: 'สิ่งที่คุณทำได้ใน KineGuide AI' })
   ).toBeVisible()
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 })

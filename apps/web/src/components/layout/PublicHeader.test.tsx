@@ -31,7 +31,7 @@ describe('PublicHeader', () => {
     await i18n.changeLanguage('th')
   })
 
-  it('links the brand home and presents sign in to a guest', () => {
+  it('links the brand home and presents the reference CTA to a guest', () => {
     renderHeader()
 
     expect(
@@ -42,10 +42,9 @@ describe('PublicHeader', () => {
     })) {
       expect(brandLink).toHaveAttribute('href', '/')
     }
-    expect(screen.getByRole('link', { name: 'เข้าสู่ระบบ' })).toHaveAttribute(
-      'href',
-      '/login'
-    )
+    expect(
+      screen.getByRole('link', { name: 'เริ่มต้นใช้งาน' })
+    ).toHaveAttribute('href', '/register')
     expect(
       screen.queryByRole('link', { name: 'คุณสมบัติ' })
     ).not.toBeInTheDocument()
@@ -72,9 +71,9 @@ describe('PublicHeader', () => {
 
     renderHeader()
 
-    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Get started' })).toHaveAttribute(
       'href',
-      '/login'
+      '/register'
     )
   })
 })

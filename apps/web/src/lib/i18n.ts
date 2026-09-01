@@ -147,13 +147,15 @@ const th = {
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
     title:
       'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ',
+    titleAccent: 'ความเป็นส่วน\u2060ตัวของคุณ',
+    titleRest: 'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์ บันทึกกิจกรรมแบบย่อ และติดตามความสม่ำเสมอ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มใช้งาน',
     learn: 'ดูวิธีการทำงาน',
     heroNote:
       'คุณจะเห็นคำอธิบายและเลือกความยินยอมก่อนระบบขอสิทธิ์ใช้กล้องหรือจัดเก็บข้อมูล',
-    previewTitle: 'กล้องและการประมวลผลบนอุปกรณ์',
+    previewTitle: 'กล้องทำงานในอุปกรณ์',
     cameraPermissionNote:
       'กล้องจะเริ่มหลังจากคุณเลือกเริ่มใช้งานและให้สิทธิ์เท่านั้น',
     previewLocal: 'ภาพอยู่ในหน่วยความจำของเบราว์เซอร์',
@@ -161,6 +163,7 @@ const th = {
     highlightsTitle: 'ออกแบบให้ชัดเจน ตั้งแต่ก่อนเริ่มใช้งาน',
     highlightsBody:
       'รู้ว่ากล้องทำงานเมื่อใด ข้อมูลใดถูกจัดเก็บ และผลลัพธ์แต่ละส่วนหมายถึงอะไร',
+    featureAction: 'ดูรายละเอียด {{feature}}',
     cameraTitle: 'กล้องทำงานในอุปกรณ์',
     cameraBody:
       'ภาพจากกล้องอยู่ในหน่วยความจำของเบราว์เซอร์และไม่ถูกส่งไปยังเซิร์ฟเวอร์',
@@ -217,6 +220,9 @@ const th = {
       'เริ่มจากการสร้างบัญชี อ่านรายละเอียดความยินยอม แล้วเลือกฟีเจอร์ที่เหมาะกับสิ่งที่คุณต้องการสำรวจ',
     finalAction: 'สร้างบัญชีเพื่อเริ่มต้น',
     footerNav: 'ข้อมูลส่วนท้ายเว็บไซต์',
+    footerHow: 'ขั้นตอนการใช้งาน',
+    footerCopyright: '© 2026 KineGuide AI. All rights reserved.',
+    footerPrivacyNote: 'ความเป็นส่วนตัวของคุณ คือสิ่งสำคัญที่สุดของเรา',
     footer:
       'โครงการต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์และไม่มีการรับรองด้านกฎระเบียบ'
   },
@@ -977,13 +983,15 @@ const en: typeof th = {
     features: 'Features',
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
     title: 'Explore movement confidently with support that values your privacy',
+    titleAccent: 'privacy-first support',
+    titleRest: 'Explore movement confidently with',
     subtitle:
       'Try an on-device camera flow, save minimal activity summaries, and track consistency without uploading photos or video.',
     start: 'Get started',
     learn: 'How it works',
     heroNote:
       'You will see an explanation and choose consent before the system requests camera access or stores data.',
-    previewTitle: 'On-device camera and processing',
+    previewTitle: 'On-device camera',
     cameraPermissionNote:
       'The camera starts only after you choose to begin and grant permission.',
     previewLocal: 'Frames stay in browser memory',
@@ -991,6 +999,7 @@ const en: typeof th = {
     highlightsTitle: 'Clarity before you begin',
     highlightsBody:
       'Know when the camera runs, what data is stored, and what each result means.',
+    featureAction: 'View details for {{feature}}',
     cameraTitle: 'On-device camera',
     cameraBody:
       'Camera frames stay in browser memory and are never sent to the server.',
@@ -1047,6 +1056,9 @@ const en: typeof th = {
       'Create an account, review consent details, and choose the feature that matches what you want to explore.',
     finalAction: 'Create an account to begin',
     footerNav: 'Website footer information',
+    footerHow: 'Getting started',
+    footerCopyright: '© 2026 KineGuide AI. All rights reserved.',
+    footerPrivacyNote: 'Your privacy is our highest priority',
     footer:
       'Educational prototype only. It is not a medical device and has no regulatory certification.'
   },
