@@ -63,6 +63,7 @@ const th = {
     closeMenu: 'ปิดเมนู',
     home: 'หน้าแรก',
     chat: 'ผู้ช่วย AI',
+    clinicalDemo: 'Clinical Flow สาธิต',
     plan: 'แผนกิจกรรม',
     camera: 'ฝึกด้วยกล้อง',
     exercises: 'ท่าฝึกสาธิต',
@@ -334,13 +335,14 @@ const th = {
       'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี',
     boundary:
       'KineGuide AI ให้ข้อมูลเพื่อการศึกษาเท่านั้น ไม่วินิจฉัยโรค ไม่กำหนดการรักษา และไม่ใช้แทนแพทย์หรือนักกายภาพบำบัด',
+    educationalFlow: 'Clinical Flow สาธิต',
     conversations: 'รายการบทสนทนา',
     conversation: 'บทสนทนา',
     new: 'เริ่มบทสนทนาใหม่',
     empty: 'ยังไม่มีบทสนทนา เริ่มห้องใหม่เมื่อคุณพร้อม',
-    startPrompt: 'พิมพ์ข้อความเพื่อเริ่มบทสนทนา',
+    startPrompt: 'ลองถาม เช่น “มีท่าสาธิตอะไรให้เลือกบ้าง”',
     messageLabel: 'ข้อความถึง KineGuide AI',
-    placeholder: 'พิมพ์ข้อความของคุณ…',
+    placeholder: 'ลองพิมพ์: มีท่าสาธิตอะไรแนะนำบ้าง',
     composerHint: 'กด Enter เพื่อส่ง หรือ Shift และ Enter เพื่อขึ้นบรรทัดใหม่',
     messageRequired: 'กรุณาพิมพ์ข้อความไม่เกิน 4,000 ตัวอักษร',
     send: 'ส่งข้อความ',
@@ -356,6 +358,21 @@ const th = {
     deleteFailed: 'ไม่สามารถลบบทสนทนาได้ กรุณาลองใหม่',
     you: 'คุณ: ',
     ai: 'KineGuide AI: '
+  },
+  clinicalFlow: {
+    eyebrow: 'Educational Prototype · Pending Clinical Review',
+    title: 'Clinical Flow สำหรับการสาธิตระบบ',
+    pendingBadge: 'รอตรวจสอบโดยผู้เชี่ยวชาญ',
+    disclaimer:
+      'ฟีเจอร์นี้เป็นต้นแบบเพื่อการศึกษา ข้อมูลท่าและขั้นตอนคัดกรองยังอยู่ระหว่างการตรวจสอบโดยผู้เชี่ยวชาญ และไม่ใช้แทนคำแนะนำจากแพทย์หรือนักกายภาพบำบัด',
+    mockNotice:
+      'ตัวเลือกทั้งหมดเป็น mock data ที่มี demo_only: true และ not_for_clinical_use: true ไม่มีความหมายด้านความเสี่ยงหรือความปลอดภัยทางการแพทย์',
+    evaluate: 'ตรวจสอบ flow สาธิต',
+    evaluateFailed: 'ไม่สามารถประมวลผล flow สาธิตได้ กรุณาลองใหม่',
+    stoppedTitle: 'หยุดการสาธิต',
+    restart: 'เริ่ม flow สาธิตใหม่',
+    demoExercises: 'รายการท่าสาธิตที่ยังรอการตรวจสอบ',
+    demoMovement: 'ท่าสาธิตในระบบต้นแบบ'
   },
   plan: {
     title: 'แผนกิจกรรมสาธิต 7 วัน',
@@ -427,6 +444,8 @@ const th = {
     start: 'เริ่มทดสอบกล้อง',
     empty: 'ไม่พบรายการที่ตรงกับการค้นหา',
     review: 'รอ clinical review',
+    sitToStandImageAlt: 'ภาพตัวอย่างสาธิตการลุกนั่งจากเก้าอี้ 3 จังหวะ',
+    shoulderImageAlt: 'ภาพตัวอย่างสาธิตการเคลื่อนไหวหัวไหล่ 3 จังหวะ',
     what: 'ระบบจะทำอะไร',
     whatBody:
       'เปิดกล้องหลังได้รับอนุญาต แสดงภาพในอุปกรณ์ และให้คุณบันทึกจำนวนครั้งด้วยตนเอง',
@@ -463,6 +482,9 @@ const th = {
     live: 'Live session สาธิต',
     timer: 'เวลา',
     reps: 'จำนวนครั้งที่บันทึกเอง',
+    automaticTechnicalCount: 'จำนวนรอบการเคลื่อนไหวอัตโนมัติ (เชิงเทคนิค)',
+    automaticTechnicalBoundary:
+      'นับเฉพาะลำดับการยก-ลดที่กล้องสังเกตได้ ไม่ใช่คะแนนความถูกต้อง ไม่ใช่คำสั่งรักษา และยังไม่บันทึกในประวัติ',
     addRep: 'เพิ่ม 1 ครั้ง',
     undo: 'ย้อนกลับ 1 ครั้ง',
     startCamera: 'เปิดกล้องสำหรับ session',
@@ -486,6 +508,22 @@ const th = {
     poseError: 'ไม่สามารถเริ่มการตรวจจับได้ คุณยังนับด้วยตนเองได้',
     posePrivacy:
       'ภาพ จุดร่างกาย ใบหน้า มือ และค่าประมาณการกะพริบตาประมวลผลชั่วคราวในเบราว์เซอร์ ไม่ถูกอัปโหลดหรือบันทึก และไม่ใช่การตรวจสุขภาพ',
+    technicalCheck: 'ขอ feedback เชิงเทคนิค',
+    technicalResult: 'ผลเชิงเทคนิคจาก Python AI Service',
+    technicalConfidence: 'ความมั่นใจของการมองเห็นจุด: {{value}}',
+    phaseUnavailable:
+      'movement phase และการนับอัตโนมัติยังไม่พร้อม ระบบใช้การนับด้วยตนเองเท่านั้น',
+    notAvailable: 'ไม่พร้อมใช้งาน',
+    technicalFailed:
+      'ไม่สามารถรับ feedback เชิงเทคนิคได้ คุณยังนับด้วยตนเองได้',
+    technicalFeedback: {
+      waiting_for_camera: 'กำลังรอข้อมูลสถานะกล้อง',
+      camera_ready: 'ข้อมูลการมองเห็นจุดพร้อมสำหรับการสาธิตเชิงเทคนิค',
+      adjust_camera: 'การมองเห็นจุดไม่ครบ โปรดปรับตำแหน่งกล้อง',
+      multiple_people_detected: 'พบมากกว่าหนึ่งคน ระบบไม่เลือกบุคคลใด',
+      unsupported_exercise: 'ยังไม่มี technical profile สำหรับท่าสาธิตนี้',
+      technical_analysis_unavailable: 'การวิเคราะห์เชิงเทคนิคไม่พร้อมใช้งาน'
+    },
     poseResearchMethod: 'วิธีเปรียบเทียบจากงานวิจัย',
     poseResearchPending:
       'มีโครง cosine similarity และ DTW สำหรับท่าไหล่มุมหน้า แต่ยังไม่แสดงผลถูกหรือผิดจนกว่าจะมีลำดับอ้างอิงที่นักกายภาพอนุมัติ',
@@ -724,6 +762,7 @@ const en: typeof th = {
     closeMenu: 'Close menu',
     home: 'Home',
     chat: 'AI assistant',
+    clinicalDemo: 'Clinical flow demo',
     plan: 'Activity plan',
     camera: 'Camera practice',
     exercises: 'Movement demos',
@@ -998,13 +1037,14 @@ const en: typeof th = {
       'Continue a typed conversation using history from this account. Messages remain stored until you delete the conversation or your account.',
     boundary:
       'KineGuide AI provides educational information only. It does not diagnose, prescribe treatment, or replace a physician or physiotherapist.',
+    educationalFlow: 'Clinical flow demo',
     conversations: 'Conversation list',
     conversation: 'Conversation',
     new: 'Start a new conversation',
     empty: 'No conversations yet. Start one when you are ready.',
-    startPrompt: 'Type a message to begin the conversation.',
+    startPrompt: 'Try asking, “Which movement demonstrations can I explore?”',
     messageLabel: 'Message to KineGuide AI',
-    placeholder: 'Type your message…',
+    placeholder: 'Try: Can you recommend a movement demonstration?',
     composerHint: 'Press Enter to send, or Shift and Enter for a new line.',
     messageRequired: 'Enter a message of no more than 4,000 characters.',
     send: 'Send message',
@@ -1021,6 +1061,22 @@ const en: typeof th = {
     deleteFailed: 'Unable to delete the conversation. Please try again.',
     you: 'You: ',
     ai: 'KineGuide AI: '
+  },
+  clinicalFlow: {
+    eyebrow: 'Educational Prototype · Pending Clinical Review',
+    title: 'Clinical flow system demonstration',
+    pendingBadge: 'Pending professional review',
+    disclaimer:
+      'This feature is an educational prototype. Its movement and screening content is pending professional review and does not replace advice from a physician or physiotherapist.',
+    mockNotice:
+      'Every option is mock data marked demo_only: true and not_for_clinical_use: true. It has no medical risk or safety meaning.',
+    evaluate: 'Evaluate demo flow',
+    evaluateFailed:
+      'Unable to evaluate the demonstration flow. Please try again.',
+    stoppedTitle: 'Demonstration stopped',
+    restart: 'Restart demonstration flow',
+    demoExercises: 'Pending-review movement demonstrations',
+    demoMovement: 'Movement demonstration in the prototype'
   },
   plan: {
     title: '7-day demo activity plan',
@@ -1093,6 +1149,9 @@ const en: typeof th = {
     start: 'Test camera',
     empty: 'No matching demos',
     review: 'Clinical review pending',
+    sitToStandImageAlt:
+      'Three-stage illustration of the sit-to-stand movement demo',
+    shoulderImageAlt: 'Three-stage illustration of the shoulder movement demo',
     what: 'What the system does',
     whatBody:
       'Opens the camera after permission, keeps the preview on-device, and lets you record counts manually.',
@@ -1129,6 +1188,9 @@ const en: typeof th = {
     live: 'Live demo session',
     timer: 'Time',
     reps: 'Manually recorded count',
+    automaticTechnicalCount: 'Automatic movement cycles (technical)',
+    automaticTechnicalBoundary:
+      'Counts only an observable raise-lower sequence. It is not a correctness score or treatment direction and is not saved to history yet.',
     addRep: 'Add one',
     undo: 'Undo one',
     startCamera: 'Turn on camera for session',
@@ -1154,6 +1216,23 @@ const en: typeof th = {
       'Skeleton detection could not start. Manual counting is still available',
     posePrivacy:
       'Frames, body, face, hand, and estimated blink landmarks are processed temporarily in this browser, are not uploaded or saved, and are not a health assessment.',
+    technicalCheck: 'Request technical feedback',
+    technicalResult: 'Technical result from the Python AI Service',
+    technicalConfidence: 'Landmark visibility confidence: {{value}}',
+    phaseUnavailable:
+      'Movement phase and automatic counting are unavailable. Counting remains manual.',
+    notAvailable: 'Unavailable',
+    technicalFailed:
+      'Technical feedback is unavailable. Manual counting remains available.',
+    technicalFeedback: {
+      waiting_for_camera: 'Waiting for camera status data',
+      camera_ready: 'Landmark visibility data is ready for the technical demo',
+      adjust_camera: 'Some landmarks are not visible. Adjust the camera',
+      multiple_people_detected:
+        'More than one person is visible; nobody is selected',
+      unsupported_exercise: 'No technical profile exists for this demo',
+      technical_analysis_unavailable: 'Technical analysis is unavailable'
+    },
     poseResearchMethod: 'Research comparison method',
     poseResearchPending:
       'Cosine similarity and DTW are prepared for the front-view shoulder activity, but no correct/incorrect result is shown without a physiotherapist-approved reference sequence.',

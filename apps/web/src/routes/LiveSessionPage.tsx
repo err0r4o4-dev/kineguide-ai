@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   Camera,
   CircleMinus,
@@ -7,7 +7,7 @@ import {
   Play,
   Square
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 
@@ -16,12 +16,17 @@ import { useCamera } from '@/features/camera/useCamera'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
 import { researchProfileForExercise } from '@/features/pose/poseResearchProfiles'
+import { createTechnicalRepetitionCounter } from '@/features/pose/technicalRepetitionCounter'
 import {
   usePoseTracking,
   type PoseTrackingStatus
 } from '@/features/pose/usePoseTracking'
 import { formatDuration } from '@/lib/format'
-import { getSession, updateSession } from '@/services/product'
+import {
+  getSession,
+  getTechnicalPoseFeedback,
+  updateSession
+} from '@/services/product'
 
 export function LiveSessionPage() {
   const { id = '' } = useParams()
@@ -43,11 +48,25 @@ export function LiveSessionPage() {
   const researchProfile = researchProfileForExercise(
     query.data?.exercise_slug ?? ''
   )
+  const repetitionCounter = useMemo(
+    () => createTechnicalRepetitionCounter(query.data?.exercise_slug ?? ''),
+    [query.data?.exercise_slug]
+  )
+  const [automaticCount, setAutomaticCount] = useState(0)
+  const [automaticAvailable, setAutomaticAvailable] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [reps, setReps] = useState(0)
   const [running, setRunning] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const technicalFeedback = useMutation({
+    mutationFn: () =>
+      getTechnicalPoseFeedback(id, {
+        pose_status: pose.status,
+        landmark_visibility:
+          pose.landmarks?.map(({ visibility = 0 }) => visibility) ?? []
+      })
+  })
   const initialized = useRef(false)
   useEffect(() => {
     if (query.data && !initialized.current) {
@@ -64,6 +83,12 @@ export function LiveSessionPage() {
     )
     return () => window.clearInterval(timer)
   }, [running])
+  useEffect(() => {
+    const frameStatus = pose.status === 'ready' ? 'ready' : 'no_pose'
+    const result = repetitionCounter.update(frameStatus, pose.landmarks)
+    setAutomaticCount(result.count)
+    setAutomaticAvailable(result.available)
+  }, [pose.landmarks, pose.status, repetitionCounter])
   const finish = async (status: 'completed' | 'stopped') => {
     setSaving(true)
     setRunning(false)
@@ -166,6 +191,44 @@ export function LiveSessionPage() {
             <p className="mt-2 text-xs leading-5 text-slate-500">
               {t('session.posePrivacy')}
             </p>
+            <button
+              className="kg-button-secondary mt-4 w-full"
+              disabled={camera.state !== 'ready' || technicalFeedback.isPending}
+              onClick={() => technicalFeedback.mutate()}
+              type="button"
+            >
+              {technicalFeedback.isPending
+                ? t('common.loading')
+                : t('session.technicalCheck')}
+            </button>
+            {technicalFeedback.data && (
+              <div className="mt-4 border-t border-slate-200 pt-4 text-xs leading-5 text-slate-600">
+                <p className="font-semibold text-slate-800">
+                  {t('session.technicalResult')}
+                </p>
+                <p className="mt-1">
+                  {t(
+                    `session.technicalFeedback.${technicalFeedback.data.camera_feedback}`
+                  )}
+                </p>
+                <p className="mt-1">
+                  {t('session.technicalConfidence', {
+                    value:
+                      technicalFeedback.data.confidence_score === null
+                        ? t('session.notAvailable')
+                        : Math.round(
+                            technicalFeedback.data.confidence_score * 100
+                          )
+                  })}
+                </p>
+                <p className="mt-1">{t('session.phaseUnavailable')}</p>
+              </div>
+            )}
+            {technicalFeedback.isError && (
+              <p className="kg-alert-danger mt-4" role="alert">
+                {t('session.technicalFailed')}
+              </p>
+            )}
             {researchProfile && (
               <div className="mt-4 border-t border-slate-200 pt-4">
                 <p className="text-xs font-semibold text-slate-800">
@@ -186,6 +249,19 @@ export function LiveSessionPage() {
             )}
           </article>
           <article className="kg-card p-6 text-center">
+            <div className="mb-6 rounded-xl border border-sky-200 bg-sky-50 p-4 text-left">
+              <p className="text-sm font-semibold text-sky-950">
+                {t('session.automaticTechnicalCount')}
+              </p>
+              <p className="mt-1 text-3xl font-bold tabular-nums text-sky-900">
+                {automaticAvailable
+                  ? automaticCount
+                  : t('session.notAvailable')}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-sky-900">
+                {t('session.automaticTechnicalBoundary')}
+              </p>
+            </div>
             <p className="text-sm uppercase tracking-wide text-slate-500">
               {t('session.reps')}
             </p>

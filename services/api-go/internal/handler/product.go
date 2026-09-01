@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"math"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -24,11 +25,12 @@ import (
 const userIDKey = "authenticated_user_id"
 
 type productAPI struct {
-	cfg       config.Config
-	store     product.Store
-	signer    *security.TokenSigner
-	providers map[string]oauthprovider.Provider
-	chatAI    ChatResponder
+	cfg         config.Config
+	store       product.Store
+	signer      *security.TokenSigner
+	providers   map[string]oauthprovider.Provider
+	chatAI      ChatResponder
+	technicalAI TechnicalPoseResponder
 }
 
 type authResponse struct {
@@ -37,11 +39,11 @@ type authResponse struct {
 	User        product.User `json:"user"`
 }
 
-func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider, chatAI ChatResponder) {
+func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider, chatAI ChatResponder, technicalAI TechnicalPoseResponder) {
 	if store == nil || signer == nil {
 		return
 	}
-	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers, chatAI: chatAI}
+	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers, chatAI: chatAI, technicalAI: technicalAI}
 	v1 := router.Group(apiV1Prefix)
 	auth := v1.Group("/auth")
 	auth.POST("/register", api.register)
@@ -75,6 +77,9 @@ func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.
 	secured.POST("/sessions", api.createSession)
 	secured.GET("/sessions/:id", api.getSession)
 	secured.PATCH("/sessions/:id", api.updateSession)
+	secured.POST("/sessions/:id/technical-feedback", api.technicalPoseFeedback)
+	secured.GET("/educational-clinical-flow/catalog", api.educationalClinicalCatalog)
+	secured.POST("/educational-clinical-flow/evaluate", api.evaluateEducationalScreening)
 	secured.GET("/conversations", api.listConversations)
 	secured.POST("/conversations", api.createConversation)
 	secured.DELETE("/conversations/:id", api.deleteConversation)
@@ -355,10 +360,6 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 	if !a.requireAIChatConsent(c) {
 		return
 	}
-	if a.chatAI == nil {
-		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable.")
-		return
-	}
 	var request struct {
 		Content string `json:"content"`
 	}
@@ -380,6 +381,15 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load the conversation.")
 		return
 	}
+	assistantContent, isEducationalMovementRequest := product.EducationalExerciseChatResponse(conversation.Locale, request.Content)
+	if isEducationalMovementRequest {
+		a.saveConversationExchange(c, conversation.ID, request.Content, assistantContent)
+		return
+	}
+	if a.chatAI == nil {
+		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable.")
+		return
+	}
 	history, err := a.store.ListMessages(c.Request.Context(), c.GetString(userIDKey), conversation.ID, 20)
 	if err != nil {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load conversation context.")
@@ -396,7 +406,24 @@ func (a *productAPI) sendConversationMessage(c *gin.Context) {
 		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat is currently unavailable. Please try again.")
 		return
 	}
-	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversation.ID, request.Content, generated.Message)
+	assistantContent = generated.Message
+	if generated.ToolRequest != nil {
+		switch *generated.ToolRequest {
+		case "list_pending_movement_demonstrations":
+			assistantContent, _ = product.EducationalExerciseChatResponse(conversation.Locale, "show exercise")
+		case "list_pending_evidence":
+			assistantContent = product.PendingEvidenceChatResponse(conversation.Locale)
+		default:
+			writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI chat requested an unsupported action.")
+			return
+		}
+	}
+	a.saveConversationExchange(c, conversation.ID, request.Content, assistantContent)
+}
+
+func (a *productAPI) saveConversationExchange(c *gin.Context, conversationID, userContent, assistantContent string) {
+	title := product.ConversationTitle(userContent)
+	messages, err := a.store.SaveConversationExchange(c.Request.Context(), c.GetString(userIDKey), conversationID, title, userContent, assistantContent)
 	if errors.Is(err, product.ErrNotFound) {
 		writeError(c, http.StatusNotFound, "CONVERSATION_NOT_FOUND", "The conversation was not found.")
 		return
@@ -492,6 +519,47 @@ func (a *productAPI) deleteHealthProfile(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func (a *productAPI) requireEducationalFlowConsent(c *gin.Context) bool {
+	consent, err := a.store.LatestConsent(c.Request.Context(), c.GetString(userIDKey))
+	if err != nil || !consent.IsActive() || consent.PolicyVersion != product.CurrentConsentPolicyVersion || !consent.SessionSummaryStorage {
+		writeError(c, http.StatusForbidden, "CONSENT_REQUIRED", "Active prototype consent is required before using the educational flow.")
+		return false
+	}
+	return true
+}
+
+func (a *productAPI) educationalClinicalCatalog(c *gin.Context) {
+	if !a.requireEducationalFlowConsent(c) {
+		return
+	}
+	locale := c.Query("locale")
+	if !oneOf(locale, "th", "en") {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Locale must be th or en.")
+		return
+	}
+	c.JSON(http.StatusOK, product.BuildEducationalClinicalCatalog(locale))
+}
+
+func (a *productAPI) evaluateEducationalScreening(c *gin.Context) {
+	if !a.requireEducationalFlowConsent(c) {
+		return
+	}
+	var request struct {
+		Locale  string                    `json:"locale"`
+		Answers []product.ScreeningAnswer `json:"answers"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil || !oneOf(request.Locale, "th", "en") {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Please answer the demonstration screening question.")
+		return
+	}
+	result, err := product.EvaluateEducationalScreening(request.Locale, request.Answers)
+	if err != nil {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Please answer the demonstration screening question.")
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
 func (a *productAPI) listExercises(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"exercises": product.Exercises})
 }
@@ -555,6 +623,31 @@ func (a *productAPI) updateSession(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, session)
+}
+
+func (a *productAPI) technicalPoseFeedback(c *gin.Context) {
+	if a.technicalAI == nil {
+		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "Technical pose feedback is currently unavailable.")
+		return
+	}
+	if _, err := a.store.SessionByID(c.Request.Context(), c.GetString(userIDKey), c.Param("id")); errors.Is(err, product.ErrNotFound) {
+		writeError(c, http.StatusNotFound, "SESSION_NOT_FOUND", "The session was not found.")
+		return
+	} else if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load the session.")
+		return
+	}
+	var request ai.TechnicalPoseRequest
+	if err := c.ShouldBindJSON(&request); err != nil || !validTechnicalPoseRequest(request) {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Technical pose values are outside the accepted range.")
+		return
+	}
+	result, err := a.technicalAI.TechnicalPoseFeedback(c.Request.Context(), request)
+	if err != nil {
+		writeError(c, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "Technical pose feedback is currently unavailable.")
+		return
+	}
+	c.JSON(http.StatusOK, result)
 }
 
 func (a *productAPI) getSession(c *gin.Context) {
@@ -624,6 +717,18 @@ func validHealthProfile(profile product.HealthProfile) bool {
 		return false
 	}
 	return exclusiveNone(profile.WarningSigns) && exclusiveNone(profile.Equipment)
+}
+
+func validTechnicalPoseRequest(request ai.TechnicalPoseRequest) bool {
+	if !oneOf(request.PoseStatus, "idle", "loading_model", "ready", "adjust_camera", "no_pose", "multiple_poses", "unsupported_exercise", "unavailable", "error") || len(request.LandmarkVisibility) > 33 {
+		return false
+	}
+	for _, visibility := range request.LandmarkVisibility {
+		if math.IsNaN(visibility) || math.IsInf(visibility, 0) || visibility < 0 || visibility > 1 {
+			return false
+		}
+	}
+	return true
 }
 
 func validUniqueValues(values []string, options ...string) bool {

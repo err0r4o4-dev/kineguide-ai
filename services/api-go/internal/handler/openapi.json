@@ -42,6 +42,10 @@
       "description": "Minimal user-owned activity summaries."
     },
     {
+      "name": "Educational Clinical Flow",
+      "description": "Demo-only screening and pending-review movement metadata with no clinical decision."
+    },
+    {
       "name": "Conversations",
       "description": "Account-scoped AI chat history retained until the user deletes the conversation or account."
     }
@@ -877,6 +881,102 @@
         }
       }
     },
+    "/v1/educational-clinical-flow/catalog": {
+      "get": {
+        "operationId": "getEducationalClinicalCatalog",
+        "tags": [
+          "Educational Clinical Flow"
+        ],
+        "summary": "Get localized demo-only clinical-flow placeholders",
+        "description": "Requires active prototype consent. Every returned clinical-content record is pending clinical review, demo-only, not for clinical use, and has no reviewer or source claim.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "th",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Versioned educational prototype catalog.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EducationalClinicalCatalog"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/educational-clinical-flow/evaluate": {
+      "post": {
+        "operationId": "evaluateEducationalScreening",
+        "tags": [
+          "Educational Clinical Flow"
+        ],
+        "summary": "Evaluate only the non-clinical demo stop placeholder",
+        "description": "This endpoint does not interpret symptoms or make a medical-safety decision. It routes one synthetic placeholder answer to either stop the demo or list pending-review demos.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EducationalScreeningRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Demo-only routing result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EducationalScreeningResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/v1/exercises/{slug}": {
       "parameters": [
         {
@@ -1126,6 +1226,60 @@
         }
       }
     },
+    "/v1/sessions/{id}/technical-feedback": {
+      "post": {
+        "operationId": "getTechnicalPoseFeedback",
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Get non-clinical technical camera feedback for an owned session",
+        "description": "Sends only pose status and bounded landmark-visibility values to the internal Python service. Raw frames, images, video, landmark coordinates, diagnosis, treatment, automatic dosage, and clinical suitability are excluded and nothing is persisted.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TechnicalPoseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transient technical camera feedback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechnicalPoseResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/v1/conversations": {
       "get": {
         "operationId": "listConversations",
@@ -1294,7 +1448,7 @@
           "Conversations"
         ],
         "summary": "Generate and persist one user/assistant exchange",
-        "description": "Requires explicit AI-chat storage consent. If the internal AI dependency is unavailable, neither the submitted message nor an assistant response is persisted.",
+        "description": "Requires explicit AI-chat storage consent. Requests to view movement demonstrations are answered deterministically from the pending-review educational catalog without selecting an exercise for a symptom or calling the AI provider. Other messages use the internal AI dependency; if it is unavailable, neither the submitted message nor an assistant response is persisted.",
         "security": [
           {
             "bearerAuth": []
@@ -2266,6 +2420,353 @@
           }
         }
       },
+      "ClinicalReviewStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "pending_clinical_review",
+          "approved",
+          "rejected",
+          "archived"
+        ]
+      },
+      "ClinicalMetadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version",
+          "locale",
+          "reviewStatus",
+          "demoOnly",
+          "notForClinicalUse",
+          "reviewedBy",
+          "reviewedAt",
+          "sourceReferences",
+          "lastUpdatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "th",
+              "en"
+            ]
+          },
+          "reviewStatus": {
+            "$ref": "#/components/schemas/ClinicalReviewStatus"
+          },
+          "demoOnly": {
+            "type": "boolean",
+            "const": true
+          },
+          "notForClinicalUse": {
+            "type": "boolean",
+            "const": true
+          },
+          "reviewedBy": {
+            "type": "null",
+            "description": "Remains null while pending clinical review."
+          },
+          "reviewedAt": {
+            "type": "null",
+            "description": "Remains null while pending clinical review."
+          },
+          "sourceReferences": {
+            "type": "array",
+            "maxItems": 0,
+            "items": {
+              "type": "string"
+            }
+          },
+          "lastUpdatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ScreeningOption": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "ScreeningQuestion": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClinicalMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "prompt",
+              "options"
+            ],
+            "properties": {
+              "prompt": {
+                "type": "string"
+              },
+              "options": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "$ref": "#/components/schemas/ScreeningOption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "RedFlagPlaceholder": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClinicalMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "triggerOptionId",
+              "label"
+            ],
+            "properties": {
+              "triggerOptionId": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "EducationalExercise": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClinicalMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "slug",
+              "title",
+              "description"
+            ],
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ClinicalPlaceholder": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClinicalMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "triggerOptionId": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ClinicalReference": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClinicalMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "title",
+              "url"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uri"
+              }
+            }
+          }
+        ]
+      },
+      "EducationalClinicalCatalog": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reviewWorkflow",
+          "screeningQuestions",
+          "redFlags",
+          "exercises",
+          "contraindications",
+          "stopConditions",
+          "clinicalReferences"
+        ],
+        "properties": {
+          "reviewWorkflow": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "items": {
+              "$ref": "#/components/schemas/ClinicalReviewStatus"
+            }
+          },
+          "screeningQuestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScreeningQuestion"
+            }
+          },
+          "redFlags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RedFlagPlaceholder"
+            }
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EducationalExercise"
+            }
+          },
+          "contraindications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicalPlaceholder"
+            }
+          },
+          "stopConditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicalPlaceholder"
+            }
+          },
+          "clinicalReferences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicalReference"
+            }
+          }
+        }
+      },
+      "ScreeningAnswer": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "questionId",
+          "optionId"
+        ],
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "optionId": {
+            "type": "string"
+          }
+        }
+      },
+      "EducationalScreeningRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "locale",
+          "answers"
+        ],
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "th",
+              "en"
+            ]
+          },
+          "answers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ScreeningAnswer"
+            }
+          }
+        }
+      },
+      "EducationalScreeningResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "outcome",
+          "message",
+          "demoOnly",
+          "notForClinicalUse",
+          "exercises"
+        ],
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "stopped_demo_placeholder",
+              "demo_exercises_available"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "demoOnly": {
+            "type": "boolean",
+            "const": true
+          },
+          "notForClinicalUse": {
+            "type": "boolean",
+            "const": true
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EducationalExercise"
+            }
+          }
+        }
+      },
       "ActivityPlanDay": {
         "type": "object",
         "additionalProperties": false,
@@ -2342,6 +2843,83 @@
           }
         }
       },
+      "TechnicalPoseRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pose_status",
+          "landmark_visibility"
+        ],
+        "properties": {
+          "pose_status": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "loading_model",
+              "ready",
+              "adjust_camera",
+              "no_pose",
+              "multiple_poses",
+              "unsupported_exercise",
+              "unavailable",
+              "error"
+            ]
+          },
+          "landmark_visibility": {
+            "type": "array",
+            "maxItems": 33,
+            "description": "Derived visibility scores only; coordinates and raw media are forbidden.",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      },
+      "TechnicalPoseResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "movement_phase",
+          "repetition_count",
+          "confidence_score",
+          "camera_feedback"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "completed"
+          },
+          "movement_phase": {
+            "type": "string",
+            "const": "unavailable"
+          },
+          "repetition_count": {
+            "type": "null"
+          },
+          "confidence_score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "camera_feedback": {
+            "type": "string",
+            "enum": [
+              "waiting_for_camera",
+              "camera_ready",
+              "adjust_camera",
+              "multiple_people_detected",
+              "unsupported_exercise",
+              "technical_analysis_unavailable"
+            ]
+          }
+        }
+      },
       "UpdateSessionRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -2374,6 +2952,7 @@
       "Session": {
         "type": "object",
         "additionalProperties": false,
+        "description": "Minimal session summary. Raw camera media, frames, recordings, and landmarks are never stored.",
         "required": [
           "id",
           "exercise_slug",

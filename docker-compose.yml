@@ -32,6 +32,8 @@ services:
       AI_PORT: 8001
       LLM_PROVIDER: ${LLM_PROVIDER:-disabled}
       LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://openrouter.ai/api/v1}
       ALLOWED_HOSTS: '["localhost","127.0.0.1","ai-python"]'
     expose: ["8001"]
     networks: [app-internal]

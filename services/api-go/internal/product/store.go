@@ -43,5 +43,5 @@ type Store interface {
 	ListConversations(context.Context, string, int) ([]Conversation, error)
 	DeleteConversation(context.Context, string, string) error
 	ListMessages(context.Context, string, string, int) ([]Message, error)
-	SaveConversationExchange(context.Context, string, string, string, string) ([]Message, error)
+	SaveConversationExchange(context.Context, string, string, string, string, string) ([]Message, error)
 }

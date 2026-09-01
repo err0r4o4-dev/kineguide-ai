@@ -59,7 +59,7 @@ func (s *chatStore) ListMessages(context.Context, string, string, int) ([]produc
 	return append([]product.Message(nil), s.saved...), nil
 }
 
-func (s *chatStore) SaveConversationExchange(_ context.Context, userID, conversationID, userContent, assistantContent string) ([]product.Message, error) {
+func (s *chatStore) SaveConversationExchange(_ context.Context, userID, conversationID, title, userContent, assistantContent string) ([]product.Message, error) {
 	if s.conversation.UserID != userID || s.conversation.ID != conversationID {
 		return nil, product.ErrNotFound
 	}
@@ -67,6 +67,9 @@ func (s *chatStore) SaveConversationExchange(_ context.Context, userID, conversa
 	s.saved = []product.Message{
 		{ID: "55eaef83-72c6-4180-a442-49f6cb698c12", ConversationID: conversationID, Role: "user", Content: userContent, CreatedAt: now},
 		{ID: "1eb4cb23-7615-46d6-a702-fe557578b1d6", ConversationID: conversationID, Role: "assistant", Content: assistantContent, CreatedAt: now},
+	}
+	if s.conversation.Title == "บทสนทนาใหม่" || s.conversation.Title == "New conversation" {
+		s.conversation.Title = title
 	}
 	return s.saved, nil
 }
@@ -120,6 +123,86 @@ func TestChatCreatesAccountScopedConversationAndStoresSuccessfulExchange(t *test
 	assert.Contains(t, response.Body.String(), "คำตอบจำลองที่ปลอดภัย")
 	assert.Equal(t, 1, chatAI.calls)
 	assert.Len(t, store.saved, 2)
+	assert.Equal(t, "ข้อความทดสอบทั่วไป", store.conversation.Title)
+}
+
+func TestChatTitleUsesOnlyTheFirstMessageAndIsBounded(t *testing.T) {
+	store := &chatStore{
+		consent: product.Consent{ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true},
+		conversation: product.Conversation{
+			ID: "864cb7ae-64dd-4db4-8200-12b44e5bcab1", UserID: chatTestUserID,
+			Title: "บทสนทนาใหม่", Locale: "th",
+		},
+	}
+	router := chatRouter(t, store, &stubChatAI{response: ai.ChatResponse{Status: "completed", Message: "คำตอบจำลอง"}})
+
+	first := httptest.NewRecorder()
+	router.ServeHTTP(first, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations/"+store.conversation.ID+"/messages", `{"content":"   อยากทราบวิธีเตรียมตัวก่อนเริ่มกิจกรรม   และข้อความส่วนนี้ยาวเกินกว่าชื่อบทสนทนาที่ควรแสดงบนการ์ดอย่างชัดเจน"}`))
+	require.Equal(t, http.StatusCreated, first.Code)
+	firstTitle := store.conversation.Title
+	assert.True(t, strings.HasPrefix(firstTitle, "อยากทราบวิธีเตรียมตัวก่อนเริ่มกิจกรรม"))
+	assert.True(t, strings.HasSuffix(firstTitle, "…"))
+	assert.LessOrEqual(t, len([]rune(firstTitle)), 60)
+
+	second := httptest.NewRecorder()
+	router.ServeHTTP(second, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations/"+store.conversation.ID+"/messages", `{"content":"เปลี่ยนหัวข้อใหม่"}`))
+	require.Equal(t, http.StatusCreated, second.Code)
+	assert.Equal(t, firstTitle, store.conversation.Title)
+}
+
+func TestChatListsPendingMovementDemonstrationsWithoutCallingAI(t *testing.T) {
+	tests := []struct {
+		name        string
+		locale      string
+		content     string
+		wantTitle   string
+		wantPending string
+	}{
+		{
+			name:        "Thai request",
+			locale:      "th",
+			content:     "ฉันปวดหลัง มีท่าอะไรแนะนำบ้าง",
+			wantTitle:   "สาธิตการลุกนั่งจากเก้าอี้",
+			wantPending: "รอตรวจสอบโดยผู้เชี่ยวชาญ",
+		},
+		{
+			name:        "English request",
+			locale:      "en",
+			content:     "Can you recommend an exercise?",
+			wantTitle:   "Sit-to-stand movement demo",
+			wantPending: "Pending professional review",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			conversationID := "864cb7ae-64dd-4db4-8200-12b44e5bcab1"
+			store := &chatStore{
+				consent: product.Consent{
+					ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true,
+				},
+				conversation: product.Conversation{
+					ID: conversationID, UserID: chatTestUserID, Locale: test.locale,
+				},
+			}
+			chatAI := &stubChatAI{err: errors.New("provider should not be called")}
+			router := chatRouter(t, store, chatAI)
+
+			response := httptest.NewRecorder()
+			router.ServeHTTP(response, authenticatedChatRequest(
+				t, http.MethodPost, "/v1/conversations/"+conversationID+"/messages",
+				`{"content":"`+test.content+`"}`,
+			))
+
+			require.Equal(t, http.StatusCreated, response.Code)
+			require.Len(t, store.saved, 2)
+			assert.Contains(t, store.saved[1].Content, test.wantTitle)
+			assert.Contains(t, store.saved[1].Content, test.wantPending)
+			assert.NotContains(t, store.saved[1].Content, "เหมาะกับอาการของคุณ")
+			assert.NotContains(t, store.saved[1].Content, "treat")
+			assert.Zero(t, chatAI.calls)
+		})
+	}
 }
 
 func TestChatRequiresCurrentRetentionConsentPolicy(t *testing.T) {
@@ -131,6 +214,23 @@ func TestChatRequiresCurrentRetentionConsentPolicy(t *testing.T) {
 
 	assert.Equal(t, http.StatusForbidden, response.Code)
 	assert.Contains(t, response.Body.String(), `"code":"AI_CHAT_CONSENT_REQUIRED"`)
+}
+
+func TestChatExecutesOnlyPendingEvidenceTool(t *testing.T) {
+	tool := "list_pending_evidence"
+	conversationID := "864cb7ae-64dd-4db4-8200-12b44e5bcab1"
+	store := &chatStore{
+		consent:      product.Consent{ID: "consent", PolicyVersion: product.CurrentConsentPolicyVersion, AIChatStorage: true},
+		conversation: product.Conversation{ID: conversationID, UserID: chatTestUserID, Locale: "th"},
+	}
+	router := chatRouter(t, store, &stubChatAI{response: ai.ChatResponse{Status: "completed", Message: "ignored", ToolRequest: &tool}})
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPost, "/v1/conversations/"+conversationID+"/messages", `{"content":"ขอดูหลักฐาน"}`))
+
+	require.Equal(t, http.StatusCreated, response.Code)
+	require.Len(t, store.saved, 2)
+	assert.Contains(t, store.saved[1].Content, "ยังไม่ผ่านการอนุมัติทางคลินิก")
+	assert.Contains(t, store.saved[1].Content, "PMID 25780258")
 }
 
 func TestChatRequiresExplicitStorageConsent(t *testing.T) {

@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ChevronDown,
+  ClipboardList,
   HeartPulse,
   MessageCircle,
   Plus,
@@ -101,6 +102,7 @@ export function ChatPage() {
         ['conversation-messages', selectedID],
         (current) => [...(current ?? []), ...exchange]
       )
+      void queryClient.invalidateQueries({ queryKey: ['conversations'] })
       form.reset()
     }
   })
@@ -187,15 +189,21 @@ export function ChatPage() {
             {t('chat.subtitle')}
           </p>
         </div>
-        <button
-          className="kg-button-secondary shrink-0 self-start sm:self-auto"
-          disabled={create.isPending}
-          onClick={() => create.mutate()}
-          type="button"
-        >
-          <Plus aria-hidden="true" size={18} />
-          {t('chat.new')}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <Link className="kg-button-secondary" to="/app/educational-flow">
+            <ClipboardList aria-hidden="true" size={18} />
+            {t('chat.educationalFlow')}
+          </Link>
+          <button
+            className="kg-button-secondary"
+            disabled={create.isPending}
+            onClick={() => create.mutate()}
+            type="button"
+          >
+            <Plus aria-hidden="true" size={18} />
+            {t('chat.new')}
+          </button>
+        </div>
       </header>
 
       {create.isError && (

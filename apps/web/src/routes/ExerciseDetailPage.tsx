@@ -13,6 +13,7 @@ import { Link, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
+import { ExerciseIllustration } from '@/features/exercises/ExerciseIllustration'
 import { getExercise } from '@/services/product'
 
 export function ExerciseDetailPage() {
@@ -62,16 +63,12 @@ export function ExerciseDetailPage() {
       <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(330px,0.78fr)_minmax(0,1fr)]">
         <div>
           <div className="relative grid aspect-video place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 text-teal-800">
-            <div className="text-center">
-              <Camera aria-hidden="true" className="mx-auto" size={54} />
-              <p className="mt-3 px-6 text-sm font-semibold">
-                {t('camera.secure')}
-              </p>
-            </div>
-            <span className="absolute inset-0 grid place-items-center">
-              <span className="grid size-16 place-items-center rounded-2xl bg-white/95 text-teal-800 shadow-lg shadow-slate-900/10">
-                <Play aria-hidden="true" fill="currentColor" size={25} />
-              </span>
+            <ExerciseIllustration
+              className="size-full object-cover"
+              slug={slug}
+            />
+            <span className="pointer-events-none absolute bottom-3 right-3 grid size-12 place-items-center rounded-xl bg-white/95 text-teal-800 shadow-lg shadow-slate-900/10">
+              <Play aria-hidden="true" fill="currentColor" size={21} />
             </span>
           </div>
           <article className="kg-card mt-4 p-5">

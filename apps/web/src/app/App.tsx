@@ -49,6 +49,11 @@ const DashboardPage = lazy(() =>
 const ChatPage = lazy(() =>
   import('@/routes/ChatPage').then((module) => ({ default: module.ChatPage }))
 )
+const EducationalClinicalFlowPage = lazy(() =>
+  import('@/routes/EducationalClinicalFlowPage').then((module) => ({
+    default: module.EducationalClinicalFlowPage
+  }))
+)
 const PlanPage = lazy(() =>
   import('@/routes/PlanPage').then((module) => ({
     default: module.PlanPage
@@ -140,6 +145,10 @@ const router = createBrowserRouter([
                 children: [
                   { index: true, element: <DashboardPage /> },
                   { path: 'chat', element: <ChatPage /> },
+                  {
+                    path: 'educational-flow',
+                    element: <EducationalClinicalFlowPage />
+                  },
                   { path: 'plan', element: <PlanPage /> },
                   { path: 'exercises', element: <ExerciseLibraryPage /> },
                   { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
