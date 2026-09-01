@@ -1,22 +1,30 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
+  AlertTriangle,
   Camera,
+  CheckCircle,
   CircleMinus,
   CirclePlus,
+  Layers,
   Pause,
   Play,
-  Square
+  Square,
+  XCircle
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { useCamera } from '@/features/camera/useCamera'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
-import { researchProfileForExercise } from '@/features/pose/poseResearchProfiles'
 import { createTechnicalRepetitionCounter } from '@/features/pose/technicalRepetitionCounter'
+import { RealTimePoseComparator } from '@/features/pose/realTimePoseComparator'
+import {
+  loadReferenceModelFromStorage,
+  type ReferenceMovementModel
+} from '@/features/pose/referenceMovementModel'
 import {
   usePoseTracking,
   type PoseTrackingStatus
@@ -24,7 +32,6 @@ import {
 import { formatDuration } from '@/lib/format'
 import {
   getSession,
-  getTechnicalPoseFeedback,
   updateSession
 } from '@/services/product'
 
@@ -38,36 +45,42 @@ export function LiveSessionPage() {
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal)
   })
+  const exerciseSlug = query.data?.exercise_slug ?? ''
+
   const pose = usePoseTracking(
     camera.videoRef,
     cameraCanvasRef,
     camera.state === 'ready',
-    query.data?.exercise_slug ?? '',
+    exerciseSlug,
     createMediaPipePoseAdapter
   )
-  const researchProfile = researchProfileForExercise(
-    query.data?.exercise_slug ?? ''
-  )
   const repetitionCounter = useMemo(
-    () => createTechnicalRepetitionCounter(query.data?.exercise_slug ?? ''),
-    [query.data?.exercise_slug]
+    () => createTechnicalRepetitionCounter(exerciseSlug),
+    [exerciseSlug]
   )
+  const poseComparator = useMemo(() => new RealTimePoseComparator(3, 15), [])
+
+  const [referenceModel, setReferenceModel] =
+    useState<ReferenceMovementModel | null>(null)
   const [automaticCount, setAutomaticCount] = useState(0)
+  const [repProgressPercent, setRepProgressPercent] = useState(0)
   const [automaticAvailable, setAutomaticAvailable] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [reps, setReps] = useState(0)
   const [running, setRunning] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const technicalFeedback = useMutation({
-    mutationFn: () =>
-      getTechnicalPoseFeedback(id, {
-        pose_status: pose.status,
-        landmark_visibility:
-          pose.landmarks?.map(({ visibility = 0 }) => visibility) ?? []
-      })
-  })
+
+  // Load reference model from local storage if available
+  useEffect(() => {
+    if (exerciseSlug) {
+      const stored = loadReferenceModelFromStorage(exerciseSlug)
+      setReferenceModel(stored)
+    }
+  }, [exerciseSlug])
+
   const initialized = useRef(false)
+
   useEffect(() => {
     if (query.data && !initialized.current) {
       initialized.current = true
@@ -75,6 +88,7 @@ export function LiveSessionPage() {
       setReps(query.data.manual_repetitions)
     }
   }, [query.data])
+
   useEffect(() => {
     if (!running) return
     const timer = window.setInterval(
@@ -83,12 +97,31 @@ export function LiveSessionPage() {
     )
     return () => window.clearInterval(timer)
   }, [running])
+
+  // Real-time evaluation update
+  const evaluation = useMemo(() => {
+    if (pose.status !== 'ready' || !pose.landmarks) {
+      return {
+        hasReference: referenceModel !== null,
+        comparison: null,
+        userFeatures: null
+      }
+    }
+    return poseComparator.update(
+      pose.landmarks,
+      referenceModel,
+      Date.now()
+    )
+  }, [pose.landmarks, pose.status, poseComparator, referenceModel])
+
   useEffect(() => {
     const frameStatus = pose.status === 'ready' ? 'ready' : 'no_pose'
     const result = repetitionCounter.update(frameStatus, pose.landmarks)
     setAutomaticCount(result.count)
     setAutomaticAvailable(result.available)
+    setRepProgressPercent(result.repProgressPercent)
   }, [pose.landmarks, pose.status, repetitionCounter])
+
   const finish = async (status: 'completed' | 'stopped') => {
     setSaving(true)
     setRunning(false)
@@ -107,28 +140,43 @@ export function LiveSessionPage() {
       setSaving(false)
     }
   }
+
   if (query.isLoading) return <QueryLoading />
   if (query.isError) return <QueryError retry={() => void query.refetch()} />
+
+  const comp = evaluation.comparison
+
   return (
     <div>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-teal-700">
-            {query.data?.exercise_slug}
+            {exerciseSlug}
           </p>
           <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950">
             {t('session.live')}
           </h1>
         </div>
-        <span className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-lg font-semibold tabular-nums">
-          {formatDuration(seconds)}
-        </span>
+        <div className="flex items-center gap-3">
+          <Link
+            className="kg-button-secondary text-xs"
+            to="/app/reference-models"
+          >
+            <Layers size={15} />
+            {t('session.manageReference')}
+          </Link>
+          <span className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-lg font-semibold tabular-nums">
+            {formatDuration(seconds)}
+          </span>
+        </div>
       </header>
-      <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
+
+      <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_360px]">
         <div className="kg-card overflow-hidden bg-black">
           <div className="relative aspect-video">
             <CameraPoseLayer
               canvasRef={cameraCanvasRef}
+              jointErrors={comp?.jointErrors ?? []}
               label={t('camera.visibility')}
               snapshot={pose}
               videoRef={camera.videoRef}
@@ -139,6 +187,14 @@ export function LiveSessionPage() {
                 className={`absolute left-3 top-3 max-w-[calc(100%-1.5rem)] rounded-xl border px-3 py-2 text-xs font-semibold shadow-sm sm:left-4 sm:top-4 ${poseStatusClass(pose.status)}`}
               >
                 {t(poseStatusKey(pose.status))}
+              </div>
+            )}
+            {referenceModel && camera.state === 'ready' && (
+              <div
+                aria-hidden="true"
+                className="absolute right-3 top-3 rounded-xl border border-teal-200 bg-teal-50/90 px-3 py-1.5 text-xs font-semibold text-teal-900 shadow-sm"
+              >
+                ✓ {t('session.referenceModelLoaded')}
               </div>
             )}
             {camera.state !== 'ready' && (
@@ -178,100 +234,102 @@ export function LiveSessionPage() {
             </div>
           </div>
         </div>
+
         <aside className="space-y-5">
-          <article aria-live="polite" className="kg-card p-5" role="status">
+          {/* Movement Accuracy & Quality Score Card */}
+          <article className="kg-card p-5">
             <p className="text-sm font-semibold text-slate-950">
-              {t('session.poseTitle')}
+              {t('session.accuracy')}
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {camera.state === 'ready'
-                ? t(poseStatusKey(pose.status))
-                : t('session.poseIdle')}
-            </p>
-            <p className="mt-2 text-xs leading-5 text-slate-500">
-              {t('session.posePrivacy')}
-            </p>
-            <button
-              className="kg-button-secondary mt-4 w-full"
-              disabled={camera.state !== 'ready' || technicalFeedback.isPending}
-              onClick={() => technicalFeedback.mutate()}
-              type="button"
-            >
-              {technicalFeedback.isPending
-                ? t('common.loading')
-                : t('session.technicalCheck')}
-            </button>
-            {technicalFeedback.data && (
-              <div className="mt-4 border-t border-slate-200 pt-4 text-xs leading-5 text-slate-600">
-                <p className="font-semibold text-slate-800">
-                  {t('session.technicalResult')}
-                </p>
-                <p className="mt-1">
-                  {t(
-                    `session.technicalFeedback.${technicalFeedback.data.camera_feedback}`
-                  )}
-                </p>
-                <p className="mt-1">
-                  {t('session.technicalConfidence', {
-                    value:
-                      technicalFeedback.data.confidence_score === null
-                        ? t('session.notAvailable')
-                        : Math.round(
-                            technicalFeedback.data.confidence_score * 100
-                          )
-                  })}
-                </p>
-                <p className="mt-1">{t('session.phaseUnavailable')}</p>
+            {comp ? (
+              <div className="mt-3 space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-slate-600">{t('session.accuracyScore')}</span>
+                    <span className="text-lg font-bold text-teal-800">{comp.overallScore}%</span>
+                  </div>
+                  <div className="mt-1 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={`h-full transition-all duration-300 ${
+                        comp.overallScore >= 80
+                          ? 'bg-emerald-500'
+                          : comp.overallScore >= 60
+                            ? 'bg-amber-500'
+                            : 'bg-red-500'
+                      }`}
+                      style={{ width: `${comp.overallScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Real-time Feedback Messages */}
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-700">{t('session.movementQuality')}</p>
+                  <ul className="mt-2 space-y-1.5 text-xs">
+                    {comp.feedbackMessages.map((msg, i) => (
+                      <li
+                        className={`flex items-start gap-1.5 ${
+                          msg.status === 'correct'
+                            ? 'text-emerald-700'
+                            : msg.status === 'warning'
+                              ? 'text-amber-700'
+                              : 'text-red-700'
+                        }`}
+                        key={i}
+                      >
+                        {msg.status === 'correct' ? (
+                          <CheckCircle className="mt-0.5 shrink-0" size={13} />
+                        ) : msg.status === 'warning' ? (
+                          <AlertTriangle className="mt-0.5 shrink-0" size={13} />
+                        ) : (
+                          <XCircle className="mt-0.5 shrink-0" size={13} />
+                        )}
+                        <span>{t(msg.messageKey, { degreeDiff: msg.degreeDiff })}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            )}
-            {technicalFeedback.isError && (
-              <p className="kg-alert-danger mt-4" role="alert">
-                {t('session.technicalFailed')}
-              </p>
-            )}
-            {researchProfile && (
-              <div className="mt-4 border-t border-slate-200 pt-4">
-                <p className="text-xs font-semibold text-slate-800">
-                  {t('session.poseResearchMethod')}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-slate-600">
-                  {t('session.poseResearchPending')}
-                </p>
-                <a
-                  className="mt-2 inline-flex min-h-11 items-center text-xs font-semibold text-teal-800 underline underline-offset-4"
-                  href={researchProfile.sourceUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  {t('session.poseResearchSource')}
-                </a>
+            ) : (
+              <div className="mt-3 rounded-xl border border-dashed border-slate-300 p-4 text-center text-xs text-slate-500">
+                {referenceModel ? t('session.feedback.noMovementDetected') : t('session.noReferenceModel')}
               </div>
             )}
           </article>
+
+          {/* Repetitions & Progress Card */}
           <article className="kg-card p-6 text-center">
-            <div className="mb-6 rounded-xl border border-sky-200 bg-sky-50 p-4 text-left">
-              <p className="text-sm font-semibold text-sky-950">
-                {t('session.automaticTechnicalCount')}
-              </p>
-              <p className="mt-1 text-3xl font-bold tabular-nums text-sky-900">
-                {automaticAvailable
-                  ? automaticCount
-                  : t('session.notAvailable')}
-              </p>
-              <p className="mt-2 text-xs leading-5 text-sky-900">
-                {t('session.automaticTechnicalBoundary')}
-              </p>
+            <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-4 text-left">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-sky-950">
+                  {t('session.automaticTechnicalCount')}
+                </p>
+                <span className="text-2xl font-bold tabular-nums text-sky-900">
+                  {automaticAvailable ? automaticCount : t('session.notAvailable')}
+                </span>
+              </div>
+              {automaticAvailable && (
+                <div className="mt-2">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-sky-200">
+                    <div
+                      className="h-full bg-sky-600 transition-all duration-150"
+                      style={{ width: `${repProgressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-            <p className="text-sm uppercase tracking-wide text-slate-500">
+
+            <p className="text-xs uppercase tracking-wide text-slate-500">
               {t('session.reps')}
             </p>
             <p
               aria-live="polite"
-              className="mt-3 text-5xl font-bold tabular-nums text-teal-800"
+              className="mt-2 text-4xl font-bold tabular-nums text-teal-800"
             >
               {reps}
             </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-2 gap-3">
               <button
                 className="kg-button-secondary"
                 disabled={reps === 0}
@@ -291,9 +349,7 @@ export function LiveSessionPage() {
               </button>
             </div>
           </article>
-          <p className="rounded-2xl border border-teal-200 bg-teal-50 p-4 text-sm leading-6 text-teal-950">
-            {t('session.estimate')}
-          </p>
+
           {error && (
             <p className="kg-alert-danger" role="alert">
               {error}
