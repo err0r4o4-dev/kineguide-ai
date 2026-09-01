@@ -183,37 +183,6 @@ button:disabled {
   translate: 0 -1px;
 }
 
-.kg-landing-privacy-panel,
-.kg-landing-final {
-  background:
-    radial-gradient(circle at 15% 18%, rgb(45 212 191 / 15%), transparent 34%),
-    #0b6b63;
-}
-
-.kg-landing-final-cta {
-  display: inline-flex;
-  min-height: 48px;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 1px solid white;
-  border-radius: 0.8rem;
-  background: white;
-  padding: 0.75rem 1.25rem;
-  color: #0b5f59;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 10px 25px rgb(4 47 46 / 14%);
-  transition:
-    background-color 150ms ease,
-    translate 150ms ease;
-}
-
-.kg-landing-final-cta:hover {
-  background: #f0fdfa;
-  translate: 0 -1px;
-}
-
 .kg-icon-button {
   min-width: 44px;
   border: 1px solid #d7e2df;

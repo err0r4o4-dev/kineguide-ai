@@ -66,7 +66,7 @@ describe('LandingPage', () => {
     )
   })
 
-  it('presents the complete public journey and safety boundaries', () => {
+  it('presents the compact public journey without the removed sections', () => {
     render(
       <AuthContext.Provider value={guestAuth}>
         <MemoryRouter>
@@ -76,42 +76,39 @@ describe('LandingPage', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
-    ).toBeInTheDocument()
-    expect(
       screen.getByRole('heading', { name: 'สิ่งที่คุณทำได้ใน KineGuide AI' })
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม' })
-    ).toBeInTheDocument()
+      screen.queryByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
+    ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: 'ใช้งานอย่างปลอดภัย' })
-    ).toBeInTheDocument()
+      screen.queryByRole('heading', { name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม' })
+    ).not.toBeInTheDocument()
     expect(
-      screen.getByText(/ไม่วินิจฉัยโรคหรือทดแทนบุคลากรทางการแพทย์/)
-    ).toBeInTheDocument()
-    expect(screen.getByText(/หยุดใช้งานทันทีหากรู้สึกเจ็บ/)).toBeInTheDocument()
+      screen.queryByRole('heading', { name: 'ใช้งานอย่างปลอดภัย' })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(/ไม่ใช่อุปกรณ์การแพทย์/)).toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: 'ดูวิธีการทำงาน' })
-    ).toHaveAttribute('href', '#how-it-works')
+    ).toHaveAttribute('href', '#features')
     expect(
       screen.getByRole('link', {
         name: 'ดูรายละเอียด กล้องทำงานในอุปกรณ์'
       })
-    ).toHaveAttribute('href', '#how-it-works')
+    ).toHaveAttribute('href', '#capabilities')
     expect(
       screen.getByRole('link', {
         name: 'ดูรายละเอียด ควบคุมข้อมูลของคุณ'
       })
-    ).toHaveAttribute('href', '#privacy')
+    ).toHaveAttribute('href', '/register')
     expect(
       screen.getByRole('link', {
         name: 'ดูรายละเอียด ติดตามกิจกรรมแบบไม่กล่าวอ้างทางคลินิก'
       })
     ).toHaveAttribute('href', '#capabilities')
     expect(
-      screen.getByRole('link', { name: 'สร้างบัญชีเพื่อเริ่มต้น' })
-    ).toHaveAttribute('href', '/register')
+      screen.queryByRole('link', { name: 'สร้างบัญชีเพื่อเริ่มต้น' })
+    ).not.toBeInTheDocument()
   })
 
   it('provides the same public journey and boundaries in English', async () => {
@@ -126,21 +123,19 @@ describe('LandingPage', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: 'Get started in 3 steps' })
-    ).toBeInTheDocument()
-    expect(
       screen.getByRole('heading', {
         name: 'What you can do in KineGuide AI'
       })
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', {
+      screen.queryByRole('heading', {
         name: 'Your data stays under your control'
       })
-    ).toBeInTheDocument()
+    ).not.toBeInTheDocument()
     expect(
-      screen.getByText(/Stop immediately if you feel pain/)
-    ).toBeInTheDocument()
+      screen.queryByRole('heading', { name: 'Get started in 3 steps' })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(/not a medical device/i)).toBeInTheDocument()
   })
 
   it('lets an authenticated visitor use the brand to open the public landing page', async () => {
