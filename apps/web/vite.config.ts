@@ -29,7 +29,7 @@ export default defineConfig({
         theme_color: '#0f766e',
         icons: [
           {
-            src: '/pwa.svg',
+            src: '/logo.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable'

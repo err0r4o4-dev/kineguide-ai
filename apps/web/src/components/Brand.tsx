@@ -1,6 +1,7 @@
-import { HeartPulse } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+
+import { LogoMark } from '@/components/LogoMark'
 
 export function Brand({
   compact = false,
@@ -20,15 +21,13 @@ export function Brand({
       }`}
       to="/"
     >
-      <span
-        className={`grid place-items-center text-white ${
+      <LogoMark
+        className={
           prominent
-            ? 'size-11 rounded-[0.9rem] bg-[linear-gradient(135deg,#0891b2,#2dd4bf_58%,#6ee7b7)] shadow-[0_8px_20px_rgb(13_148_136_/_22%)] sm:size-12'
-            : 'size-10 rounded-xl shadow-sm'
-        } ${prominent ? '' : inverted ? 'bg-white/20' : 'bg-teal-700'}`}
-      >
-        <HeartPulse aria-hidden="true" size={prominent ? 24 : 21} />
-      </span>
+            ? 'size-11 drop-shadow-[0_8px_10px_rgb(13_148_136_/_20%)] sm:size-12'
+            : 'size-10 drop-shadow-sm'
+        }
+      />
       {!compact && (
         <span className="min-w-0">
           <span

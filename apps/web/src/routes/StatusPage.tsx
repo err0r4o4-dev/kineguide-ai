@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Activity, Bot, Database, Globe2, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { LogoMark } from '@/components/LogoMark'
 import { getSystemStatus } from '@/services/system'
 
 type CardState = 'ok' | 'unavailable' | 'unknown'
@@ -62,9 +63,7 @@ export function StatusPage() {
     <div className="min-h-screen bg-kg-canvas">
       <header className="mx-auto flex max-w-6xl items-center justify-between border-b border-slate-200/80 px-5 py-5 sm:px-8">
         <div className="flex items-center gap-3 font-semibold text-slate-900">
-          <span className="grid size-10 place-items-center rounded-xl bg-teal-700 text-white">
-            K
-          </span>
+          <LogoMark />
           KineGuide AI
         </div>
         <button

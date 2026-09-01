@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ChevronDown,
   ClipboardList,
-  HeartPulse,
   MessageCircle,
   Plus,
   Send,
@@ -16,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { z } from 'zod'
 
+import { LogoMark } from '@/components/LogoMark'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { confirmNotification, showError, showSuccess } from '@/lib/notification'
 import {
@@ -274,9 +274,7 @@ export function ChatPage() {
                 <>
                   {messages.data.length === 0 && (
                     <div className="m-auto max-w-md py-12 text-center text-kg-muted">
-                      <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-kg-primary text-white">
-                        <HeartPulse aria-hidden="true" size={21} />
-                      </div>
+                      <LogoMark className="mx-auto size-11" />
                       <p className="mt-4 leading-7">{t('chat.startPrompt')}</p>
                     </div>
                   )}
@@ -290,9 +288,7 @@ export function ChatPage() {
                       key={message.id}
                     >
                       {message.role === 'assistant' && (
-                        <div className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full bg-kg-primary text-white">
-                          <HeartPulse aria-hidden="true" size={17} />
-                        </div>
+                        <LogoMark className="mt-1 size-9" />
                       )}
                       <div
                         className={`min-w-0 rounded-2xl px-4 py-3 text-sm leading-7 ${

@@ -1,7 +1,9 @@
-import { Check, Circle, HeartPulse, Home, RefreshCw } from 'lucide-react'
+import { Check, Circle, Home, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+
+import { LogoMark } from '@/components/LogoMark'
 
 function PoseOrbit({ error = false }: { error?: boolean }) {
   return (
@@ -141,9 +143,7 @@ export function SystemLoading({
         className="inline-flex items-center gap-3 text-slate-950"
         aria-label="KineGuide AI"
       >
-        <span className="grid size-10 place-items-center rounded-xl bg-teal-700 text-white shadow-sm">
-          <HeartPulse aria-hidden="true" size={21} />
-        </span>
+        <LogoMark />
         <strong className="text-xl tracking-tight">KineGuide AI</strong>
       </div>
       {content}

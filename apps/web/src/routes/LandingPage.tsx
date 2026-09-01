@@ -4,7 +4,6 @@ import {
   ChartNoAxesCombined,
   ChevronRight,
   CirclePlay,
-  HeartPulse,
   MessageCircle,
   ShieldCheck
 } from 'lucide-react'
@@ -12,6 +11,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
+import { LogoMark } from '@/components/LogoMark'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { SystemLoading } from '@/components/SystemState'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -201,9 +201,7 @@ export function LandingPage() {
                 className="relative mt-auto hidden h-44 items-end justify-center overflow-hidden lg:flex"
               >
                 <span className="absolute bottom-2 size-40 rounded-full bg-teal-50/80 blur-sm" />
-                <span className="relative mb-4 grid size-28 place-items-center rounded-[2rem] bg-white text-teal-600 shadow-[0_18px_38px_rgb(15_118_110_/_14%)] ring-1 ring-teal-100">
-                  <HeartPulse size={58} strokeWidth={1.55} />
-                </span>
+                <LogoMark className="relative mb-4 size-28 drop-shadow-[0_18px_19px_rgb(15_118_110_/_14%)]" />
                 <span className="absolute bottom-6 left-10 grid size-11 place-items-center rounded-2xl bg-teal-100 text-teal-600">
                   <MessageCircle size={23} />
                 </span>
