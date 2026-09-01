@@ -74,7 +74,7 @@ export function LandingPage() {
     <div className="kg-landing-page min-h-screen overflow-hidden bg-kg-canvas">
       <PublicHeader />
       <main id="main-content">
-        <section className="kg-landing-hero relative isolate overflow-hidden">
+        <section className="relative isolate overflow-hidden">
           <div className="mx-auto grid max-w-[90rem] items-center gap-10 px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:px-14 lg:pb-6 lg:pt-12">
             <div className="min-w-0 lg:py-2">
               <p className="inline-flex min-h-9 items-center rounded-xl border border-teal-100/80 bg-cyan-50/80 px-4 text-sm font-semibold text-teal-700 shadow-sm shadow-teal-900/[0.03]">
@@ -248,7 +248,7 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.4),#ffffff_38%)]">
+      <footer className="border-t border-slate-200/70 bg-transparent">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div>
             <p>{t('landing.footerCopyright')}</p>

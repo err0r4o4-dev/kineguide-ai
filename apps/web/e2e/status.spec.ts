@@ -30,4 +30,19 @@ test('landing page explains privacy before authentication', async ({
     'href',
     '/register'
   )
+  const backgrounds = await page.evaluate(() => ({
+    page: getComputedStyle(document.querySelector('.kg-landing-page')!)
+      .backgroundImage,
+    attachment: getComputedStyle(document.querySelector('.kg-landing-page')!)
+      .backgroundAttachment,
+    hero: getComputedStyle(document.querySelector('main > section')!)
+      .backgroundImage,
+    footer: getComputedStyle(document.querySelector('footer')!).backgroundImage
+  }))
+  expect(backgrounds.page).not.toBe('none')
+  expect(
+    backgrounds.attachment.split(', ').every((value) => value === 'fixed')
+  ).toBe(true)
+  expect(backgrounds.hero).toBe('none')
+  expect(backgrounds.footer).toBe('none')
 })

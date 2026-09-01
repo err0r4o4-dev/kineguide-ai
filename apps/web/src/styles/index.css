@@ -42,6 +42,10 @@ body {
     radial-gradient(circle at 84% 25%, rgb(237 233 254 / 34%), transparent 28%),
     radial-gradient(circle at 76% 67%, rgb(204 251 241 / 32%), transparent 24%),
     #f7f9fb;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 a {
@@ -108,13 +112,6 @@ button:disabled {
 
 .kg-button-secondary:hover:not(:disabled) {
   background: #f0fdfa;
-}
-
-.kg-landing-hero {
-  background:
-    radial-gradient(circle at 9% 56%, rgb(153 246 228 / 25%), transparent 23%),
-    radial-gradient(circle at 72% 72%, rgb(204 251 241 / 32%), transparent 25%),
-    radial-gradient(circle at 98% 12%, rgb(224 242 254 / 44%), transparent 30%);
 }
 
 .kg-landing-camera-panel {
