@@ -100,7 +100,7 @@ paths:
       operationId: refreshSession
       tags: [Authentication]
       summary: Rotate a refresh token and issue a new access token
-      security: [{ refreshCookie: [] }]
+      description: Uses the HttpOnly `kg_refresh` cookie sent automatically by the browser.
       responses:
         "200":
           description: Access token refreshed and refresh cookie rotated.
@@ -112,7 +112,7 @@ paths:
       operationId: logout
       tags: [Authentication]
       summary: Revoke the refresh session
-      security: [{ refreshCookie: [] }]
+      description: Revokes the session identified by the HttpOnly `kg_refresh` cookie when present.
       responses:
         "204": { description: Refresh session revoked. }
   /v1/auth/providers:
@@ -661,7 +661,6 @@ paths:
 components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
-    refreshCookie: { type: apiKey, in: cookie, name: kg_refresh }
   parameters:
     ExerciseSlug: { name: slug, in: path, required: true, schema: { type: string, maxLength: 80 } }
     SessionID: { name: id, in: path, required: true, schema: { type: string, format: uuid } }

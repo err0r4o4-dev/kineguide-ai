@@ -202,11 +202,7 @@
           "Authentication"
         ],
         "summary": "Rotate a refresh token and issue a new access token",
-        "security": [
-          {
-            "refreshCookie": []
-          }
-        ],
+        "description": "Uses the HttpOnly `kg_refresh` cookie sent automatically by the browser.",
         "responses": {
           "200": {
             "description": "Access token refreshed and refresh cookie rotated.",
@@ -231,11 +227,7 @@
           "Authentication"
         ],
         "summary": "Revoke the refresh session",
-        "security": [
-          {
-            "refreshCookie": []
-          }
-        ],
+        "description": "Revokes the session identified by the HttpOnly `kg_refresh` cookie when present.",
         "responses": {
           "204": {
             "description": "Refresh session revoked."
@@ -1522,11 +1514,6 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
-      },
-      "refreshCookie": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "kg_refresh"
       }
     },
     "parameters": {
