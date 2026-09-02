@@ -45,9 +45,14 @@ describe('PublicHeader', () => {
     expect(
       screen.getByRole('link', { name: 'เริ่มต้นใช้งาน' })
     ).toHaveAttribute('href', '/register')
-    expect(
-      screen.queryByRole('link', { name: 'คุณสมบัติ' })
-    ).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'หน้าแรก' })).toHaveAttribute(
+      'href',
+      '#landing-home'
+    )
+    expect(screen.getByRole('link', { name: 'ความสามารถ' })).toHaveAttribute(
+      'href',
+      '#capabilities'
+    )
   })
 
   it('presents the app CTA to an authenticated user', () => {

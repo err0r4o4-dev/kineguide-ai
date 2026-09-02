@@ -94,7 +94,10 @@ export function LandingPage() {
     <div className="kg-landing-page min-h-screen overflow-x-clip bg-kg-canvas">
       <PublicHeader />
       <main id="main-content">
-        <section className="relative isolate overflow-hidden">
+        <section
+          className="relative isolate scroll-mt-28 overflow-hidden"
+          id="landing-home"
+        >
           <div className="kg-landing-content mx-auto grid items-center gap-10 pb-10 pt-10 sm:pb-12 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:py-16">
             <div className="min-w-0 lg:py-2">
               <p className="inline-flex min-h-9 items-center rounded-xl border border-teal-100/80 bg-cyan-50/80 px-4 text-sm font-semibold text-teal-700 shadow-sm shadow-teal-900/[0.03]">
@@ -159,7 +162,11 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section aria-labelledby="privacy-title" className="pb-6 sm:pb-8">
+        <section
+          aria-labelledby="privacy-title"
+          className="scroll-mt-28 pb-6 sm:pb-8"
+          id="landing-privacy"
+        >
           <div className="kg-landing-content kg-landing-surface mx-auto rounded-[1.75rem] p-6 sm:p-8 lg:rounded-[2rem]">
             <div className="max-w-3xl">
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-teal-700">
@@ -195,7 +202,7 @@ export function LandingPage() {
 
         <section
           aria-labelledby="how-title"
-          className="scroll-mt-24 py-10 sm:py-14"
+          className="scroll-mt-28 py-10 sm:py-14"
           id="how-it-works"
         >
           <div className="kg-landing-content mx-auto">
@@ -241,7 +248,7 @@ export function LandingPage() {
 
         <section
           aria-labelledby="capabilities-title"
-          className="py-10 sm:py-14"
+          className="scroll-mt-28 py-10 sm:py-14"
           id="capabilities"
         >
           <div className="kg-landing-content mx-auto">

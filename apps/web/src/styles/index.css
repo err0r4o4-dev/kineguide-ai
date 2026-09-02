@@ -36,6 +36,16 @@ body {
   background: #f4f7f6;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 .kg-landing-page {
   background:
     radial-gradient(circle at 19% 17%, rgb(207 250 254 / 42%), transparent 28%),
@@ -54,6 +64,10 @@ body {
 
 .kg-public-header {
   isolation: isolate;
+}
+
+.kg-public-header-content {
+  width: min(calc(100% - 2rem), 80rem);
 }
 
 .kg-public-header::before {

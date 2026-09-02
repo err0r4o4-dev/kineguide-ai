@@ -144,6 +144,13 @@ const th = {
   },
   landing: {
     features: 'คุณสมบัติ',
+    navigation: {
+      label: 'ส่วนต่าง ๆ ของหน้าแรก',
+      home: 'หน้าแรก',
+      privacy: 'ความเป็นส่วนตัว',
+      how: 'วิธีใช้งาน',
+      capabilities: 'ความสามารถ'
+    },
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
     title:
       'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ',
@@ -981,6 +988,13 @@ const en: typeof th = {
   },
   landing: {
     features: 'Features',
+    navigation: {
+      label: 'Landing page sections',
+      home: 'Home',
+      privacy: 'Privacy',
+      how: 'How it works',
+      capabilities: 'Capabilities'
+    },
     eyebrow: 'KineGuide AI · Physiotherapy support prototype',
     title: 'Explore movement confidently with support that values your privacy',
     titleAccent: 'privacy-first support',

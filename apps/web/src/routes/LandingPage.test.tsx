@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, beforeEach, vi } from 'vitest'
@@ -107,6 +107,39 @@ describe('LandingPage', () => {
     expect(
       screen.queryByRole('link', { name: 'สร้างบัญชีเพื่อเริ่มต้น' })
     ).not.toBeInTheDocument()
+  })
+
+  it('highlights the header tab for the section currently in view', () => {
+    render(
+      <AuthContext.Provider value={guestAuth}>
+        <MemoryRouter>
+          <LandingPage />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    )
+
+    const capabilities = document.querySelector('#capabilities')
+    expect(capabilities).not.toBeNull()
+    vi.spyOn(
+      capabilities as HTMLElement,
+      'getBoundingClientRect'
+    ).mockReturnValue({ top: 80 } as DOMRect)
+    for (const id of ['landing-home', 'landing-privacy', 'how-it-works']) {
+      vi.spyOn(
+        document.querySelector(`#${id}`) as HTMLElement,
+        'getBoundingClientRect'
+      ).mockReturnValue({ top: -200 } as DOMRect)
+    }
+
+    fireEvent.scroll(window)
+
+    expect(screen.getByRole('link', { name: 'ความสามารถ' })).toHaveAttribute(
+      'aria-current',
+      'location'
+    )
+    expect(screen.getByRole('link', { name: 'หน้าแรก' })).not.toHaveAttribute(
+      'aria-current'
+    )
   })
 
   it('provides the same public journey and boundaries in English', async () => {
