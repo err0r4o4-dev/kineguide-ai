@@ -1,6 +1,6 @@
-# KineGuide AI
+# KineGuide-AI
 
-**Personalized recovery, guided by AI.**
+**Personalized recovery, guided-by-AI.**
 
 **KineGuide AI: A Personalized Physiotherapy Planning and Real-Time Pose Assessment System**
 
