@@ -1,4 +1,4 @@
-# KineGuide AI
+# KineGuide-AI
 
 **Personalized recovery, guided by AI.**
 
