@@ -29,7 +29,10 @@ function createSchema(requiresDisplayName: boolean) {
       .max(80)
       .refine((value) => !requiresDisplayName || value.length >= 2),
     email: z.string().trim().email().max(254),
-    password: z.string().min(12).max(128)
+    password: z
+      .string()
+      .min(requiresDisplayName ? 12 : 1)
+      .max(128)
   })
 }
 
@@ -188,11 +191,15 @@ export function AuthPage() {
                   {...register('password')}
                 />
               </span>
-              <span className="text-xs text-slate-500">
-                {t('auth.passwordHint')}
-              </span>
+              {isRegister && (
+                <span className="text-xs text-slate-500">
+                  {t('auth.passwordHint')}
+                </span>
+              )}
               {errors.password && (
-                <span className="kg-error">{t('auth.passwordHint')}</span>
+                <span className="kg-error">
+                  {t(isRegister ? 'auth.passwordHint' : 'common.error')}
+                </span>
               )}
             </label>
             {serverError && (

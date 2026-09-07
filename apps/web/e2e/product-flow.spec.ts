@@ -469,7 +469,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
 
   await page.goto('/login')
   await page.getByLabel('อีเมล').fill('student@example.com')
-  await page.getByLabel('รหัสผ่าน').fill('safe-demo-password')
+  await page.getByLabel('รหัสผ่าน').fill('legacy-pass')
   runtimeErrors.length = 0
   await page.getByRole('button', { name: 'เข้าสู่ระบบ' }).click()
 

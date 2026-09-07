@@ -95,7 +95,7 @@ describe('AuthPage social sign in', () => {
     navigationError.mockRestore()
   })
 
-  it('submits email login without validating the hidden display name', async () => {
+  it('submits email login without applying registration-only validation', async () => {
     const user = userEvent.setup()
     vi.mocked(product.getOAuthProviders).mockResolvedValue({ providers: [] })
     vi.mocked(auth.login).mockResolvedValue()
@@ -114,12 +114,12 @@ describe('AuthPage social sign in', () => {
     )
 
     await user.type(screen.getByLabelText('อีเมล'), 'student@example.com')
-    await user.type(screen.getByLabelText(/รหัสผ่าน/), 'safe-demo-password')
+    await user.type(screen.getByLabelText(/รหัสผ่าน/), 'legacy-pass')
     await user.click(screen.getByRole('button', { name: 'เข้าสู่ระบบ' }))
 
     expect(auth.login).toHaveBeenCalledWith({
       email: 'student@example.com',
-      password: 'safe-demo-password'
+      password: 'legacy-pass'
     })
   })
 })
