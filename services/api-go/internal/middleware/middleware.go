@@ -30,6 +30,9 @@ func StructuredLogger(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		started := time.Now()
 		c.Next()
+		if c.Request.Method == http.MethodGet && c.Request.URL.Path == "/health" && c.Writer.Status() < http.StatusBadRequest {
+			return
+		}
 		logger.Info("http_request",
 			"method", c.Request.Method,
 			"path", c.Request.URL.Path,
