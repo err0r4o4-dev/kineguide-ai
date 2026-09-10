@@ -27,7 +27,9 @@ func (s technicalFeedbackStub) TechnicalPoseFeedback(context.Context, ai.Technic
 
 type clinicalFlowStore struct {
 	product.Store
-	session product.Session
+	session        product.Session
+	createdSession product.Session
+	updatedSession product.Session
 }
 
 func (s *clinicalFlowStore) LatestConsent(context.Context, string) (product.Consent, error) {
@@ -39,6 +41,18 @@ func (s *clinicalFlowStore) LatestConsent(context.Context, string) (product.Cons
 
 func (s *clinicalFlowStore) SessionByID(context.Context, string, string) (product.Session, error) {
 	return s.session, nil
+}
+
+func (s *clinicalFlowStore) CreateSession(_ context.Context, session product.Session) (product.Session, error) {
+	s.createdSession = session
+	session.ID = "864cb7ae-64dd-4db4-8200-12b44e5bcab1"
+	session.Status = "active"
+	return session, nil
+}
+
+func (s *clinicalFlowStore) UpdateSession(_ context.Context, session product.Session) (product.Session, error) {
+	s.updatedSession = session
+	return session, nil
 }
 
 func clinicalFlowRouter(t *testing.T, store product.Store, technical technicalFeedbackStub) http.Handler {
@@ -97,4 +111,38 @@ func TestSessionContractDoesNotStoreRawVideoByDefault(t *testing.T) {
 	for _, forbidden := range []string{"video", "image", "frame", "landmark", "recording"} {
 		assert.NotContains(t, strings.ToLower(string(payload)), forbidden)
 	}
+}
+
+func TestCreateSessionDerivesActivityMetadataAndAcceptsNoCameraMode(t *testing.T) {
+	store := &clinicalFlowStore{}
+	router := clinicalFlowRouter(t, store, technicalFeedbackStub{})
+	response := httptest.NewRecorder()
+	body := `{"activity_slug":"walking-demo","camera_used":false}`
+
+	router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPost, "/v1/sessions", body))
+
+	require.Equal(t, http.StatusCreated, response.Code)
+	assert.Equal(t, "walking-demo", store.createdSession.ActivitySlug)
+	assert.Equal(t, "gait", store.createdSession.ActivityKind)
+	assert.Equal(t, "observation", store.createdSession.MeasurementMode)
+	assert.False(t, store.createdSession.CameraUsed)
+	assert.Contains(t, response.Body.String(), `"activity_slug":"walking-demo"`)
+}
+
+func TestObservationActivityRejectsManualCycles(t *testing.T) {
+	store := &clinicalFlowStore{session: product.Session{
+		ID:              "864cb7ae-64dd-4db4-8200-12b44e5bcab1",
+		UserID:          chatTestUserID,
+		ActivitySlug:    "walking-demo",
+		MeasurementMode: "observation",
+	}}
+	router := clinicalFlowRouter(t, store, technicalFeedbackStub{})
+	response := httptest.NewRecorder()
+	body := `{"status":"completed","manual_cycles":1,"elapsed_seconds":30}`
+
+	router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPatch, "/v1/sessions/864cb7ae-64dd-4db4-8200-12b44e5bcab1", body))
+
+	require.Equal(t, http.StatusUnprocessableEntity, response.Code)
+	assert.Empty(t, store.updatedSession.ID)
+	assert.Contains(t, response.Body.String(), `"code":"VALIDATION_ERROR"`)
 }

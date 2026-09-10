@@ -426,10 +426,12 @@ func (p *Postgres) DeleteHealthProfile(ctx context.Context, userID string) error
 
 func (p *Postgres) CreateSession(ctx context.Context, session product.Session) (product.Session, error) {
 	err := p.pool.QueryRow(ctx, `
-		INSERT INTO exercise_sessions (user_id, exercise_slug, camera_used)
-		VALUES ($1, $2, $3)
-		RETURNING id::text, status, manual_repetitions, elapsed_seconds, started_at, retention_until`, session.UserID, session.ExerciseSlug, session.CameraUsed).
+		INSERT INTO exercise_sessions (user_id, exercise_slug, activity_kind, measurement_mode, camera_used)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id::text, status, manual_repetitions, elapsed_seconds, started_at, retention_until`, session.UserID, session.ExerciseSlug, session.ActivityKind, session.MeasurementMode, session.CameraUsed).
 		Scan(&session.ID, &session.Status, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.RetentionUntil)
+	session.ActivitySlug = session.ExerciseSlug
+	session.ManualCycles = session.ManualRepetitions
 	return session, mapError(err)
 }
 
@@ -439,24 +441,28 @@ func (p *Postgres) UpdateSession(ctx context.Context, session product.Session) (
 		SET status = $3, manual_repetitions = $4, elapsed_seconds = $5,
 		    completed_at = CASE WHEN $3 IN ('completed', 'stopped') THEN now() ELSE completed_at END
 		WHERE id = $1 AND user_id = $2
-		RETURNING exercise_slug, camera_used, started_at, completed_at, retention_until`, session.ID, session.UserID, session.Status, session.ManualRepetitions, session.ElapsedSeconds).
-		Scan(&session.ExerciseSlug, &session.CameraUsed, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil)
+		RETURNING exercise_slug, activity_kind, measurement_mode, camera_used, started_at, completed_at, retention_until`, session.ID, session.UserID, session.Status, session.ManualRepetitions, session.ElapsedSeconds).
+		Scan(&session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode, &session.CameraUsed, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil)
+	session.ActivitySlug = session.ExerciseSlug
+	session.ManualCycles = session.ManualRepetitions
 	return session, mapError(err)
 }
 
 func (p *Postgres) SessionByID(ctx context.Context, userID, sessionID string) (product.Session, error) {
 	var session product.Session
 	err := p.pool.QueryRow(ctx, `
-		SELECT id::text, user_id::text, exercise_slug, status, camera_used,
+		SELECT id::text, user_id::text, exercise_slug, activity_kind, measurement_mode, status, camera_used,
 		       manual_repetitions, elapsed_seconds, started_at, completed_at, retention_until
 		FROM exercise_sessions WHERE id = $1 AND user_id = $2`, sessionID, userID).
-		Scan(&session.ID, &session.UserID, &session.ExerciseSlug, &session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil)
+		Scan(&session.ID, &session.UserID, &session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode, &session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil)
+	session.ActivitySlug = session.ExerciseSlug
+	session.ManualCycles = session.ManualRepetitions
 	return session, mapError(err)
 }
 
 func (p *Postgres) ListSessions(ctx context.Context, userID string, limit int) ([]product.Session, error) {
 	rows, err := p.pool.Query(ctx, `
-		SELECT id::text, user_id::text, exercise_slug, status, camera_used,
+		SELECT id::text, user_id::text, exercise_slug, activity_kind, measurement_mode, status, camera_used,
 		       manual_repetitions, elapsed_seconds, started_at, completed_at, retention_until
 		FROM exercise_sessions WHERE user_id = $1
 		ORDER BY started_at DESC LIMIT $2`, userID, limit)
@@ -467,9 +473,11 @@ func (p *Postgres) ListSessions(ctx context.Context, userID string, limit int) (
 	sessions := make([]product.Session, 0)
 	for rows.Next() {
 		var session product.Session
-		if err := rows.Scan(&session.ID, &session.UserID, &session.ExerciseSlug, &session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil); err != nil {
+		if err := rows.Scan(&session.ID, &session.UserID, &session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode, &session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil); err != nil {
 			return nil, err
 		}
+		session.ActivitySlug = session.ExerciseSlug
+		session.ManualCycles = session.ManualRepetitions
 		sessions = append(sessions, session)
 	}
 	return sessions, rows.Err()

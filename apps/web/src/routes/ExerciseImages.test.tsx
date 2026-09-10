@@ -10,23 +10,35 @@ import { ExerciseLibraryPage } from './ExerciseLibraryPage'
 
 vi.mock('@/services/product', async () => {
   const actual = await vi.importActual<typeof product>('@/services/product')
-  return { ...actual, getExercises: vi.fn(), getExercise: vi.fn() }
+  return { ...actual, getActivities: vi.fn(), getActivity: vi.fn() }
 })
 
 const exercises: product.Exercise[] = [
   {
     slug: 'sit-to-stand-demo',
-    title_th: 'สาธิตการลุกนั่งจากเก้าอี้',
-    title_en: 'Sit-to-stand movement demo',
-    category: 'lower_back',
-    review_status: 'pending_clinical_review'
+    title_th: 'สาธิตการเปลี่ยนจากนั่งเป็นยืน',
+    title_en: 'Sit-to-stand demonstration',
+    category: 'transition',
+    kind: 'transition',
+    required_view: 'side',
+    measurement_mode: 'manual_cycles',
+    review_status: 'pending_clinical_review',
+    demo_only: true,
+    not_for_clinical_use: true,
+    analysis_available: false
   },
   {
-    slug: 'shoulder-movement-demo',
-    title_th: 'สาธิตการเคลื่อนไหวหัวไหล่',
-    title_en: 'Shoulder movement demo',
-    category: 'shoulder',
-    review_status: 'pending_clinical_review'
+    slug: 'walking-demo',
+    title_th: 'สาธิตการเดิน',
+    title_en: 'Walking demonstration',
+    category: 'walking',
+    kind: 'gait',
+    required_view: 'full_body',
+    measurement_mode: 'observation',
+    review_status: 'pending_clinical_review',
+    demo_only: true,
+    not_for_clinical_use: true,
+    analysis_available: false
   }
 ]
 
@@ -37,10 +49,10 @@ function renderWithQuery(ui: React.ReactNode) {
   return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>)
 }
 
-describe('exercise demonstration images', () => {
-  it('shows an accessible image for every exercise in the library', async () => {
+describe('activity demonstrations', () => {
+  it('shows an accessible concept illustration for every activity', async () => {
     await i18n.changeLanguage('th')
-    vi.mocked(product.getExercises).mockResolvedValue(exercises)
+    vi.mocked(product.getActivities).mockResolvedValue(exercises)
 
     renderWithQuery(
       <MemoryRouter>
@@ -50,32 +62,35 @@ describe('exercise demonstration images', () => {
 
     expect(
       await screen.findByRole('img', {
-        name: 'ภาพตัวอย่างสาธิตการลุกนั่งจากเก้าอี้ 3 จังหวะ'
+        name: 'ภาพแนวคิดสามช่วงจากนั่งไปยืน'
       })
-    ).toHaveAttribute('src', '/exercises/sit-to-stand-demo.png')
+    ).toBeVisible()
     expect(
       screen.getByRole('img', {
-        name: 'ภาพตัวอย่างสาธิตการเคลื่อนไหวหัวไหล่ 3 จังหวะ'
+        name: 'ภาพแนวคิดสามช่วงของการสาธิตการเดิน'
       })
-    ).toHaveAttribute('src', '/exercises/shoulder-movement-demo.png')
+    ).toBeVisible()
   })
 
   it('shows the selected exercise image on its detail page', async () => {
     await i18n.changeLanguage('en')
-    vi.mocked(product.getExercise).mockResolvedValue(exercises[1])
+    vi.mocked(product.getActivity).mockResolvedValue(exercises[1])
 
     renderWithQuery(
-      <MemoryRouter initialEntries={['/app/exercises/shoulder-movement-demo']}>
+      <MemoryRouter initialEntries={['/app/activities/walking-demo']}>
         <Routes>
-          <Route element={<ExerciseDetailPage />} path="/app/exercises/:slug" />
+          <Route
+            element={<ExerciseDetailPage />}
+            path="/app/activities/:slug"
+          />
         </Routes>
       </MemoryRouter>
     )
 
     expect(
       await screen.findByRole('img', {
-        name: 'Three-stage illustration of the shoulder movement demo'
+        name: 'Three-stage concept illustration for the walking demonstration'
       })
-    ).toHaveAttribute('src', '/exercises/shoulder-movement-demo.png')
+    ).toBeVisible()
   })
 })

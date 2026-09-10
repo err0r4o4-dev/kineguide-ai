@@ -11,6 +11,10 @@ vi.mock('@/features/auth/AuthContext', () => ({
 }))
 
 vi.mock('@/services/product', () => ({
+  sessionActivitySlug: (session: {
+    activity_slug?: string
+    exercise_slug: string
+  }) => session.activity_slug ?? session.exercise_slug,
   getDashboard: vi.fn().mockResolvedValue({
     completed_sessions: 3,
     current_streak: 2,
@@ -60,7 +64,7 @@ describe('DashboardPage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'เริ่มกิจกรรม' })).toHaveAttribute(
       'href',
-      '/app/exercises'
+      '/app/activities'
     )
     expect(screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })).toHaveClass(
       '!text-kg-primary'

@@ -83,7 +83,7 @@ export function PlanPage() {
           {firstExercise && (
             <Link
               className="kg-button-primary"
-              to={`/app/exercises/${firstExercise.slug}/setup`}
+              to={`/app/activities/${firstExercise.slug}/setup`}
             >
               <Play aria-hidden="true" />
               {t('plan.start')}
@@ -226,13 +226,13 @@ function ExerciseCard({
         <div className="mt-auto grid gap-3 pt-5 sm:grid-cols-2">
           <Link
             className="kg-button-secondary px-3 text-sm"
-            to={`/app/exercises/${exercise.slug}`}
+            to={`/app/activities/${exercise.slug}`}
           >
             {t('plan.viewExercise')}
           </Link>
           <Link
             className="kg-button-primary px-3 text-sm"
-            to={`/app/exercises/${exercise.slug}/setup`}
+            to={`/app/activities/${exercise.slug}/setup`}
           >
             {t('plan.startExercise')}
             <ArrowRight aria-hidden="true" size={17} />

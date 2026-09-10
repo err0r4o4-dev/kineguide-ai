@@ -23,7 +23,7 @@ The paper:
 - compares frontal smartphone recordings against motion-capture measurements.
 
 KineGuide implements the bounded cosine and DTW calculations as a research-only
-engine. It always returns `clinicalVerdict: null`.
+engine. It always returns `clinicalVerdict: null`. Research comparison and reference-authoring routes are not reachable from the daily-movement user flow.
 
 ## Release gate
 
@@ -39,6 +39,8 @@ exist:
 
 The reported 90% threshold must not be reused for sit-to-stand, knee extension,
 or another exercise without exercise-specific validation.
+
+The daily-movement catalog therefore declares `analysis_available: false` for sitting, standing, sit-to-stand, and walking. The browser may report only whether the required landmarks are technically visible. It does not report posture correctness, gait quality, movement phase, or automatic counts.
 
 ## Evidence limitations
 

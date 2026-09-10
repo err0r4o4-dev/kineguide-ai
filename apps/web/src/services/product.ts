@@ -118,13 +118,26 @@ export interface HealthProfile extends Omit<
 
 export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
 
-export interface Exercise {
+export type ActivityKind = 'static_posture' | 'transition' | 'gait'
+export type ActivityView = 'front' | 'side' | 'full_body'
+export type ActivityMeasurement =
+  'observation' | 'hold_duration' | 'manual_cycles'
+
+export interface Activity {
   slug: string
   title_th: string
   title_en: string
-  category: 'neck' | 'shoulder' | 'lower_back' | 'knee' | 'hand'
+  category: 'sitting' | 'standing' | 'transition' | 'walking'
+  kind: ActivityKind
+  required_view: ActivityView
+  measurement_mode: ActivityMeasurement
   review_status: 'pending_clinical_review'
+  demo_only: true
+  not_for_clinical_use: true
+  analysis_available: false
 }
+
+export type Exercise = Activity
 
 export type ClinicalReviewStatus =
   'draft' | 'pending_clinical_review' | 'approved' | 'rejected' | 'archived'
@@ -196,12 +209,14 @@ export interface TechnicalPoseFeedback {
     | 'camera_ready'
     | 'adjust_camera'
     | 'multiple_people_detected'
+    | 'unsupported_activity'
     | 'unsupported_exercise'
     | 'technical_analysis_unavailable'
 }
 
 export interface ActivityPlanDay {
   day: number
+  activities: Activity[]
   exercises: Exercise[]
 }
 
@@ -215,6 +230,10 @@ export interface ActivityPlan {
 
 export interface ExerciseSession {
   id: string
+  activity_slug?: string
+  activity_kind?: ActivityKind
+  measurement_mode?: ActivityMeasurement
+  manual_cycles?: number
   exercise_slug: string
   status: 'active' | 'completed' | 'stopped'
   camera_used: boolean
@@ -409,6 +428,13 @@ export async function getExercises(signal?: AbortSignal) {
   return response.data.exercises
 }
 
+export async function getActivities(signal?: AbortSignal) {
+  const response = await http.get<{ activities: Activity[] }>('/activities', {
+    signal
+  })
+  return response.data.activities
+}
+
 export async function getEducationalClinicalCatalog(
   locale: 'th' | 'en',
   signal?: AbortSignal
@@ -433,6 +459,11 @@ export async function evaluateEducationalScreening(input: {
 
 export async function getExercise(slug: string, signal?: AbortSignal) {
   const response = await http.get<Exercise>(`/exercises/${slug}`, { signal })
+  return response.data
+}
+
+export async function getActivity(slug: string, signal?: AbortSignal) {
+  const response = await http.get<Activity>(`/activities/${slug}`, { signal })
   return response.data
 }
 
@@ -464,7 +495,7 @@ export async function getSession(id: string, signal?: AbortSignal) {
 }
 
 export async function createSession(input: {
-  exercise_slug: string
+  activity_slug: string
   camera_used: boolean
 }) {
   const response = await http.post<ExerciseSession>('/sessions', input)
@@ -473,13 +504,20 @@ export async function createSession(input: {
 
 export async function updateSession(
   id: string,
-  input: Pick<
-    ExerciseSession,
-    'status' | 'manual_repetitions' | 'elapsed_seconds'
-  >
+  input: Pick<ExerciseSession, 'status' | 'elapsed_seconds'> & {
+    manual_cycles: number
+  }
 ) {
   const response = await http.patch<ExerciseSession>(`/sessions/${id}`, input)
   return response.data
+}
+
+export function sessionActivitySlug(session: ExerciseSession) {
+  return session.activity_slug ?? session.exercise_slug
+}
+
+export function sessionManualCycles(session: ExerciseSession) {
+  return session.manual_cycles ?? session.manual_repetitions
 }
 
 export async function getTechnicalPoseFeedback(

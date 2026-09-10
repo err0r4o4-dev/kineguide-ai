@@ -24,7 +24,7 @@ export interface ExerciseConfig {
     angle: number
     temporal: number
   }
-  thresholds: {
+  thresholds?: {
     warning: number // e.g. error > 15 degrees
     incorrect: number // e.g. error > 30 degrees
   }
@@ -51,6 +51,33 @@ export interface ReferenceMovementModel {
 }
 
 export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
+  'seated-posture-demo': {
+    id: 'seated-posture-demo',
+    slug: 'seated-posture-demo',
+    name: 'Seated posture demonstration',
+    requiredJoints: [0, 11, 12, 23, 24, 25, 26],
+    importantAngles: ['leftHip', 'rightHip', 'leftKnee', 'rightKnee'],
+    similarityWeights: { landmark: 0.3, angle: 0.5, temporal: 0.2 },
+    repCounting: { enabled: false }
+  },
+  'standing-posture-demo': {
+    id: 'standing-posture-demo',
+    slug: 'standing-posture-demo',
+    name: 'Standing posture demonstration',
+    requiredJoints: [0, 11, 12, 23, 24, 25, 26, 27, 28],
+    importantAngles: ['leftHip', 'rightHip', 'leftKnee', 'rightKnee'],
+    similarityWeights: { landmark: 0.3, angle: 0.5, temporal: 0.2 },
+    repCounting: { enabled: false }
+  },
+  'walking-demo': {
+    id: 'walking-demo',
+    slug: 'walking-demo',
+    name: 'Walking demonstration',
+    requiredJoints: [0, 11, 12, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+    importantAngles: ['leftHip', 'rightHip', 'leftKnee', 'rightKnee'],
+    similarityWeights: { landmark: 0.3, angle: 0.5, temporal: 0.2 },
+    repCounting: { enabled: false }
+  },
   'shoulder-movement-demo': {
     id: 'shoulder-movement-demo',
     slug: 'shoulder-movement-demo',
@@ -72,7 +99,7 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
       incorrect: 30
     },
     repCounting: {
-      enabled: true,
+      enabled: false,
       primaryJoint: 'leftShoulder',
       restAngle: 30,
       peakAngle: 90,
@@ -90,17 +117,7 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
       angle: 0.55,
       temporal: 0.2
     },
-    thresholds: {
-      warning: 15,
-      incorrect: 30
-    },
-    repCounting: {
-      enabled: true,
-      primaryJoint: 'leftKnee',
-      restAngle: 90,
-      peakAngle: 170,
-      threshold: 20
-    }
+    repCounting: { enabled: false }
   },
   'seated-knee-demo': {
     id: 'seated-knee-demo',
@@ -118,7 +135,7 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
       incorrect: 25
     },
     repCounting: {
-      enabled: true,
+      enabled: false,
       primaryJoint: 'rightKnee',
       restAngle: 90,
       peakAngle: 170,
@@ -141,7 +158,7 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
       incorrect: 30
     },
     repCounting: {
-      enabled: true,
+      enabled: false,
       primaryJoint: 'leftKnee',
       restAngle: 170,
       peakAngle: 95,
@@ -169,7 +186,7 @@ export const EXERCISE_CONFIGS: Record<string, ExerciseConfig> = {
       incorrect: 30
     },
     repCounting: {
-      enabled: true,
+      enabled: false,
       primaryJoint: 'leftShoulder',
       restAngle: 20,
       peakAngle: 160,
@@ -198,16 +215,8 @@ export function getExerciseConfig(exerciseSlug: string): ExerciseConfig {
         angle: 0.5,
         temporal: 0.2
       },
-      thresholds: {
-        warning: 15,
-        incorrect: 30
-      },
       repCounting: {
-        enabled: true,
-        primaryJoint: 'leftShoulder',
-        restAngle: 30,
-        peakAngle: 120,
-        threshold: 20
+        enabled: false
       }
     }
   )

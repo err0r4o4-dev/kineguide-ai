@@ -149,7 +149,7 @@ func (c *Client) TechnicalPoseFeedback(ctx context.Context, input TechnicalPoseR
 func oneOfTechnicalFeedback(value string) bool {
 	for _, option := range []string{
 		"waiting_for_camera", "camera_ready", "adjust_camera", "multiple_people_detected",
-		"unsupported_exercise", "technical_analysis_unavailable",
+		"unsupported_activity", "unsupported_exercise", "technical_analysis_unavailable",
 	} {
 		if value == option {
 			return true

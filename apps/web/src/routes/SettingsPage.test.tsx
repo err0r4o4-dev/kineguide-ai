@@ -149,7 +149,7 @@ describe('SettingsPage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /สิทธิ์กล้อง/ })).toHaveAttribute(
       'href',
-      '/app/exercises'
+      '/app/activities'
     )
     await user.click(await screen.findByRole('button', { name: 'ถอน consent' }))
     await screen.findByRole('dialog', { name: 'ถอน consent' })

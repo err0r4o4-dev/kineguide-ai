@@ -112,12 +112,6 @@ const NotificationsPage = lazy(() =>
     default: module.NotificationsPage
   }))
 )
-const ReferenceManagementPage = lazy(() =>
-  import('@/routes/ReferenceManagementPage').then((module) => ({
-    default: module.ReferenceManagementPage
-  }))
-)
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 15_000 }
@@ -161,9 +155,15 @@ const router = createBrowserRouter([
                     path: 'exercises/:slug/setup',
                     element: <CameraSetupPage />
                   },
+                  { path: 'activities', element: <ExerciseLibraryPage /> },
+                  { path: 'activities/:slug', element: <ExerciseDetailPage /> },
+                  {
+                    path: 'activities/:slug/setup',
+                    element: <CameraSetupPage />
+                  },
                   {
                     path: 'reference-models',
-                    element: <ReferenceManagementPage />
+                    element: <Navigate replace to="/app/activities" />
                   },
                   { path: 'sessions/:id/live', element: <LiveSessionPage /> },
                   {

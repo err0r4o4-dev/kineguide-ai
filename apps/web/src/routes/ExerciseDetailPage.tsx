@@ -5,7 +5,6 @@ import {
   CircleAlert,
   ClipboardCheck,
   Info,
-  Play,
   ShieldCheck
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -13,15 +12,15 @@ import { Link, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
-import { ExerciseIllustration } from '@/features/exercises/ExerciseIllustration'
-import { getExercise } from '@/services/product'
+import { ActivityDemonstration } from '@/features/activities/ActivityDemonstration'
+import { getActivity } from '@/services/product'
 
 export function ExerciseDetailPage() {
   const { slug = '' } = useParams()
   const { t, i18n } = useTranslation()
   const query = useQuery({
-    queryKey: ['exercise', slug],
-    queryFn: ({ signal }) => getExercise(slug, signal)
+    queryKey: ['activity', slug],
+    queryFn: ({ signal }) => getActivity(slug, signal)
   })
 
   if (query.isLoading) return <QueryLoading />
@@ -52,7 +51,7 @@ export function ExerciseDetailPage() {
           </Link>
           <Link
             className="kg-button-primary"
-            to={`/app/exercises/${slug}/setup`}
+            to={`/app/activities/${slug}/setup`}
           >
             <Camera aria-hidden="true" size={18} />
             {t('exercises.start')}
@@ -63,13 +62,7 @@ export function ExerciseDetailPage() {
       <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(330px,0.78fr)_minmax(0,1fr)]">
         <div>
           <div className="relative grid aspect-video place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 text-teal-800">
-            <ExerciseIllustration
-              className="size-full object-cover"
-              slug={slug}
-            />
-            <span className="pointer-events-none absolute bottom-3 right-3 grid size-12 place-items-center rounded-xl bg-white/95 text-teal-800 shadow-lg shadow-slate-900/10">
-              <Play aria-hidden="true" fill="currentColor" size={21} />
-            </span>
+            <ActivityDemonstration slug={slug} />
           </div>
           <article className="kg-card mt-4 p-5">
             <div className="flex items-center gap-2 text-sm font-bold text-teal-800">
@@ -100,8 +93,26 @@ export function ExerciseDetailPage() {
               {t('exercises.what')}
             </h2>
             <p className="mt-3 leading-7 text-slate-600">
-              {t('exercises.whatBody')}
+              {t(`activities.items.${slug}.description`)}
             </p>
+            <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl bg-slate-50 p-4">
+                <dt className="text-xs text-slate-500">
+                  {t('activities.requiredView')}
+                </dt>
+                <dd className="mt-1 font-semibold">
+                  {t(`activities.views.${query.data.required_view}`)}
+                </dd>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-4">
+                <dt className="text-xs text-slate-500">
+                  {t('activities.measurement')}
+                </dt>
+                <dd className="mt-1 font-semibold">
+                  {t(`activities.measurements.${query.data.measurement_mode}`)}
+                </dd>
+              </div>
+            </dl>
           </section>
           <section className="mt-7 border-t border-slate-200 pt-6">
             <h2 className="flex items-center gap-2 text-xl font-bold text-slate-950">

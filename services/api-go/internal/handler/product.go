@@ -71,6 +71,8 @@ func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.
 	secured.DELETE("/health-profile", api.deleteHealthProfile)
 	secured.GET("/exercises", api.listExercises)
 	secured.GET("/exercises/:slug", api.getExercise)
+	secured.GET("/activities", api.listActivities)
+	secured.GET("/activities/:slug", api.getActivity)
 	secured.GET("/activity-plan", api.activityPlan)
 	secured.GET("/dashboard", api.dashboard)
 	secured.GET("/sessions", api.listSessions)
@@ -573,6 +575,19 @@ func (a *productAPI) getExercise(c *gin.Context) {
 	c.JSON(http.StatusOK, exercise)
 }
 
+func (a *productAPI) listActivities(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"activities": product.Activities})
+}
+
+func (a *productAPI) getActivity(c *gin.Context) {
+	activity, ok := product.FindActivity(c.Param("slug"))
+	if !ok {
+		writeError(c, http.StatusNotFound, "ACTIVITY_NOT_FOUND", "The movement activity was not found.")
+		return
+	}
+	c.JSON(http.StatusOK, activity)
+}
+
 func (a *productAPI) activityPlan(c *gin.Context) {
 	c.JSON(http.StatusOK, product.BuildDemoActivityPlan())
 }
@@ -584,6 +599,7 @@ func (a *productAPI) createSession(c *gin.Context) {
 		return
 	}
 	var request struct {
+		ActivitySlug string `json:"activity_slug"`
 		ExerciseSlug string `json:"exercise_slug"`
 		CameraUsed   bool   `json:"camera_used"`
 	}
@@ -591,11 +607,23 @@ func (a *productAPI) createSession(c *gin.Context) {
 		writeError(c, http.StatusBadRequest, "INVALID_REQUEST", "Please check the session information.")
 		return
 	}
-	if _, ok := product.FindExercise(request.ExerciseSlug); !ok {
+	slug := request.ActivitySlug
+	if slug == "" {
+		slug = request.ExerciseSlug
+	}
+	if request.ActivitySlug != "" && request.ExerciseSlug != "" && request.ActivitySlug != request.ExerciseSlug {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Activity identifiers must match.")
+		return
+	}
+	activity, ok := product.FindActivity(slug)
+	if !ok {
 		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Unknown movement demo.")
 		return
 	}
-	session, err := a.store.CreateSession(c.Request.Context(), product.Session{UserID: c.GetString(userIDKey), ExerciseSlug: request.ExerciseSlug, CameraUsed: request.CameraUsed})
+	session, err := a.store.CreateSession(c.Request.Context(), product.Session{
+		UserID: c.GetString(userIDKey), ActivitySlug: slug, ExerciseSlug: slug,
+		ActivityKind: activity.Kind, MeasurementMode: activity.MeasurementMode, CameraUsed: request.CameraUsed,
+	})
 	if err != nil {
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to start the session.")
 		return
@@ -606,14 +634,43 @@ func (a *productAPI) createSession(c *gin.Context) {
 func (a *productAPI) updateSession(c *gin.Context) {
 	var request struct {
 		Status            string `json:"status"`
-		ManualRepetitions int    `json:"manual_repetitions"`
+		ManualCycles      *int   `json:"manual_cycles"`
+		ManualRepetitions *int   `json:"manual_repetitions"`
 		ElapsedSeconds    int    `json:"elapsed_seconds"`
 	}
-	if err := c.ShouldBindJSON(&request); err != nil || !oneOf(request.Status, "active", "completed", "stopped") || request.ManualRepetitions < 0 || request.ManualRepetitions > 1000 || request.ElapsedSeconds < 0 || request.ElapsedSeconds > 86400 {
+	if err := c.ShouldBindJSON(&request); err != nil || !oneOf(request.Status, "active", "completed", "stopped") || (request.ManualCycles == nil && request.ManualRepetitions == nil) || request.ElapsedSeconds < 0 || request.ElapsedSeconds > 86400 {
 		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Session values are outside the accepted range.")
 		return
 	}
-	session, err := a.store.UpdateSession(c.Request.Context(), product.Session{ID: c.Param("id"), UserID: c.GetString(userIDKey), Status: request.Status, ManualRepetitions: request.ManualRepetitions, ElapsedSeconds: request.ElapsedSeconds})
+	manualCycles := 0
+	if request.ManualCycles != nil {
+		manualCycles = *request.ManualCycles
+	}
+	if request.ManualRepetitions != nil {
+		if request.ManualCycles != nil && *request.ManualRepetitions != manualCycles {
+			writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Manual count values must match.")
+			return
+		}
+		manualCycles = *request.ManualRepetitions
+	}
+	if manualCycles < 0 || manualCycles > 1000 {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Session values are outside the accepted range.")
+		return
+	}
+	currentSession, err := a.store.SessionByID(c.Request.Context(), c.GetString(userIDKey), c.Param("id"))
+	if errors.Is(err, product.ErrNotFound) {
+		writeError(c, http.StatusNotFound, "SESSION_NOT_FOUND", "The session was not found.")
+		return
+	}
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load the session.")
+		return
+	}
+	if manualCycles > 0 && currentSession.MeasurementMode != "manual_cycles" {
+		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Manual cycles are not supported for this activity.")
+		return
+	}
+	session, err := a.store.UpdateSession(c.Request.Context(), product.Session{ID: c.Param("id"), UserID: c.GetString(userIDKey), Status: request.Status, ManualCycles: manualCycles, ManualRepetitions: manualCycles, ElapsedSeconds: request.ElapsedSeconds})
 	if errors.Is(err, product.ErrNotFound) {
 		writeError(c, http.StatusNotFound, "SESSION_NOT_FOUND", "The session was not found.")
 		return
@@ -720,7 +777,7 @@ func validHealthProfile(profile product.HealthProfile) bool {
 }
 
 func validTechnicalPoseRequest(request ai.TechnicalPoseRequest) bool {
-	if !oneOf(request.PoseStatus, "idle", "loading_model", "ready", "adjust_camera", "no_pose", "multiple_poses", "unsupported_exercise", "unavailable", "error") || len(request.LandmarkVisibility) > 33 {
+	if !oneOf(request.PoseStatus, "idle", "loading_model", "ready", "adjust_camera", "no_pose", "multiple_poses", "unsupported_activity", "unsupported_exercise", "unavailable", "error") || len(request.LandmarkVisibility) > 33 {
 		return false
 	}
 	for _, visibility := range request.LandmarkVisibility {

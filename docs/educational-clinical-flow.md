@@ -17,18 +17,19 @@ The placeholders deliberately contain no symptom, red-flag, contraindication, tr
 
 ## End-to-end data flow
 
-The account-scoped chat recognizes explicit requests to view movements and returns the full
-pending-review demonstration list from the Go-owned catalog. This deterministic response does not
+The account-scoped chat recognizes explicit requests to view movements and returns the four
+pending-review daily-movement demonstrations—sitting, standing, sit-to-stand, and walking—from the Go-owned catalog. This deterministic response does not
 require an LLM token and does not select or rank a movement from the user's symptom text.
 
 ```text
 Active prototype consent
   -> React requests localized mock catalog from Go
-  -> user selects a clearly labelled synthetic placeholder
+  -> user selects a clearly labelled daily-movement demonstration
   -> Go validates consent and routes the placeholder deterministically
      -> stop placeholder: stop the demo and show a non-clinical escalation message
      -> continue placeholder: show pending-review movement demonstrations only
-  -> user opens a demo and explicitly starts the browser camera
+  -> user opens a concept demonstration and chooses camera or demo-only mode
+  -> if camera mode is chosen, the user explicitly starts the browser camera
   -> MediaPipe extracts landmarks locally in the browser
   -> browser renders technical framing feedback locally
   -> on explicit technical-feedback action, React sends Go only:
@@ -41,7 +42,7 @@ Active prototype consent
   -> Go stores the existing minimal session summary in PostgreSQL
 ```
 
-Raw frames, video, images, recordings, face/hand data, blink estimates, and landmark coordinates never cross the browser boundary. Technical visibility values are transient and are not persisted. Session history stores only the movement-demo slug, camera-used flag, status, manual count, elapsed time, and timestamps.
+Raw frames, video, images, recordings, face/hand data, blink estimates, and landmark coordinates never cross the browser boundary. Technical visibility values are transient and are not persisted. Session history stores only the public activity identifier and kind, measurement mode, camera-used flag, status, manual cycle count when applicable, elapsed time, and timestamps. The legacy exercise fields remain as compatibility aliases during migration.
 
 ## Schemas
 
@@ -68,7 +69,7 @@ Changing a status in data is insufficient by itself. Production eligibility is d
 
 Python is stateless and cannot access PostgreSQL. For this prototype it accepts only derived pose status and visibility scores. It may calculate a technical confidence average and return camera framing state. It does not receive enough information to diagnose, select a movement, decide safety, generate treatment, determine movement correctness, or prescribe sets and repetitions.
 
-Landmark extraction remains in React because repository privacy architecture requires camera media to stay in-browser. Movement-phase detection and automatic repetition counting remain explicitly unavailable until a reviewed technical method, synthetic fixtures, confidence behavior, and clinical interpretation boundary exist.
+Landmark extraction remains in React because repository privacy architecture requires camera media to stay in-browser. The live route exposes technical visibility and framing states only. Reference-model comparison, correctness scoring, movement-phase detection, and automatic repetition counting are unreachable until a reviewed technical method, synthetic fixtures, confidence behavior, and clinical interpretation boundary exist. Transition cycles, when shown, are entered manually by the user.
 
 ## Known limitations
 
@@ -79,6 +80,7 @@ Landmark extraction remains in React because repository privacy architecture req
 - No treatment benefit, recovery, correctness, dosage, progression, or risk claim is available.
 - Technical confidence describes visibility input only, not movement quality or health status.
 - Automatic phase detection and repetition counting are unavailable.
+- Walking is observation-only and does not assess gait or fall risk.
 - Production backup expiry, scheduled retention enforcement, export, and formal privacy ownership remain unresolved release gates.
 
 ## Required physiotherapist review before production

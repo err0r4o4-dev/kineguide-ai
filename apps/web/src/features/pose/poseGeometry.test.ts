@@ -24,7 +24,10 @@ describe('pose geometry', () => {
   })
 
   it.each([
+    'seated-posture-demo',
+    'standing-posture-demo',
     'sit-to-stand-demo',
+    'walking-demo',
     'seated-knee-demo',
     'shoulder-movement-demo',
     'arm-abduction-research-demo',
@@ -71,7 +74,7 @@ describe('pose geometry', () => {
   it('does not imply support for an exercise without an approved observation profile', () => {
     const result = classifyPoseFrame([syntheticPose()], 'unknown-exercise')
 
-    expect(result.status).toBe('unsupported_exercise')
+    expect(result.status).toBe('unsupported_activity')
     expect(result.landmarks).toBeNull()
   })
 })

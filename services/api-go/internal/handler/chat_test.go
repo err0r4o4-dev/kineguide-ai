@@ -162,14 +162,14 @@ func TestChatListsPendingMovementDemonstrationsWithoutCallingAI(t *testing.T) {
 			name:        "Thai request",
 			locale:      "th",
 			content:     "ฉันปวดหลัง มีท่าอะไรแนะนำบ้าง",
-			wantTitle:   "สาธิตการลุกนั่งจากเก้าอี้",
+			wantTitle:   "สาธิตท่านั่ง",
 			wantPending: "รอตรวจสอบโดยผู้เชี่ยวชาญ",
 		},
 		{
 			name:        "English request",
 			locale:      "en",
 			content:     "Can you recommend an exercise?",
-			wantTitle:   "Sit-to-stand movement demo",
+			wantTitle:   "Seated posture demonstration",
 			wantPending: "Pending professional review",
 		},
 	}

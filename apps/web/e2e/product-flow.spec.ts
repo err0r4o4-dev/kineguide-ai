@@ -274,7 +274,7 @@ test('new user completes consent and structured onboarding', async ({
   await expect(page.getByText('ไม่ได้ปรับตามอาการของคุณ')).toBeVisible()
   await expect(
     page.getByRole('link', { name: 'ดูรายละเอียดกิจกรรม' }).first()
-  ).toHaveAttribute('href', '/app/exercises/sit-to-stand-demo')
+  ).toHaveAttribute('href', '/app/activities/sit-to-stand-demo')
 
   await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(
@@ -282,7 +282,7 @@ test('new user completes consent and structured onboarding', async ({
   ).toHaveAttribute('href', '/app/chat')
   await expect(
     page.getByRole('link', { name: 'เริ่มกิจกรรม' })
-  ).toHaveAttribute('href', '/app/exercises')
+  ).toHaveAttribute('href', '/app/activities')
   await expect(
     page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
   ).toHaveAttribute('href', '/app/chat')
@@ -456,8 +456,8 @@ test('login, hard refresh, and every authenticated navigation target stay consis
       })
       return
     }
-    if (url.endsWith('/exercises')) {
-      await route.fulfill({ json: { exercises: [] } })
+    if (url.endsWith('/activities')) {
+      await route.fulfill({ json: { activities: [] } })
       return
     }
     if (url.endsWith('/sessions')) {
@@ -504,7 +504,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   const destinations = [
     ['ผู้ช่วย AI', '/app/chat'],
     ['แผนกิจกรรม', '/app/plan'],
-    ['ท่าฝึกสาธิต', '/app/exercises'],
+    ['กิจกรรมท่าทาง', '/app/activities'],
     ['บันทึกและความก้าวหน้า', '/app/progress'],
     ['หน้าแรก', '/app']
   ] as const

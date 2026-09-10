@@ -15,7 +15,11 @@ import { PageHeader } from '@/components/PageHeader'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { StatCard } from '@/components/StatCard'
 import { formatDate, formatDuration } from '@/lib/format'
-import { getDashboard, getSessions } from '@/services/product'
+import {
+  getDashboard,
+  getSessions,
+  sessionActivitySlug
+} from '@/services/product'
 
 const HISTORY_PAGE_SIZE = 10
 
@@ -36,7 +40,9 @@ export function ProgressPage() {
     () =>
       (sessions.data ?? [])
         .filter((session) =>
-          session.exercise_slug.toLowerCase().includes(search.toLowerCase())
+          sessionActivitySlug(session)
+            .toLowerCase()
+            .includes(search.toLowerCase())
         )
         .filter(
           (session) =>
@@ -173,7 +179,7 @@ export function ProgressPage() {
               />
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold text-slate-900">
-                  {session.exercise_slug}
+                  {sessionActivitySlug(session)}
                 </span>
                 <span className="mt-1 block text-sm text-slate-500">
                   {formatDate(

@@ -4,29 +4,36 @@ import {
   CircleAlert,
   Cpu,
   LockKeyhole,
+  MonitorOff,
   Play
 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 
 import { useCamera } from '@/features/camera/useCamera'
-import { createSession } from '@/services/product'
+import { QueryError, QueryLoading } from '@/components/QueryState'
+import { createSession, getActivity } from '@/services/product'
 
 export function CameraSetupPage() {
   const { slug = '' } = useParams()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
+  const activity = useQuery({
+    queryKey: ['activity', slug],
+    queryFn: ({ signal }) => getActivity(slug, signal)
+  })
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
-  const begin = async () => {
+  const begin = async (cameraUsed: boolean) => {
     setCreating(true)
     setError('')
     try {
       const session = await createSession({
-        exercise_slug: slug,
-        camera_used: camera.state === 'ready'
+        activity_slug: slug,
+        camera_used: cameraUsed
       })
       camera.stop()
       navigate(`/app/sessions/${session.id}/live`)
@@ -40,6 +47,9 @@ export function CameraSetupPage() {
     camera.state === 'denied' ||
     camera.state === 'error' ||
     camera.state === 'unsupported'
+  if (activity.isLoading) return <QueryLoading />
+  if (activity.isError)
+    return <QueryError retry={() => void activity.refetch()} />
   return (
     <div>
       <header>
@@ -47,6 +57,13 @@ export function CameraSetupPage() {
           {t('camera.title')}
         </h1>
         <p className="mt-2 text-slate-600">{t('camera.subtitle')}</p>
+        {activity.data && (
+          <p className="mt-3 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">
+            {t('activities.cameraPlacement', {
+              view: t(`activities.views.${activity.data.required_view}`)
+            })}
+          </p>
+        )}
       </header>
       <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_400px]">
         <div className="kg-card overflow-hidden bg-slate-950 ring-1 ring-slate-900/5">
@@ -144,15 +161,26 @@ export function CameraSetupPage() {
               {error}
             </p>
           )}
-          <button
-            className="kg-button-primary mt-6 w-full"
-            disabled={camera.state !== 'ready' || creating}
-            onClick={() => void begin()}
-            type="button"
-          >
-            <Play aria-hidden="true" />
-            {creating ? t('common.loading') : t('camera.continue')}
-          </button>
+          <div className="mt-6 grid gap-3">
+            <button
+              className="kg-button-primary w-full"
+              disabled={camera.state !== 'ready' || creating}
+              onClick={() => void begin(true)}
+              type="button"
+            >
+              <Play aria-hidden="true" />
+              {creating ? t('common.loading') : t('camera.continue')}
+            </button>
+            <button
+              className="kg-button-secondary w-full"
+              disabled={creating}
+              onClick={() => void begin(false)}
+              type="button"
+            >
+              <MonitorOff aria-hidden="true" />
+              {t('camera.continueWithoutCamera')}
+            </button>
+          </div>
         </aside>
       </section>
     </div>

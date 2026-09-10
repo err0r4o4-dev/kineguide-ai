@@ -95,36 +95,52 @@ type HealthProfile struct {
 	RetentionUntil        time.Time `json:"retention_until"`
 }
 
-type Exercise struct {
-	Slug         string `json:"slug"`
-	TitleTH      string `json:"title_th"`
-	TitleEN      string `json:"title_en"`
-	Category     string `json:"category"`
-	ReviewStatus string `json:"review_status"`
+type Activity struct {
+	Slug              string `json:"slug"`
+	TitleTH           string `json:"title_th"`
+	TitleEN           string `json:"title_en"`
+	Category          string `json:"category"`
+	Kind              string `json:"kind"`
+	RequiredView      string `json:"required_view"`
+	MeasurementMode   string `json:"measurement_mode"`
+	ReviewStatus      string `json:"review_status"`
+	DemoOnly          bool   `json:"demo_only"`
+	NotForClinicalUse bool   `json:"not_for_clinical_use"`
+	AnalysisAvailable bool   `json:"analysis_available"`
 }
 
-var Exercises = []Exercise{
-	{Slug: "neck-flexion-demo", TitleTH: "สาธิตการก้มและเงยคอ", TitleEN: "Neck flexion and extension demo", Category: "neck", ReviewStatus: "pending_clinical_review"},
-	{Slug: "neck-rotation-demo", TitleTH: "สาธิตการหันศีรษะซ้าย-ขวา", TitleEN: "Neck rotation demo", Category: "neck", ReviewStatus: "pending_clinical_review"},
-	{Slug: "shoulder-movement-demo", TitleTH: "สาธิตการเคลื่อนไหวหัวไหล่", TitleEN: "Shoulder movement demo", Category: "shoulder", ReviewStatus: "pending_clinical_review"},
-	{Slug: "arm-abduction-research-demo", TitleTH: "สาธิตการกางแขนด้านข้าง", TitleEN: "Arm abduction demo", Category: "shoulder", ReviewStatus: "pending_clinical_review"},
-	{Slug: "sit-to-stand-demo", TitleTH: "สาธิตการลุกนั่งจากเก้าอี้", TitleEN: "Sit-to-stand movement demo", Category: "lower_back", ReviewStatus: "pending_clinical_review"},
-	{Slug: "seated-knee-demo", TitleTH: "สาธิตการเหยียดเข่าขณะนั่ง", TitleEN: "Seated knee movement demo", Category: "knee", ReviewStatus: "pending_clinical_review"},
-	{Slug: "hand-wrist-demo", TitleTH: "สาธิตการเคลื่อนไหวมือและข้อมือ", TitleEN: "Hand and wrist movement demo", Category: "hand", ReviewStatus: "pending_clinical_review"},
+var Activities = []Activity{
+	{Slug: "seated-posture-demo", TitleTH: "สาธิตท่านั่ง", TitleEN: "Seated posture demonstration", Category: "sitting", Kind: "static_posture", RequiredView: "side", MeasurementMode: "hold_duration", ReviewStatus: "pending_clinical_review", DemoOnly: true, NotForClinicalUse: true, AnalysisAvailable: false},
+	{Slug: "standing-posture-demo", TitleTH: "สาธิตท่ายืน", TitleEN: "Standing posture demonstration", Category: "standing", Kind: "static_posture", RequiredView: "front", MeasurementMode: "hold_duration", ReviewStatus: "pending_clinical_review", DemoOnly: true, NotForClinicalUse: true, AnalysisAvailable: false},
+	{Slug: "sit-to-stand-demo", TitleTH: "สาธิตการเปลี่ยนจากนั่งเป็นยืน", TitleEN: "Sit-to-stand demonstration", Category: "transition", Kind: "transition", RequiredView: "side", MeasurementMode: "manual_cycles", ReviewStatus: "pending_clinical_review", DemoOnly: true, NotForClinicalUse: true, AnalysisAvailable: false},
+	{Slug: "walking-demo", TitleTH: "สาธิตการเดิน", TitleEN: "Walking demonstration", Category: "walking", Kind: "gait", RequiredView: "full_body", MeasurementMode: "observation", ReviewStatus: "pending_clinical_review", DemoOnly: true, NotForClinicalUse: true, AnalysisAvailable: false},
 }
 
-func FindExercise(slug string) (Exercise, bool) {
-	for _, exercise := range Exercises {
-		if exercise.Slug == slug {
-			return exercise, true
+// Exercise remains as a compatibility alias while older clients migrate to Activity.
+type Exercise = Activity
+
+// Exercises remains as a compatibility view for the existing activity-plan response.
+var Exercises = Activities
+
+func FindActivity(slug string) (Activity, bool) {
+	for _, activity := range Activities {
+		if activity.Slug == slug {
+			return activity, true
 		}
 	}
-	return Exercise{}, false
+	return Activity{}, false
 }
 
+func FindExercise(slug string) (Exercise, bool) { return FindActivity(slug) }
+
 type Session struct {
-	ID                string     `json:"id"`
-	UserID            string     `json:"-"`
+	ID              string `json:"id"`
+	UserID          string `json:"-"`
+	ActivitySlug    string `json:"activity_slug"`
+	ActivityKind    string `json:"activity_kind"`
+	MeasurementMode string `json:"measurement_mode"`
+	ManualCycles    int    `json:"manual_cycles"`
+	// Deprecated compatibility fields; use ActivitySlug and ManualCycles.
 	ExerciseSlug      string     `json:"exercise_slug"`
 	Status            string     `json:"status"`
 	CameraUsed        bool       `json:"camera_used"`

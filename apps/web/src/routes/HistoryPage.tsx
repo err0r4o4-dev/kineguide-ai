@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { formatDate, formatDuration } from '@/lib/format'
-import { getSessions } from '@/services/product'
+import {
+  getSessions,
+  sessionActivitySlug,
+  sessionManualCycles
+} from '@/services/product'
 
 export function HistoryPage() {
   const { t, i18n } = useTranslation()
@@ -39,7 +43,9 @@ export function HistoryPage() {
                     ? t('history.completed')
                     : t('history.stopped')}
                 </span>
-                <h2 className="mt-3 font-bold">{session.exercise_slug}</h2>
+                <h2 className="mt-3 font-bold">
+                  {sessionActivitySlug(session)}
+                </h2>
                 <p className="mt-2 flex items-center gap-2 text-sm text-slate-500">
                   <CalendarDays aria-hidden="true" size={16} />
                   {formatDate(
@@ -55,7 +61,7 @@ export function HistoryPage() {
                 </span>
                 <span className="flex items-center gap-2">
                   <Hash aria-hidden="true" />
-                  {session.manual_repetitions}
+                  {sessionManualCycles(session)}
                 </span>
               </div>
             </article>

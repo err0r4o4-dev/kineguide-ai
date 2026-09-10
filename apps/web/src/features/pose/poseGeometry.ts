@@ -17,7 +17,7 @@ export type PoseFrameStatus =
   | 'adjust_camera'
   | 'no_pose'
   | 'multiple_poses'
-  | 'unsupported_exercise'
+  | 'unsupported_activity'
 
 export interface ClassifiedPoseFrame {
   status: PoseFrameStatus
@@ -33,6 +33,9 @@ export const TECHNICAL_VISIBILITY_GATE = 0.5
 const BOUNDS_PADDING = 0.05
 
 const REQUIRED_LANDMARKS: Record<string, readonly number[]> = {
+  'seated-posture-demo': [0, 11, 12, 23, 24, 25, 26],
+  'standing-posture-demo': [0, 11, 12, 23, 24, 25, 26, 27, 28],
+  'walking-demo': [0, 11, 12, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
   'neck-flexion-demo': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   'neck-rotation-demo': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   'sit-to-stand-demo': [11, 12, 23, 24, 25, 26, 27, 28],
@@ -89,7 +92,7 @@ export function classifyPoseFrame(
 ): ClassifiedPoseFrame {
   if (!Object.hasOwn(REQUIRED_LANDMARKS, exerciseSlug)) {
     return {
-      status: 'unsupported_exercise',
+      status: 'unsupported_activity',
       landmarks: null,
       bounds: null,
       unreliableLandmarks: []

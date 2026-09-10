@@ -66,7 +66,7 @@ const th = {
     clinicalDemo: 'Clinical Flow สาธิต',
     plan: 'แผนกิจกรรม',
     camera: 'ฝึกด้วยกล้อง',
-    exercises: 'ท่าฝึกสาธิต',
+    exercises: 'กิจกรรมท่าทาง',
     history: 'ประวัติ',
     progress: 'บันทึกและความก้าวหน้า',
     profile: 'โปรไฟล์',
@@ -503,9 +503,9 @@ const th = {
       'ตัวเลขทั้งหมดเป็นข้อมูลกิจกรรมที่บันทึกเอง ไม่ใช่ผลการประเมินการฟื้นตัว'
   },
   exercises: {
-    title: 'คลังการสาธิตการเคลื่อนไหว',
+    title: 'กิจกรรมท่าทางในชีวิตประจำวัน',
     subtitle:
-      'เลือกเพื่อทดลอง flow ของกล้อง เนื้อหายังไม่ใช่โปรแกรมกายภาพบำบัด',
+      'ดูตัวอย่างท่านั่ง ท่ายืน การเปลี่ยนนั่งเป็นยืน และการเดิน โดยไม่ตัดสินว่าท่าถูกหรือผิด',
     search: 'ค้นหาการสาธิต',
     all: 'ทั้งหมด',
     neck: 'บริเวณคอ',
@@ -513,6 +513,10 @@ const th = {
     lower_back: 'บริเวณหลังช่วงล่าง',
     knee: 'บริเวณเข่า',
     hand: 'บริเวณมือ',
+    sitting: 'ท่านั่ง',
+    standing: 'ท่ายืน',
+    transition: 'นั่งเป็นยืน',
+    walking: 'การเดิน',
     upper: 'ช่วงบน',
     lower: 'ช่วงล่าง',
     details: 'ดูรายละเอียด',
@@ -528,6 +532,46 @@ const th = {
     notIncludedBody:
       'ไม่มีการตัดสินว่าท่าถูกหรือผิด ไม่มีเกณฑ์มุมข้อ และไม่มีคำแนะนำการรักษา'
   },
+  activities: {
+    demonstration: 'ลำดับภาพสาธิต',
+    stage: 'ช่วงที่ {{count}}',
+    demoUnavailable: 'ยังไม่มีภาพสาธิตสำหรับกิจกรรมนี้',
+    requiredView: 'ตำแหน่งกล้อง',
+    measurement: 'รูปแบบการบันทึก',
+    cameraPlacement: 'กิจกรรมนี้ใช้มุมกล้อง: {{view}}',
+    views: {
+      front: 'ด้านหน้า',
+      side: 'ด้านข้าง',
+      full_body: 'เห็นร่างกายเต็มตัวและพื้นที่เคลื่อนไหว'
+    },
+    measurements: {
+      observation: 'สังเกตการมองเห็นเท่านั้น',
+      hold_duration: 'บันทึกเวลาเท่านั้น',
+      manual_cycles: 'ผู้ใช้นับรอบด้วยตนเอง'
+    },
+    items: {
+      'seated-posture-demo': {
+        description:
+          'ตัวอย่างลำดับสำหรับการเตรียมพื้นที่ นั่ง และตรวจว่ากล้องมองเห็นร่างกาย โดยยังไม่มีเกณฑ์รับรองความถูกต้อง',
+        visualLabel: 'ภาพแนวคิดสามช่วงของการสาธิตท่านั่ง'
+      },
+      'standing-posture-demo': {
+        description:
+          'ตัวอย่างลำดับสำหรับการเตรียมพื้นที่ ยืน และตรวจการมองเห็นร่างกาย ไม่ใช่การประเมินการทรงตัว',
+        visualLabel: 'ภาพแนวคิดสามช่วงของการสาธิตท่ายืน'
+      },
+      'sit-to-stand-demo': {
+        description:
+          'ตัวอย่างการเปลี่ยนจากนั่งเป็นยืน ผู้ใช้สามารถบันทึกจำนวนรอบเอง ระบบยังไม่ตรวจคุณภาพการเคลื่อนไหว',
+        visualLabel: 'ภาพแนวคิดสามช่วงจากนั่งไปยืน'
+      },
+      'walking-demo': {
+        description:
+          'ตัวอย่างลำดับการเดินแบบสังเกตเท่านั้น ระบบไม่วิเคราะห์รูปแบบการเดินหรือความเสี่ยงต่อการล้ม',
+        visualLabel: 'ภาพแนวคิดสามช่วงของการสาธิตการเดิน'
+      }
+    }
+  },
   camera: {
     title: 'ตั้งค่ากล้อง',
     practiceTitle: 'ฝึกด้วยกล้อง',
@@ -538,6 +582,7 @@ const th = {
     start: 'เปิดกล้อง',
     stop: 'ปิดกล้อง',
     continue: 'เริ่ม session สาธิต',
+    continueWithoutCamera: 'ดูสาธิตโดยไม่ใช้กล้อง',
     readiness: 'ความพร้อมของระบบ',
     secure: 'ข้อมูลกล้องอยู่ในอุปกรณ์',
     permission: 'สิทธิ์กล้อง',
@@ -557,6 +602,12 @@ const th = {
     live: 'Live session สาธิต',
     timer: 'เวลา',
     reps: 'จำนวนครั้งที่บันทึกเอง',
+    cycles: 'จำนวนรอบที่บันทึกเอง',
+    addCycle: 'เพิ่ม 1 รอบ',
+    demoOnlyMode: 'กำลังดูสาธิตโดยไม่ใช้กล้อง คุณยังจับเวลาและจบ session ได้',
+    observationTitle: 'สถานะการสังเกต',
+    analysisPending:
+      'กล้องตรวจเพียงว่าจุดร่างกายที่จำเป็นอยู่ในภาพ ยังไม่เปรียบเทียบความถูกต้องของท่าทาง',
     automaticTechnicalCount: 'จำนวนรอบการเคลื่อนไหวอัตโนมัติ (เชิงเทคนิค)',
     automaticTechnicalBoundary:
       'นับเฉพาะลำดับการยก-ลดที่กล้องสังเกตได้ ไม่ใช่คะแนนความถูกต้อง ไม่ใช่คำสั่งรักษา และยังไม่บันทึกในประวัติ',
@@ -577,7 +628,7 @@ const th = {
     poseMissing: 'ยังไม่พบร่างกายในภาพ',
     poseMultiple:
       'พบมากกว่าหนึ่งคนในภาพ ระบบจึงไม่เลือกหรือติดตามบุคคลใด กรุณาให้เหลือผู้ใช้เพียงคนเดียวในเฟรม',
-    poseUnsupportedExercise:
+    poseUnsupportedActivity:
       'ท่านี้ยังไม่มีรูปแบบสังเกตด้วยกล้องที่ผ่านการกำหนด ระบบจึงไม่ประเมินการเคลื่อนไหว',
     poseUnavailable: 'โมเดลยังใช้งานไม่ได้ขณะออฟไลน์ คุณยังนับด้วยตนเองได้',
     poseError: 'ไม่สามารถเริ่มการตรวจจับได้ คุณยังนับด้วยตนเองได้',
@@ -587,7 +638,7 @@ const th = {
     technicalResult: 'ผลเชิงเทคนิคจาก Python AI Service',
     technicalConfidence: 'ความมั่นใจของการมองเห็นจุด: {{value}}',
     phaseUnavailable:
-      'movement phase และการนับอัตโนมัติยังไม่พร้อม ระบบใช้การนับด้วยตนเองเท่านั้น',
+      'การวิเคราะห์ท่าทาง movement phase และการนับอัตโนมัติยังไม่พร้อม',
     notAvailable: 'ไม่พร้อมใช้งาน',
     technicalFailed:
       'ไม่สามารถรับ feedback เชิงเทคนิคได้ คุณยังนับด้วยตนเองได้',
@@ -596,6 +647,7 @@ const th = {
       camera_ready: 'ข้อมูลการมองเห็นจุดพร้อมสำหรับการสาธิตเชิงเทคนิค',
       adjust_camera: 'การมองเห็นจุดไม่ครบ โปรดปรับตำแหน่งกล้อง',
       multiple_people_detected: 'พบมากกว่าหนึ่งคน ระบบไม่เลือกบุคคลใด',
+      unsupported_activity: 'ยังไม่มี technical profile สำหรับกิจกรรมนี้',
       unsupported_exercise: 'ยังไม่มี technical profile สำหรับท่าสาธิตนี้',
       technical_analysis_unavailable: 'การวิเคราะห์เชิงเทคนิคไม่พร้อมใช้งาน'
     },
@@ -910,7 +962,7 @@ const en: typeof th = {
     clinicalDemo: 'Clinical flow demo',
     plan: 'Activity plan',
     camera: 'Camera practice',
-    exercises: 'Movement demos',
+    exercises: 'Movement activities',
     history: 'History',
     progress: 'Activity records and progress',
     profile: 'Profile',
@@ -1353,8 +1405,9 @@ const en: typeof th = {
       'All figures are self-recorded activity data, not recovery outcomes.'
   },
   exercises: {
-    title: 'Movement demo library',
-    subtitle: 'Choose a camera-flow demo. This is not a physiotherapy program.',
+    title: 'Daily movement activities',
+    subtitle:
+      'Explore sitting, standing, sit-to-stand, and walking demonstrations without a correct/incorrect judgment.',
     search: 'Search demos',
     all: 'All',
     neck: 'Neck',
@@ -1362,6 +1415,10 @@ const en: typeof th = {
     lower_back: 'Lower back',
     knee: 'Knee',
     hand: 'Hand',
+    sitting: 'Sitting',
+    standing: 'Standing',
+    transition: 'Sit to stand',
+    walking: 'Walking',
     upper: 'Upper body',
     lower: 'Lower body',
     details: 'View details',
@@ -1378,6 +1435,49 @@ const en: typeof th = {
     notIncludedBody:
       'No correct/incorrect decision, joint-angle thresholds, or treatment advice.'
   },
+  activities: {
+    demonstration: 'Demonstration sequence',
+    stage: 'Stage {{count}}',
+    demoUnavailable: 'No demonstration is available for this activity yet',
+    requiredView: 'Camera position',
+    measurement: 'Recording mode',
+    cameraPlacement: 'This activity uses this camera view: {{view}}',
+    views: {
+      front: 'Front view',
+      side: 'Side view',
+      full_body: 'Full body and movement space visible'
+    },
+    measurements: {
+      observation: 'Visibility observation only',
+      hold_duration: 'Time recording only',
+      manual_cycles: 'Cycles counted manually by the user'
+    },
+    items: {
+      'seated-posture-demo': {
+        description:
+          'A sequence for preparing the space, sitting, and checking camera visibility. No correctness criteria are available.',
+        visualLabel:
+          'Three-stage concept illustration for the seated posture demonstration'
+      },
+      'standing-posture-demo': {
+        description:
+          'A sequence for preparing the space, standing, and checking body visibility. This is not a balance assessment.',
+        visualLabel:
+          'Three-stage concept illustration for the standing posture demonstration'
+      },
+      'sit-to-stand-demo': {
+        description:
+          'A sit-to-stand sequence with optional manual cycle recording. Movement quality is not assessed.',
+        visualLabel: 'Three-stage concept illustration from sitting to standing'
+      },
+      'walking-demo': {
+        description:
+          'A walking sequence for observation only. The system does not assess gait or fall risk.',
+        visualLabel:
+          'Three-stage concept illustration for the walking demonstration'
+      }
+    }
+  },
   camera: {
     title: 'Camera setup',
     practiceTitle: 'Camera practice',
@@ -1388,6 +1488,7 @@ const en: typeof th = {
     start: 'Turn on camera',
     stop: 'Turn off camera',
     continue: 'Start demo session',
+    continueWithoutCamera: 'View demo without camera',
     readiness: 'System readiness',
     secure: 'Camera data stays on-device',
     permission: 'Camera permission',
@@ -1407,6 +1508,13 @@ const en: typeof th = {
     live: 'Live demo session',
     timer: 'Time',
     reps: 'Manually recorded count',
+    cycles: 'Manually recorded cycles',
+    addCycle: 'Add one cycle',
+    demoOnlyMode:
+      'You are viewing the demonstration without a camera. You can still record time and finish the session.',
+    observationTitle: 'Observation status',
+    analysisPending:
+      'The camera checks only whether required body landmarks are visible. It does not compare movement correctness.',
     automaticTechnicalCount: 'Automatic movement cycles (technical)',
     automaticTechnicalBoundary:
       'Counts only an observable raise-lower sequence. It is not a correctness score or treatment direction and is not saved to history yet.',
@@ -1427,7 +1535,7 @@ const en: typeof th = {
     poseMissing: 'No body detected in the preview yet',
     poseMultiple:
       'More than one person is visible. The system will not select or track anyone until only one person remains in frame.',
-    poseUnsupportedExercise:
+    poseUnsupportedActivity:
       'This activity has no defined camera-observation profile, so movement is not assessed.',
     poseUnavailable:
       'The model is unavailable while offline. Manual counting is still available',
@@ -1439,7 +1547,7 @@ const en: typeof th = {
     technicalResult: 'Technical result from the Python AI Service',
     technicalConfidence: 'Landmark visibility confidence: {{value}}',
     phaseUnavailable:
-      'Movement phase and automatic counting are unavailable. Counting remains manual.',
+      'Posture analysis, movement phase, and automatic counting are unavailable.',
     notAvailable: 'Unavailable',
     technicalFailed:
       'Technical feedback is unavailable. Manual counting remains available.',
@@ -1449,6 +1557,7 @@ const en: typeof th = {
       adjust_camera: 'Some landmarks are not visible. Adjust the camera',
       multiple_people_detected:
         'More than one person is visible; nobody is selected',
+      unsupported_activity: 'No technical profile exists for this activity',
       unsupported_exercise: 'No technical profile exists for this demo',
       technical_analysis_unavailable: 'Technical analysis is unavailable'
     },

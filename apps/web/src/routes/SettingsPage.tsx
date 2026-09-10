@@ -245,7 +245,7 @@ export function SettingsPage() {
         </article>
         <Link
           className="kg-card flex min-h-24 items-center gap-4 p-5 no-underline transition hover:border-teal-300 hover:bg-teal-50 sm:p-6"
-          to="/app/exercises"
+          to="/app/activities"
         >
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
             <Camera aria-hidden="true" size={21} />

@@ -24,7 +24,7 @@ const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
   { to: '/app/chat', key: 'chat', icon: MessageCircle, end: false },
   { to: '/app/plan', key: 'plan', icon: CalendarDays, end: false },
-  { to: '/app/exercises', key: 'exercises', icon: Activity, end: false },
+  { to: '/app/activities', key: 'exercises', icon: Activity, end: false },
   { to: '/app/progress', key: 'progress', icon: BarChart3, end: false }
 ] as const
 

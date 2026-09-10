@@ -159,7 +159,7 @@ export function EducationalClinicalFlowPage() {
                 </p>
                 <Link
                   className="kg-button-secondary mt-5"
-                  to={`/app/exercises/${exercise.slug}`}
+                  to={`/app/activities/${exercise.slug}`}
                 >
                   {t('exercises.details')}
                 </Link>

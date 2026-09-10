@@ -2,31 +2,36 @@ package product
 
 import "testing"
 
-func TestExercisesRemainPendingClinicalReviewAndCategorized(t *testing.T) {
-	expected := map[string]string{
-		"neck-flexion-demo":           "neck",
-		"neck-rotation-demo":          "neck",
-		"shoulder-movement-demo":      "shoulder",
-		"arm-abduction-research-demo": "shoulder",
-		"sit-to-stand-demo":           "lower_back",
-		"seated-knee-demo":            "knee",
-		"hand-wrist-demo":             "hand",
+func TestActivitiesRemainPendingClinicalReviewAndDeclareCaptureBehavior(t *testing.T) {
+	expected := map[string]struct {
+		kind, view, measurement string
+	}{
+		"seated-posture-demo":   {"static_posture", "side", "hold_duration"},
+		"standing-posture-demo": {"static_posture", "front", "hold_duration"},
+		"sit-to-stand-demo":     {"transition", "side", "manual_cycles"},
+		"walking-demo":          {"gait", "full_body", "observation"},
 	}
 
-	if len(Exercises) != 7 {
-		t.Fatalf("expected 7 exercises, got %d", len(Exercises))
+	if len(Activities) != 4 {
+		t.Fatalf("expected 4 activities, got %d", len(Activities))
 	}
 
-	for slug, category := range expected {
-		exercise, found := FindExercise(slug)
+	for slug, want := range expected {
+		activity, found := FindActivity(slug)
 		if !found {
-			t.Fatalf("expected exercise %q", slug)
+			t.Fatalf("expected activity %q", slug)
 		}
-		if exercise.Category != category {
-			t.Fatalf("expected category %q for exercise %q, got %q", category, slug, exercise.Category)
+		if activity.Kind != want.kind || activity.RequiredView != want.view || activity.MeasurementMode != want.measurement {
+			t.Fatalf("unexpected capture behavior for %q: %#v", slug, activity)
 		}
-		if exercise.ReviewStatus != "pending_clinical_review" {
-			t.Fatalf("exercise %q must not bypass clinical review", slug)
+		if activity.ReviewStatus != "pending_clinical_review" || !activity.DemoOnly || !activity.NotForClinicalUse {
+			t.Fatalf("activity %q must not bypass clinical review", slug)
 		}
+	}
+}
+
+func TestUnknownActivityIsDeniedByDefault(t *testing.T) {
+	if _, found := FindActivity("unknown-demo"); found {
+		t.Fatal("unknown activity must not receive a fallback definition")
 	}
 }

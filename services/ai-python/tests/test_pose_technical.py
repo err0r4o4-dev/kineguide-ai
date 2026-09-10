@@ -34,3 +34,17 @@ def test_pose_technical_feedback_rejects_raw_media_fields(
     )
 
     assert response.status_code == 422
+
+
+def test_pose_technical_feedback_uses_activity_language_without_assessing_movement(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/v1/pose/technical-feedback",
+        json={"pose_status": "unsupported_activity", "landmark_visibility": []},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["camera_feedback"] == "unsupported_activity"
+    assert response.json()["movement_phase"] == "unavailable"
+    assert response.json()["repetition_count"] is None

@@ -1,8 +1,9 @@
 package product
 
 type ActivityPlanDay struct {
-	Day       int        `json:"day"`
-	Exercises []Exercise `json:"exercises"`
+	Day        int        `json:"day"`
+	Activities []Activity `json:"activities"`
+	Exercises  []Exercise `json:"exercises"`
 }
 
 type ActivityPlan struct {
@@ -19,11 +20,11 @@ type ActivityPlan struct {
 func BuildDemoActivityPlan() ActivityPlan {
 	days := make([]ActivityPlanDay, 7)
 	for day := range days {
-		rotated := make([]Exercise, len(Exercises))
-		for index := range Exercises {
-			rotated[index] = Exercises[(day+index)%len(Exercises)]
+		rotated := make([]Activity, len(Activities))
+		for index := range Activities {
+			rotated[index] = Activities[(day+index)%len(Activities)]
 		}
-		days[day] = ActivityPlanDay{Day: day + 1, Exercises: rotated}
+		days[day] = ActivityPlanDay{Day: day + 1, Activities: rotated, Exercises: rotated}
 	}
 	return ActivityPlan{
 		PlanType:     "demo_exploration",

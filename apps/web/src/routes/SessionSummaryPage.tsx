@@ -12,7 +12,11 @@ import { Link, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { formatDuration } from '@/lib/format'
-import { getSession } from '@/services/product'
+import {
+  getSession,
+  sessionActivitySlug,
+  sessionManualCycles
+} from '@/services/product'
 
 export function SessionSummaryPage() {
   const { id = '' } = useParams()
@@ -43,7 +47,7 @@ export function SessionSummaryPage() {
                 {t('session.summary')}
               </p>
               <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em]">
-                {query.data?.exercise_slug}
+                {query.data ? sessionActivitySlug(query.data) : '-'}
               </h1>
               <p className="mt-2 text-sm text-slate-600">
                 {t('dashboard.manual')}
@@ -70,7 +74,7 @@ export function SessionSummaryPage() {
             <Hash aria-hidden="true" className="mx-auto text-teal-700" />
             <p className="mt-3 text-sm text-slate-500">{t('session.reps')}</p>
             <p className="mt-1 text-3xl font-bold tabular-nums">
-              {query.data?.manual_repetitions}
+              {query.data ? sessionManualCycles(query.data) : 0}
             </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
@@ -100,7 +104,7 @@ export function SessionSummaryPage() {
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             className="kg-button-primary"
-            to={`/app/exercises/${query.data?.exercise_slug}/setup`}
+            to={`/app/activities/${query.data ? sessionActivitySlug(query.data) : ''}/setup`}
           >
             {t('plan.start')}
           </Link>

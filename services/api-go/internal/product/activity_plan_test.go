@@ -17,7 +17,9 @@ func TestBuildDemoActivityPlanUsesOnlyKnownPendingReviewDemos(t *testing.T) {
 
 	for index, day := range plan.Days {
 		assert.Equal(t, index+1, day.Day)
+		require.NotEmpty(t, day.Activities)
 		require.NotEmpty(t, day.Exercises)
+		assert.Equal(t, day.Activities, day.Exercises)
 		for _, exercise := range day.Exercises {
 			assert.Equal(t, "pending_clinical_review", exercise.ReviewStatus)
 			_, found := FindExercise(exercise.Slug)

@@ -21,6 +21,7 @@ async def technical_feedback(request: TechnicalPoseRequest) -> TechnicalPoseResp
         "adjust_camera": "adjust_camera",
         "no_pose": "adjust_camera",
         "multiple_poses": "multiple_people_detected",
+        "unsupported_activity": "unsupported_activity",
         "unsupported_exercise": "unsupported_exercise",
         "unavailable": "technical_analysis_unavailable",
         "error": "technical_analysis_unavailable",

@@ -5,16 +5,16 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
-import { ExerciseIllustration } from '@/features/exercises/ExerciseIllustration'
-import { getExercises } from '@/services/product'
+import { ActivityDemonstration } from '@/features/activities/ActivityDemonstration'
+import { getActivities } from '@/services/product'
 
 export function ExerciseLibraryPage() {
   const { t, i18n } = useTranslation()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const query = useQuery({
-    queryKey: ['exercises'],
-    queryFn: ({ signal }) => getExercises(signal),
+    queryKey: ['activities'],
+    queryFn: ({ signal }) => getActivities(signal),
     staleTime: 60_000
   })
   const items = useMemo(
@@ -57,11 +57,10 @@ export function ExerciseLibraryPage() {
       <div className="mt-7 flex flex-wrap gap-2">
         {[
           ['all', 'all'],
-          ['neck', 'neck'],
-          ['shoulder', 'shoulder'],
-          ['lower_back', 'lower_back'],
-          ['knee', 'knee'],
-          ['hand', 'hand']
+          ['sitting', 'sitting'],
+          ['standing', 'standing'],
+          ['transition', 'transition'],
+          ['walking', 'walking']
         ].map(([value, key]) => (
           <button
             className={category === value ? 'kg-filter-active' : 'kg-filter'}
@@ -84,10 +83,7 @@ export function ExerciseLibraryPage() {
           {items.map((exercise) => (
             <article className="kg-card overflow-hidden" key={exercise.slug}>
               <div className="grid aspect-[16/9] place-items-center overflow-hidden border-b border-slate-200 bg-slate-50 text-teal-700">
-                <ExerciseIllustration
-                  className="size-full object-cover"
-                  slug={exercise.slug}
-                />
+                <ActivityDemonstration slug={exercise.slug} />
               </div>
               <div className="p-6">
                 <span className="rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
@@ -104,13 +100,13 @@ export function ExerciseLibraryPage() {
                 <div className="mt-6 flex gap-3">
                   <Link
                     className="kg-button-secondary flex-1"
-                    to={`/app/exercises/${exercise.slug}`}
+                    to={`/app/activities/${exercise.slug}`}
                   >
                     {t('exercises.details')}
                   </Link>
                   <Link
                     className="kg-button-primary flex-1"
-                    to={`/app/exercises/${exercise.slug}/setup`}
+                    to={`/app/activities/${exercise.slug}/setup`}
                   >
                     {t('exercises.start')}
                   </Link>

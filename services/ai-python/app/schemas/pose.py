@@ -9,6 +9,7 @@ PoseStatus = Literal[
     "adjust_camera",
     "no_pose",
     "multiple_poses",
+    "unsupported_activity",
     "unsupported_exercise",
     "unavailable",
     "error",
@@ -19,6 +20,7 @@ CameraFeedback = Literal[
     "camera_ready",
     "adjust_camera",
     "multiple_people_detected",
+    "unsupported_activity",
     "unsupported_exercise",
     "technical_analysis_unavailable",
 ]

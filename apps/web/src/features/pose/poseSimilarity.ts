@@ -249,6 +249,10 @@ export function analyzeJointErrors(
 ): JointError[] {
   const errors: JointError[] = []
 
+  // Daily-movement demonstrations intentionally have no correctness thresholds
+  // until a qualified clinical owner approves traceable rules for them.
+  if (!config.thresholds) return errors
+
   for (const joint of config.importantAngles) {
     const refAngle = refAngles[joint]
     const userAngle = userAngles[joint]

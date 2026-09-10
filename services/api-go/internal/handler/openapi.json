@@ -839,6 +839,8 @@
           "Exercises"
         ],
         "summary": "List movement demos",
+        "deprecated": true,
+        "description": "Compatibility alias for `/v1/activities`.",
         "security": [
           {
             "bearerAuth": []
@@ -981,6 +983,7 @@
           "Exercises"
         ],
         "summary": "Get movement demo metadata",
+        "deprecated": true,
         "security": [
           {
             "bearerAuth": []
@@ -993,6 +996,82 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/activities": {
+      "get": {
+        "operationId": "listDailyMovementActivities",
+        "tags": [
+          "Activities"
+        ],
+        "summary": "List demo-only daily movement activities",
+        "description": "Lists sitting, standing, sit-to-stand, and walking demonstrations. Pose analysis remains unavailable until an activity-specific method is clinically reviewed.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daily movement activities pending clinical review.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "activities"
+                  ],
+                  "properties": {
+                    "activities": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Activity"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/activities/{slug}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ExerciseSlug"
+        }
+      ],
+      "get": {
+        "operationId": "getDailyMovementActivity",
+        "tags": [
+          "Activities"
+        ],
+        "summary": "Get daily movement activity metadata",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Demo-only activity metadata and camera protocol.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Activity"
                 }
               }
             }
@@ -2374,7 +2453,7 @@
           }
         }
       },
-      "Exercise": {
+      "Activity": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -2382,7 +2461,13 @@
           "title_th",
           "title_en",
           "category",
-          "review_status"
+          "kind",
+          "required_view",
+          "measurement_mode",
+          "review_status",
+          "demo_only",
+          "not_for_clinical_use",
+          "analysis_available"
         ],
         "properties": {
           "slug": {
@@ -2397,18 +2482,61 @@
           "category": {
             "type": "string",
             "enum": [
-              "neck",
-              "shoulder",
-              "lower_back",
-              "knee",
-              "hand"
+              "sitting",
+              "standing",
+              "transition",
+              "walking"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "static_posture",
+              "transition",
+              "gait"
+            ]
+          },
+          "required_view": {
+            "type": "string",
+            "enum": [
+              "front",
+              "side",
+              "full_body"
+            ]
+          },
+          "measurement_mode": {
+            "type": "string",
+            "enum": [
+              "observation",
+              "hold_duration",
+              "manual_cycles"
             ]
           },
           "review_status": {
             "type": "string",
             "const": "pending_clinical_review"
+          },
+          "demo_only": {
+            "type": "boolean",
+            "const": true
+          },
+          "not_for_clinical_use": {
+            "type": "boolean",
+            "const": true
+          },
+          "analysis_available": {
+            "type": "boolean",
+            "const": false
           }
         }
+      },
+      "Exercise": {
+        "deprecated": true,
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Activity"
+          }
+        ]
       },
       "ClinicalReviewStatus": {
         "type": "string",
@@ -2762,6 +2890,7 @@
         "additionalProperties": false,
         "required": [
           "day",
+          "activities",
           "exercises"
         ],
         "properties": {
@@ -2769,6 +2898,13 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 7
+          },
+          "activities": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
           },
           "exercises": {
             "type": "array",
@@ -2821,12 +2957,29 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "exercise_slug",
           "camera_used"
         ],
+        "anyOf": [
+          {
+            "required": [
+              "activity_slug"
+            ]
+          },
+          {
+            "required": [
+              "exercise_slug"
+            ]
+          }
+        ],
         "properties": {
+          "activity_slug": {
+            "type": "string",
+            "description": "Preferred daily movement activity identifier."
+          },
           "exercise_slug": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true,
+            "description": "Compatibility alias for activity_slug."
           },
           "camera_used": {
             "type": "boolean"
@@ -2850,6 +3003,7 @@
               "adjust_camera",
               "no_pose",
               "multiple_poses",
+              "unsupported_activity",
               "unsupported_exercise",
               "unavailable",
               "error"
@@ -2904,6 +3058,7 @@
               "camera_ready",
               "adjust_camera",
               "multiple_people_detected",
+              "unsupported_activity",
               "unsupported_exercise",
               "technical_analysis_unavailable"
             ]
@@ -2915,8 +3070,19 @@
         "additionalProperties": false,
         "required": [
           "status",
-          "manual_repetitions",
           "elapsed_seconds"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "manual_cycles"
+            ]
+          },
+          {
+            "required": [
+              "manual_repetitions"
+            ]
+          }
         ],
         "properties": {
           "status": {
@@ -2927,10 +3093,18 @@
               "stopped"
             ]
           },
+          "manual_cycles": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000,
+            "description": "Self-recorded cycles for transition activities; zero for observation-only activities."
+          },
           "manual_repetitions": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 1000
+            "maximum": 1000,
+            "deprecated": true,
+            "description": "Compatibility alias for manual_cycles."
           },
           "elapsed_seconds": {
             "type": "integer",
@@ -2945,6 +3119,10 @@
         "description": "Minimal session summary. Raw camera media, frames, recordings, and landmarks are never stored.",
         "required": [
           "id",
+          "activity_slug",
+          "activity_kind",
+          "measurement_mode",
+          "manual_cycles",
           "exercise_slug",
           "camera_used",
           "status",
@@ -2959,8 +3137,34 @@
             "type": "string",
             "format": "uuid"
           },
-          "exercise_slug": {
+          "activity_slug": {
             "type": "string"
+          },
+          "activity_kind": {
+            "type": "string",
+            "enum": [
+              "static_posture",
+              "transition",
+              "gait"
+            ]
+          },
+          "measurement_mode": {
+            "type": "string",
+            "enum": [
+              "observation",
+              "hold_duration",
+              "manual_cycles"
+            ]
+          },
+          "manual_cycles": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "exercise_slug": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Compatibility alias for activity_slug."
           },
           "camera_used": {
             "type": "boolean"
@@ -2976,7 +3180,9 @@
           "manual_repetitions": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 1000
+            "maximum": 1000,
+            "deprecated": true,
+            "description": "Compatibility alias for manual_cycles."
           },
           "elapsed_seconds": {
             "type": "integer",

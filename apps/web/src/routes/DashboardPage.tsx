@@ -19,7 +19,11 @@ import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
 import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
-import { getDashboard, type ExerciseSession } from '@/services/product'
+import {
+  getDashboard,
+  sessionActivitySlug,
+  type ExerciseSession
+} from '@/services/product'
 
 const dayInMilliseconds = 86_400_000
 const illustrationPath = '/dashboard-sit-to-stand.png'
@@ -158,11 +162,11 @@ function TodayActivity() {
             {t('common.pendingReview')}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link className="kg-button-primary" to="/app/exercises">
+            <Link className="kg-button-primary" to="/app/activities">
               <Play aria-hidden="true" size={17} />
               {t('plan.start')}
             </Link>
-            <Link className="kg-button-secondary" to="/app/exercises">
+            <Link className="kg-button-secondary" to="/app/activities">
               {t('dashboard.viewDetails')}
             </Link>
           </div>
@@ -394,9 +398,9 @@ function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold text-slate-900">
-                {session.exercise_slug === 'sit-to-stand-demo'
+                {sessionActivitySlug(session) === 'sit-to-stand-demo'
                   ? t('dashboard.todayName')
-                  : session.exercise_slug}
+                  : sessionActivitySlug(session)}
               </span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {formatDate(session.started_at, i18n.resolvedLanguage ?? 'th')}

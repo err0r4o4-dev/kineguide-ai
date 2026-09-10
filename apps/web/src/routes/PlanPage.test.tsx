@@ -20,8 +20,14 @@ describe('PlanPage', () => {
       slug: 'sit-to-stand-demo',
       title_th: 'สาธิตการลุกนั่งจากเก้าอี้',
       title_en: 'Sit-to-stand movement demo',
-      category: 'lower_back',
-      review_status: 'pending_clinical_review'
+      category: 'transition',
+      kind: 'transition',
+      required_view: 'side',
+      measurement_mode: 'manual_cycles',
+      review_status: 'pending_clinical_review',
+      demo_only: true,
+      not_for_clinical_use: true,
+      analysis_available: false
     }
     vi.mocked(product.getActivityPlan).mockResolvedValue({
       plan_type: 'demo_exploration',
@@ -30,6 +36,7 @@ describe('PlanPage', () => {
       duration_days: 7,
       days: Array.from({ length: 7 }, (_, index) => ({
         day: index + 1,
+        activities: [exercise],
         exercises: [exercise]
       }))
     })

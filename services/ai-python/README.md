@@ -8,6 +8,8 @@ Endpoints: `GET /health`, `GET /ready`, `GET /v1/health`, internal `POST /v1/cha
 
 `POST /v1/pose/technical-feedback` accepts only derived pose status and up to 33 visibility scores. It returns transient technical camera feedback and a visibility confidence average. It deliberately returns `movement_phase: unavailable` and `repetition_count: null`; raw media, landmark coordinates, diagnosis, treatment, suitability, and clinical safety decisions are forbidden.
 
+Both `unsupported_activity` and the legacy `unsupported_exercise` status are accepted during the public activity-contract migration. Neither status enables movement analysis.
+
 The provider protocol is shaped to later support bounded Thai symptom extraction, structured JSON, follow-up-question drafting, and user-friendly explanations. Each capability requires a separately reviewed schema and safety policy.
 
 `LLM_PROVIDER=mock` enables a deterministic, non-clinical fixture response for local tests only and is rejected in production. `disabled` remains the default.

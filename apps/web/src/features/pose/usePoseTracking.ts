@@ -23,7 +23,7 @@ export type PoseTrackingStatus =
   | 'adjust_camera'
   | 'no_pose'
   | 'multiple_poses'
-  | 'unsupported_exercise'
+  | 'unsupported_activity'
   | 'unavailable'
   | 'error'
 

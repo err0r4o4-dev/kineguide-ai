@@ -34,3 +34,22 @@ func TestActivityPlanRequiresAuthenticationAndReturnsDemoOnlySchedule(t *testing
 	assert.Contains(t, response.Body.String(), `"personalized":false`)
 	assert.NotContains(t, response.Body.String(), "concern_area")
 }
+
+func TestActivitiesEndpointReturnsDailyMovementKinds(t *testing.T) {
+	signer, err := security.NewTokenSigner("test-secret-with-at-least-thirty-two-characters")
+	require.NoError(t, err)
+	router := testRouter(Dependencies{Store: &registrationStore{}, Signer: signer})
+	token, err := signer.Sign("1af854ea-56cf-4e98-b7bb-93d347275568", "access", time.Minute)
+	require.NoError(t, err)
+	request := httptest.NewRequest(http.MethodGet, "/v1/activities", nil)
+	request.Header.Set("Authorization", "Bearer "+token)
+	response := httptest.NewRecorder()
+
+	router.ServeHTTP(response, request)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	assert.Contains(t, response.Body.String(), `"slug":"seated-posture-demo"`)
+	assert.Contains(t, response.Body.String(), `"kind":"static_posture"`)
+	assert.Contains(t, response.Body.String(), `"slug":"walking-demo"`)
+	assert.Contains(t, response.Body.String(), `"measurement_mode":"observation"`)
+}
