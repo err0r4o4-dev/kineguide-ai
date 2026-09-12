@@ -1,98 +1,108 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
 import i18n from '@/lib/i18n'
 import * as product from '@/services/product'
+import * as poseTracking from '@/features/pose/usePoseTracking'
 import { LiveSessionPage } from './LiveSessionPage'
+
+vi.mock('@/services/product', () => ({
+  getSession: vi.fn(),
+  updateSession: vi.fn().mockResolvedValue({})
+}))
 
 vi.mock('@/features/camera/useCamera', () => ({
   useCamera: () => ({
-    state: 'idle',
-    videoRef: { current: null },
+    state: 'ready',
     start: vi.fn(),
-    stop: vi.fn()
+    stop: vi.fn(),
+    videoRef: { current: document.createElement('video') }
   })
 }))
 
 vi.mock('@/features/pose/usePoseTracking', () => ({
-  usePoseTracking: () => ({
-    status: 'idle',
-    landmarks: null,
-    bounds: null,
-    unreliableLandmarks: [],
-    faceLandmarks: null,
-    leftHandLandmarks: null,
-    rightHandLandmarks: null,
-    blink: null
-  })
+  usePoseTracking: vi.fn()
 }))
 
-vi.mock('@/services/product', async () => {
-  const actual = await vi.importActual<typeof product>('@/services/product')
-  return {
-    ...actual,
-    getSession: vi.fn(),
-    getActivity: vi.fn(),
-    updateSession: vi.fn()
-  }
-})
+vi.mock('@/features/pose/CameraPoseLayer', () => ({
+  CameraPoseLayer: () => <div data-testid="pose-layer" />
+}))
+
+function renderRoute() {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } }
+  })
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={['/app/monitor/live']}>
+        <Routes>
+          <Route element={<LiveSessionPage />} path="/app/monitor/live" />
+          <Route element={<h1>Summary</h1>} path="/app/monitor/summary/:id" />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
+  )
+}
 
 describe('LiveSessionPage', () => {
-  it('keeps walking demo-only and does not expose unreviewed scoring', async () => {
-    await i18n.changeLanguage('th')
+  beforeEach(() => {
+    vi.useFakeTimers()
     vi.mocked(product.getSession).mockResolvedValue({
-      id: 'session-id',
-      activity_slug: 'walking-demo',
-      activity_kind: 'gait',
-      measurement_mode: 'observation',
-      manual_cycles: 0,
-      exercise_slug: 'walking-demo',
+      id: 'session-1',
       status: 'active',
-      camera_used: false,
-      manual_repetitions: 0,
-      elapsed_seconds: 0,
-      started_at: '2026-09-10T10:00:00Z',
+      metrics: {
+        duration_seconds: 0,
+        sitting_seconds: 0,
+        standing_seconds: 0,
+        good_alignment_seconds: 0,
+        needs_adjustment_seconds: 0,
+        alert_count: 0,
+        break_count: 0,
+        longest_sitting_seconds: 0
+      },
+      started_at: '2026-08-28T09:00:00Z',
       completed_at: null,
-      retention_until: '2027-09-10T10:00:00Z'
+      retention_until: '2027-08-28T09:00:00Z'
     })
-    vi.mocked(product.getActivity).mockResolvedValue({
-      slug: 'walking-demo',
-      title_th: 'สาธิตการเดิน',
-      title_en: 'Walking demonstration',
-      category: 'walking',
-      kind: 'gait',
-      required_view: 'full_body',
-      measurement_mode: 'observation',
-      review_status: 'pending_clinical_review',
-      demo_only: true,
-      not_for_clinical_use: true,
-      analysis_available: false
+    vi.mocked(poseTracking.usePoseTracking).mockReturnValue({
+      status: 'ready',
+      result: {} as any
     })
-    const client = new QueryClient({
-      defaultOptions: { queries: { retry: false } }
-    })
+  })
 
-    render(
-      <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={['/app/sessions/session-id/live']}>
-          <Routes>
-            <Route
-              element={<LiveSessionPage />}
-              path="/app/sessions/:id/live"
-            />
-          </Routes>
-        </MemoryRouter>
-      </QueryClientProvider>
-    )
+  afterEach(() => {
+    vi.useRealTimers()
+  })
 
-    expect(await screen.findByText('สาธิตการเดิน')).toBeVisible()
-    expect(screen.getByText(/กำลังดูสาธิตโดยไม่ใช้กล้อง/)).toBeVisible()
-    expect(screen.getByText(/ยังไม่เปรียบเทียบความถูกต้อง/)).toBeVisible()
-    expect(screen.queryByText('คะแนนความแม่นยำ')).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'เพิ่ม 1 รอบ' })
-    ).not.toBeInTheDocument()
+  it('renders posture monitoring session UI', async () => {
+    await i18n.changeLanguage('th')
+    renderRoute()
+
+    expect(await screen.findByRole('heading', { name: 'Live Posture Monitoring' })).toBeVisible()
+    expect(screen.getByText('สถานะปัจจุบัน')).toBeVisible()
+    expect(screen.getByText('การจัดท่าทาง')).toBeVisible()
+    expect(screen.getByText('เปรียบเทียบจากค่า Baseline')).toBeVisible()
+    expect(screen.getByTestId('pose-layer')).toBeInTheDocument()
+  })
+
+  it('can pause and finish the session', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    renderRoute()
+
+    await screen.findByRole('heading', { name: 'Live Posture Monitoring' })
+
+    const pauseBtn = screen.getByRole('button', { name: 'พักการตรวจจับ' })
+    await user.click(pauseBtn)
+    expect(screen.getByRole('button', { name: 'ตรวจจับต่อ' })).toBeVisible()
+
+    const finishBtn = screen.getByRole('button', { name: 'จบเซสชัน' })
+    await user.click(finishBtn)
+
+    expect(product.updateSession).toHaveBeenCalled()
+    expect(await screen.findByRole('heading', { name: 'Summary' })).toBeInTheDocument()
   })
 })

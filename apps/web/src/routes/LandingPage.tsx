@@ -74,7 +74,7 @@ export function LandingPage() {
       icon: Camera,
       title: t('landing.movementTitle'),
       body: t('landing.movementBody'),
-      href: auth.user ? '/app/activities' : primaryPath
+      href: auth.user ? '/app/monitor' : primaryPath
     },
     {
       icon: MessageCircle,

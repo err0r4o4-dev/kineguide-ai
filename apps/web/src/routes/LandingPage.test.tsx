@@ -1,243 +1,83 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router'
-import { afterEach, beforeEach, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
+import { vi } from 'vitest'
 
-import { Brand } from '@/components/Brand'
-import { AuthContext, type AuthContextValue } from '@/features/auth/AuthContext'
-import '@/lib/i18n'
 import i18n from '@/lib/i18n'
 import { LandingPage } from './LandingPage'
 
-const guestAuth: AuthContextValue = {
-  user: null,
-  ready: true,
-  async login() {},
-  async register() {},
-  async logout() {},
-  clearSession() {}
-}
+const { userMock } = vi.hoisted(() => ({ userMock: vi.fn() }))
+
+vi.mock('@/features/auth/AuthContext', () => ({
+  useAuth: () => ({ ready: true, user: userMock() })
+}))
+
+vi.mock('@/lib/navigation', () => ({
+  isBrowserRefresh: () => false,
+  finishBrowserRefresh: vi.fn()
+}))
 
 describe('LandingPage', () => {
-  beforeEach(async () => {
+  it('highlights privacy and Posture Monitoring capabilities', async () => {
     await i18n.changeLanguage('th')
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('does not show the loading page while restoring a session after refresh', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
-      { type: 'reload' } as PerformanceNavigationTiming
-    ])
-
-    const { container } = render(
-      <AuthContext.Provider value={{ ...guestAuth, ready: false }}>
-        <MemoryRouter>
-          <LandingPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
-    )
-
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-    expect(container).toBeEmptyDOMElement()
-  })
-
-  it('explains the camera boundary before sign in', () => {
+    userMock.mockReturnValue(null)
     render(
-      <AuthContext.Provider value={guestAuth}>
-        <MemoryRouter>
-          <LandingPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
-    )
-
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน\u2060ตัวของคุณ'
-    )
-    expect(screen.getByText(/ไม่อัปโหลดรูปหรือวิดีโอ/)).toBeInTheDocument()
-    expect(
-      screen.getByText(/กล้องจะเริ่มหลังจากคุณเลือกเริ่มใช้งานและให้สิทธิ์/)
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'เริ่มใช้งาน' })).toHaveAttribute(
-      'href',
-      '/register'
-    )
-  })
-
-  it('presents one clear public journey from privacy through safety', () => {
-    render(
-      <AuthContext.Provider value={guestAuth}>
-        <MemoryRouter>
-          <LandingPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
-    )
-
-    expect(
-      screen.getByRole('heading', { name: 'สิ่งที่คุณทำได้ใน KineGuide AI' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'ใช้งานอย่างปลอดภัย' })
-    ).toBeInTheDocument()
-    expect(screen.getByText(/ไม่ใช่อุปกรณ์การแพทย์/)).toBeInTheDocument()
-    expect(
-      screen.queryByRole('link', { name: 'สถานะระบบ' })
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('heading', { name: 'การใช้งาน' })
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('navigation', { name: 'ข้อมูลส่วนท้ายเว็บไซต์' })
-    ).not.toBeInTheDocument()
-    expect(screen.getByText(/© 2026 KineGuide AI/)).toBeInTheDocument()
-    expect(
-      screen.getByText(/ความเป็นส่วนตัวของคุณ คือสิ่งสำคัญที่สุดของเรา/)
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: 'ดูวิธีการทำงาน' })
-    ).toHaveAttribute('href', '#how-it-works')
-    expect(
-      screen.queryByRole('link', { name: 'สร้างบัญชีเพื่อเริ่มต้น' })
-    ).not.toBeInTheDocument()
-  })
-
-  it('highlights the header tab for the section currently in view', () => {
-    render(
-      <AuthContext.Provider value={guestAuth}>
-        <MemoryRouter>
-          <LandingPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
-    )
-
-    const capabilities = document.querySelector('#capabilities')
-    expect(capabilities).not.toBeNull()
-    vi.spyOn(
-      capabilities as HTMLElement,
-      'getBoundingClientRect'
-    ).mockReturnValue({ top: 80 } as DOMRect)
-    for (const id of ['landing-home', 'landing-privacy', 'how-it-works']) {
-      vi.spyOn(
-        document.querySelector(`#${id}`) as HTMLElement,
-        'getBoundingClientRect'
-      ).mockReturnValue({ top: -200 } as DOMRect)
-    }
-
-    fireEvent.scroll(window)
-
-    expect(screen.getByRole('link', { name: 'ความสามารถ' })).toHaveAttribute(
-      'aria-current',
-      'location'
-    )
-    expect(screen.getByRole('link', { name: 'หน้าแรก' })).not.toHaveAttribute(
-      'aria-current'
-    )
-  })
-
-  it('provides the same public journey and boundaries in English', async () => {
-    await i18n.changeLanguage('en')
-
-    render(
-      <AuthContext.Provider value={guestAuth}>
-        <MemoryRouter>
-          <LandingPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>
     )
 
     expect(
       screen.getByRole('heading', {
-        name: 'What you can do in KineGuide AI'
+        name: 'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ'
       })
     ).toBeInTheDocument()
+
+    expect(screen.getByText('Real-Time Posture Monitoring')).toBeVisible()
+
     expect(
-      screen.getByRole('heading', {
-        name: 'Your data stays under your control'
-      })
-    ).toBeInTheDocument()
+      screen.getByRole('heading', { name: 'กล้องทำงานในอุปกรณ์' })
+    ).toBeVisible()
+
     expect(
-      screen.getByRole('heading', { name: 'Get started in 3 steps' })
-    ).toBeInTheDocument()
+      screen.getByRole('heading', { name: 'ควบคุมข้อมูลของคุณ' })
+    ).toBeVisible()
+
     expect(
-      screen.getByRole('heading', { name: 'Use the system safely' })
-    ).toBeInTheDocument()
-    expect(screen.getByText(/not a medical device/i)).toBeInTheDocument()
+      screen.getByRole('heading', { name: 'ติดตามท่าทางแบบเรียลไทม์' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'สรุปการใช้งานหน้าจอ' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด' })
+    ).toBeVisible()
   })
 
-  it('lets an authenticated visitor use the brand to open the public landing page', async () => {
-    const user = userEvent.setup()
-
+  it('routes to registration for anonymous users', async () => {
+    await i18n.changeLanguage('th')
+    userMock.mockReturnValue(null)
     render(
-      <AuthContext.Provider
-        value={{
-          ...guestAuth,
-          user: {
-            id: '3356dcec-f826-41f1-8dba-f434b74e75c8',
-            email: 'student@example.com',
-            display_name: 'ผู้ใช้ทดสอบ',
-            created_at: '2026-08-24T12:00:00Z'
-          }
-        }}
-      >
-        <MemoryRouter initialEntries={['/app']}>
-          <Routes>
-            <Route element={<LandingPage />} path="/" />
-            <Route element={<Brand />} path="/app" />
-          </Routes>
-        </MemoryRouter>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>
     )
 
-    await user.click(screen.getByRole('link', { name: 'KineGuide AI' }))
-
-    expect(
-      await screen.findByRole('heading', {
-        name: 'สำรวจการเคลื่อนไหวอย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ'
-      })
-    ).toBeInTheDocument()
+    const cta = screen.getAllByRole('link', { name: 'เริ่มตรวจท่าทาง' })
+    expect(cta.length).toBeGreaterThan(0)
+    expect(cta[0]).toHaveAttribute('href', '/register')
   })
 
-  it('opens each capability directly for an authenticated visitor', () => {
+  it('routes to the application for signed-in users', async () => {
+    await i18n.changeLanguage('th')
+    userMock.mockReturnValue({ display_name: 'Thirawat Duangta' })
     render(
-      <AuthContext.Provider
-        value={{
-          ...guestAuth,
-          user: {
-            id: '3356dcec-f826-41f1-8dba-f434b74e75c8',
-            email: 'student@example.com',
-            display_name: 'ผู้ใช้ทดสอบ',
-            created_at: '2026-08-24T12:00:00Z'
-          }
-        }}
-      >
-        <MemoryRouter>
-          <LandingPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>
     )
 
-    expect(
-      screen.getByRole('link', {
-        name: 'ดูรายละเอียด สำรวจท่าการเคลื่อนไหวสาธิต'
-      })
-    ).toHaveAttribute('href', '/app/activities')
-    expect(
-      screen.getByRole('link', {
-        name: 'ดูรายละเอียด พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด'
-      })
-    ).toHaveAttribute('href', '/app/chat')
-    expect(
-      screen.getByRole('link', {
-        name: 'ดูรายละเอียด ทบทวนบันทึกกิจกรรม'
-      })
-    ).toHaveAttribute('href', '/app/history')
+    const cta = screen.getAllByRole('link', { name: 'เริ่มต้นใช้งาน' })
+    expect(cta.length).toBeGreaterThan(0)
+    expect(cta[0]).toHaveAttribute('href', '/app')
   })
 })

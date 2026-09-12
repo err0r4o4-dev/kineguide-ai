@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Camera,
   CircleMinus,
-  CirclePlus,
   Eye,
   MonitorOff,
   Pause,
@@ -16,7 +15,6 @@ import { useNavigate, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
-import { ActivityDemonstration } from '@/features/activities/ActivityDemonstration'
 import { useCamera } from '@/features/camera/useCamera'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
@@ -26,295 +24,240 @@ import {
 } from '@/features/pose/usePoseTracking'
 import { formatDuration } from '@/lib/format'
 import {
-  getActivity,
   getSession,
-  sessionActivitySlug,
-  sessionManualCycles,
   updateSession
 } from '@/services/product'
 
 export function LiveSessionPage() {
   const { id = '' } = useParams()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
+
   const session = useQuery({
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal)
   })
-  const activitySlug = session.data ? sessionActivitySlug(session.data) : ''
-  const activity = useQuery({
-    queryKey: ['activity', activitySlug],
-    queryFn: ({ signal }) => getActivity(activitySlug, signal),
-    enabled: activitySlug !== ''
-  })
+
+  // Hardcoded 'static_posture' placeholder for now since we don't have exercise slugs
   const pose = usePoseTracking(
     camera.videoRef,
     cameraCanvasRef,
     camera.state === 'ready',
-    activitySlug,
+    'static_posture',
     createMediaPipePoseAdapter
   )
+
   const [seconds, setSeconds] = useState(0)
-  const [manualCycles, setManualCycles] = useState(0)
-  const [running, setRunning] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const initialized = useRef(false)
+  const [paused, setPaused] = useState(false)
 
+  // Start camera automatically
   useEffect(() => {
-    if (session.data && !initialized.current) {
-      initialized.current = true
-      setSeconds(session.data.elapsed_seconds)
-      setManualCycles(sessionManualCycles(session.data))
+    if (camera.state === 'idle') {
+      void camera.start()
     }
-  }, [session.data])
+  }, [camera])
 
+  // Timer
   useEffect(() => {
-    if (!running) return
-    const timer = window.setInterval(
-      () => setSeconds((value) => value + 1),
-      1000
-    )
-    return () => window.clearInterval(timer)
-  }, [running])
+    if (paused) return
+    const interval = setInterval(() => setSeconds((s) => s + 1), 1000)
+    return () => clearInterval(interval)
+  }, [paused])
 
-  const finish = async (status: 'completed' | 'stopped') => {
-    setSaving(true)
-    setRunning(false)
-    setError('')
+  const finishSession = async () => {
     try {
       await updateSession(id, {
-        status,
-        manual_cycles: manualCycles,
-        elapsed_seconds: seconds
+        status: 'completed',
+        metrics: {
+          duration_seconds: seconds,
+          sitting_seconds: seconds * 0.8, // placeholder
+          standing_seconds: seconds * 0.2, // placeholder
+          good_alignment_seconds: seconds * 0.7, // placeholder
+          needs_adjustment_seconds: seconds * 0.3, // placeholder
+          alert_count: 2, // placeholder
+          break_count: 1, // placeholder
+          longest_sitting_seconds: seconds > 60 ? 60 : seconds // placeholder
+        }
       })
-      camera.stop()
-      navigate(`/app/sessions/${id}/summary`, { replace: true })
+      navigate(`/app/monitor/summary/${id}`)
     } catch {
-      setError(t('session.saveFailed'))
-      setRunning(true)
-      setSaving(false)
+      alert(t('session.saveFailed'))
     }
   }
 
-  if (session.isLoading || activity.isLoading) return <QueryLoading />
-  if (session.isError || activity.isError) {
-    return (
-      <QueryError
-        retry={() => {
-          void session.refetch()
-          void activity.refetch()
-        }}
-      />
-    )
-  }
-  if (!session.data || !activity.data) return null
-
-  const title =
-    i18n.resolvedLanguage === 'th'
-      ? activity.data.title_th
-      : activity.data.title_en
-  const usesManualCycles = activity.data.measurement_mode === 'manual_cycles'
+  if (session.isLoading) return <QueryLoading />
+  if (session.isError) return <QueryError retry={() => void session.refetch()} />
 
   return (
-    <div>
-      <header className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto max-w-[82rem] pb-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-teal-700">{title}</p>
-          <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
             {t('session.live')}
           </h1>
+          <p className="mt-1 flex items-center gap-2 text-sm text-emerald-700">
+            <span className="relative flex size-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
+            </span>
+            {t('common.active')}
+          </p>
         </div>
-        <span className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-lg font-semibold tabular-nums">
-          {formatDuration(seconds)}
-        </span>
-      </header>
-
-      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="space-y-5">
-          <article className="kg-card overflow-hidden">
-            <h2 className="sr-only">{t('activities.demonstration')}</h2>
-            <ActivityDemonstration slug={activitySlug} />
-          </article>
-
-          <article className="kg-card overflow-hidden bg-black">
-            <div className="relative aspect-video">
-              {session.data.camera_used ? (
-                <>
-                  <CameraPoseLayer
-                    canvasRef={cameraCanvasRef}
-                    label={t('camera.visibility')}
-                    snapshot={pose}
-                    videoRef={camera.videoRef}
-                  />
-                  {camera.state === 'ready' && (
-                    <p
-                      aria-live="polite"
-                      className={`absolute left-3 top-3 max-w-[calc(100%-1.5rem)] rounded-xl border px-3 py-2 text-xs font-semibold shadow-sm ${poseStatusClass(pose.status)}`}
-                    >
-                      {t(poseStatusKey(pose.status))}
-                    </p>
-                  )}
-                  {camera.state !== 'ready' && (
-                    <div className="absolute inset-0 grid place-items-center text-white">
-                      <button
-                        className="kg-button-primary"
-                        onClick={() => void camera.start()}
-                        type="button"
-                      >
-                        <Camera aria-hidden="true" />
-                        {t('session.startCamera')}
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="absolute inset-0 grid place-items-center px-6 text-center text-white">
-                  <div>
-                    <MonitorOff
-                      aria-hidden="true"
-                      className="mx-auto"
-                      size={48}
-                    />
-                    <p className="mt-4 max-w-md text-slate-200">
-                      {t('session.demoOnlyMode')}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-3 rounded-2xl bg-white/95 p-2 shadow-lg">
-                <button
-                  aria-label={
-                    running ? t('session.pause') : t('session.resume')
-                  }
-                  className="kg-icon-button"
-                  onClick={() => setRunning((value) => !value)}
-                  type="button"
-                >
-                  {running ? (
-                    <Pause aria-hidden="true" />
-                  ) : (
-                    <Play aria-hidden="true" />
-                  )}
-                </button>
-                <button
-                  className="inline-flex min-h-11 items-center rounded-xl bg-red-700 px-5 py-2 font-semibold text-white hover:bg-red-800"
-                  disabled={saving}
-                  onClick={() => void finish('stopped')}
-                  type="button"
-                >
-                  <Square aria-hidden="true" size={15} />
-                  {t('session.stop')}
-                </button>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <aside className="space-y-5">
-          <article className="kg-card p-6">
-            <h2 className="flex items-center gap-2 text-xl font-bold">
-              <Eye aria-hidden="true" className="text-teal-700" />
-              {t('session.observationTitle')}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              {t('session.analysisPending')}
-            </p>
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
-              {t('session.phaseUnavailable')}
-            </p>
-          </article>
-
-          {usesManualCycles && (
-            <article className="kg-card p-6 text-center">
-              <p className="text-xs uppercase tracking-wide text-slate-500">
-                {t('session.cycles')}
-              </p>
-              <p
-                aria-live="polite"
-                className="mt-2 text-4xl font-bold tabular-nums text-teal-800"
-              >
-                {manualCycles}
-              </p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <button
-                  className="kg-button-secondary"
-                  disabled={manualCycles === 0}
-                  onClick={() =>
-                    setManualCycles((value) => Math.max(0, value - 1))
-                  }
-                  type="button"
-                >
-                  <CircleMinus aria-hidden="true" />
-                  {t('session.undo')}
-                </button>
-                <button
-                  className="kg-button-primary"
-                  onClick={() => setManualCycles((value) => value + 1)}
-                  type="button"
-                >
-                  <CirclePlus aria-hidden="true" />
-                  {t('session.addCycle')}
-                </button>
-              </div>
-            </article>
-          )}
-
-          {error && (
-            <p className="kg-alert-danger" role="alert">
-              {error}
-            </p>
-          )}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 font-semibold tabular-nums text-slate-700 shadow-sm">
+            {formatDuration(seconds)}
+          </div>
           <button
-            className="kg-button-primary w-full"
-            disabled={saving}
-            onClick={() => void finish('completed')}
+            className="kg-button-secondary"
+            onClick={() => setPaused(!paused)}
             type="button"
           >
-            {saving ? t('common.loading') : t('session.finish')}
+            {paused ? (
+              <Play aria-hidden="true" size={18} />
+            ) : (
+              <Pause aria-hidden="true" size={18} />
+            )}
+            {paused ? t('session.resume') : t('session.pause')}
           </button>
-        </aside>
-      </section>
+          <button
+            className="kg-button-primary"
+            onClick={() => void finishSession()}
+            type="button"
+          >
+            <Square aria-hidden="true" size={18} />
+            {t('session.finish')}
+          </button>
+        </div>
+      </div>
 
-      <SafetyNotice>
-        <span className="flex items-start gap-2">
-          <ShieldCheck
-            aria-hidden="true"
-            className="mt-0.5 shrink-0"
-            size={18}
-          />
-          {t('session.posePrivacy')}
-        </span>
-      </SafetyNotice>
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_22rem] xl:grid-cols-[1fr_24rem]">
+        <div className="flex flex-col gap-4">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-950 shadow-sm">
+            {camera.state === 'ready' && (
+              <video
+                autoPlay
+                className="absolute inset-0 h-full w-full object-cover"
+                muted
+                playsInline
+                ref={camera.videoRef}
+              />
+            )}
+            <canvas
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              ref={cameraCanvasRef}
+            />
+            {camera.state === 'ready' && pose.status === 'ready' && pose.result && (
+              <CameraPoseLayer
+                canvas={cameraCanvasRef.current}
+                result={pose.result}
+                video={camera.videoRef.current}
+              />
+            )}
+            <CameraStateOverlay camera={camera.state} pose={pose.status} />
+          </div>
+
+          <div className="flex items-start gap-3 rounded-2xl bg-teal-50/50 p-4 text-sm text-teal-900">
+            <ShieldCheck aria-hidden="true" className="mt-0.5 shrink-0" size={20} />
+            <p>{t('session.posePrivacy')}</p>
+          </div>
+        </div>
+
+        <aside className="flex flex-col gap-4">
+          <div className="kg-card overflow-hidden">
+            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+              <h2 className="font-bold text-slate-900">{t('session.currentActivity')}</h2>
+            </div>
+            <div className="p-5">
+              <div className="flex items-center gap-3">
+                <span className="grid size-12 place-items-center rounded-xl bg-blue-50 text-blue-700">
+                  <Eye aria-hidden="true" size={24} />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-slate-500">{t('session.postureState')}</p>
+                  <p className="text-xl font-bold text-slate-900">
+                    {/* Placeholder state */}
+                    {t('session.activitySitting')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="kg-card overflow-hidden">
+            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+              <h2 className="font-bold text-slate-900">{t('session.postureState')}</h2>
+            </div>
+            <div className="p-5 flex flex-col gap-4">
+              <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3">
+                <span className="font-semibold text-emerald-900">{t('session.stateGood')}</span>
+                <CheckCircle2 aria-hidden="true" className="text-emerald-600" size={20} />
+              </div>
+
+              <div className="space-y-3 pl-2 border-l-2 border-slate-200">
+                <p className="text-sm font-medium text-slate-700">{t('session.headAlignment')}</p>
+                <p className="text-sm font-medium text-slate-700">{t('session.shoulderAlignment')}</p>
+                <p className="text-sm font-medium text-slate-700">{t('session.torsoAlignment')}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="kg-card overflow-hidden">
+            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+              <h2 className="font-bold text-slate-900">{t('session.baselineComparison')}</h2>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-slate-500">
+                {t('calibration.placeholderNote')}
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <SafetyNotice className="mt-8">{t('common.noDiagnosis')}</SafetyNotice>
     </div>
   )
 }
 
-function poseStatusKey(status: PoseTrackingStatus) {
-  const keys: Record<PoseTrackingStatus, string> = {
-    idle: 'session.poseIdle',
-    loading_model: 'session.poseLoading',
-    ready: 'session.poseReady',
-    adjust_camera: 'session.poseAdjust',
-    no_pose: 'session.poseMissing',
-    multiple_poses: 'session.poseMultiple',
-    unsupported_activity: 'session.poseUnsupportedActivity',
-    unavailable: 'session.poseUnavailable',
-    error: 'session.poseError'
-  }
-  return keys[status]
-}
+function CameraStateOverlay({
+  camera,
+  pose
+}: {
+  camera: ReturnType<typeof useCamera>['state']
+  pose: PoseTrackingStatus
+}) {
+  const { t } = useTranslation()
 
-function poseStatusClass(status: PoseTrackingStatus) {
-  if (status === 'ready')
-    return 'border-emerald-200 bg-emerald-50/95 text-emerald-900'
-  if (status === 'adjust_camera' || status === 'multiple_poses') {
-    return 'border-amber-200 bg-amber-50/95 text-amber-950'
+  if (camera === 'denied') {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/80 p-6 text-center text-white backdrop-blur-sm">
+        <MonitorOff aria-hidden="true" size={32} />
+        <p className="font-medium">{t('camera.denied')}</p>
+      </div>
+    )
   }
-  if (status === 'error' || status === 'unavailable') {
-    return 'border-red-200 bg-red-50/95 text-red-900'
+
+  if (camera === 'waiting' || pose === 'initializing') {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/50 text-white backdrop-blur-sm">
+        <div className="size-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+        <p className="font-medium text-white/90">
+          {camera === 'waiting' ? t('camera.waiting') : t('session.poseLoading')}
+        </p>
+      </div>
+    )
   }
-  return 'border-slate-200 bg-white/95 text-slate-800'
+
+  if (pose === 'error') {
+    return (
+      <div className="absolute inset-x-0 top-0 flex items-center justify-center bg-red-950/80 p-3 text-red-50 backdrop-blur-md">
+        <CircleMinus aria-hidden="true" className="mr-2" size={18} />
+        <p className="text-sm font-medium">{t('session.poseError')}</p>
+      </div>
+    )
+  }
+
+  return null
 }

@@ -5,7 +5,7 @@ import {
   Clock3,
   Flame,
   MessageCircle,
-  Play
+  Monitor
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
@@ -20,11 +20,8 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
 import {
   getDashboard,
-  sessionActivitySlug,
-  type ExerciseSession
+  type PostureSession
 } from '@/services/product'
-
-const illustrationPath = '/dashboard-sit-to-stand.png'
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
@@ -99,30 +96,19 @@ function ActivityStartCard() {
   const { t } = useTranslation()
 
   return (
-    <article className="kg-card grid gap-6 overflow-hidden p-5 sm:p-6 md:grid-cols-[minmax(13rem,0.8fr)_minmax(0,1fr)] md:items-center">
-      <div className="grid min-h-52 place-items-center overflow-hidden rounded-2xl bg-[#f3f9f8] sm:min-h-64">
-        <img
-          alt={t('dashboard.todayIllustrationAlt')}
-          className="h-full max-h-72 w-full object-contain"
-          decoding="async"
-          height="1024"
-          loading="eager"
-          src={illustrationPath}
-          width="1536"
-        />
-      </div>
-      <div className="min-w-0">
-        <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
-          <Activity aria-hidden="true" size={20} />
+    <article className="kg-card flex flex-col gap-6 overflow-hidden p-6 sm:p-8 md:flex-row md:items-center">
+      <div className="min-w-0 flex-1">
+        <span className="grid size-12 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
+          <Monitor aria-hidden="true" size={24} />
         </span>
-        <h2 className="mt-4 text-2xl font-bold leading-tight text-slate-950">
+        <h2 className="mt-5 text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
           {t('dashboard.exploreTitle')}
         </h2>
-        <p className="mt-3 leading-7 text-slate-600">
+        <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
           {t('dashboard.exploreBody')}
         </p>
-        <Link className="kg-button-primary mt-5" to="/app/activities">
-          <Play aria-hidden="true" size={17} />
+        <Link className="kg-button-primary mt-6 min-h-12 w-full sm:w-auto" to="/app/monitor">
+          <Activity aria-hidden="true" size={20} />
           {t('dashboard.start')}
         </Link>
       </div>
@@ -154,7 +140,7 @@ function DashboardStat({
   )
 }
 
-function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
+function RecentActivity({ sessions }: { sessions: PostureSession[] }) {
   const { t, i18n } = useTranslation()
 
   return (
@@ -176,29 +162,21 @@ function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
           <Link
             className="flex min-h-[4.75rem] items-center gap-3 rounded-xl px-1 py-3 no-underline hover:bg-slate-50 sm:px-2"
             key={session.id}
-            to={`/app/sessions/${session.id}/summary`}
+            to={`/app/monitor/summary/${session.id}`}
           >
-            <span className="size-11 shrink-0 overflow-hidden rounded-full bg-teal-50 ring-1 ring-inset ring-teal-100">
-              <img
-                alt=""
-                className="h-full w-full object-cover"
-                decoding="async"
-                loading="lazy"
-                src={illustrationPath}
-              />
+            <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100">
+              <Monitor aria-hidden="true" size={20} />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold text-slate-900">
-                {sessionActivitySlug(session) === 'sit-to-stand-demo'
-                  ? t('dashboard.todayName')
-                  : sessionActivitySlug(session)}
+                {t('dashboard.todayName')}
               </span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {formatDate(session.started_at, i18n.resolvedLanguage ?? 'th')}
               </span>
             </span>
             <span className="text-xs tabular-nums text-slate-500 sm:text-sm">
-              {formatDuration(session.elapsed_seconds)}
+              {formatDuration(session.metrics.duration_seconds)}
             </span>
             <ArrowRight
               aria-hidden="true"

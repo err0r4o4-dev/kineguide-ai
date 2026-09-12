@@ -8,7 +8,6 @@ import { PwaUpdateNotice } from '@/components/PwaUpdateNotice'
 import { SystemLoading } from '@/components/SystemState'
 import { AuthProvider } from '@/features/auth/AuthProvider'
 import { ConsentRoute } from '@/features/auth/ConsentRoute'
-import { HealthProfileRoute } from '@/features/auth/HealthProfileRoute'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { finishRouteRefresh, isRouteRefresh } from '@/lib/navigation'
 import { NotFoundPage } from '@/routes/NotFoundPage'
@@ -36,11 +35,6 @@ const ConsentPage = lazy(() =>
     default: module.ConsentPage
   }))
 )
-const HealthProfileOnboardingPage = lazy(() =>
-  import('@/routes/HealthProfileOnboardingPage').then((module) => ({
-    default: module.HealthProfileOnboardingPage
-  }))
-)
 const DashboardPage = lazy(() =>
   import('@/routes/DashboardPage').then((module) => ({
     default: module.DashboardPage
@@ -51,19 +45,14 @@ const ChatPage = lazy(() =>
     default: module.ChatPage
   }))
 )
-const ExerciseLibraryPage = lazy(() =>
-  import('@/routes/ExerciseLibraryPage').then((module) => ({
-    default: module.ExerciseLibraryPage
-  }))
-)
-const ExerciseDetailPage = lazy(() =>
-  import('@/routes/ExerciseDetailPage').then((module) => ({
-    default: module.ExerciseDetailPage
-  }))
-)
 const CameraSetupPage = lazy(() =>
   import('@/routes/CameraSetupPage').then((module) => ({
     default: module.CameraSetupPage
+  }))
+)
+const CalibrationPage = lazy(() =>
+  import('@/routes/CalibrationPage').then((module) => ({
+    default: module.CalibrationPage
   }))
 )
 const LiveSessionPage = lazy(() =>
@@ -76,7 +65,7 @@ const SessionSummaryPage = lazy(() =>
     default: module.SessionSummaryPage
   }))
 )
-const HistoryPage = lazy(() =>
+const ProgressPage = lazy(() =>
   import('@/routes/ProgressPage').then((module) => ({
     default: module.ProgressPage
   }))
@@ -84,11 +73,6 @@ const HistoryPage = lazy(() =>
 const ProfilePage = lazy(() =>
   import('@/routes/ProfilePage').then((module) => ({
     default: module.ProfilePage
-  }))
-)
-const AssessmentPage = lazy(() =>
-  import('@/routes/AssessmentPage').then((module) => ({
-    default: module.AssessmentPage
   }))
 )
 const SettingsPage = lazy(() =>
@@ -104,6 +88,7 @@ const NotificationsPage = lazy(() =>
     default: module.NotificationsPage
   }))
 )
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 15_000 }
@@ -124,65 +109,62 @@ const router = createBrowserRouter([
         element: <ConsentRoute />,
         children: [
           {
-            path: '/onboarding',
-            element: <HealthProfileOnboardingPage />
-          },
-          {
-            element: <HealthProfileRoute />,
+            path: '/app',
+            element: <AppShell />,
             children: [
+              { index: true, element: <DashboardPage /> },
               {
-                path: '/app',
-                element: <AppShell />,
-                children: [
-                  { index: true, element: <DashboardPage /> },
-                  {
-                    path: 'chat',
-                    element: <ChatPage />
-                  },
-                  {
-                    path: 'educational-flow',
-                    element: <Navigate replace to="/app/activities" />
-                  },
-                  {
-                    path: 'plan',
-                    element: <Navigate replace to="/app/activities" />
-                  },
-                  { path: 'exercises', element: <ExerciseLibraryPage /> },
-                  { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
-                  {
-                    path: 'exercises/:slug/setup',
-                    element: <CameraSetupPage />
-                  },
-                  { path: 'activities', element: <ExerciseLibraryPage /> },
-                  { path: 'activities/:slug', element: <ExerciseDetailPage /> },
-                  {
-                    path: 'activities/:slug/setup',
-                    element: <CameraSetupPage />
-                  },
-                  {
-                    path: 'reference-models',
-                    element: <Navigate replace to="/app/activities" />
-                  },
-                  { path: 'sessions/:id/live', element: <LiveSessionPage /> },
-                  {
-                    path: 'sessions/:id/summary',
-                    element: <SessionSummaryPage />
-                  },
-                  {
-                    path: 'history',
-                    element: <HistoryPage />
-                  },
-                  {
-                    path: 'progress',
-                    element: <Navigate replace to="/app/history" />
-                  },
-                  { path: 'profile', element: <ProfilePage /> },
-                  { path: 'assessment', element: <AssessmentPage /> },
-                  { path: 'notifications', element: <NotificationsPage /> },
-                  { path: 'settings', element: <SettingsPage /> },
-                  { path: 'help', element: <HelpPage /> }
-                ]
-              }
+                path: 'chat',
+                element: <ChatPage />
+              },
+              {
+                path: 'monitor',
+                element: <CameraSetupPage />
+              },
+              {
+                path: 'monitor/calibration',
+                element: <CalibrationPage />
+              },
+              {
+                path: 'monitor/live',
+                element: <LiveSessionPage />
+              },
+              {
+                path: 'monitor/summary/:id',
+                element: <SessionSummaryPage />
+              },
+              {
+                path: 'sessions/:id/live',
+                element: <LiveSessionPage />
+              },
+              {
+                path: 'sessions/:id/summary',
+                element: <SessionSummaryPage />
+              },
+              {
+                path: 'history',
+                element: <ProgressPage />
+              },
+              {
+                path: 'analytics',
+                element: <ProgressPage />
+              },
+              {
+                path: 'progress',
+                element: <Navigate replace to="/app/analytics" />
+              },
+              {
+                path: 'activities',
+                element: <Navigate replace to="/app/monitor" />
+              },
+              {
+                path: 'exercises',
+                element: <Navigate replace to="/app/monitor" />
+              },
+              { path: 'profile', element: <ProfilePage /> },
+              { path: 'notifications', element: <NotificationsPage /> },
+              { path: 'settings', element: <SettingsPage /> },
+              { path: 'help', element: <HelpPage /> }
             ]
           }
         ]

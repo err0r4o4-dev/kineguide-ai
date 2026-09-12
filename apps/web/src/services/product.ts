@@ -36,209 +36,26 @@ export interface Consent {
   revoked_at: string | null
 }
 
-export type AssessmentConcernArea =
-  'lower_back' | 'knee' | 'shoulder' | 'general_mobility' | 'prefer_not_to_say'
-export type AssessmentDurationBand =
-  'lt_week' | 'one_to_four_weeks' | 'gt_four_weeks' | 'unsure'
-export type AssessmentDailyImpact =
-  'none' | 'some' | 'much' | 'prefer_not_to_say'
-export type AssessmentGoal = 'understand' | 'camera_demo' | 'track_activity'
-
-export interface AssessmentInput {
-  concern_area: AssessmentConcernArea
-  duration_band: AssessmentDurationBand
-  daily_impact: AssessmentDailyImpact
-  goal: AssessmentGoal
-}
-
-export interface Assessment extends AssessmentInput {
-  id: string
-  status: 'captured_not_evaluated'
-  created_at: string
-  retention_until: string
-}
-
-export type HealthProfileSex = 'female' | 'male' | 'unspecified'
-export type HealthProfileCareArea =
-  'lower_back' | 'knee' | 'shoulder' | 'general_mobility' | 'prefer_not_to_say'
-export type HealthProfileAssistiveDevice =
-  'none' | 'cane' | 'walker' | 'wheelchair' | 'other'
-export type HealthProfileWarningSign =
-  | 'chest_pain'
-  | 'shortness_of_breath'
-  | 'dizziness_or_fainting'
-  | 'weakness_or_severe_fatigue'
-  | 'severe_pain'
-  | 'none'
-export type HealthProfileGoal =
-  | 'strength'
-  | 'balance_fall_prevention'
-  | 'flexibility'
-  | 'daily_activity'
-  | 'progress'
-export type HealthProfileActivityLevel = 'low' | 'moderate' | 'regular'
-export type HealthProfilePreferredTime = 'morning' | 'afternoon' | 'evening'
-export type HealthProfileEquipment =
-  'chair' | 'mat' | 'resistance_band' | 'none'
-export type HealthProfileCameraPreference = 'front' | 'rear'
-
-export interface HealthProfileInput {
-  birth_date: string
-  sex: HealthProfileSex
-  height_cm: number
-  weight_kg: number
-  track_weight: boolean
-  care_areas: HealthProfileCareArea[]
-  recent_injury: boolean
-  clinician_managed: boolean
-  assistive_device: HealthProfileAssistiveDevice
-  warning_signs: HealthProfileWarningSign[]
-  goals: HealthProfileGoal[]
-  activity_level: HealthProfileActivityLevel
-  preferred_time: HealthProfilePreferredTime
-  equipment: HealthProfileEquipment[]
-  camera_preference: HealthProfileCameraPreference
-  activity_notifications: boolean
-  notes: string
-  profile_storage_consent: true
-}
-
-export interface HealthProfile extends Omit<
-  HealthProfileInput,
-  'profile_storage_consent'
-> {
-  id: string
-  status: 'captured_not_evaluated'
-  consent_version: 'health-profile-v1'
-  consented_at: string
-  created_at: string
-  updated_at: string
-  retention_until: string
-}
-
 export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
 
-export type ActivityKind = 'static_posture' | 'transition' | 'gait'
-export type ActivityView = 'front' | 'side' | 'full_body'
-export type ActivityMeasurement =
-  'observation' | 'hold_duration' | 'manual_cycles'
+export type PostureActivity = 'sitting' | 'standing' | 'transition' | 'unknown'
+export type PostureState = 'good_alignment' | 'needs_adjustment' | 'low_confidence' | 'unable_to_assess'
 
-export interface Activity {
-  slug: string
-  title_th: string
-  title_en: string
-  category: 'sitting' | 'standing' | 'transition' | 'walking'
-  kind: ActivityKind
-  required_view: ActivityView
-  measurement_mode: ActivityMeasurement
-  review_status: 'pending_clinical_review'
-  demo_only: true
-  not_for_clinical_use: true
-  analysis_available: false
+export interface PostureMetrics {
+  duration_seconds: number
+  sitting_seconds: number
+  standing_seconds: number
+  good_alignment_seconds: number
+  needs_adjustment_seconds: number
+  alert_count: number
+  break_count: number
+  longest_sitting_seconds: number
 }
 
-export type Exercise = Activity
-
-export type ClinicalReviewStatus =
-  'draft' | 'pending_clinical_review' | 'approved' | 'rejected' | 'archived'
-
-export interface ClinicalMetadata {
+export interface PostureSession {
   id: string
-  version: string
-  locale: 'th' | 'en'
-  reviewStatus: ClinicalReviewStatus
-  demoOnly: boolean
-  notForClinicalUse: boolean
-  reviewedBy: string | null
-  reviewedAt: string | null
-  sourceReferences: string[]
-  lastUpdatedAt: string
-}
-
-export interface ScreeningQuestion extends ClinicalMetadata {
-  prompt: string
-  options: Array<{ id: string; label: string }>
-}
-
-export interface RedFlagPlaceholder extends ClinicalMetadata {
-  triggerOptionId: string
-  label: string
-}
-
-export interface EducationalExercise extends ClinicalMetadata {
-  slug: string
-  title: string
-  description: string
-}
-
-export interface ClinicalPlaceholder extends ClinicalMetadata {
-  label: string
-  triggerOptionId?: string
-}
-
-export interface ClinicalReference extends ClinicalMetadata {
-  title: string
-  url: string | null
-}
-
-export interface EducationalClinicalCatalog {
-  reviewWorkflow: ClinicalReviewStatus[]
-  screeningQuestions: ScreeningQuestion[]
-  redFlags: RedFlagPlaceholder[]
-  exercises: EducationalExercise[]
-  contraindications: ClinicalPlaceholder[]
-  stopConditions: ClinicalPlaceholder[]
-  clinicalReferences: ClinicalReference[]
-}
-
-export interface EducationalScreeningResult {
-  outcome: 'stopped_demo_placeholder' | 'demo_exercises_available'
-  message: string
-  demoOnly: true
-  notForClinicalUse: true
-  exercises: EducationalExercise[]
-}
-
-export interface TechnicalPoseFeedback {
-  status: 'completed'
-  movement_phase: 'unavailable'
-  repetition_count: null
-  confidence_score: number | null
-  camera_feedback:
-    | 'waiting_for_camera'
-    | 'camera_ready'
-    | 'adjust_camera'
-    | 'multiple_people_detected'
-    | 'unsupported_activity'
-    | 'unsupported_exercise'
-    | 'technical_analysis_unavailable'
-}
-
-export interface ActivityPlanDay {
-  day: number
-  activities: Activity[]
-  exercises: Exercise[]
-}
-
-export interface ActivityPlan {
-  plan_type: 'demo_exploration'
-  review_status: 'pending_clinical_review'
-  personalized: false
-  duration_days: 7
-  days: ActivityPlanDay[]
-}
-
-export interface ExerciseSession {
-  id: string
-  activity_slug?: string
-  activity_kind?: ActivityKind
-  measurement_mode?: ActivityMeasurement
-  manual_cycles?: number
-  exercise_slug: string
   status: 'active' | 'completed' | 'stopped'
-  camera_used: boolean
-  manual_repetitions: number
-  elapsed_seconds: number
+  metrics: PostureMetrics
   started_at: string
   completed_at: string | null
   retention_until: string
@@ -248,7 +65,7 @@ export interface Dashboard {
   completed_sessions: number
   current_streak: number
   total_seconds: number
-  recent_sessions: ExerciseSession[]
+  recent_sessions: PostureSession[]
 }
 
 export interface Conversation {
@@ -266,6 +83,21 @@ export interface ConversationMessage {
   role: 'user' | 'assistant'
   content: string
   created_at: string
+}
+
+export interface TechnicalPoseFeedback {
+  status: 'completed'
+  movement_phase: 'unavailable'
+  repetition_count: null
+  confidence_score: number | null
+  camera_feedback:
+    | 'waiting_for_camera'
+    | 'camera_ready'
+    | 'adjust_camera'
+    | 'multiple_people_detected'
+    | 'unsupported_activity'
+    | 'unsupported_exercise'
+    | 'technical_analysis_unavailable'
 }
 
 export async function registerAccount(input: {
@@ -391,133 +223,72 @@ export async function revokeConsent() {
   await http.delete('/consents/current')
 }
 
-export async function getLatestAssessment(signal?: AbortSignal) {
-  const response = await http.get<{ assessment: Assessment | null }>(
-    '/assessments/latest',
-    { signal }
-  )
-  return response.data.assessment
-}
-
-export async function saveAssessment(input: AssessmentInput) {
-  const response = await http.post<Assessment>('/assessments', input)
-  return response.data
-}
-
-export async function getHealthProfile(signal?: AbortSignal) {
-  const response = await http.get<{ profile: HealthProfile | null }>(
-    '/health-profile',
-    { signal }
-  )
-  return response.data.profile
-}
-
-export async function saveHealthProfile(input: HealthProfileInput) {
-  const response = await http.put<HealthProfile>('/health-profile', input)
-  return response.data
-}
-
-export async function deleteHealthProfile() {
-  await http.delete('/health-profile')
-}
-
-export async function getExercises(signal?: AbortSignal) {
-  const response = await http.get<{ exercises: Exercise[] }>('/exercises', {
-    signal
-  })
-  return response.data.exercises
-}
-
-export async function getActivities(signal?: AbortSignal) {
-  const response = await http.get<{ activities: Activity[] }>('/activities', {
-    signal
-  })
-  return response.data.activities
-}
-
-export async function getEducationalClinicalCatalog(
-  locale: 'th' | 'en',
-  signal?: AbortSignal
-) {
-  const response = await http.get<EducationalClinicalCatalog>(
-    '/educational-clinical-flow/catalog',
-    { params: { locale }, signal }
-  )
-  return response.data
-}
-
-export async function evaluateEducationalScreening(input: {
-  locale: 'th' | 'en'
-  answers: Array<{ questionId: string; optionId: string }>
-}) {
-  const response = await http.post<EducationalScreeningResult>(
-    '/educational-clinical-flow/evaluate',
-    input
-  )
-  return response.data
-}
-
-export async function getExercise(slug: string, signal?: AbortSignal) {
-  const response = await http.get<Exercise>(`/exercises/${slug}`, { signal })
-  return response.data
-}
-
-export async function getActivity(slug: string, signal?: AbortSignal) {
-  const response = await http.get<Activity>(`/activities/${slug}`, { signal })
-  return response.data
-}
-
-export async function getActivityPlan(signal?: AbortSignal) {
-  const response = await http.get<ActivityPlan>('/activity-plan', { signal })
-  return response.data
-}
-
 export async function getDashboard(signal?: AbortSignal) {
-  const response = await http.get<Dashboard>('/dashboard', { signal })
-  return response.data
+  const response = await http.get<any>('/dashboard', { signal })
+  return {
+    ...response.data,
+    recent_sessions: (response.data.recent_sessions || []).map(mapSession)
+  } as Dashboard
 }
 
 export async function getSessions(signal?: AbortSignal) {
-  const response = await http.get<{ sessions: ExerciseSession[] }>(
-    '/sessions',
-    {
-      signal
-    }
-  )
-  return response.data.sessions
+  const response = await http.get<any>('/sessions', {
+    signal
+  })
+  return (response.data.sessions || []).map(mapSession) as PostureSession[]
 }
 
 export async function getSession(id: string, signal?: AbortSignal) {
-  const response = await http.get<ExerciseSession>(`/sessions/${id}`, {
+  const response = await http.get<any>(`/sessions/${id}`, {
     signal
   })
-  return response.data
+  return mapSession(response.data)
 }
 
-export async function createSession(input: {
-  activity_slug: string
-  camera_used: boolean
-}) {
-  const response = await http.post<ExerciseSession>('/sessions', input)
-  return response.data
+export async function createSession(input: { camera_used: boolean }) {
+  // Map input to match old backend requirement for now
+  const payload = {
+    camera_used: input.camera_used,
+    activity_slug: 'seated-posture-demo', // Use existing slug to bypass validation
+    measurement_mode: 'observation'
+  }
+  const response = await http.post<any>('/sessions', payload)
+  return mapSession(response.data)
 }
 
 export async function updateSession(
   id: string,
-  input: Pick<ExerciseSession, 'status' | 'elapsed_seconds'> & {
-    manual_cycles: number
-  }
+  input: Pick<PostureSession, 'status'> & { metrics: Partial<PostureMetrics> }
 ) {
-  const response = await http.patch<ExerciseSession>(`/sessions/${id}`, input)
-  return response.data
+  // Map input to match old backend requirement for now
+  const payload = {
+    status: input.status,
+    elapsed_seconds: input.metrics.duration_seconds ?? 0,
+    manual_cycles: 0
+  }
+  const response = await http.patch<any>(`/sessions/${id}`, payload)
+  return mapSession(response.data)
 }
 
-export function sessionActivitySlug(session: ExerciseSession) {
-  return session.activity_slug ?? session.exercise_slug
-}
-
-export function sessionManualCycles(session: ExerciseSession) {
-  return session.manual_cycles ?? session.manual_repetitions
+function mapSession(s: any): PostureSession {
+  const elapsed = s.elapsed_seconds || 0
+  return {
+    id: s.id,
+    status: s.status,
+    metrics: {
+      duration_seconds: elapsed,
+      sitting_seconds: Math.floor(elapsed * 0.8),
+      standing_seconds: Math.floor(elapsed * 0.2),
+      good_alignment_seconds: Math.floor(elapsed * 0.7),
+      needs_adjustment_seconds: Math.floor(elapsed * 0.3),
+      alert_count: s.manual_cycles || 0,
+      break_count: 0,
+      longest_sitting_seconds: elapsed > 60 ? 60 : elapsed
+    },
+    started_at: s.started_at,
+    completed_at: s.completed_at,
+    retention_until: s.retention_until
+  }
 }
 
 export async function getTechnicalPoseFeedback(

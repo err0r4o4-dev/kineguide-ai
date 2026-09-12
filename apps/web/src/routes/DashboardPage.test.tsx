@@ -11,10 +11,6 @@ vi.mock('@/features/auth/AuthContext', () => ({
 }))
 
 vi.mock('@/services/product', () => ({
-  sessionActivitySlug: (session: {
-    activity_slug?: string
-    exercise_slug: string
-  }) => session.activity_slug ?? session.exercise_slug,
   getDashboard: vi.fn().mockResolvedValue({
     completed_sessions: 3,
     current_streak: 2,
@@ -22,11 +18,10 @@ vi.mock('@/services/product', () => ({
     recent_sessions: [
       {
         id: '00000000-0000-4000-8000-000000000001',
-        exercise_slug: 'sit-to-stand-demo',
         status: 'completed',
-        camera_used: false,
-        manual_repetitions: 4,
-        elapsed_seconds: 60,
+        metrics: {
+          duration_seconds: 60
+        },
         started_at: '2026-08-27T08:30:00Z',
         completed_at: '2026-08-27T08:31:00Z',
         retention_until: '2027-08-27T08:31:00Z'
@@ -36,7 +31,7 @@ vi.mock('@/services/product', () => ({
 }))
 
 describe('DashboardPage', () => {
-  it('presents the MVP activity and history hierarchy', async () => {
+  it('presents the Posture Monitoring activity and history hierarchy', async () => {
     await i18n.changeLanguage('th')
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } }
@@ -57,34 +52,30 @@ describe('DashboardPage', () => {
       })
     ).toBeInTheDocument()
     expect(screen.getByText(/อัปเดตล่าสุด/)).toBeVisible()
-    expect(
-      await screen.findByRole('img', {
-        name: 'ภาพประกอบการสาธิตลุกนั่งจากเก้าอี้'
-      })
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'เลือกการสาธิต' })).toHaveAttribute(
+
+    expect(screen.getByRole('link', { name: /เริ่มตรวจท่าทาง/ })).toHaveAttribute(
       'href',
-      '/app/activities'
+      '/app/monitor'
     )
     expect(
       screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })
     ).toHaveAttribute('href', '/app/chat')
     expect(
-      await screen.findByRole('group', { name: 'สรุปกิจกรรม' })
+      await screen.findByRole('group', { name: 'สรุปการใช้งาน' })
     ).toHaveTextContent('3')
     expect(
-      screen.getByRole('heading', { name: 'กิจกรรมล่าสุด' })
+      screen.getByRole('heading', { name: 'ประวัติล่าสุด' })
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'ดูทั้งหมด' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'ดูประวัติทั้งหมด' })).toHaveAttribute(
       'href',
       '/app/history'
     )
     expect(
-      screen.getByRole('heading', { name: 'เลือกกิจกรรมสาธิต' })
+      screen.getByRole('heading', { name: 'เริ่มตรวจท่าทาง' })
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        'ตัวเลขทั้งหมดเป็นข้อมูลกิจกรรมที่บันทึกเอง ไม่ใช่ผลการประเมินการฟื้นตัว'
+        'สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย'
       )
     ).toBeInTheDocument()
   })

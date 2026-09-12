@@ -1,216 +1,197 @@
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   Camera,
   CheckCircle2,
+  ChevronRight,
   CircleAlert,
-  Cpu,
-  LockKeyhole,
+  Loader2,
   MonitorOff,
-  Play
+  UserRoundX
 } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 
+import { PageHeader } from '@/components/PageHeader'
+import { SafetyNotice } from '@/components/SafetyNotice'
 import { useCamera } from '@/features/camera/useCamera'
-import { QueryError, QueryLoading } from '@/components/QueryState'
-import { createSession, getActivity } from '@/services/product'
+import { createSession } from '@/services/product'
 
 export function CameraSetupPage() {
-  const { slug = '' } = useParams()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
-  const activity = useQuery({
-    queryKey: ['activity', slug],
-    queryFn: ({ signal }) => getActivity(slug, signal)
-  })
-  const [creating, setCreating] = useState(false)
-  const [error, setError] = useState('')
-  const begin = async (cameraUsed: boolean) => {
-    setCreating(true)
-    setError('')
-    try {
-      const session = await createSession({
-        activity_slug: slug,
-        camera_used: cameraUsed
-      })
-      camera.stop()
-      navigate(`/app/sessions/${session.id}/live`)
-    } catch {
-      setError(t('session.saveFailed'))
-    } finally {
-      setCreating(false)
+  const [permissionStep, setPermissionStep] = useState(true)
+
+  const startSession = useMutation({
+    mutationFn: async () => {
+      return createSession({ camera_used: true })
+    },
+    onSuccess: () => {
+      navigate(`/app/monitor/calibration`)
     }
-  }
-  const denied =
-    camera.state === 'denied' ||
-    camera.state === 'error' ||
-    camera.state === 'unsupported'
-  if (activity.isLoading) return <QueryLoading />
-  if (activity.isError)
-    return <QueryError retry={() => void activity.refetch()} />
-  return (
-    <div>
-      <header>
-        <h1 className="text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-4xl">
-          {t('camera.title')}
-        </h1>
-        <p className="mt-2 text-slate-600">{t('camera.subtitle')}</p>
-        {activity.data && (
-          <p className="mt-3 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">
-            {t('activities.cameraPlacement', {
-              view: t(`activities.views.${activity.data.required_view}`)
-            })}
+  })
+
+  if (permissionStep) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <PageHeader title={t('monitor.setupTitle')} subtitle={t('monitor.setupSubtitle')} />
+        <div className="kg-card mt-8 flex flex-col items-center justify-center p-8 text-center sm:p-12">
+          <Camera aria-hidden="true" className="text-teal-700" size={56} />
+          <h2 className="mt-6 text-xl font-bold text-slate-900">
+            {t('consent.cameraTitle')}
+          </h2>
+          <p className="mt-4 max-w-md text-slate-600 leading-relaxed">
+            {t('consent.cameraBody')}
           </p>
-        )}
-      </header>
-      <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_400px]">
-        <div className="kg-card overflow-hidden bg-slate-950 ring-1 ring-slate-900/5">
-          <div className="relative aspect-video">
-            <video
-              aria-label={t('camera.visibility')}
-              className="h-full w-full object-cover [transform:scaleX(-1)]"
-              muted
-              playsInline
-              ref={camera.videoRef}
-            />
-            <div className="pointer-events-none absolute inset-8 rounded-[2rem] border-2 border-dashed border-white/40" />
-            {camera.state !== 'ready' && (
-              <div className="absolute inset-0 grid place-items-center text-center text-white">
-                <div>
-                  <Camera aria-hidden="true" className="mx-auto" size={58} />
-                  <p className="mt-4 max-w-sm px-5 text-slate-300">
-                    {t('camera.instructions')}
-                  </p>
-                </div>
+          <div className="mt-8 flex gap-4">
+            <button
+              className="kg-button-primary"
+              onClick={() => {
+                setPermissionStep(false)
+                void camera.start()
+              }}
+              type="button"
+            >
+              {t('monitor.start')}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl pb-4">
+      <PageHeader title={t('monitor.setupTitle')} subtitle={t('monitor.setupSubtitle')} />
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_minmax(18rem,0.4fr)]">
+        <section className="flex flex-col gap-4">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-950">
+            {camera.state === 'ready' && (
+              <video
+                autoPlay
+                className="absolute inset-0 h-full w-full object-cover"
+                muted
+                playsInline
+                ref={camera.videoRef}
+              />
+            )}
+            {camera.state === 'waiting' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-white/80">
+                <Loader2 aria-hidden="true" className="animate-spin" size={32} />
+                <p>{t('monitor.waiting')}</p>
+              </div>
+            )}
+            {camera.state === 'denied' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-white/80">
+                <MonitorOff aria-hidden="true" size={32} />
+                <p>{t('monitor.denied')}</p>
+              </div>
+            )}
+            {camera.state === 'unsupported' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-white/80">
+                <CircleAlert aria-hidden="true" size={32} />
+                <p>{t('monitor.unsupported')}</p>
               </div>
             )}
           </div>
-          <div className="flex flex-wrap justify-center gap-3 bg-slate-900 p-4">
-            {camera.state !== 'ready' ? (
-              <button
-                className="kg-button-primary"
-                disabled={camera.state === 'requesting'}
-                onClick={() => void camera.start()}
-                type="button"
-              >
-                <Camera aria-hidden="true" />
-                {camera.state === 'requesting'
-                  ? t('common.loading')
-                  : t('camera.start')}
-              </button>
-            ) : (
-              <button
-                className="kg-button-secondary border-white/30 bg-white text-slate-900"
-                onClick={camera.stop}
-                type="button"
-              >
-                {t('camera.stop')}
-              </button>
-            )}
-          </div>
-        </div>
-        <aside className="kg-card p-6 sm:p-7">
-          <h2 className="text-2xl font-bold">{t('camera.readiness')}</h2>
-          <div className="mt-6 space-y-3">
-            <Ready
-              icon={LockKeyhole}
-              ok
-              label={t('camera.secure')}
-              detail={t('common.onDevice')}
-            />
-            <Ready
-              icon={camera.state === 'ready' ? CheckCircle2 : CircleAlert}
-              ok={camera.state === 'ready'}
-              label={t('camera.permission')}
-              detail={
-                camera.state === 'ready'
-                  ? t('camera.granted')
-                  : denied
-                    ? t('camera.denied')
-                    : t('camera.waiting')
-              }
-            />
-            <Ready
-              icon={Camera}
-              ok={camera.state === 'ready'}
-              label={t('camera.visibility')}
-              detail={
-                camera.state === 'ready'
-                  ? t('camera.granted')
-                  : t('camera.waiting')
-              }
-            />
-            <Ready
-              icon={Cpu}
-              ok={false}
-              label={t('camera.model')}
-              detail={t('camera.modelPending')}
-            />
-          </div>
-          {denied && (
-            <p className="kg-alert-danger mt-5" role="alert">
-              {camera.state === 'unsupported'
-                ? t('camera.unsupported')
-                : t('camera.denied')}
+          <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 sm:px-5">
+            <p className="text-sm font-medium text-slate-700">
+              {t('monitor.secure')}
             </p>
-          )}
-          {error && (
-            <p className="kg-alert-danger mt-5" role="alert">
-              {error}
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700">
+              <CheckCircle2 aria-hidden="true" size={18} />
+              {t('common.onDevice')}
+            </span>
+          </div>
+        </section>
+
+        <section className="flex flex-col">
+          <div className="kg-card flex-1 p-5">
+            <h2 className="font-bold text-slate-950">{t('monitor.readiness')}</h2>
+            <ul className="mt-5 space-y-4">
+              <StatusItem
+                label={t('monitor.permission')}
+                state={
+                  camera.state === 'ready'
+                    ? 'good'
+                    : camera.state === 'denied'
+                      ? 'error'
+                      : 'pending'
+                }
+              />
+              <StatusItem
+                label={t('monitor.visibility')}
+                state={camera.state === 'ready' ? 'good' : 'pending'}
+              />
+              <StatusItem
+                label={t('monitor.model')}
+                state={camera.state === 'ready' ? 'pending' : 'pending'}
+                value={camera.state === 'ready' ? t('monitor.modelPending') : undefined}
+              />
+            </ul>
+          </div>
+
+          <div className="mt-5">
+            <p className="mb-4 text-sm text-slate-600 text-center">
+              {t('monitor.instructions')}
             </p>
-          )}
-          <div className="mt-6 grid gap-3">
             <button
               className="kg-button-primary w-full"
-              disabled={camera.state !== 'ready' || creating}
-              onClick={() => void begin(true)}
+              disabled={camera.state !== 'ready' || startSession.isPending}
+              onClick={() => startSession.mutate()}
               type="button"
             >
-              <Play aria-hidden="true" />
-              {creating ? t('common.loading') : t('camera.continue')}
-            </button>
-            <button
-              className="kg-button-secondary w-full"
-              disabled={creating}
-              onClick={() => void begin(false)}
-              type="button"
-            >
-              <MonitorOff aria-hidden="true" />
-              {t('camera.continueWithoutCamera')}
+              {startSession.isPending && (
+                <Loader2 aria-hidden="true" className="animate-spin" size={18} />
+              )}
+              {t('monitor.continue')}
+              <ChevronRight aria-hidden="true" size={18} />
             </button>
           </div>
-        </aside>
-      </section>
+        </section>
+      </div>
+
+      <SafetyNotice className="mt-8">{t('common.noDiagnosis')}</SafetyNotice>
     </div>
   )
 }
 
-function Ready({
-  icon: Icon,
-  ok,
+function StatusItem({
   label,
-  detail
+  state,
+  value
 }: {
-  icon: typeof Camera
-  ok: boolean
   label: string
-  detail: string
+  state: 'good' | 'error' | 'pending'
+  value?: string
 }) {
   return (
-    <div
-      className={`flex items-start gap-3 rounded-2xl border p-4 ${ok ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-slate-50'}`}
-    >
-      <Icon
-        aria-hidden="true"
-        className={ok ? 'text-emerald-700' : 'text-slate-500'}
-        size={20}
-      />
-      <div>
-        <p className="font-semibold">{label}</p>
-        <p className="mt-1 text-xs text-slate-600">{detail}</p>
+    <li className="flex items-start gap-3">
+      {state === 'good' ? (
+        <CheckCircle2
+          aria-hidden="true"
+          className="mt-0.5 shrink-0 text-emerald-600"
+          size={18}
+        />
+      ) : state === 'error' ? (
+        <UserRoundX
+          aria-hidden="true"
+          className="mt-0.5 shrink-0 text-red-600"
+          size={18}
+        />
+      ) : (
+        <div className="mt-1.5 size-2 shrink-0 rounded-full bg-slate-300" />
+      )}
+      <div className="min-w-0 flex-1">
+        <p
+          className={`text-sm font-medium ${state === 'error' ? 'text-red-900' : 'text-slate-700'}`}
+        >
+          {label}
+        </p>
+        {value && <p className="mt-0.5 text-xs text-slate-500">{value}</p>}
       </div>
-    </div>
+    </li>
   )
 }

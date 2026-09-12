@@ -1,4 +1,4 @@
-import { Activity, Home, History, Menu, MessageCircle, Settings } from 'lucide-react'
+import { BarChart3, History, Home, Menu, Monitor, Settings } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet } from 'react-router'
@@ -15,9 +15,9 @@ import { NotificationProvider } from '@/features/notifications/NotificationProvi
 
 const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
-  { to: '/app/chat', key: 'chat', icon: MessageCircle, end: false },
-  { to: '/app/activities', key: 'exercises', icon: Activity, end: false },
+  { to: '/app/monitor', key: 'monitor', icon: Monitor, end: false },
   { to: '/app/history', key: 'history', icon: History, end: false },
+  { to: '/app/analytics', key: 'analytics', icon: BarChart3, end: false },
   { to: '/app/settings', key: 'settings', icon: Settings, end: false }
 ] as const
 

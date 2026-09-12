@@ -5,7 +5,8 @@ import {
   ChevronRight,
   Clock3,
   Flame,
-  Search
+  Search,
+  Monitor
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -17,8 +18,7 @@ import { StatCard } from '@/components/StatCard'
 import { formatDate, formatDuration } from '@/lib/format'
 import {
   getDashboard,
-  getSessions,
-  sessionActivitySlug
+  getSessions
 } from '@/services/product'
 
 const HISTORY_PAGE_SIZE = 10
@@ -28,6 +28,7 @@ export function ProgressPage() {
   const [range, setRange] = useState(7)
   const [search, setSearch] = useState('')
   const [historyPage, setHistoryPage] = useState(1)
+
   const dashboard = useQuery({
     queryKey: ['dashboard'],
     queryFn: ({ signal }) => getDashboard(signal)
@@ -36,11 +37,12 @@ export function ProgressPage() {
     queryKey: ['sessions'],
     queryFn: ({ signal }) => getSessions(signal)
   })
+
   const visibleSessions = useMemo(
     () =>
       (sessions.data ?? [])
         .filter((session) =>
-          sessionActivitySlug(session)
+          t('dashboard.todayName')
             .toLowerCase()
             .includes(search.toLowerCase())
         )
@@ -50,8 +52,9 @@ export function ProgressPage() {
             new Date(session.started_at).getTime() >=
               Date.now() - range * 86400000
         ),
-    [range, search, sessions.data]
+    [range, search, sessions.data, t]
   )
+
   const historyPageCount = Math.max(
     1,
     Math.ceil(visibleSessions.length / HISTORY_PAGE_SIZE)
@@ -76,7 +79,7 @@ export function ProgressPage() {
 
   return (
     <div>
-      <PageHeader title={t('history.title')} subtitle={t('history.subtitle')} />
+      <PageHeader title={t('progress.title')} subtitle={t('progress.subtitle')} />
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           icon={CalendarCheck2}
@@ -94,6 +97,7 @@ export function ProgressPage() {
           value={String(dashboard.data.current_streak)}
         />
       </section>
+
       <section className="kg-card mt-6 p-5 sm:p-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold">{t('progress.chart')}</h2>
@@ -109,7 +113,7 @@ export function ProgressPage() {
                 type="button"
               >
                 {value === 0
-                  ? t('exercises.all')
+                  ? t('notifications.filter.all')
                   : `${value} ${i18n.resolvedLanguage === 'th' ? 'วัน' : 'days'}`}
               </button>
             ))}
@@ -123,28 +127,31 @@ export function ProgressPage() {
           {visibleSessions
             .slice(0, 12)
             .reverse()
-            .map((session) => (
-              <div
-                className="flex h-full flex-1 flex-col justify-end"
-                key={session.id}
-              >
-                <span
-                  className="rounded-t-lg bg-teal-700"
-                  style={{
-                    height: `${Math.max(8, Math.min(100, session.elapsed_seconds / 6))}%`
-                  }}
-                />
-                <span className="pt-2 text-center text-xs text-slate-500">
-                  {new Date(session.started_at).getDate()}
-                </span>
-              </div>
-            ))}
+            .map((session) => {
+              const heightPercentage = Math.max(8, Math.min(100, (session.metrics.duration_seconds / 3600) * 100))
+              return (
+                <div
+                  className="flex h-full flex-1 flex-col justify-end"
+                  key={session.id}
+                >
+                  <span
+                    className="rounded-t-lg bg-teal-700 transition-all hover:bg-teal-600"
+                    style={{ height: `${heightPercentage}%` }}
+                    title={formatDuration(session.metrics.duration_seconds)}
+                  />
+                  <span className="pt-2 text-center text-xs text-slate-500">
+                    {new Date(session.started_at).getDate()}
+                  </span>
+                </div>
+              )
+            })}
           {visibleSessions.length === 0 && (
             <p className="m-auto text-slate-500">{t('history.empty')}</p>
           )}
         </div>
         <p className="mt-4 text-xs text-slate-500">{t('dashboard.manual')}</p>
       </section>
+
       <section className="kg-card mt-6 overflow-hidden">
         <div className="flex flex-col gap-3 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold">{t('history.title')}</h2>
@@ -171,15 +178,21 @@ export function ProgressPage() {
             <Link
               className="flex items-center gap-3 p-4 no-underline hover:bg-slate-50 sm:px-6"
               key={session.id}
-              to={`/app/sessions/${session.id}/summary`}
+              to={`/app/monitor/summary/${session.id}`}
             >
-              <span
-                className={`size-2 rounded-full ${session.status === 'completed' ? 'bg-emerald-600' : 'bg-amber-500'}`}
-                aria-hidden="true"
-              />
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700">
+                <Monitor aria-hidden="true" size={18} />
+              </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold text-slate-900">
-                  {sessionActivitySlug(session)}
+                <span className="flex items-center gap-2">
+                  <span className="block truncate font-semibold text-slate-900">
+                    {t('dashboard.todayName')}
+                  </span>
+                  <span
+                    className={`size-2 rounded-full ${session.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                    title={session.status === 'completed' ? t('history.completed') : t('history.stopped')}
+                    aria-hidden="true"
+                  />
                 </span>
                 <span className="mt-1 block text-sm text-slate-500">
                   {formatDate(
@@ -188,8 +201,8 @@ export function ProgressPage() {
                   )}
                 </span>
               </span>
-              <span className="hidden text-sm text-slate-500 sm:block">
-                {formatDuration(session.elapsed_seconds)}
+              <span className="hidden text-sm font-medium text-slate-700 sm:block">
+                {formatDuration(session.metrics.duration_seconds)}
               </span>
               <ChevronRight
                 aria-hidden="true"
