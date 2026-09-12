@@ -202,6 +202,9 @@ const th = {
     aiTitle: 'พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด',
     aiBody:
       'ใช้เพื่อข้อมูลสนับสนุนทั่วไป คำตอบอาจไม่สมบูรณ์และไม่ใช้แทนคำแนะนำจากผู้เชี่ยวชาญ',
+    demoChoiceTitle: 'เลือกดูสาธิตได้ตามความพร้อม',
+    demoChoiceBody:
+      'เลือกดูภาพสาธิตอย่างเดียว หรือเปิดกล้องในอุปกรณ์เมื่อคุณพร้อม',
     summaryTitle: 'ทบทวนบันทึกกิจกรรม',
     summaryBody:
       'ดูเวลา จำนวนกิจกรรม และประวัติที่คุณยินยอมให้จัดเก็บ โดยไม่สรุปผลการฟื้นตัว',
@@ -485,6 +488,9 @@ const th = {
     todayName: 'การลุกนั่งจากเก้าอี้',
     todayIllustrationAlt: 'ภาพประกอบการสาธิตลุกนั่งจากเก้าอี้',
     todayProgress: 'วันที่ 1 จาก 7',
+    exploreTitle: 'เลือกกิจกรรมสาธิต',
+    exploreBody:
+      'ดูท่านั่ง ท่ายืน การเปลี่ยนจากนั่งเป็นยืน หรือการเดิน โดยเลือกได้ว่าจะใช้กล้องหรือไม่',
     viewDetails: 'ดูรายละเอียด',
     completed: 'ทำสำเร็จ',
     start: 'เลือกการสาธิต',
@@ -520,6 +526,7 @@ const th = {
     upper: 'ช่วงบน',
     lower: 'ช่วงล่าง',
     details: 'ดูรายละเอียด',
+    category: 'ประเภทกิจกรรม',
     start: 'เริ่มทดสอบกล้อง',
     empty: 'ไม่พบรายการที่ตรงกับการค้นหา',
     review: 'รอ clinical review',
@@ -735,6 +742,7 @@ const th = {
   history: {
     title: 'ประวัติกิจกรรม',
     subtitle: 'เฉพาะ session summary ที่คุณอนุญาตให้จัดเก็บ',
+    search: 'ค้นหาประวัติกิจกรรม',
     empty: 'ยังไม่มีประวัติ',
     completed: 'เสร็จสิ้น',
     stopped: 'หยุดก่อนเสร็จ',
@@ -1097,6 +1105,9 @@ const en: typeof th = {
     aiTitle: 'Talk with a bounded AI assistant',
     aiBody:
       'Use it for general support information. Answers may be incomplete and do not replace qualified advice.',
+    demoChoiceTitle: 'Choose a demo that fits your setup',
+    demoChoiceBody:
+      'View the demonstration alone, or turn on the on-device camera when you are ready.',
     summaryTitle: 'Review activity records',
     summaryBody:
       'See time, activity counts, and history you agreed to store without a recovery interpretation.',
@@ -1387,6 +1398,9 @@ const en: typeof th = {
     todayName: 'Sit-to-stand movement demo',
     todayIllustrationAlt: 'Illustration of the sit-to-stand movement demo',
     todayProgress: 'Day 1 of 7',
+    exploreTitle: 'Choose a demonstration',
+    exploreBody:
+      'Explore sitting, standing, sit-to-stand, or walking and choose whether to use the camera.',
     viewDetails: 'View details',
     completed: 'Completed',
     start: 'Choose a demo',
@@ -1422,6 +1436,7 @@ const en: typeof th = {
     upper: 'Upper body',
     lower: 'Lower body',
     details: 'View details',
+    category: 'Activity type',
     start: 'Test camera',
     empty: 'No matching demos',
     review: 'Clinical review pending',
@@ -1643,6 +1658,7 @@ const en: typeof th = {
   history: {
     title: 'Activity history',
     subtitle: 'Only session summaries you consented to store',
+    search: 'Search activity history',
     empty: 'No history yet',
     completed: 'Completed',
     stopped: 'Stopped early',

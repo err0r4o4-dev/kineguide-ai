@@ -1,11 +1,4 @@
-import {
-  Activity,
-  BarChart3,
-  CalendarDays,
-  Home,
-  MessageCircle,
-  Menu
-} from 'lucide-react'
+import { Activity, Home, History, Menu, Settings } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet } from 'react-router'
@@ -22,10 +15,9 @@ import { NotificationProvider } from '@/features/notifications/NotificationProvi
 
 const links = [
   { to: '/app', key: 'home', icon: Home, end: true },
-  { to: '/app/chat', key: 'chat', icon: MessageCircle, end: false },
-  { to: '/app/plan', key: 'plan', icon: CalendarDays, end: false },
   { to: '/app/activities', key: 'exercises', icon: Activity, end: false },
-  { to: '/app/progress', key: 'progress', icon: BarChart3, end: false }
+  { to: '/app/history', key: 'history', icon: History, end: false },
+  { to: '/app/settings', key: 'settings', icon: Settings, end: false }
 ] as const
 
 export function AppShell() {

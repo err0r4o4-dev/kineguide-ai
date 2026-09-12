@@ -36,7 +36,7 @@ vi.mock('@/services/product', () => ({
 }))
 
 describe('DashboardPage', () => {
-  it('presents the supplied dashboard hierarchy with usable range controls', async () => {
+  it('presents the MVP activity and history hierarchy', async () => {
     await i18n.changeLanguage('th')
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } }
@@ -62,20 +62,26 @@ describe('DashboardPage', () => {
         name: 'ภาพประกอบการสาธิตลุกนั่งจากเก้าอี้'
       })
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'เริ่มกิจกรรม' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'เลือกการสาธิต' })).toHaveAttribute(
       'href',
       '/app/activities'
     )
-    expect(screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })).toHaveClass(
-      '!text-kg-primary'
-    )
+    expect(
+      screen.queryByRole('link', { name: 'เริ่มคุยกับ AI' })
+    ).not.toBeInTheDocument()
     expect(
       await screen.findByRole('group', { name: 'สรุปกิจกรรม' })
     ).toHaveTextContent('3')
     expect(
       screen.getByRole('heading', { name: 'กิจกรรมล่าสุด' })
     ).toBeInTheDocument()
-    expect(screen.getAllByText('การลุกนั่งจากเก้าอี้')).toHaveLength(2)
+    expect(screen.getByRole('link', { name: 'ดูทั้งหมด' })).toHaveAttribute(
+      'href',
+      '/app/history'
+    )
+    expect(
+      screen.getByRole('heading', { name: 'เลือกกิจกรรมสาธิต' })
+    ).toBeInTheDocument()
     expect(
       screen.getByText(
         'ตัวเลขทั้งหมดเป็นข้อมูลกิจกรรมที่บันทึกเอง ไม่ใช่ผลการประเมินการฟื้นตัว'

@@ -76,7 +76,7 @@ export function ProgressPage() {
 
   return (
     <div>
-      <PageHeader title={t('nav.progress')} subtitle={t('progress.subtitle')} />
+      <PageHeader title={t('history.title')} subtitle={t('history.subtitle')} />
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           icon={CalendarCheck2}
@@ -149,7 +149,7 @@ export function ProgressPage() {
         <div className="flex flex-col gap-3 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold">{t('history.title')}</h2>
           <label className="relative">
-            <span className="sr-only">{t('exercises.search')}</span>
+            <span className="sr-only">{t('history.search')}</span>
             <Search
               aria-hidden="true"
               className="absolute left-3 top-3 text-slate-500"
@@ -161,7 +161,7 @@ export function ProgressPage() {
                 setSearch(event.target.value)
                 setHistoryPage(1)
               }}
-              placeholder={t('exercises.search')}
+              placeholder={t('history.search')}
               value={search}
             />
           </label>

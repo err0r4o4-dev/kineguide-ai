@@ -31,10 +31,10 @@ export function SessionSummaryPage() {
     <div className="mx-auto max-w-4xl pb-4">
       <Link
         className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-800"
-        to="/app/progress"
+        to="/app/history"
       >
         <ArrowLeft aria-hidden="true" size={18} />
-        {t('nav.progress')}
+        {t('nav.history')}
       </Link>
       <section className="kg-card mt-5 p-6 sm:p-8">
         <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
@@ -108,8 +108,8 @@ export function SessionSummaryPage() {
           >
             {t('plan.start')}
           </Link>
-          <Link className="kg-button-secondary" to="/app/progress">
-            {t('nav.progress')}
+          <Link className="kg-button-secondary" to="/app/history">
+            {t('nav.history')}
           </Link>
         </div>
       </section>

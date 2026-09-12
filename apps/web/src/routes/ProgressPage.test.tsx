@@ -51,6 +51,9 @@ describe('ProgressPage', () => {
     )
 
     expect(await screen.findByText('activity-1')).toBeVisible()
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'ประวัติกิจกรรม' })
+    ).toBeVisible()
     expect(screen.getByText('activity-10')).toBeVisible()
     expect(screen.queryByText('activity-11')).not.toBeInTheDocument()
     expect(screen.getByText('หน้า 1 จาก 2')).toBeVisible()

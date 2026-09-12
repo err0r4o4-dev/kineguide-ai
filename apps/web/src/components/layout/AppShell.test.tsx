@@ -44,7 +44,7 @@ describe('AppShell', () => {
     expect(logoutMock).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps exactly five primary destinations and puts account pages in the account menu', async () => {
+  it('keeps exactly four MVP destinations and puts deferred features outside primary navigation', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
     render(
@@ -58,13 +58,25 @@ describe('AppShell', () => {
     )
 
     const navigation = screen.getByRole('navigation', { name: 'เมนูหลัก' })
-    expect(within(navigation).getAllByRole('link')).toHaveLength(5)
+    expect(within(navigation).getAllByRole('link')).toHaveLength(4)
     expect(
       within(navigation).getByRole('link', { name: 'หน้าแรก' })
     ).toBeInTheDocument()
     expect(
-      within(navigation).getByRole('link', { name: 'ผู้ช่วย AI' })
+      within(navigation).getByRole('link', { name: 'กิจกรรมท่าทาง' })
     ).toBeInTheDocument()
+    expect(
+      within(navigation).getByRole('link', { name: 'ประวัติ' })
+    ).toBeInTheDocument()
+    expect(
+      within(navigation).getByRole('link', { name: 'ตั้งค่า' })
+    ).toBeInTheDocument()
+    expect(
+      within(navigation).queryByRole('link', { name: 'ผู้ช่วย AI' })
+    ).not.toBeInTheDocument()
+    expect(
+      within(navigation).queryByRole('link', { name: 'แผนกิจกรรม' })
+    ).not.toBeInTheDocument()
     expect(
       within(navigation).queryByRole('link', { name: 'โปรไฟล์' })
     ).not.toBeInTheDocument()

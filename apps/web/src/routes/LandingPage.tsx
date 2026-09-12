@@ -7,7 +7,7 @@ import {
   ClipboardCheck,
   Database,
   LayoutGrid,
-  MessageCircle,
+  ListChecks,
   ShieldCheck,
   TriangleAlert
 } from 'lucide-react'
@@ -77,16 +77,16 @@ export function LandingPage() {
       href: auth.user ? '/app/activities' : primaryPath
     },
     {
-      icon: MessageCircle,
-      title: t('landing.aiTitle'),
-      body: t('landing.aiBody'),
-      href: auth.user ? '/app/chat' : primaryPath
+      icon: ListChecks,
+      title: t('landing.demoChoiceTitle'),
+      body: t('landing.demoChoiceBody'),
+      href: auth.user ? '/app/activities' : primaryPath
     },
     {
       icon: ChartNoAxesCombined,
       title: t('landing.summaryTitle'),
       body: t('landing.summaryBody'),
-      href: auth.user ? '/app/progress' : primaryPath
+      href: auth.user ? '/app/history' : primaryPath
     }
   ]
 

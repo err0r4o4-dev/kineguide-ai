@@ -92,5 +92,8 @@ describe('activity demonstrations', () => {
         name: 'Three-stage concept illustration for the walking demonstration'
       })
     ).toBeVisible()
+    expect(
+      screen.getByRole('link', { name: 'Movement activities' })
+    ).toHaveAttribute('href', '/app/activities')
   })
 })

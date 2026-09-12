@@ -46,19 +46,6 @@ const DashboardPage = lazy(() =>
     default: module.DashboardPage
   }))
 )
-const ChatPage = lazy(() =>
-  import('@/routes/ChatPage').then((module) => ({ default: module.ChatPage }))
-)
-const EducationalClinicalFlowPage = lazy(() =>
-  import('@/routes/EducationalClinicalFlowPage').then((module) => ({
-    default: module.EducationalClinicalFlowPage
-  }))
-)
-const PlanPage = lazy(() =>
-  import('@/routes/PlanPage').then((module) => ({
-    default: module.PlanPage
-  }))
-)
 const ExerciseLibraryPage = lazy(() =>
   import('@/routes/ExerciseLibraryPage').then((module) => ({
     default: module.ExerciseLibraryPage
@@ -84,7 +71,7 @@ const SessionSummaryPage = lazy(() =>
     default: module.SessionSummaryPage
   }))
 )
-const ProgressPage = lazy(() =>
+const HistoryPage = lazy(() =>
   import('@/routes/ProgressPage').then((module) => ({
     default: module.ProgressPage
   }))
@@ -143,12 +130,18 @@ const router = createBrowserRouter([
                 element: <AppShell />,
                 children: [
                   { index: true, element: <DashboardPage /> },
-                  { path: 'chat', element: <ChatPage /> },
+                  {
+                    path: 'chat',
+                    element: <Navigate replace to="/app/activities" />
+                  },
                   {
                     path: 'educational-flow',
-                    element: <EducationalClinicalFlowPage />
+                    element: <Navigate replace to="/app/activities" />
                   },
-                  { path: 'plan', element: <PlanPage /> },
+                  {
+                    path: 'plan',
+                    element: <Navigate replace to="/app/activities" />
+                  },
                   { path: 'exercises', element: <ExerciseLibraryPage /> },
                   { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
                   {
@@ -172,9 +165,12 @@ const router = createBrowserRouter([
                   },
                   {
                     path: 'history',
-                    element: <Navigate replace to="/app/progress" />
+                    element: <HistoryPage />
                   },
-                  { path: 'progress', element: <ProgressPage /> },
+                  {
+                    path: 'progress',
+                    element: <Navigate replace to="/app/history" />
+                  },
                   { path: 'profile', element: <ProfilePage /> },
                   { path: 'assessment', element: <AssessmentPage /> },
                   { path: 'notifications', element: <NotificationsPage /> },

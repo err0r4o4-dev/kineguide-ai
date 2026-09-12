@@ -83,6 +83,28 @@ test('new user completes consent and structured onboarding', async ({
       })
       return
     }
+    if (url.endsWith('/activities')) {
+      await route.fulfill({
+        json: {
+          activities: [
+            {
+              slug: 'seated-posture-demo',
+              title_th: 'สาธิตท่านั่ง',
+              title_en: 'Seated posture demonstration',
+              category: 'sitting',
+              kind: 'static_posture',
+              required_view: 'side',
+              measurement_mode: 'hold_duration',
+              review_status: 'pending_clinical_review',
+              demo_only: true,
+              not_for_clinical_use: true,
+              analysis_available: false
+            }
+          ]
+        }
+      })
+      return
+    }
     if (url.endsWith('/activity-plan')) {
       const exercises = [
         {
@@ -266,34 +288,22 @@ test('new user completes consent and structured onboarding', async ({
   await expect(
     page.getByRole('heading', { name: 'สวัสดี ผู้ใช้ทดสอบ' })
   ).toBeVisible()
-  await page.getByRole('link', { name: 'แผนกิจกรรม', exact: true }).click()
+  await page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true }).click()
 
   await expect(
-    page.getByRole('heading', { name: 'แผนกิจกรรมสาธิต 7 วัน' })
+    page.getByRole('heading', { name: 'กิจกรรมท่าทางในชีวิตประจำวัน' })
   ).toBeVisible()
-  await expect(page.getByText('ไม่ได้ปรับตามอาการของคุณ')).toBeVisible()
   await expect(
-    page.getByRole('link', { name: 'ดูรายละเอียดกิจกรรม' }).first()
-  ).toHaveAttribute('href', '/app/activities/sit-to-stand-demo')
+    page.getByRole('link', { name: 'ดูรายละเอียด' }).first()
+  ).toHaveAttribute('href', '/app/activities/seated-posture-demo')
 
   await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(
-    page.getByRole('link', { name: 'เริ่มคุยกับ AI' })
-  ).toHaveAttribute('href', '/app/chat')
-  await expect(
-    page.getByRole('link', { name: 'เริ่มกิจกรรม' })
+    page.getByRole('link', { name: 'เลือกการสาธิต' })
   ).toHaveAttribute('href', '/app/activities')
   await expect(
-    page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
-  ).toHaveAttribute('href', '/app/chat')
-  await page.getByRole('link', { name: 'เริ่มคุยกับ AI' }).click()
-  await expect(
-    page.getByRole('heading', { name: 'ผู้ช่วย KineGuide AI' })
-  ).toBeVisible()
-  await page.getByRole('button', { name: 'เริ่มบทสนทนาใหม่' }).click()
-  await page.getByLabel('ข้อความถึง KineGuide AI').fill('สวัสดี')
-  await page.getByRole('button', { name: 'ส่งข้อความ' }).click()
-  await expect(page.getByText('คำตอบจำลองที่ปลอดภัย')).toBeVisible()
+    page.getByRole('navigation', { name: 'เมนูหลัก' })
+  ).not.toContainText('ผู้ช่วย AI')
 })
 
 test('login, hard refresh, and every authenticated navigation target stay consistent', async ({
@@ -475,13 +485,13 @@ test('login, hard refresh, and every authenticated navigation target stay consis
 
   await expect(page).toHaveURL('/app')
   await expect(
-    page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
+    page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true })
   ).toBeVisible()
 
   for (let reload = 0; reload < 3; reload += 1) {
     await page.reload()
     await expect(
-      page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
+      page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true })
     ).toBeVisible()
   }
   expect(refreshRequests).toBe(4)
@@ -491,7 +501,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await menuButton.click()
   await expect(menuButton).toHaveAccessibleName('ปิดเมนู')
   await expect(
-    page.getByRole('link', { name: 'ผู้ช่วย AI', exact: true })
+    page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true })
   ).toBeVisible()
   expect(
     await page.evaluate(
@@ -502,10 +512,9 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const destinations = [
-    ['ผู้ช่วย AI', '/app/chat'],
-    ['แผนกิจกรรม', '/app/plan'],
     ['กิจกรรมท่าทาง', '/app/activities'],
-    ['บันทึกและความก้าวหน้า', '/app/progress'],
+    ['ประวัติ', '/app/history'],
+    ['ตั้งค่า', '/app/settings'],
     ['หน้าแรก', '/app']
   ] as const
   const primaryNavigation = page.getByRole('navigation', {
@@ -516,6 +525,15 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     await primaryNavigation.getByRole('link', { name, exact: true }).click()
     await expect(page).toHaveURL(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  }
+
+  for (const [legacyPath, destination] of [
+    ['/app/chat', '/app/activities'],
+    ['/app/plan', '/app/activities'],
+    ['/app/progress', '/app/history']
+  ] as const) {
+    await page.goto(legacyPath)
+    await expect(page).toHaveURL(destination)
   }
 
   await page.getByRole('button', { name: 'เมนูบัญชี' }).click()

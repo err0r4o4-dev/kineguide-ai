@@ -35,7 +35,7 @@ export function ExerciseDetailPage() {
         <div>
           <Link
             className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-600"
-            to="/app/plan"
+            to="/app/activities"
           >
             <ArrowLeft aria-hidden="true" size={18} />
             {t('common.back')}
@@ -46,8 +46,8 @@ export function ExerciseDetailPage() {
           <p className="mt-2 text-lg text-slate-600">{title}</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link className="kg-button-secondary" to="/app/plan">
-            {t('nav.plan')}
+          <Link className="kg-button-secondary" to="/app/activities">
+            {t('nav.exercises')}
           </Link>
           <Link
             className="kg-button-primary"
@@ -71,7 +71,9 @@ export function ExerciseDetailPage() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
-                <p className="text-xs text-slate-500">{t('nav.plan')}</p>
+                <p className="text-xs text-slate-500">
+                  {t('exercises.category')}
+                </p>
                 <p className="mt-1 font-bold text-slate-900">
                   {t(`exercises.${query.data.category}`)}
                 </p>

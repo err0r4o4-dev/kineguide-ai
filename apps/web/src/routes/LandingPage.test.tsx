@@ -231,13 +231,13 @@ describe('LandingPage', () => {
     ).toHaveAttribute('href', '/app/activities')
     expect(
       screen.getByRole('link', {
-        name: 'ดูรายละเอียด พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด'
+        name: 'ดูรายละเอียด เลือกดูสาธิตได้ตามความพร้อม'
       })
-    ).toHaveAttribute('href', '/app/chat')
+    ).toHaveAttribute('href', '/app/activities')
     expect(
       screen.getByRole('link', {
         name: 'ดูรายละเอียด ทบทวนบันทึกกิจกรรม'
       })
-    ).toHaveAttribute('href', '/app/progress')
+    ).toHaveAttribute('href', '/app/history')
   })
 })
