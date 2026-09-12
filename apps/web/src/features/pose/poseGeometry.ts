@@ -142,3 +142,61 @@ export function classifyPoseFrame(
     unreliableLandmarks
   }
 }
+
+/**
+ * คำนวณมุม (องศา) ระหว่าง 3 จุด (p1 -> p2 -> p3) โดย p2 เป็นจุดยอดมุม (Vertex)
+ */
+export function calculateAngle(
+  p1: PoseLandmark,
+  p2: PoseLandmark,
+  p3: PoseLandmark
+): number {
+  const radians = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x)
+  let angle = Math.abs((radians * 180.0) / Math.PI)
+
+  if (angle > 180.0) {
+    angle = 360.0 - angle
+  }
+  return rounded(angle)
+}
+
+/**
+ * [TECHNICAL PROTOTYPE ONLY]
+ * คำนวณค่ามุมทางเรขาคณิตสำหรับท่านั่ง ไม่ใช่การวินิจฉัยทางการแพทย์
+ */
+export function calculateSeatedPostureAngles(landmarks: PoseLandmark[]) {
+  // Indices:
+  // 11 = Left Shoulder, 12 = Right Shoulder
+  // 23 = Left Hip, 24 = Right Hip
+  // 25 = Left Knee, 26 = Right Knee
+  // 27 = Left Ankle, 28 = Right Ankle
+
+  const hasRequired = [11, 12, 23, 24, 25, 26, 27, 28].every(
+    (i) => landmarks[i] && (landmarks[i].visibility ?? 0) >= TECHNICAL_VISIBILITY_GATE
+  )
+
+  if (!hasRequired) return null
+
+  // คำนวณมุมสะโพก (Shoulder -> Hip -> Knee)
+  const leftHipAngle = calculateAngle(landmarks[11], landmarks[23], landmarks[25])
+  const rightHipAngle = calculateAngle(landmarks[12], landmarks[24], landmarks[26])
+
+  // คำนวณมุมเข่า (Hip -> Knee -> Ankle)
+  const leftKneeAngle = calculateAngle(landmarks[23], landmarks[25], landmarks[27])
+  const rightKneeAngle = calculateAngle(landmarks[24], landmarks[26], landmarks[28])
+
+  return {
+    leftHipAngle,
+    rightHipAngle,
+    leftKneeAngle,
+    rightKneeAngle,
+    // MOCK_THRESHOLDS: ต้องได้รับการตรวจสอบ/กำหนดโดยนักกายภาพบำบัด
+    // ห้ามใช้ค่าเหล่านี้เพื่อการประเมินผู้ใช้จนกว่าจะผ่าน clinical review
+    mock_thresholds: {
+      hip_min: 80, // TODO: Pending clinical review
+      hip_max: 110, // TODO: Pending clinical review
+      knee_min: 80, // TODO: Pending clinical review
+      knee_max: 100 // TODO: Pending clinical review
+    }
+  }
+}

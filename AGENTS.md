@@ -4,11 +4,13 @@ Authoritative repository-wide instructions for AI coding agents. Scoped rules an
 
 ## Mission and product boundary
 
-Build a safe, explainable, Thai-first physiotherapy support and education prototype that a two-person university team can maintain.
+Build a safe, explainable, Thai-first real-time posture-monitoring and ergonomic-awareness prototype that a two-person university team can maintain.
 
-KineGuide AI does not diagnose, prescribe, or replace a physician, physiotherapist, or other qualified clinician. Treat pose estimates and LLM output as uncertain support, never final clinical judgment.
+KineGuide AI observes camera-derived posture patterns and session duration for contexts such as gaming, studying, and desk work. It does not diagnose pain, disease, or injury; determine the cause of symptoms; prescribe treatment or exercise; or replace a physician, physiotherapist, ergonomist, or other qualified professional.
 
-Never invent diagnoses, red flags, exercise protocols, treatment, dosage, progression, or pose thresholds. Every clinical rule requires a traceable source and qualified review.
+Treat pose estimates, posture classifications, product thresholds, and LLM output as uncertain support. Use deterministic, testable posture logic for the core monitor and preserve honest `low confidence` / `unable to assess` states. Never turn missing landmarks or uncertain inference into confident feedback.
+
+Do not invent medical claims or present product posture thresholds as universal medical facts. Any threshold or timing rule must define its rationale, units/coordinate system, calibration behavior, confidence requirements, and tests. Health or clinical claims still require a traceable authoritative source and qualified review.
 
 ## Instruction order
 
@@ -20,7 +22,7 @@ Follow, in order:
 4. The smallest matching `.agents/skills/*/SKILL.md` skill set.
 5. Existing contracts, tests, code, and documentation.
 
-Resolve conflicts toward medical safety, privacy, security, and data integrity, and report the conflict. Do not invent a rule or substitute a similar skill when ownership is unclear.
+Resolve conflicts toward user safety, privacy, security, truthful posture feedback, and data integrity, and report the conflict. Do not invent a rule or substitute a similar skill when ownership is unclear.
 
 ## Efficient task workflow
 
@@ -63,8 +65,8 @@ Before editing, report the exact scoped rules and `SKILL.md` files loaded for th
 | Public HTTP contract | `$evolve-kineguide-contracts` | Every affected producer and consumer skill |
 | PostgreSQL persistence | `$migrate-kineguide-database` | Go API skill for repository behavior |
 | Docker, Caddy, CI, environment | `$operate-kineguide-infrastructure` | Owning service skill when runtime behavior changes |
-| Auth, consent, health data, secrets | `$protect-kineguide-data` | Required alongside the owning implementation skill |
-| Symptoms, pain, exercise, pose feedback | `$review-kineguide-clinical-safety` | Required alongside the owning implementation skill |
+| Auth, consent, posture/session data, secrets | `$protect-kineguide-data` | Required alongside the owning implementation skill |
+| Health/medical claims, pain language, treatment/exercise advice | `$review-kineguide-clinical-safety` | Required alongside the owning implementation skill |
 | Concise, token-efficient replies | `$caveman` | Use when explicitly requested; preserve technical and safety detail |
 
 Web work starts with `$build-kineguide-web`. Add at most one web specialist unless an independent audit is explicitly required. Diagnose broken behavior before considering redesign.
@@ -80,7 +82,7 @@ Browser / React PWA
 
 - The browser calls only the public Go API.
 - Go alone owns primary PostgreSQL access and application orchestration.
-- Python AI is internal and stateless, has no primary database credentials, and cannot make final clinical decisions.
+- Python AI is internal and stateless, has no primary database credentials, and cannot perform primary posture classification, override deterministic posture results, or make medical decisions.
 - Raw camera media stays in-browser. APIs receive only explicitly approved derived metrics.
 - Caddy is the integrated entry point; direct service ports are for development and diagnostics.
 - `packages/contracts/openapi/kineguide-api.yaml` is the public API source of truth.
@@ -104,21 +106,26 @@ Ownership follows directory boundaries: `apps/web`, `services/api-go`, `services
 - Use semantic, accessible UI with visible focus, practical targets, reduced motion, and reachable loading, empty, degraded, offline, denied, unsupported, failure, and retry states.
 - Design from 320 px and verify at 320, 768, 1024, and 1440 px without overflow, obstruction, or hover-only actions.
 - Explain camera purpose before permission. Process media locally and release every track, frame, timer, worker, observer, subscription, and object URL on every exit path.
-- Present pose results with honest unavailable and low-confidence states. Never cache authenticated or sensitive health data without an explicit reviewed policy.
+- Keep pose inference and the first-pass posture classifier in-browser. Model sitting, standing, transition/unknown, low-confidence, and unavailable states explicitly; do not infer posture from a single noisy frame.
+- Personal calibration must record the camera/setup assumptions needed to interpret the baseline. Debounce/hysteresis rules must be deterministic and unit-tested.
+- Present pose results with honest unavailable and low-confidence states. Never cache authenticated or sensitive posture/session data without an explicit reviewed policy.
 
 ### Go and Python gates
 
 - Go `main` owns only configuration, wiring, lifecycle, and shutdown. Keep HTTP, service, repository, middleware, and AI-client concerns separated; use `context.Context`, standard JSON errors, table tests, and `httptest`.
-- Python uses strict Pydantic boundary schemas and provider adapters. Preserve the deterministic disabled provider, remain stateless, and never log health prompts or provider responses by default.
-- Neither an LLM nor low-confidence/unavailable pose output may be converted into confident synthetic clinical guidance.
+- Python uses strict Pydantic boundary schemas and provider adapters. Preserve the deterministic disabled provider, remain stateless, and never log sensitive prompts, posture payloads, or provider responses by default.
+- The LLM is optional and must not perform primary pose/posture classification, override deterministic posture results, diagnose conditions, or prescribe treatment.
+- Low-confidence or unavailable pose output must remain low-confidence/unavailable; never synthesize a confident posture state to keep the UI populated.
 
-## Privacy and healthcare safety gates
+## Privacy and posture-safety gates
 
-- Minimize data before securing it. Never commit secrets, `.env`, health data, datasets, recordings, uploads, or model artifacts.
-- Define purpose, consent, retention, export, correction, and deletion before storing health data.
+- Minimize data before securing it. Never commit secrets, `.env`, identifiable posture/session data, datasets, recordings, uploads, or model artifacts.
+- Define purpose, consent, retention, export, correction, and deletion before storing posture/session data.
+- Raw camera media stays in the browser. Prefer compact session summaries over storing high-frequency landmark streams; persist landmark sequences only when a reviewed requirement justifies them.
 - Keep secrets server-side and deny access by default. Test unauthorized, forbidden, expired, invalid, and deleted states where applicable.
-- Preserve consent, pain reporting, stop conditions, escalation, accessibility, and honest unavailable-service behavior.
-- Stop and request a clinical-owner decision when safety behavior is undefined. Never claim regulatory compliance without evidence.
+- Preserve camera-purpose disclosure, permission-denied/unsupported states, low-confidence/unavailable pose states, accessibility, and user control over reminders and monitoring.
+- Posture alerts must debounce transient movement and avoid alarmist or medical wording.
+- Stop and request a qualified review when a requested behavior becomes a medical/clinical claim or treatment recommendation. Never claim regulatory, medical-device, or ergonomic certification without evidence.
 
 ## Verification matrix
 
