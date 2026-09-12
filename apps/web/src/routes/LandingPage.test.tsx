@@ -231,9 +231,9 @@ describe('LandingPage', () => {
     ).toHaveAttribute('href', '/app/activities')
     expect(
       screen.getByRole('link', {
-        name: 'ดูรายละเอียด เลือกดูสาธิตได้ตามความพร้อม'
+        name: 'ดูรายละเอียด พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด'
       })
-    ).toHaveAttribute('href', '/app/activities')
+    ).toHaveAttribute('href', '/app/chat')
     expect(
       screen.getByRole('link', {
         name: 'ดูรายละเอียด ทบทวนบันทึกกิจกรรม'

@@ -67,8 +67,8 @@ describe('DashboardPage', () => {
       '/app/activities'
     )
     expect(
-      screen.queryByRole('link', { name: 'เริ่มคุยกับ AI' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })
+    ).toHaveAttribute('href', '/app/chat')
     expect(
       await screen.findByRole('group', { name: 'สรุปกิจกรรม' })
     ).toHaveTextContent('3')

@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Clock3,
   Flame,
+  MessageCircle,
   Play
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -57,26 +58,29 @@ export function DashboardPage() {
         <>
           <section className="mt-7 grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.8fr)]">
             <ActivityStartCard />
-            <div
-              aria-label={t('dashboard.activitySummary')}
-              className="kg-card grid grid-cols-3 divide-x divide-slate-200 overflow-hidden"
-              role="group"
-            >
-              <DashboardStat
-                icon={CheckCircle2}
-                label={t('dashboard.completed')}
-                value={String(query.data.completed_sessions)}
-              />
-              <DashboardStat
-                icon={Flame}
-                label={t('dashboard.streak')}
-                value={String(query.data.current_streak)}
-              />
-              <DashboardStat
-                icon={Clock3}
-                label={t('dashboard.time')}
-                value={formatDuration(query.data.total_seconds)}
-              />
+            <div className="flex flex-col gap-4">
+              <AIChatCard />
+              <div
+                aria-label={t('dashboard.activitySummary')}
+                className="kg-card grid min-h-24 grid-cols-3 divide-x divide-slate-200 overflow-hidden"
+                role="group"
+              >
+                <DashboardStat
+                  icon={CheckCircle2}
+                  label={t('dashboard.completed')}
+                  value={String(query.data.completed_sessions)}
+                />
+                <DashboardStat
+                  icon={Flame}
+                  label={t('dashboard.streak')}
+                  value={String(query.data.current_streak)}
+                />
+                <DashboardStat
+                  icon={Clock3}
+                  label={t('dashboard.time')}
+                  value={formatDuration(query.data.total_seconds)}
+                />
+              </div>
             </div>
           </section>
 
@@ -212,6 +216,38 @@ function RecentActivity({ sessions }: { sessions: ExerciseSession[] }) {
       <p className="mt-3 text-xs leading-5 text-slate-500">
         {t('dashboard.manual')}
       </p>
+    </article>
+  )
+}
+
+function AIChatCard() {
+  const { t } = useTranslation()
+
+  return (
+    <article className="kg-card flex flex-1 flex-col justify-center border-teal-200 bg-teal-50/60 p-5 sm:p-6">
+      <div className="flex gap-4">
+        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-teal-700 text-white shadow-sm">
+          <MessageCircle aria-hidden="true" size={23} />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-lg font-bold text-slate-950">
+            {t('dashboard.aiTitle')}
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-700">
+            {t('dashboard.aiBody')}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            {t('dashboard.aiBoundary')}
+          </p>
+          <Link
+            className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl font-bold text-teal-800 no-underline hover:text-teal-950"
+            to="/app/chat"
+          >
+            {t('dashboard.aiStart')}
+            <ArrowRight aria-hidden="true" size={17} />
+          </Link>
+        </div>
+      </div>
     </article>
   )
 }
