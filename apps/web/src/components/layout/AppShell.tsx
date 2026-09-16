@@ -69,7 +69,7 @@ export function AppShell() {
           }
           hidden={Boolean(pageError)}
         >
-          <header className="sticky top-0 z-50 flex h-[4.5rem] items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur-lg lg:hidden">
+          <header className="sticky top-0 z-[var(--z-index-sticky)] flex h-[var(--layout-mobile-nav,4.5rem)] items-center justify-between border-b border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 backdrop-blur-[var(--blur-glass)] saturate-[var(--glass-saturation)] lg:hidden">
             <Brand compact />
             <div className="flex items-center gap-2">
               <LanguageButton />
@@ -97,7 +97,7 @@ export function AppShell() {
 
           <aside
             id="app-navigation"
-            className={`fixed bottom-0 left-0 top-[4.5rem] z-40 flex w-[280px] flex-col overflow-y-auto border-r border-slate-200/80 bg-white px-4 py-5 shadow-2xl shadow-slate-950/10 transition-transform sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:px-6 lg:py-7 lg:shadow-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
+            className={`fixed bottom-0 left-0 top-[var(--layout-mobile-nav,4.5rem)] z-[var(--z-index-navigation)] flex w-[var(--layout-sidebar,280px)] flex-col overflow-y-auto border-r border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 py-5 shadow-[var(--shadow-floating)] backdrop-blur-[var(--blur-glass)] saturate-[var(--glass-saturation)] transition-transform duration-[var(--motion-standard)] ease-[var(--ease-standard)] sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:px-6 lg:py-7 lg:shadow-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
           >
             <div className="hidden lg:block">
               <Brand />
@@ -106,7 +106,7 @@ export function AppShell() {
               {links.map(({ to, key, icon: Icon, end }) => (
                 <NavLink
                   className={({ isActive }) =>
-                    `flex min-h-12 items-center gap-3.5 rounded-xl px-4 text-[0.95rem] font-semibold no-underline transition-colors ${isActive ? 'bg-teal-50 text-teal-900 ring-1 ring-inset ring-teal-100' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'}`
+                    `ui-transition pressable flex min-h-11 items-center gap-3.5 rounded-[var(--radius-control)] px-4 text-[0.95rem] font-semibold no-underline ${isActive ? 'bg-[var(--color-kg-primary)] text-white shadow-[var(--shadow-card)]' : 'text-[var(--color-kg-muted)] hover:bg-[var(--color-kg-soft)] hover:text-[var(--color-kg-ink)]'}`
                   }
                   end={end}
                   key={to}
