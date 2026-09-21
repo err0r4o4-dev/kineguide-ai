@@ -1,48 +1,43 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { vi } from 'vitest'
 
 import i18n from '@/lib/i18n'
 import { CalibrationPage } from './CalibrationPage'
 
 describe('CalibrationPage', () => {
-  it('flows through calibration states', async () => {
+  it('does not simulate a captured baseline before calibration exists', async () => {
     await i18n.changeLanguage('th')
-    vi.useFakeTimers()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    const user = userEvent.setup()
 
     render(
       <MemoryRouter initialEntries={['/app/monitor/calibration']}>
         <Routes>
-          <Route element={<CalibrationPage />} path="/app/monitor/calibration" />
-          <Route element={<h1>Live Monitoring</h1>} path="/app/monitor/live" />
+          <Route
+            element={<CalibrationPage />}
+            path="/app/monitor/calibration"
+          />
+          <Route element={<h1>Camera setup</h1>} path="/app/monitor" />
         </Routes>
       </MemoryRouter>
     )
 
-    // Initial state
-    const startBtn = screen.getByRole('button', { name: 'ปรับเทียบท่าทาง (Calibration)' })
-    expect(startBtn).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'การปรับเทียบยังไม่พร้อมใช้งาน' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'ยังไม่มี Baseline ที่ผ่านการตรวจสอบ'
+      })
+    ).toBeVisible()
+    expect(
+      screen.queryByText('บันทึกค่า Baseline สำเร็จ')
+    ).not.toBeInTheDocument()
 
-    // Start countdown
-    await user.click(startBtn)
-    expect(screen.getByText('3')).toBeVisible()
-
-    // Advance to capturing
-    vi.advanceTimersByTime(3500)
-    expect(await screen.findByText('กำลังบันทึก Baseline...')).toBeVisible()
-
-    // Advance to complete
-    vi.advanceTimersByTime(2500)
-    expect(await screen.findByText('บันทึกค่า Baseline สำเร็จ')).toBeVisible()
-
-    // Navigate to live session
-    const proceedBtn = screen.getByRole('button', { name: 'เริ่มตรวจท่าทาง' })
-    await user.click(proceedBtn)
-
-    expect(await screen.findByRole('heading', { name: 'Live Monitoring' })).toBeInTheDocument()
-
-    vi.useRealTimers()
+    await user.click(screen.getByRole('link', { name: 'กลับไปตั้งค่ากล้อง' }))
+    expect(
+      await screen.findByRole('heading', { name: 'Camera setup' })
+    ).toBeVisible()
   })
 })

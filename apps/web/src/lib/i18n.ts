@@ -152,7 +152,8 @@ const th = {
     title:
       'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ',
     titleAccent: 'ความเป็นส่วน⁠ตัวของคุณ',
-    titleRest: 'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
+    titleRest:
+      'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์ ติดตามท่าทางการนั่งและยืนแบบเรียลไทม์ และแจ้งเตือนเมื่อนั่งต่อเนื่องเป็นเวลานาน โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มตรวจท่าทาง',
@@ -187,8 +188,7 @@ const th = {
     consentStepBody:
       'ตรวจสอบการใช้กล้อง การจัดเก็บสรุปเซสชัน และ AI chat แยกตามวัตถุประสงค์',
     exploreStepTitle: 'เริ่มตรวจท่าทาง',
-    exploreStepBody:
-      'เปิดใช้งานกล้องเพื่อติดตามท่าทางและการจัดสรรเวลาหน้าจอ',
+    exploreStepBody: 'เปิดใช้งานกล้องเพื่อติดตามท่าทางและการจัดสรรเวลาหน้าจอ',
     capabilitiesEyebrow: 'ขอบเขตของต้นแบบ',
     capabilitiesTitle: 'สิ่งที่คุณทำได้ใน KineGuide AI',
     capabilitiesBody:
@@ -200,11 +200,9 @@ const th = {
     aiBody:
       'ใช้เพื่อข้อมูลสนับสนุนทั่วไป คำตอบอาจไม่สมบูรณ์และไม่ใช้แทนคำแนะนำจากแพทย์',
     demoChoiceTitle: 'ติดตามประวัติศาสตร์การใช้งานหน้าจอ',
-    demoChoiceBody:
-      'ดูระยะเวลาการใช้งาน การนั่ง การยืน และความถี่การหยุดพัก',
+    demoChoiceBody: 'ดูระยะเวลาการใช้งาน การนั่ง การยืน และความถี่การหยุดพัก',
     summaryTitle: 'สรุปการใช้งานหน้าจอ',
-    summaryBody:
-      'ดูสถิติเกี่ยวกับท่าทางการทำงานตามที่คุณยินยอมให้จัดเก็บ',
+    summaryBody: 'ดูสถิติเกี่ยวกับท่าทางการทำงานตามที่คุณยินยอมให้จัดเก็บ',
     privacyTitle: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม',
     privacyBody:
       'ระบบลดข้อมูลตั้งแต่ต้น แยกความยินยอมตามวัตถุประสงค์ และให้คุณกลับมาจัดการข้อมูลได้',
@@ -277,8 +275,7 @@ const th = {
       'ข้อความแชตอาจมีข้อมูลสุขภาพและจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี',
     research: 'ยอมรับการใช้เพื่อการวิจัย',
     accept: 'ยอมรับและดำเนินการต่อ',
-    privacy:
-      'คุณสามารถถอน consent และลบบัญชีได้เสมอ',
+    privacy: 'คุณสามารถถอน consent และลบบัญชีได้เสมอ',
     failed: 'ไม่สามารถบันทึก consent ได้'
   },
   chat: {
@@ -317,10 +314,8 @@ const th = {
     ready: 'พร้อมสำหรับติดตามท่าทางวันนี้หรือยัง?',
     aiTitle: 'ผู้ช่วยสนทนา KineGuide AI',
     aiStructured: 'คำถามแบบมีโครงสร้าง',
-    aiBody:
-      'วิเคราะห์และอธิบายสถิติการใช้งานหน้าจอของคุณ',
-    aiBoundary:
-      'ผู้ช่วยนี้ไม่วินิจฉัย และไม่สร้างคำแนะนำทางการแพทย์',
+    aiBody: 'วิเคราะห์และอธิบายสถิติการใช้งานหน้าจอของคุณ',
+    aiBoundary: 'ผู้ช่วยนี้ไม่วินิจฉัย และไม่สร้างคำแนะนำทางการแพทย์',
     aiStart: 'เริ่มคุยกับ AI',
     recommended: 'แนะนำให้ติดตามท่าทางเมื่อนั่งหน้าจอนานๆ',
     today: 'การติดตามวันนี้',
@@ -343,61 +338,90 @@ const th = {
     range: 'ช่วงเวลาของกราฟ',
     rangeDays: '{{count}} วัน',
     chartSummary: 'เซสชัน {{count}} รายการในช่วง {{range}} วัน',
-    manual:
-      'สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย'
+    manual: 'สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย'
   },
   monitor: {
     title: 'เริ่มตรวจท่าทาง',
     setupTitle: 'ตั้งค่ากล้อง',
-    setupSubtitle: 'จัดตำแหน่งอุปกรณ์ในพื้นที่มั่นคงให้เห็นศีรษะ ไหล่ และลำตัวส่วนบนชัดเจน',
+    setupSubtitle:
+      'จัดตำแหน่งอุปกรณ์ในพื้นที่มั่นคงให้เห็นศีรษะ ไหล่ และลำตัวส่วนบนชัดเจน',
     start: 'เริ่ม Live Monitoring',
-    continue: 'เริ่ม Calibration',
+    continue: 'เริ่มเซสชันเชิงเทคนิค',
     readiness: 'ความพร้อมของระบบ',
     secure: 'ภาพประมวลผลบนอุปกรณ์ของคุณเท่านั้น',
     permission: 'สิทธิ์กล้อง',
-    visibility: 'มองเห็นร่างกายและใบหน้า',
+    visibility: 'การตรวจจับจุดอ้างอิง',
     model: 'Pose model',
-    modelPending: 'ดาวน์โหลดโมเดลขณะนี้',
+    modelPending: 'จะโหลดเมื่อเริ่มเซสชัน',
+    notChecked: 'จะตรวจเมื่อเริ่มเซสชัน',
     granted: 'อนุญาตแล้ว',
     waiting: 'รออนุญาต',
     denied: 'ถูกปฏิเสธ',
     unsupported: 'เบราว์เซอร์ไม่รองรับ',
-    instructions: 'คลิกด้านล่างเพื่อเริ่มการปรับเทียบเริ่มต้น (Calibration)'
+    instructions: 'เริ่มเซสชันเพื่อดูสถานะการตรวจจับจุดอ้างอิงเชิงเทคนิค',
+    startSessionFailed: 'ไม่สามารถเริ่มเซสชันได้ โปรดลองอีกครั้ง'
   },
   calibration: {
-    title: 'ปรับเทียบท่าทาง (Calibration)',
-    subtitle: 'นั่งตัวตรงผ่อนคลาย เพื่อบันทึกเป็นค่าเริ่มต้น (Baseline)',
-    capturing: 'กำลังบันทึก Baseline...',
-    countdown: 'เริ่มใน',
-    complete: 'เสร็จสิ้นการปรับเทียบ',
-    failed: 'ไม่สามารถปรับเทียบได้',
-    startMonitoring: 'เริ่มตรวจท่าทาง',
-    placeholderNote: 'หมายเหตุ: สถานะนี้เป็นเพียงโครงสร้าง UI อัลกอริทึมจริงยังไม่ได้ทำงาน',
-    baselineCaptured: 'บันทึกค่า Baseline สำเร็จ'
+    title: 'การปรับเทียบยังไม่พร้อมใช้งาน',
+    subtitle: 'ต้นแบบนี้ยังไม่มี Baseline ที่ผ่านการตรวจสอบสำหรับประเมินท่าทาง',
+    unavailableTitle: 'ยังไม่มี Baseline ที่ผ่านการตรวจสอบ',
+    unavailableBody:
+      'ระบบจะยังไม่บันทึกหรือเปรียบเทียบท่าทางจนกว่าจะมีขั้นตอนปรับเทียบและข้อมูลอ้างอิงที่ตรวจสอบได้',
+    noBaselineClaim:
+      'หน้านี้ไม่สร้างผลการปรับเทียบจำลอง และไม่ถือว่าท่าปัจจุบันเป็นค่ามาตรฐานของผู้ใช้',
+    returnToSetup: 'กลับไปตั้งค่ากล้อง'
   },
   session: {
     live: 'Live Posture Monitoring',
+    technicalOnly: 'เซสชันเชิงเทคนิค ไม่ใช่การประเมินทางคลินิก',
     timer: 'ระยะเวลา',
     pause: 'พักการตรวจจับ',
     resume: 'ตรวจจับต่อ',
     finish: 'จบเซสชัน',
     stop: 'หยุด',
     poseTitle: 'ข้อมูลท่าทาง',
-    poseIdle: 'เปิดกล้องเพื่อตรวจจับโครงร่าง',
+    poseIdle: 'ยังไม่ได้เปิดกล้อง',
     poseLoading: 'กำลังโหลดโมเดล...',
     poseReady: 'มองเห็นจุดอ้างอิงชัดเจน',
-    poseAdjust: 'โปรดปรับกล้องให้เห็นไหล่และใบหน้า',
+    poseAdjust: 'โปรดปรับกล้องให้เห็นจุดอ้างอิงที่จำเป็น',
     poseMissing: 'ไม่พบผู้ใช้งาน',
     poseMultiple: 'พบหลายคน โปรดอยู่คนเดียวในเฟรม',
+    poseUnsupported: 'กิจกรรมนี้ยังไม่รองรับการตรวจจับจุดอ้างอิง',
+    poseUnavailable: 'ไม่สามารถใช้การตรวจจับจุดอ้างอิงได้ในขณะนี้',
+    poseError: 'การตรวจจับจุดอ้างอิงขัดข้อง',
+    posePaused: 'หยุดการตรวจจับชั่วคราว',
+    cameraRequesting: 'กำลังขอสิทธิ์ใช้งานกล้อง',
+    cameraDenied: 'ไม่ได้รับสิทธิ์ใช้งานกล้อง',
+    cameraUnsupported: 'เบราว์เซอร์นี้ไม่รองรับกล้อง',
+    cameraError: 'ไม่สามารถเปิดกล้องได้',
+    startCamera: 'เปิดกล้อง',
+    startCameraBody:
+      'กดเปิดกล้องเมื่อต้องการเริ่มประมวลผลจุดอ้างอิงบนอุปกรณ์นี้',
+    poseVisualLabel: 'ภาพกล้องพร้อมโครงร่างจุดอ้างอิงเชิงเทคนิค',
     posePrivacy: 'เฟรมทำงานในอุปกรณ์ ไม่บันทึกหรือส่งไปเซิร์ฟเวอร์',
     summary: 'สรุปเซสชัน',
     completed: 'บันทึกเซสชัน',
     elapsed: 'เวลาติดตามทั้งหมด',
+    summaryUnavailableTitle: 'ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้',
+    summaryUnavailableBody:
+      'ระบบบันทึกเฉพาะระยะเวลาของเซสชัน และยังไม่แสดงผลท่าทางจนกว่าจะมีวิธีวัดที่ตรวจสอบได้และผ่านการทบทวน',
     backHome: 'กลับหน้าหลัก',
     viewHistory: 'ดูสถิติ',
     saveFailed: 'บันทึกเซสชันไม่สำเร็จ',
     currentActivity: 'สถานะปัจจุบัน',
-    postureState: 'การจัดท่าทาง',
+    technicalSession: 'เซสชันตรวจจับจุดอ้างอิง',
+    technicalSessionBody:
+      'ระบบตรวจเฉพาะการมองเห็นจุดอ้างอิง และยังไม่ประเมินความถูกต้องของท่าทาง',
+    technicalStatus: 'สถานะการตรวจจับ',
+    technicalStatusBody:
+      'สถานะนี้สะท้อนคุณภาพการตรวจจับของกล้อง ไม่ใช่ผลว่าท่าทางดีหรือไม่ดี',
+    baselineTitle: 'Baseline',
+    baselineUnavailable: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
+    baselineUnavailableBody:
+      'ระบบจะไม่สร้างคะแนนเปรียบเทียบจนกว่าจะมีขั้นตอนปรับเทียบและข้อมูลอ้างอิงที่ตรวจสอบได้',
+    missingSessionTitle: 'ไม่พบเซสชันสำหรับเริ่มตรวจจับ',
+    missingSessionBody: 'โปรดเริ่มเซสชันจากหน้าตั้งค่ากล้องก่อนเปิดหน้าตรวจจับ',
+    returnToSetup: 'กลับไปตั้งค่ากล้อง',
     activitySitting: 'นั่ง',
     activityStanding: 'ยืน',
     activityTransitioning: 'กำลังเปลี่ยนท่า',
@@ -635,7 +659,8 @@ const en: typeof th = {
     },
     items: {
       planTitle: 'Posture adjustment suggestion',
-      planBody: 'You have a suggestion to adjust your posture for better comfort.',
+      planBody:
+        'You have a suggestion to adjust your posture for better comfort.',
       streakTitle: 'You have used the system 4 days in a row',
       streakBody: 'Review consistency based on the activity you recorded.',
       assistantTitle: 'KineGuide AI has a new message',
@@ -786,8 +811,7 @@ const en: typeof th = {
       'Chat may contain health information and remains stored until you delete the conversation or your account.',
     research: 'Allow research use',
     accept: 'Accept and continue',
-    privacy:
-      'You may withdraw consent and delete your account at any time.',
+    privacy: 'You may withdraw consent and delete your account at any time.',
     failed: 'Unable to save consent.'
   },
   chat: {
@@ -827,8 +851,7 @@ const en: typeof th = {
     ready: 'Ready to monitor your posture today?',
     aiTitle: 'KineGuide AI conversation assistant',
     aiStructured: 'Structured questions',
-    aiBody:
-      'Analyze and understand your screen time and posture statistics.',
+    aiBody: 'Analyze and understand your screen time and posture statistics.',
     aiBoundary:
       'This assistant does not diagnose or generate medical treatment guidance.',
     aiStart: 'Start AI chat',
@@ -853,61 +876,95 @@ const en: typeof th = {
     range: 'Chart range',
     rangeDays: '{{count}} days',
     chartSummary: '{{count}} recorded sessions in the past {{range}} days',
-    manual:
-      'These stats are usage data, not medical outcomes.'
+    manual: 'These stats are usage data, not medical outcomes.'
   },
   monitor: {
     title: 'Start Monitoring',
     setupTitle: 'Camera Setup',
-    setupSubtitle: 'Place your device securely so your head, shoulders, and upper torso are visible.',
+    setupSubtitle:
+      'Place your device securely so your head, shoulders, and upper torso are visible.',
     start: 'Start Live Monitoring',
-    continue: 'Start Calibration',
+    continue: 'Start technical session',
     readiness: 'System readiness',
     secure: 'Camera data stays on-device',
     permission: 'Camera permission',
-    visibility: 'Body and face visible',
+    visibility: 'Landmark detection',
     model: 'Pose model',
-    modelPending: 'Downloading model now',
+    modelPending: 'Loads after the session starts',
+    notChecked: 'Checked after the session starts',
     granted: 'Granted',
     waiting: 'Waiting',
     denied: 'Denied',
     unsupported: 'Browser unsupported',
-    instructions: 'Click below to capture your personal baseline.'
+    instructions:
+      'Start a session to view technical landmark-detection status.',
+    startSessionFailed: 'The session could not be started. Please try again.'
   },
   calibration: {
-    title: 'Posture Calibration',
-    subtitle: 'Sit up straight and comfortably to set your personal baseline.',
-    capturing: 'Capturing baseline...',
-    countdown: 'Starting in',
-    complete: 'Calibration complete',
-    failed: 'Calibration failed',
-    startMonitoring: 'Start Monitoring',
-    placeholderNote: 'Note: This is just a UI scaffold. Actual calibration algorithm is pending.',
-    baselineCaptured: 'Baseline captured successfully'
+    title: 'Calibration is not available yet',
+    subtitle:
+      'This prototype does not yet have a validated baseline for posture assessment.',
+    unavailableTitle: 'No validated baseline is available',
+    unavailableBody:
+      'The system will not capture or compare posture until a verifiable calibration process and approved reference data are available.',
+    noBaselineClaim:
+      'This page does not simulate calibration or treat the current pose as the user’s baseline.',
+    returnToSetup: 'Return to camera setup'
   },
   session: {
     live: 'Live Posture Monitoring',
+    technicalOnly: 'Technical session, not a clinical assessment',
     timer: 'Duration',
     pause: 'Pause',
     resume: 'Resume',
     finish: 'Finish Session',
     stop: 'Stop',
     poseTitle: 'Posture Data',
-    poseIdle: 'Turn on camera to detect pose',
+    poseIdle: 'Camera is not started',
     poseLoading: 'Loading model...',
     poseReady: 'Landmarks clearly visible',
-    poseAdjust: 'Please adjust camera to see shoulders and face',
+    poseAdjust: 'Adjust the camera so the required landmarks are visible',
     poseMissing: 'No user detected',
     poseMultiple: 'Multiple people detected. Please be alone in frame.',
+    poseUnsupported:
+      'Landmark detection is not supported for this activity yet',
+    poseUnavailable: 'Landmark detection is currently unavailable',
+    poseError: 'Landmark detection failed',
+    posePaused: 'Landmark detection is paused',
+    cameraRequesting: 'Requesting camera permission',
+    cameraDenied: 'Camera permission was not granted',
+    cameraUnsupported: 'This browser does not support camera access',
+    cameraError: 'The camera could not be started',
+    startCamera: 'Start camera',
+    startCameraBody:
+      'Start the camera when you are ready to process technical landmarks on this device.',
+    poseVisualLabel: 'Camera view with a technical landmark overlay',
     posePrivacy: 'Frames process on-device. No data is sent to the server.',
     summary: 'Session Summary',
     completed: 'Session saved',
     elapsed: 'Total duration',
+    summaryUnavailableTitle:
+      'No posture analysis is available for this session',
+    summaryUnavailableBody:
+      'Only the session duration was recorded. Posture results remain unavailable until a verifiable, reviewed measurement method exists.',
     backHome: 'Back to Dashboard',
     viewHistory: 'View Analytics',
     saveFailed: 'Failed to save session',
     currentActivity: 'Current Activity',
-    postureState: 'Posture State',
+    technicalSession: 'Technical landmark session',
+    technicalSessionBody:
+      'The system checks landmark visibility only and does not assess whether posture is correct.',
+    technicalStatus: 'Detection status',
+    technicalStatusBody:
+      'This status describes camera detection quality, not whether posture is good or bad.',
+    baselineTitle: 'Baseline',
+    baselineUnavailable: 'No baseline is available for comparison',
+    baselineUnavailableBody:
+      'The system will not generate comparison scores until a verifiable calibration process and approved reference data are available.',
+    missingSessionTitle: 'No session is available to start detection',
+    missingSessionBody:
+      'Start a session from camera setup before opening live detection.',
+    returnToSetup: 'Return to camera setup',
     activitySitting: 'Sitting',
     activityStanding: 'Standing',
     activityTransitioning: 'Transitioning',

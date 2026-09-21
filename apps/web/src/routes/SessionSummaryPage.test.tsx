@@ -19,7 +19,10 @@ function renderRoute() {
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={['/app/monitor/summary/session-1']}>
         <Routes>
-          <Route element={<SessionSummaryPage />} path="/app/monitor/summary/:id" />
+          <Route
+            element={<SessionSummaryPage />}
+            path="/app/monitor/summary/:id"
+          />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>
@@ -27,7 +30,7 @@ function renderRoute() {
 }
 
 describe('SessionSummaryPage', () => {
-  it('renders posture metrics for a completed session', async () => {
+  it('shows elapsed time without presenting unmeasured posture metrics', async () => {
     await i18n.changeLanguage('th')
     vi.mocked(product.getSession).mockResolvedValue({
       id: 'session-1',
@@ -49,15 +52,18 @@ describe('SessionSummaryPage', () => {
 
     renderRoute()
 
-    expect(await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })).toBeVisible()
+    expect(
+      await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
+    ).toBeVisible()
     expect(screen.getByText('เสร็จสิ้น')).toBeVisible()
 
-    // Check formatting of duration: 1h 0m
-    expect(screen.getByText('1 ชม. 0 นาที')).toBeVisible()
-    expect(screen.getByText('45 นาที 0 วินาที')).toBeVisible()
-    expect(screen.getByText('40 นาที 0 วินาที')).toBeVisible()
-    expect(screen.getByText('30 นาที 0 วินาที')).toBeVisible()
-    expect(screen.getByText('3')).toBeVisible()
+    expect(screen.getByText('1h 0m')).toBeVisible()
+    expect(
+      screen.getByText('ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้')
+    ).toBeVisible()
+    expect(screen.queryByText('อยู่ในเกณฑ์ดี')).not.toBeInTheDocument()
+    expect(screen.queryByText('จำนวนการแจ้งเตือน')).not.toBeInTheDocument()
+    expect(screen.queryByText('ช่วงเวลานั่งนานที่สุด')).not.toBeInTheDocument()
   })
 
   it('renders stopped state', async () => {
@@ -82,7 +88,9 @@ describe('SessionSummaryPage', () => {
 
     renderRoute()
 
-    expect(await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })).toBeVisible()
+    expect(
+      await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
+    ).toBeVisible()
     expect(screen.getByText('หยุดก่อนเสร็จ')).toBeVisible()
   })
 })

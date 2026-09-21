@@ -4,9 +4,8 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
-  Activity,
-  ShieldCheck,
-  AlertCircle
+  EyeOff,
+  ShieldCheck
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
@@ -61,48 +60,31 @@ export function SessionSummaryPage() {
           </span>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 md:grid-cols-[minmax(0,18rem)_1fr]">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <Clock3 aria-hidden="true" className="text-teal-700" size={24} />
-            <p className="mt-3 text-sm text-slate-500">{t('session.elapsed')}</p>
+            <p className="mt-3 text-sm text-slate-500">
+              {t('session.elapsed')}
+            </p>
             <p className="mt-1 text-2xl font-bold tabular-nums">
               {formatDuration(query.data?.metrics.duration_seconds ?? 0)}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <Activity aria-hidden="true" className="text-teal-700" size={24} />
-            <p className="mt-3 text-sm text-slate-500">{t('session.activitySitting')}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums">
-              {formatDuration(query.data?.metrics.sitting_seconds ?? 0)}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-emerald-50/50 p-5">
-            <CheckCircle2 aria-hidden="true" className="text-emerald-700" size={24} />
-            <p className="mt-3 text-sm text-slate-500">{t('session.stateGood')}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-900">
-              {formatDuration(query.data?.metrics.good_alignment_seconds ?? 0)}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-amber-50/50 p-5">
-            <AlertCircle aria-hidden="true" className="text-amber-700" size={24} />
-            <p className="mt-3 text-sm text-slate-500">{t('session.alertCount')}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-amber-900">
-              {query.data?.metrics.alert_count ?? 0}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-600">{t('session.longestSitting')}</p>
-            <p className="font-bold tabular-nums">{formatDuration(query.data?.metrics.longest_sitting_seconds ?? 0)}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-600">{t('session.breakCount')}</p>
-            <p className="font-bold tabular-nums">{query.data?.metrics.break_count ?? 0}</p>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="flex items-start gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-600">
+                <EyeOff aria-hidden="true" size={22} />
+              </span>
+              <div>
+                <h2 className="font-bold text-slate-900">
+                  {t('session.summaryUnavailableTitle')}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {t('session.summaryUnavailableBody')}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -116,7 +98,11 @@ export function SessionSummaryPage() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-6">
-          <CalendarDays aria-hidden="true" className="text-slate-400" size={20} />
+          <CalendarDays
+            aria-hidden="true"
+            className="text-slate-400"
+            size={20}
+          />
           <p className="text-sm font-medium text-slate-600">
             {query.data?.started_at
               ? new Intl.DateTimeFormat(

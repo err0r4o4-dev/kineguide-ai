@@ -39,7 +39,8 @@ export interface Consent {
 export const CURRENT_CONSENT_POLICY_VERSION = 'prototype-v3'
 
 export type PostureActivity = 'sitting' | 'standing' | 'transition' | 'unknown'
-export type PostureState = 'good_alignment' | 'needs_adjustment' | 'low_confidence' | 'unable_to_assess'
+export type PostureState =
+  'good_alignment' | 'needs_adjustment' | 'low_confidence' | 'unable_to_assess'
 
 export interface PostureMetrics {
   duration_seconds: number
@@ -59,6 +60,23 @@ export interface PostureSession {
   started_at: string
   completed_at: string | null
   retention_until: string
+}
+
+export interface SessionResponse {
+  id: string
+  status: PostureSession['status']
+  manual_cycles: number
+  elapsed_seconds: number
+  started_at: string
+  completed_at: string | null
+  retention_until: string
+}
+
+interface DashboardResponse {
+  completed_sessions: number
+  current_streak: number
+  total_seconds: number
+  recent_sessions: SessionResponse[]
 }
 
 export interface Dashboard {
@@ -224,25 +242,28 @@ export async function revokeConsent() {
 }
 
 export async function getDashboard(signal?: AbortSignal) {
-  const response = await http.get<any>('/dashboard', { signal })
+  const response = await http.get<DashboardResponse>('/dashboard', { signal })
   return {
     ...response.data,
-    recent_sessions: (response.data.recent_sessions || []).map(mapSession)
-  } as Dashboard
+    recent_sessions: response.data.recent_sessions.map(mapSessionResponse)
+  } satisfies Dashboard
 }
 
 export async function getSessions(signal?: AbortSignal) {
-  const response = await http.get<any>('/sessions', {
-    signal
-  })
-  return (response.data.sessions || []).map(mapSession) as PostureSession[]
+  const response = await http.get<{ sessions: SessionResponse[] }>(
+    '/sessions',
+    {
+      signal
+    }
+  )
+  return response.data.sessions.map(mapSessionResponse)
 }
 
 export async function getSession(id: string, signal?: AbortSignal) {
-  const response = await http.get<any>(`/sessions/${id}`, {
+  const response = await http.get<SessionResponse>(`/sessions/${id}`, {
     signal
   })
-  return mapSession(response.data)
+  return mapSessionResponse(response.data)
 }
 
 export async function createSession(input: { camera_used: boolean }) {
@@ -252,8 +273,8 @@ export async function createSession(input: { camera_used: boolean }) {
     activity_slug: 'seated-posture-demo', // Use existing slug to bypass validation
     measurement_mode: 'observation'
   }
-  const response = await http.post<any>('/sessions', payload)
-  return mapSession(response.data)
+  const response = await http.post<SessionResponse>('/sessions', payload)
+  return mapSessionResponse(response.data)
 }
 
 export async function updateSession(
@@ -266,24 +287,24 @@ export async function updateSession(
     elapsed_seconds: input.metrics.duration_seconds ?? 0,
     manual_cycles: 0
   }
-  const response = await http.patch<any>(`/sessions/${id}`, payload)
-  return mapSession(response.data)
+  const response = await http.patch<SessionResponse>(`/sessions/${id}`, payload)
+  return mapSessionResponse(response.data)
 }
 
-function mapSession(s: any): PostureSession {
-  const elapsed = s.elapsed_seconds || 0
+export function mapSessionResponse(s: SessionResponse): PostureSession {
+  const elapsed = s.elapsed_seconds ?? 0
   return {
     id: s.id,
     status: s.status,
     metrics: {
       duration_seconds: elapsed,
-      sitting_seconds: Math.floor(elapsed * 0.8),
-      standing_seconds: Math.floor(elapsed * 0.2),
-      good_alignment_seconds: Math.floor(elapsed * 0.7),
-      needs_adjustment_seconds: Math.floor(elapsed * 0.3),
-      alert_count: s.manual_cycles || 0,
+      sitting_seconds: 0,
+      standing_seconds: 0,
+      good_alignment_seconds: 0,
+      needs_adjustment_seconds: 0,
+      alert_count: 0,
       break_count: 0,
-      longest_sitting_seconds: elapsed > 60 ? 60 : elapsed
+      longest_sitting_seconds: 0
     },
     started_at: s.started_at,
     completed_at: s.completed_at,

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import {
   Camera,
   CheckCircle2,
@@ -27,15 +27,18 @@ export function CameraSetupPage() {
     mutationFn: async () => {
       return createSession({ camera_used: true })
     },
-    onSuccess: () => {
-      navigate(`/app/monitor/calibration`)
+    onSuccess: (session) => {
+      navigate(`/app/sessions/${session.id}/live`)
     }
   })
 
   if (permissionStep) {
     return (
       <div className="mx-auto max-w-3xl">
-        <PageHeader title={t('monitor.setupTitle')} subtitle={t('monitor.setupSubtitle')} />
+        <PageHeader
+          title={t('monitor.setupTitle')}
+          subtitle={t('monitor.setupSubtitle')}
+        />
         <div className="kg-card mt-8 flex flex-col items-center justify-center p-8 text-center sm:p-12">
           <Camera aria-hidden="true" className="text-teal-700" size={56} />
           <h2 className="mt-6 text-xl font-bold text-slate-900">
@@ -63,7 +66,10 @@ export function CameraSetupPage() {
 
   return (
     <div className="mx-auto max-w-4xl pb-4">
-      <PageHeader title={t('monitor.setupTitle')} subtitle={t('monitor.setupSubtitle')} />
+      <PageHeader
+        title={t('monitor.setupTitle')}
+        subtitle={t('monitor.setupSubtitle')}
+      />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_minmax(18rem,0.4fr)]">
         <section className="flex flex-col gap-4">
@@ -77,9 +83,13 @@ export function CameraSetupPage() {
                 ref={camera.videoRef}
               />
             )}
-            {camera.state === 'waiting' && (
+            {camera.state === 'requesting' && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-white/80">
-                <Loader2 aria-hidden="true" className="animate-spin" size={32} />
+                <Loader2
+                  aria-hidden="true"
+                  className="animate-spin"
+                  size={32}
+                />
                 <p>{t('monitor.waiting')}</p>
               </div>
             )}
@@ -109,7 +119,9 @@ export function CameraSetupPage() {
 
         <section className="flex flex-col">
           <div className="kg-card flex-1 p-5">
-            <h2 className="font-bold text-slate-950">{t('monitor.readiness')}</h2>
+            <h2 className="font-bold text-slate-950">
+              {t('monitor.readiness')}
+            </h2>
             <ul className="mt-5 space-y-4">
               <StatusItem
                 label={t('monitor.permission')}
@@ -120,15 +132,19 @@ export function CameraSetupPage() {
                       ? 'error'
                       : 'pending'
                 }
+                value={
+                  camera.state === 'ready' ? t('monitor.granted') : undefined
+                }
               />
               <StatusItem
                 label={t('monitor.visibility')}
-                state={camera.state === 'ready' ? 'good' : 'pending'}
+                state="pending"
+                value={t('monitor.notChecked')}
               />
               <StatusItem
                 label={t('monitor.model')}
-                state={camera.state === 'ready' ? 'pending' : 'pending'}
-                value={camera.state === 'ready' ? t('monitor.modelPending') : undefined}
+                state="pending"
+                value={t('monitor.modelPending')}
               />
             </ul>
           </div>
@@ -137,6 +153,14 @@ export function CameraSetupPage() {
             <p className="mb-4 text-sm text-slate-600 text-center">
               {t('monitor.instructions')}
             </p>
+            {startSession.isError && (
+              <p
+                className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900"
+                role="alert"
+              >
+                {t('monitor.startSessionFailed')}
+              </p>
+            )}
             <button
               className="kg-button-primary w-full"
               disabled={camera.state !== 'ready' || startSession.isPending}
@@ -144,7 +168,11 @@ export function CameraSetupPage() {
               type="button"
             >
               {startSession.isPending && (
-                <Loader2 aria-hidden="true" className="animate-spin" size={18} />
+                <Loader2
+                  aria-hidden="true"
+                  className="animate-spin"
+                  size={18}
+                />
               )}
               {t('monitor.continue')}
               <ChevronRight aria-hidden="true" size={18} />

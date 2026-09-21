@@ -30,7 +30,10 @@ function renderRoute() {
       <MemoryRouter initialEntries={['/app/monitor']}>
         <Routes>
           <Route element={<CameraSetupPage />} path="/app/monitor" />
-          <Route element={<h1>Live Monitoring</h1>} path="/app/monitor/calibration" />
+          <Route
+            element={<h1>Live Monitoring</h1>}
+            path="/app/sessions/:id/live"
+          />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>
@@ -49,8 +52,12 @@ describe('CameraSetupPage', () => {
 
     renderRoute()
 
-    expect(screen.getByRole('heading', { name: 'ประมวลผลกล้องในอุปกรณ์' })).toBeVisible()
-    expect(screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ประมวลผลกล้องในอุปกรณ์' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+    ).toBeVisible()
   })
 
   it('handles camera permission and shows readiness state', async () => {
@@ -66,13 +73,18 @@ describe('CameraSetupPage', () => {
     const user = userEvent.setup()
     renderRoute()
 
-    const startBtn = screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+    const startBtn = screen.getByRole('button', {
+      name: 'เริ่ม Live Monitoring'
+    })
     await user.click(startBtn)
 
     expect(screen.getByText('ความพร้อมของระบบ')).toBeVisible()
     expect(screen.getByText('สิทธิ์กล้อง')).toBeVisible()
-    expect(screen.getByText('มองเห็นร่างกายและใบหน้า')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'เริ่ม Calibration' })).toBeEnabled()
+    expect(screen.getByText('การตรวจจับจุดอ้างอิง')).toBeVisible()
+    expect(screen.getByText('จะตรวจเมื่อเริ่มเซสชัน')).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: 'เริ่มเซสชันเชิงเทคนิค' })
+    ).toBeEnabled()
   })
 
   it('disables continue when camera is denied', async () => {
@@ -87,12 +99,16 @@ describe('CameraSetupPage', () => {
     const user = userEvent.setup()
     renderRoute()
 
-    await user.click(screen.getByRole('button', { name: 'เริ่ม Live Monitoring' }))
-    expect(screen.getByRole('button', { name: 'เริ่ม Calibration' })).toBeDisabled()
+    await user.click(
+      screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+    )
+    expect(
+      screen.getByRole('button', { name: 'เริ่มเซสชันเชิงเทคนิค' })
+    ).toBeDisabled()
     expect(screen.getByText('ถูกปฏิเสธ')).toBeVisible()
   })
 
-  it('creates session and navigates to calibration', async () => {
+  it('creates a session and navigates with the real session id', async () => {
     await i18n.changeLanguage('th')
     vi.mocked(camera.useCamera).mockReturnValue({
       state: 'ready',
@@ -121,10 +137,16 @@ describe('CameraSetupPage', () => {
     const user = userEvent.setup()
     renderRoute()
 
-    await user.click(screen.getByRole('button', { name: 'เริ่ม Live Monitoring' }))
-    await user.click(screen.getByRole('button', { name: 'เริ่ม Calibration' }))
+    await user.click(
+      screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'เริ่มเซสชันเชิงเทคนิค' })
+    )
 
     expect(product.createSession).toHaveBeenCalledWith({ camera_used: true })
-    expect(await screen.findByRole('heading', { name: 'Live Monitoring' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: 'Live Monitoring' })
+    ).toBeInTheDocument()
   })
 })

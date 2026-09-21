@@ -31,13 +31,11 @@ describe('ProfilePage', () => {
     expect(screen.getByText('test@example.com')).toBeVisible()
     expect(screen.getByText('1 สิงหาคม 2569')).toBeVisible()
 
-    expect(screen.getByRole('link', { name: /ตั้งค่าและความเป็นส่วนตัว/ })).toHaveAttribute(
-      'href',
-      '/app/settings'
-    )
-    expect(screen.getByRole('link', { name: /ปรับเทียบท่าทาง/ })).toHaveAttribute(
-      'href',
-      '/app/monitor/calibration'
-    )
+    expect(
+      screen.getByRole('link', { name: /ตั้งค่าและความเป็นส่วนตัว/ })
+    ).toHaveAttribute('href', '/app/settings')
+    expect(
+      screen.getByRole('link', { name: /การปรับเทียบยังไม่พร้อมใช้งาน/ })
+    ).toHaveAttribute('href', '/app/monitor/calibration')
   })
 })
