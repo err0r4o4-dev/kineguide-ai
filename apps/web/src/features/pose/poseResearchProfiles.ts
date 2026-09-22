@@ -1,12 +1,36 @@
-import type { PoseResearchProfile } from './poseSimilarity'
+import {
+  POSE_RESEARCH_LANDMARK_COUNT,
+  type PoseResearchProfile
+} from './poseSimilarity'
 
 export interface RegisteredPoseResearchProfile extends PoseResearchProfile {
   exerciseSlug: string
   requiredView: 'front'
-  referenceSequenceStatus: 'missing_clinician_reference'
   evidenceScope: string
   limitations: readonly string[]
 }
+
+export type ResearchMeasurementReadiness =
+  | { status: 'unsupported_activity'; comparisonAllowed: false }
+  | {
+      status: 'blocked'
+      blocker: 'missing_clinician_reference'
+      comparisonAllowed: false
+      expectedLandmarkCount: number
+      requiredView: RegisteredPoseResearchProfile['requiredView']
+      method: RegisteredPoseResearchProfile['method']
+      profileId: string
+      sourceUrl: string
+    }
+  | {
+      status: 'ready'
+      comparisonAllowed: true
+      expectedLandmarkCount: number
+      requiredView: RegisteredPoseResearchProfile['requiredView']
+      method: RegisteredPoseResearchProfile['method']
+      profileId: string
+      sourceUrl: string
+    }
 
 // This profile records a reproducible research method, not an enabled clinical
 // rule. The cited paper did not publish KineGuide-compatible landmark reference
@@ -37,4 +61,32 @@ export function researchProfileForExercise(
   return exerciseSlug === SHOULDER_FRONT_RESEARCH_PROFILE.exerciseSlug
     ? SHOULDER_FRONT_RESEARCH_PROFILE
     : null
+}
+
+export function researchMeasurementReadinessForExercise(
+  exerciseSlug: string
+): ResearchMeasurementReadiness {
+  const profile = researchProfileForExercise(exerciseSlug)
+  if (!profile) {
+    return { status: 'unsupported_activity', comparisonAllowed: false }
+  }
+
+  const shared = {
+    expectedLandmarkCount: POSE_RESEARCH_LANDMARK_COUNT,
+    requiredView: profile.requiredView,
+    method: profile.method,
+    profileId: profile.id,
+    sourceUrl: profile.sourceUrl
+  }
+
+  if (profile.referenceSequenceStatus !== 'approved_clinician_reference') {
+    return {
+      status: 'blocked',
+      blocker: profile.referenceSequenceStatus,
+      comparisonAllowed: false,
+      ...shared
+    }
+  }
+
+  return { status: 'ready', comparisonAllowed: true, ...shared }
 }

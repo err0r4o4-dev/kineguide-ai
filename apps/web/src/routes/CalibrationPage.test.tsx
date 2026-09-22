@@ -34,6 +34,27 @@ describe('CalibrationPage', () => {
     expect(
       screen.queryByText('บันทึกค่า Baseline สำเร็จ')
     ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'ความพร้อมของวิธีวัดจากงานวิจัย'
+      })
+    ).toBeVisible()
+    expect(screen.getByText(/33 จุดอ้างอิงแบบสามมิติ/)).toBeVisible()
+    expect(
+      screen.getByText(/Cosine similarity และ Dynamic Time Warping/)
+    ).toBeVisible()
+    expect(
+      screen.getByText('ยังไม่มีลำดับอ้างอิงจากนักกายภาพที่อนุมัติ')
+    ).toBeVisible()
+    expect(
+      screen.getByRole('link', { name: 'เปิดบทความงานวิจัยต้นฉบับ' })
+    ).toHaveAttribute(
+      'href',
+      'https://pmc.ncbi.nlm.nih.gov/articles/PMC10781250/'
+    )
+    expect(screen.queryByText(/90%/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/ท่าถูกต้อง/)).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('link', { name: 'กลับไปตั้งค่ากล้อง' }))
     expect(

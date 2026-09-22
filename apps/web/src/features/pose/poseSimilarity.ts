@@ -1,17 +1,6 @@
 import type { PoseLandmark } from './poseGeometry'
-import type {
-  ExerciseFeatures,
-  JointAngleMap,
-  JointError,
-  JointName
-} from './exerciseFeatures'
-import type {
-  ExerciseConfig,
-  ReferenceMovementModel
-} from './referenceMovementModel'
-import { getExerciseConfig } from './referenceMovementModel'
 
-const EXPECTED_LANDMARK_COUNT = 33
+export const POSE_RESEARCH_LANDMARK_COUNT = 33
 
 export interface PoseResearchProfile {
   id: string
@@ -19,6 +8,8 @@ export interface PoseResearchProfile {
   method: 'cosine_dtw'
   researchSimilarityThreshold: number
   releaseStatus: 'research_only' | 'clinically_approved'
+  referenceSequenceStatus:
+    'missing_clinician_reference' | 'approved_clinician_reference'
 }
 
 interface ComparePoseSequencesInput {
@@ -39,22 +30,6 @@ export type PoseSequenceComparison =
       profileId: string
       sourceUrl: string
     }
-
-export interface DetailedMovementComparison {
-  overallScore: number // 0 - 100
-  landmarkSimilarity: number // 0 - 1
-  angleSimilarity: number // 0 - 1
-  temporalSimilarity: number // 0 - 1
-  dtwDistance: number
-  matchedReferenceFrameIndex: number
-  jointErrors: JointError[]
-  feedbackMessages: {
-    status: 'correct' | 'warning' | 'incorrect'
-    messageKey: string
-    joint?: JointName
-    degreeDiff?: number
-  }[]
-}
 
 function clampSimilarity(value: number) {
   return Math.min(1, Math.max(0, value))
@@ -96,14 +71,14 @@ export function frameCosineSimilarity(
   observed: readonly PoseLandmark[]
 ): number | null {
   if (
-    reference.length !== EXPECTED_LANDMARK_COUNT ||
-    observed.length !== EXPECTED_LANDMARK_COUNT
+    reference.length !== POSE_RESEARCH_LANDMARK_COUNT ||
+    observed.length !== POSE_RESEARCH_LANDMARK_COUNT
   ) {
     return null
   }
 
   let total = 0
-  for (let index = 0; index < EXPECTED_LANDMARK_COUNT; index += 1) {
+  for (let index = 0; index < POSE_RESEARCH_LANDMARK_COUNT; index += 1) {
     const referenceVector = vectorFor(reference[index])
     const observedVector = vectorFor(observed[index])
     if (!referenceVector || !observedVector) return null
@@ -111,7 +86,7 @@ export function frameCosineSimilarity(
     if (similarity === null) return null
     total += similarity
   }
-  return total / EXPECTED_LANDMARK_COUNT
+  return total / POSE_RESEARCH_LANDMARK_COUNT
 }
 
 export function euclideanDistance(
@@ -194,7 +169,7 @@ export function dynamicTimeWarpingDistance(
 }
 
 function flattenFrame(frame: readonly PoseLandmark[]) {
-  if (frame.length !== EXPECTED_LANDMARK_COUNT) return null
+  if (frame.length !== POSE_RESEARCH_LANDMARK_COUNT) return null
   const flattened: number[] = []
   for (const landmark of frame) {
     const vector = vectorFor(landmark)
@@ -204,249 +179,14 @@ function flattenFrame(frame: readonly PoseLandmark[]) {
   return flattened
 }
 
-/**
- * Multi-dimensional feature vector per frame:
- * Combines Body-Normalized Landmarks + Selected Joint Angles (scaled to 0-1)
- */
-export function createFeatureVector(
-  features: ExerciseFeatures,
-  importantAngles: JointName[] = [
-    'leftShoulder',
-    'rightShoulder',
-    'leftElbow',
-    'rightElbow',
-    'leftKnee',
-    'rightKnee'
-  ]
-): number[] {
-  const vector: number[] = []
-
-  // Normalized landmarks (x, y, z)
-  for (const lm of features.normalizedLandmarks) {
-    vector.push(lm.x, lm.y, lm.z ?? 0)
-  }
-
-  // Key angles normalized to 0-1 range (angle / 180)
-  for (const joint of importantAngles) {
-    const angle = features.angles[joint]
-    if (angle !== undefined && Number.isFinite(angle)) {
-      vector.push(angle / 180)
-    } else {
-      vector.push(0.5) // Default neutral angle
-    }
-  }
-
-  return vector
-}
-
-/**
- * Calculates joint error analysis between reference frame and user frame.
- */
-export function analyzeJointErrors(
-  refAngles: JointAngleMap,
-  userAngles: JointAngleMap,
-  config: ExerciseConfig
-): JointError[] {
-  const errors: JointError[] = []
-
-  // Daily-movement demonstrations intentionally have no correctness thresholds
-  // until a qualified clinical owner approves traceable rules for them.
-  if (!config.thresholds) return errors
-
-  for (const joint of config.importantAngles) {
-    const refAngle = refAngles[joint]
-    const userAngle = userAngles[joint]
-
-    if (
-      refAngle !== undefined &&
-      userAngle !== undefined &&
-      Number.isFinite(refAngle) &&
-      Number.isFinite(userAngle)
-    ) {
-      const error = Math.abs(refAngle - userAngle)
-      let status: 'correct' | 'warning' | 'incorrect' = 'correct'
-
-      if (error > config.thresholds.incorrect) {
-        status = 'incorrect'
-      } else if (error > config.thresholds.warning) {
-        status = 'warning'
-      }
-
-      errors.push({
-        joint,
-        referenceAngle: refAngle,
-        userAngle,
-        error,
-        status
-      })
-    }
-  }
-
-  return errors
-}
-
-/**
- * Comprehensive Movement Quality & Similarity Evaluation against a Reference Movement Model.
- */
-export function evaluateMovementAgainstReference(
-  userSequence: ExerciseFeatures[],
-  referenceModel: ReferenceMovementModel
-): DetailedMovementComparison {
-  if (userSequence.length === 0 || referenceModel.features.length === 0) {
-    return {
-      overallScore: 0,
-      landmarkSimilarity: 0,
-      angleSimilarity: 0,
-      temporalSimilarity: 0,
-      dtwDistance: Number.POSITIVE_INFINITY,
-      matchedReferenceFrameIndex: 0,
-      jointErrors: [],
-      feedbackMessages: [
-        {
-          status: 'warning',
-          messageKey: 'session.feedback.noMovementDetected'
-        }
-      ]
-    }
-  }
-
-  const config =
-    referenceModel.config || getExerciseConfig(referenceModel.exerciseSlug)
-  const importantAngles = config.importantAngles
-
-  // Build feature vectors
-  const refVectors = referenceModel.features.map((f) =>
-    createFeatureVector(f, importantAngles)
-  )
-  const userVectors = userSequence.map((f) =>
-    createFeatureVector(f, importantAngles)
-  )
-
-  // 1. DTW Alignment
-  const { distance: dtwDist, path } = dynamicTimeWarping(
-    refVectors,
-    userVectors
-  )
-
-  // Find the reference frame aligned with the most recent user frame
-  const latestUserIndex = userSequence.length - 1
-  let matchedRefIndex = referenceModel.features.length - 1
-  for (let idx = path.length - 1; idx >= 0; idx--) {
-    if (path[idx][1] === latestUserIndex) {
-      matchedRefIndex = path[idx][0]
-      break
-    }
-  }
-
-  const matchedRefFrame =
-    referenceModel.features[matchedRefIndex] || referenceModel.features[0]
-  const latestUserFrame = userSequence[latestUserIndex]
-
-  // 2. Landmark Similarity (Cosine of normalized landmarks)
-  let landmarkSim = 0
-  const pairedLen = Math.min(
-    userSequence.length,
-    referenceModel.features.length
-  )
-  let landmarkSimSum = 0
-  let validCount = 0
-
-  for (let i = 0; i < pairedLen; i++) {
-    const sim = frameCosineSimilarity(
-      referenceModel.features[i].landmarks,
-      userSequence[i].landmarks
-    )
-    if (sim !== null) {
-      landmarkSimSum += sim
-      validCount++
-    }
-  }
-  landmarkSim = validCount > 0 ? landmarkSimSum / validCount : 0.5
-
-  // 3. Joint Angle Similarity & Joint Errors
-  const jointErrors = analyzeJointErrors(
-    matchedRefFrame.angles,
-    latestUserFrame.angles,
-    config
-  )
-
-  let angleScoreSum = 0
-  if (jointErrors.length > 0) {
-    for (const err of jointErrors) {
-      // Angular score: 100% at 0 deg diff, down linearly or gaussian
-      const score = Math.max(0, 1 - err.error / 60)
-      angleScoreSum += score
-    }
-    angleScoreSum /= jointErrors.length
-  } else {
-    angleScoreSum = 0.8 // Neutral if not enough joint data
-  }
-  const angleSimilarity = clampSimilarity(angleScoreSum)
-
-  // 4. Temporal Similarity (Normalized DTW score: lower distance is better)
-  const maxPossibleDtw = Math.max(1, userSequence.length * 2)
-  const temporalSimilarity = clampSimilarity(
-    1 - Math.min(dtwDist, maxPossibleDtw) / maxPossibleDtw
-  )
-
-  // 5. Overall Score (0-100)
-  const weights = config.similarityWeights || {
-    landmark: 0.3,
-    angle: 0.5,
-    temporal: 0.2
-  }
-  const rawScore =
-    landmarkSim * weights.landmark +
-    angleSimilarity * weights.angle +
-    temporalSimilarity * weights.temporal
-
-  const overallScore = Math.round(clampSimilarity(rawScore) * 100)
-
-  // 6. Actionable Feedback Messages
-  const feedbackMessages: DetailedMovementComparison['feedbackMessages'] = []
-
-  for (const err of jointErrors) {
-    if (err.status === 'incorrect') {
-      feedbackMessages.push({
-        status: 'incorrect',
-        messageKey: `session.feedback.jointError_${err.joint}`,
-        joint: err.joint,
-        degreeDiff: Math.round(err.error)
-      })
-    } else if (err.status === 'warning') {
-      feedbackMessages.push({
-        status: 'warning',
-        messageKey: `session.feedback.jointWarning_${err.joint}`,
-        joint: err.joint,
-        degreeDiff: Math.round(err.error)
-      })
-    }
-  }
-
-  if (feedbackMessages.length === 0) {
-    feedbackMessages.push({
-      status: 'correct',
-      messageKey: 'session.feedback.formGood'
-    })
-  }
-
-  return {
-    overallScore,
-    landmarkSimilarity: landmarkSim,
-    angleSimilarity,
-    temporalSimilarity,
-    dtwDistance: Number.isFinite(dtwDist) ? Number(dtwDist.toFixed(2)) : 999,
-    matchedReferenceFrameIndex: matchedRefIndex,
-    jointErrors,
-    feedbackMessages
-  }
-}
-
 export function comparePoseSequences({
   observed,
   reference,
   profile
 }: ComparePoseSequencesInput): PoseSequenceComparison {
+  if (profile.referenceSequenceStatus !== 'approved_clinician_reference') {
+    return { status: 'reference_unavailable' }
+  }
   if (reference.length === 0) return { status: 'reference_unavailable' }
   if (observed.length === 0) return { status: 'observation_unavailable' }
 

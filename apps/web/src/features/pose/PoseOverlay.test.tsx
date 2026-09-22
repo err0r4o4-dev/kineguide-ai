@@ -31,6 +31,30 @@ const snapshot: PoseTrackingSnapshot = {
 }
 
 describe('PoseOverlay', () => {
+  it('does not let an unreviewed correctness verdict override technical visibility colors', () => {
+    const legacyVerdictProps: Record<string, unknown> = {
+      jointErrors: [
+        {
+          joint: 'leftShoulder',
+          referenceAngle: 90,
+          userAngle: 135,
+          error: 45,
+          status: 'incorrect'
+        }
+      ]
+    }
+    const { container } = render(
+      <PoseOverlay {...legacyVerdictProps} snapshot={snapshot} />
+    )
+
+    expect(
+      container.querySelector('[data-body-connection="11-13"]')
+    ).toHaveAttribute('stroke', '#5eead4')
+    expect(
+      container.querySelector('[data-body-landmark="11"]')
+    ).toHaveAttribute('fill', '#5eead4')
+  })
+
   it('uses the camera frame as its native coordinate system', () => {
     const video = {
       videoWidth: 640,

@@ -16,7 +16,7 @@ AI chat requires a separate consent flag under policy `prototype-v3`. Account-ow
 
 The educational clinical-flow catalog contains synthetic public metadata only. Placeholder answers are evaluated transiently and are not stored. During an owner-scoped session, an explicit technical-feedback request may send pose status and up to 33 visibility scores through Go to Python; coordinates, frames, recordings, images, face/hand data, and blink estimates remain in-browser. Go and Python do not persist or log that technical payload or response. Session history stores the public activity identifier and kind, measurement mode, camera-used flag, status, user-entered cycle count when applicable, elapsed time, and timestamps only.
 
-The daily-movement flow supports a demo-only path when the camera is denied, unsupported, or not wanted for that session. Reference-video authoring is not exposed to normal users, and locally generated reference data cannot activate movement correctness feedback.
+The daily-movement flow supports a demo-only path when the camera is denied, unsupported, or not wanted for that session. The production pose source has no reference-video authoring or local reference-model storage path. Research comparison remains blocked without a clinician-approved reference, and it cannot activate movement correctness feedback or automatic repetition counting.
 
 Social sign-in stores only the provider name and provider-scoped subject linked to the KineGuide user. Provider access tokens are processed transiently by the Go API and discarded. Client secrets remain in server environment configuration, callback errors are intentionally generic, and account deletion cascades to social identities.
 

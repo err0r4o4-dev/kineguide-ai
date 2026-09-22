@@ -1,5 +1,4 @@
 import type { PoseTrackingSnapshot } from './usePoseTracking'
-import type { JointError } from './exerciseFeatures'
 
 const MIDDLE_BODY_CONNECTIONS = [
   [11, 12],
@@ -145,36 +144,6 @@ function LandmarkLines({
   })
 }
 
-// Map joints to landmark vertex indices for custom error coloring
-const JOINT_LANDMARK_MAP: Record<string, number> = {
-  leftElbow: 13,
-  rightElbow: 14,
-  leftShoulder: 11,
-  rightShoulder: 12,
-  leftHip: 23,
-  rightHip: 24,
-  leftKnee: 25,
-  rightKnee: 26,
-  leftAnkle: 27,
-  rightAnkle: 28
-}
-
-function getLandmarkColor(
-  index: number,
-  jointErrors: JointError[],
-  defaultStroke: string
-): string {
-  for (const err of jointErrors) {
-    const targetIndex = JOINT_LANDMARK_MAP[err.joint]
-    if (targetIndex === index) {
-      if (err.status === 'incorrect') return '#ef4444' // Red
-      if (err.status === 'warning') return '#f59e0b' // Yellow / Amber
-      return '#10b981' // Green
-    }
-  }
-  return defaultStroke
-}
-
 function BodyRegion({
   connections,
   firstLandmark,
@@ -184,8 +153,7 @@ function BodyRegion({
   lastLandmark,
   stroke,
   unreliable,
-  unit,
-  jointErrors = []
+  unit
 }: {
   connections: readonly (readonly [number, number])[]
   firstLandmark: number
@@ -200,7 +168,6 @@ function BodyRegion({
   stroke: string
   unreliable: ReadonlySet<number>
   unit: number
-  jointErrors?: JointError[]
 }) {
   return (
     <>
@@ -217,21 +184,11 @@ function BodyRegion({
           return null
         }
 
-        // Check if either end has error
-        const startColor = getLandmarkColor(start, jointErrors, stroke)
-        const endColor = getLandmarkColor(end, jointErrors, stroke)
-        const lineColor =
-          startColor === '#ef4444' || endColor === '#ef4444'
-            ? '#ef4444'
-            : startColor === '#f59e0b' || endColor === '#f59e0b'
-              ? '#f59e0b'
-              : stroke
-
         return (
           <line
             data-body-connection={`${start}-${end}`}
             key={`${start}-${end}`}
-            stroke={lineColor}
+            stroke={stroke}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={0.72 * unit}
@@ -252,14 +209,12 @@ function BodyRegion({
           return null
         }
 
-        const pointFill = getLandmarkColor(index, jointErrors, stroke)
-
         return (
           <circle
             cx={landmark.x * frameWidth}
             cy={landmark.y * frameHeight}
             data-body-landmark={index}
-            fill={pointFill}
+            fill={stroke}
             key={index}
             r={0.45 * unit}
             stroke="#f8fafc"
@@ -273,12 +228,10 @@ function BodyRegion({
 
 export function PoseOverlay({
   snapshot,
-  video = null,
-  jointErrors = []
+  video = null
 }: {
   snapshot: PoseTrackingSnapshot
   video?: HTMLVideoElement | null
-  jointErrors?: JointError[]
 }) {
   const {
     blink,
@@ -328,7 +281,6 @@ export function PoseOverlay({
             firstLandmark={FIRST_MIDDLE_LANDMARK}
             frameHeight={frameHeight}
             frameWidth={frameWidth}
-            jointErrors={jointErrors}
             landmarks={landmarks}
             lastLandmark={LAST_MIDDLE_LANDMARK}
             stroke={middleStroke}
@@ -377,7 +329,6 @@ export function PoseOverlay({
             firstLandmark={FIRST_LOWER_LANDMARK}
             frameHeight={frameHeight}
             frameWidth={frameWidth}
-            jointErrors={jointErrors}
             landmarks={landmarks}
             lastLandmark={LAST_LOWER_LANDMARK}
             stroke={lowerStroke}

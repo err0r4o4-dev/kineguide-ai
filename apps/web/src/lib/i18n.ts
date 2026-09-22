@@ -369,7 +369,21 @@ const th = {
       'ระบบจะยังไม่บันทึกหรือเปรียบเทียบท่าทางจนกว่าจะมีขั้นตอนปรับเทียบและข้อมูลอ้างอิงที่ตรวจสอบได้',
     noBaselineClaim:
       'หน้านี้ไม่สร้างผลการปรับเทียบจำลอง และไม่ถือว่าท่าปัจจุบันเป็นค่ามาตรฐานของผู้ใช้',
-    returnToSetup: 'กลับไปตั้งค่ากล้อง'
+    returnToSetup: 'กลับไปตั้งค่ากล้อง',
+    researchTitle: 'ความพร้อมของวิธีวัดจากงานวิจัย',
+    researchIntro:
+      'ต้นแบบบันทึกวิธีจากงานวิจัยสำหรับการเคลื่อนไหวหัวไหล่จากมุมกล้องด้านหน้า แต่ยังไม่เปิดใช้การเปรียบเทียบกับผู้ใช้',
+    researchLandmarks:
+      'ใช้ MediaPipe {{count}} จุดอ้างอิงแบบสามมิติในแต่ละเฟรม',
+    researchComparison:
+      'เปรียบเทียบลำดับด้วย Cosine similarity และ Dynamic Time Warping',
+    researchView: 'ขอบเขตที่บันทึกไว้ใช้มุมกล้องด้านหน้า',
+    researchBlocked: 'ยังไม่มีลำดับอ้างอิงจากนักกายภาพที่อนุมัติ',
+    researchBlockedBody:
+      'ระบบจึงไม่เริ่มการเปรียบเทียบ ไม่สร้างคะแนน และไม่ตัดสินว่าการเคลื่อนไหวถูกหรือผิด',
+    researchBoundary:
+      'วิธีนี้เป็นเครื่องมือวัดเพื่อการวิจัย ไม่ใช่หลักฐานว่าการเคลื่อนไหวปลอดภัยหรือถูกต้องทางคลินิก และหน้านี้ไม่เปิดกล้องหรือเก็บข้อมูลจุดอ้างอิง',
+    researchSource: 'เปิดบทความงานวิจัยต้นฉบับ'
   },
   session: {
     live: 'Live Posture Monitoring',
@@ -909,7 +923,21 @@ const en: typeof th = {
       'The system will not capture or compare posture until a verifiable calibration process and approved reference data are available.',
     noBaselineClaim:
       'This page does not simulate calibration or treat the current pose as the user’s baseline.',
-    returnToSetup: 'Return to camera setup'
+    returnToSetup: 'Return to camera setup',
+    researchTitle: 'Research measurement readiness',
+    researchIntro:
+      'The prototype records the cited method for front-view shoulder movement, but comparison is not enabled for users.',
+    researchLandmarks:
+      'Use {{count}} three-dimensional MediaPipe landmarks in each frame',
+    researchComparison:
+      'Compare sequences with cosine similarity and Dynamic Time Warping',
+    researchView: 'The documented study scope uses a front camera view',
+    researchBlocked: 'No approved physiotherapist reference sequence exists',
+    researchBlockedBody:
+      'The system therefore does not start comparison, produce a score, or label movement as correct or incorrect.',
+    researchBoundary:
+      'This is a research measurement method, not proof that movement is safe or clinically correct. This page does not start the camera or retain landmark data.',
+    researchSource: 'Open the original research article'
   },
   session: {
     live: 'Live Posture Monitoring',

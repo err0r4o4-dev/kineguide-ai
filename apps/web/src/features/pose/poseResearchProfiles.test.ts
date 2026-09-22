@@ -1,4 +1,5 @@
 import {
+  researchMeasurementReadinessForExercise,
   researchProfileForExercise,
   SHOULDER_FRONT_RESEARCH_PROFILE
 } from './poseResearchProfiles'
@@ -16,6 +17,27 @@ describe('pose research profiles', () => {
       releaseStatus: 'research_only',
       referenceSequenceStatus: 'missing_clinician_reference',
       requiredView: 'front'
+    })
+  })
+
+  it('blocks research comparison until a clinician reference is approved', () => {
+    expect(
+      researchMeasurementReadinessForExercise('shoulder-movement-demo')
+    ).toMatchObject({
+      status: 'blocked',
+      blocker: 'missing_clinician_reference',
+      comparisonAllowed: false,
+      expectedLandmarkCount: 33,
+      requiredView: 'front'
+    })
+  })
+
+  it('does not apply the shoulder study method to another activity', () => {
+    expect(
+      researchMeasurementReadinessForExercise('seated-posture-demo')
+    ).toEqual({
+      status: 'unsupported_activity',
+      comparisonAllowed: false
     })
   })
 })

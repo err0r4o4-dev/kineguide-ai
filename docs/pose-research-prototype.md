@@ -23,7 +23,16 @@ The paper:
 - compares frontal smartphone recordings against motion-capture measurements.
 
 KineGuide implements the bounded cosine and DTW calculations as a research-only
-engine. It always returns `clinicalVerdict: null`. Research comparison and reference-authoring routes are not reachable from the daily-movement user flow.
+engine. It always returns `clinicalVerdict: null`. The production pose source
+does not include reference-video authoring, a real-time correctness comparator,
+or browser persistence for reference landmark sequences.
+
+The browser comparison function also checks the registered reference-sequence
+status before doing any calculation. A supplied landmark sequence cannot bypass
+the `missing_clinician_reference` gate. The calibration screen exposes the
+method, supported front-view shoulder scope, source, and unresolved gate without
+starting the camera, retaining landmarks, showing a score, or labeling movement
+as correct or incorrect.
 
 ## Release gate
 
@@ -41,6 +50,19 @@ The reported 90% threshold must not be reused for sit-to-stand, knee extension,
 or another exercise without exercise-specific validation.
 
 The daily-movement catalog therefore declares `analysis_available: false` for sitting, standing, sit-to-stand, and walking. The browser may report only whether the required landmarks are technically visible. It does not report posture correctness, gait quality, movement phase, or automatic counts.
+
+## Residual implementation risk
+
+The former placeholder angle thresholds, joint-error verdicts, correctness
+colors, reference-video processor, real-time comparator, and local reference
+model storage have been removed. Automatic repetition counting now returns an
+explicit unavailable state because no clinician-reviewed rule exists.
+
+The remaining research engine is still not releasable for user assessment. It
+has no approved KineGuide-compatible reference sequence, does not establish
+clinical correctness, and must not gain an authoring or persistence path until
+purpose, consent, retention, deletion, clinical ownership, and validation are
+reviewed together.
 
 ## Evidence limitations
 
