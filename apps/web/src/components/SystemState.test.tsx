@@ -19,7 +19,7 @@ it('starts at zero and reaches 100 only when loading is complete', async () => {
   expect(screen.getByRole('status')).toHaveTextContent(
     'กำลังเตรียม KineGuide AI'
   )
-  expect(screen.getByText('เตรียมแผนกิจกรรม')).toBeInTheDocument()
+  expect(screen.getByText('เตรียมระบบติดตามท่าทาง')).toBeInTheDocument()
 })
 
 it('offers retry and home actions after data loading fails', async () => {

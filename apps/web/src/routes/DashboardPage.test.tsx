@@ -53,10 +53,9 @@ describe('DashboardPage', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/อัปเดตล่าสุด/)).toBeVisible()
 
-    expect(screen.getByRole('link', { name: /เริ่มตรวจท่าทาง/ })).toHaveAttribute(
-      'href',
-      '/app/monitor'
-    )
+    expect(
+      await screen.findByRole('link', { name: /เริ่มตรวจท่าทาง/ })
+    ).toHaveAttribute('href', '/app/monitor')
     expect(
       screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })
     ).toHaveAttribute('href', '/app/chat')
@@ -66,17 +65,14 @@ describe('DashboardPage', () => {
     expect(
       screen.getByRole('heading', { name: 'ประวัติล่าสุด' })
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'ดูประวัติทั้งหมด' })).toHaveAttribute(
-      'href',
-      '/app/history'
-    )
     expect(
-      screen.getByRole('heading', { name: 'เริ่มตรวจท่าทาง' })
+      screen.getByRole('link', { name: 'ดูประวัติทั้งหมด' })
+    ).toHaveAttribute('href', '/app/history')
+    expect(
+      screen.getByRole('heading', { name: 'เริ่มติดตามท่าทาง' })
     ).toBeInTheDocument()
     expect(
-      screen.getByText(
-        'สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย'
-      )
+      screen.getByText('สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย')
     ).toBeInTheDocument()
   })
 })

@@ -76,11 +76,17 @@ export function ProfilePage() {
               <ShieldCheck aria-hidden="true" size={20} />
             </span>
             <div>
-              <p className="font-semibold text-slate-900">{t('profile.privacySettings')}</p>
+              <p className="font-semibold text-slate-900">
+                {t('profile.privacySettings')}
+              </p>
               <p className="text-sm text-slate-500">{t('settings.consent')}</p>
             </div>
           </div>
-          <ChevronRight aria-hidden="true" className="text-slate-400" size={20} />
+          <ChevronRight
+            aria-hidden="true"
+            className="text-slate-400"
+            size={20}
+          />
         </Link>
         <Link
           className="kg-card flex items-center justify-between p-5 no-underline hover:bg-slate-50 transition-colors"
@@ -91,11 +97,19 @@ export function ProfilePage() {
               <Camera aria-hidden="true" size={20} />
             </span>
             <div>
-              <p className="font-semibold text-slate-900">{t('calibration.title')}</p>
-              <p className="text-sm text-slate-500">{t('calibration.subtitle')}</p>
+              <p className="font-semibold text-slate-900">
+                {t('calibration.title')}
+              </p>
+              <p className="text-sm text-slate-500">
+                {t('calibration.subtitle')}
+              </p>
             </div>
           </div>
-          <ChevronRight aria-hidden="true" className="text-slate-400" size={20} />
+          <ChevronRight
+            aria-hidden="true"
+            className="text-slate-400"
+            size={20}
+          />
         </Link>
       </section>
     </div>

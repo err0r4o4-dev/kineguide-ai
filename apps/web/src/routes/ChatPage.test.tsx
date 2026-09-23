@@ -133,7 +133,7 @@ describe('ChatPage', () => {
     })
     expect(textbox).toHaveAttribute(
       'placeholder',
-      'ลองพิมพ์: มีท่าสาธิตอะไรแนะนำบ้าง'
+      'ลองพิมพ์: ฉันควรปรับท่านั่งอย่างไรให้ดีขึ้น'
     )
     expect(
       screen.queryByRole('link', { name: 'เริ่มประเมิน' })

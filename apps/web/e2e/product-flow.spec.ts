@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('new user completes consent and structured onboarding', async ({
-  page
-}) => {
+test('new user completes registration and consent', async ({ page }) => {
   await page.route('http://localhost:8080/v1/**', async (route) => {
     const url = route.request().url()
     const method = route.request().method()
@@ -41,6 +39,23 @@ test('new user completes consent and structured onboarding', async ({
           research_use: false,
           accepted_at: '2026-08-24T12:01:00Z',
           revoked_at: null
+        }
+      })
+      return
+    }
+    if (url.endsWith('/consents/current') && method === 'GET') {
+      await route.fulfill({
+        json: {
+          consent: {
+            id: 'a91da3f1-00ae-4d7c-8ea3-b4e9f2c20d90',
+            policy_version: 'prototype-v3',
+            camera_processing: true,
+            session_summary_storage: true,
+            ai_chat_storage: true,
+            research_use: false,
+            accepted_at: '2026-08-24T12:01:00Z',
+            revoked_at: null
+          }
         }
       })
       return
@@ -220,23 +235,22 @@ test('new user completes consent and structured onboarding', async ({
     ).toBe(true)
   }
   await page.setViewportSize({ width: 1280, height: 1000 })
-  await page.getByRole('link', { name: 'เริ่มใช้งาน' }).click()
+  await page.getByRole('link', { name: 'เริ่มต้นใช้งาน', exact: true }).click()
   await page.getByLabel('ชื่อที่ใช้แสดง').fill('ผู้ใช้ทดสอบ')
   await page.getByLabel('อีเมล').fill('student@example.com')
   await page.getByLabel('รหัสผ่าน').fill('safe-demo-password')
   await page.getByRole('button', { name: 'สมัครสมาชิก' }).click()
 
   await expect(
-    page.getByRole('heading', { name: 'การอนุญาตใช้กล้องและข้อมูลการฝึก' })
+    page.getByRole('heading', { name: 'การอนุญาตใช้กล้องและข้อมูล' })
   ).toBeVisible()
   await page
     .getByLabel('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
     .check()
-  await page.getByLabel('ยอมรับการใช้ AI chat และการเก็บประวัติ').check()
   await page.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' }).click()
 
   await expect(
-    page.getByRole('heading', { name: 'ตั้งค่าโปรไฟล์สุขภาพ' })
+    page.getByRole('heading', { name: 'สวัสดี ผู้ใช้ทดสอบ' })
   ).toBeVisible()
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 })
@@ -247,63 +261,23 @@ test('new user completes consent and structured onboarding', async ({
     ).toBe(true)
   }
   await page.setViewportSize({ width: 1280, height: 1000 })
+  await page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true }).click()
 
-  await page.getByLabel('วัน เดือน ปีเกิด').fill('2000-01-02')
-  await page.getByRole('radio', { name: 'ไม่ประสงค์ระบุ' }).check()
-  await page.getByLabel(/ส่วนสูง/).fill('170')
-  await page.getByLabel(/น้ำหนักปัจจุบัน/).fill('60')
-  await page.getByLabel(/บันทึกน้ำหนักนี้ไว้ในโปรไฟล์/).check()
-  await page.getByRole('button', { name: 'ดำเนินการต่อ' }).click()
-
-  await page.getByRole('checkbox', { name: 'การเคลื่อนไหวทั่วไป' }).check()
-  const noAnswers = page.getByRole('radio', { name: 'ไม่ใช่' })
-  await noAnswers.nth(0).check()
-  await noAnswers.nth(1).check()
-  await page.getByLabel('ใช้อุปกรณ์ช่วยเดินหรือไม่').selectOption('none')
-  await page.getByRole('checkbox', { name: 'ไม่มี' }).check()
-  await page.getByRole('button', { name: 'ดำเนินการต่อ' }).click()
-
-  await page.getByRole('checkbox', { name: 'เพิ่มความแข็งแรง' }).check()
-  await page.getByRole('radio', { name: 'ปานกลาง' }).check()
-  await page.getByRole('radio', { name: 'เช้า' }).check()
-  await page.getByRole('checkbox', { name: 'ไม่มี' }).check()
-  await page
-    .getByRole('radio', { name: 'กล้องหน้า — ตั้งอุปกรณ์ไว้ด้านหน้า' })
-    .check()
-  await page.getByRole('button', { name: 'ตรวจสอบข้อมูล' }).click()
-
-  await page
-    .getByRole('checkbox', {
-      name: /ฉันยินยอมให้จัดเก็บข้อมูลโปรไฟล์สุขภาพ/
-    })
-    .check()
-  await page
-    .getByRole('checkbox', {
-      name: /ฉันเข้าใจว่าข้อมูลนี้ไม่ผ่านการวินิจฉัย/
-    })
-    .check()
-  await page.getByRole('checkbox', { name: /การแจ้งเตือนกิจกรรม/ }).check()
-  await page.getByRole('button', { name: 'บันทึกโปรไฟล์' }).click()
-
+  await expect(page).toHaveURL('/app/monitor')
   await expect(
-    page.getByRole('heading', { name: 'สวัสดี ผู้ใช้ทดสอบ' })
+    page.getByRole('heading', { name: 'ตั้งค่ากล้อง' })
   ).toBeVisible()
-  await page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true }).click()
-
-  await expect(
-    page.getByRole('heading', { name: 'กิจกรรมท่าทางในชีวิตประจำวัน' })
-  ).toBeVisible()
-  await expect(
-    page.getByRole('link', { name: 'ดูรายละเอียด' }).first()
-  ).toHaveAttribute('href', '/app/activities/seated-posture-demo')
 
   await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(
-    page.getByRole('link', { name: 'เลือกการสาธิต' })
-  ).toHaveAttribute('href', '/app/activities')
+    page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true })
+  ).toHaveAttribute('href', '/app/monitor')
   await expect(
-    page.getByRole('navigation', { name: 'เมนูหลัก' })
-  ).not.toContainText('ผู้ช่วย AI')
+    page.getByRole('navigation', { name: 'เมนูหลัก' }).getByRole('link', {
+      name: 'ผู้ช่วย KineGuide AI',
+      exact: true
+    })
+  ).toHaveAttribute('href', '/app/chat')
 })
 
 test('login, hard refresh, and every authenticated navigation target stay consistent', async ({
@@ -338,37 +312,8 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     accepted_at: '2026-08-24T12:01:00Z',
     revoked_at: null
   }
-  const healthProfile = {
-    id: '1f9cc536-e3b5-4a6f-b416-6acd218d0be8',
-    birth_date: '2000-01-02',
-    sex: 'unspecified',
-    height_cm: 170,
-    weight_kg: 60,
-    track_weight: true,
-    care_areas: ['general_mobility'],
-    recent_injury: false,
-    clinician_managed: false,
-    assistive_device: 'none',
-    warning_signs: ['none'],
-    goals: ['strength'],
-    activity_level: 'moderate',
-    preferred_time: 'morning',
-    equipment: ['none'],
-    camera_preference: 'front',
-    activity_notifications: true,
-    notes: '',
-    status: 'captured_not_evaluated',
-    consent_version: 'health-profile-v1',
-    consented_at: '2026-08-24T12:02:00Z',
-    created_at: '2026-08-24T12:02:00Z',
-    updated_at: '2026-08-24T12:02:00Z',
-    retention_until: '2027-08-24T12:02:00Z'
-  }
-  let savedAssessmentRequest: Record<string, string> | undefined
-
   await page.route('http://localhost:8080/v1/**', async (route) => {
     const url = route.request().url()
-    const method = route.request().method()
     if (url.endsWith('/auth/refresh')) {
       refreshRequests += 1
       await route.fulfill(
@@ -400,31 +345,6 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     }
     if (url.endsWith('/consents/current')) {
       await route.fulfill({ json: { consent } })
-      return
-    }
-    if (url.endsWith('/health-profile')) {
-      await route.fulfill({ json: { profile: healthProfile } })
-      return
-    }
-    if (url.endsWith('/assessments/latest')) {
-      await route.fulfill({ json: { assessment: null } })
-      return
-    }
-    if (url.endsWith('/assessments') && method === 'POST') {
-      savedAssessmentRequest = route.request().postDataJSON() as Record<
-        string,
-        string
-      >
-      await route.fulfill({
-        status: 201,
-        json: {
-          id: '5d449152-b9e3-4143-936c-d857594a892f',
-          ...savedAssessmentRequest,
-          status: 'captured_not_evaluated',
-          created_at: '2026-08-28T10:00:00Z',
-          retention_until: '2027-08-28T10:00:00Z'
-        }
-      })
       return
     }
     if (url.endsWith('/conversations')) {
@@ -485,13 +405,13 @@ test('login, hard refresh, and every authenticated navigation target stay consis
 
   await expect(page).toHaveURL('/app')
   await expect(
-    page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true })
+    page.getByRole('link', { name: 'ผู้ช่วย KineGuide AI', exact: true })
   ).toBeVisible()
 
   for (let reload = 0; reload < 3; reload += 1) {
     await page.reload()
     await expect(
-      page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true })
+      page.getByRole('link', { name: 'ผู้ช่วย KineGuide AI', exact: true })
     ).toBeVisible()
   }
   expect(refreshRequests).toBe(4)
@@ -501,7 +421,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await menuButton.click()
   await expect(menuButton).toHaveAccessibleName('ปิดเมนู')
   await expect(
-    page.getByRole('link', { name: 'กิจกรรมท่าทาง', exact: true })
+    page.getByRole('link', { name: 'ผู้ช่วย KineGuide AI', exact: true })
   ).toBeVisible()
   expect(
     await page.evaluate(
@@ -512,8 +432,10 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const destinations = [
-    ['กิจกรรมท่าทาง', '/app/activities'],
+    ['ผู้ช่วย KineGuide AI', '/app/chat'],
+    ['ตรวจท่าทาง', '/app/monitor'],
     ['ประวัติ', '/app/history'],
+    ['สถิติ', '/app/analytics'],
     ['ตั้งค่า', '/app/settings'],
     ['หน้าแรก', '/app']
   ] as const
@@ -528,9 +450,9 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   }
 
   for (const [legacyPath, destination] of [
-    ['/app/chat', '/app/activities'],
-    ['/app/plan', '/app/activities'],
-    ['/app/progress', '/app/history']
+    ['/app/activities', '/app/monitor'],
+    ['/app/exercises', '/app/monitor'],
+    ['/app/progress', '/app/analytics']
   ] as const) {
     await page.goto(legacyPath)
     await expect(page).toHaveURL(destination)
@@ -540,10 +462,12 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await page.getByRole('menuitem', { name: 'โปรไฟล์' }).click()
   await expect(page).toHaveURL('/app/profile')
   await expect(
-    page.getByRole('heading', { level: 1, name: 'โปรไฟล์สุขภาพ' })
+    page.getByRole('heading', { level: 1, name: 'โปรไฟล์' })
   ).toBeVisible()
   await expect(page.getByText(user.email)).toBeVisible()
-  await expect(page.getByRole('link', { name: 'แก้ไขข้อมูล' })).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: /ตั้งค่าและความเป็นส่วนตัว/ })
+  ).toHaveAttribute('href', '/app/settings')
 
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 })
@@ -554,7 +478,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
       )
     }
     await expect(
-      page.getByRole('heading', { name: 'ข้อมูลร่างกาย' })
+      page.getByRole('heading', { name: user.display_name })
     ).toBeVisible()
     expect(
       await page.evaluate(
@@ -562,22 +486,6 @@ test('login, hard refresh, and every authenticated navigation target stay consis
       )
     ).toBe(true)
   }
-  await page.getByRole('link', { name: 'ทบทวนแบบประเมินเบื้องต้น' }).click()
-  await expect(page).toHaveURL('/app/assessment')
-  await page.getByRole('radio', { name: 'หลังส่วนล่าง' }).check()
-  await page.getByRole('radio', { name: '1–4 สัปดาห์' }).check()
-  await page.getByRole('radio', { name: 'กระทบบางส่วน' }).check()
-  await page.getByRole('radio', { name: 'ทำความเข้าใจข้อมูล' }).check()
-  await page.getByRole('button', { name: 'บันทึกคำตอบ' }).click()
-  await expect(
-    page.getByText('บันทึกคำตอบแล้วโดยไม่มีการประเมินผล')
-  ).toBeVisible()
-  expect(savedAssessmentRequest).toEqual({
-    concern_area: 'lower_back',
-    duration_band: 'one_to_four_weeks',
-    daily_impact: 'some',
-    goal: 'understand'
-  })
   expect(runtimeErrors).toEqual([])
   runtimeErrors.length = 0
 

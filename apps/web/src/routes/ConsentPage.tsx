@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Camera, CheckCircle2, Database, ShieldCheck } from 'lucide-react'
+import { Camera, Database, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router'
@@ -41,7 +41,9 @@ export function ConsentPage() {
         <section className="kg-card overflow-hidden">
           <div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4">
             <Camera aria-hidden="true" className="text-teal-700" size={20} />
-            <h2 className="font-bold text-slate-900">{t('consent.cameraTitle')}</h2>
+            <h2 className="font-bold text-slate-900">
+              {t('consent.cameraTitle')}
+            </h2>
           </div>
           <div className="p-5">
             <p className="text-sm leading-6 text-slate-700">
@@ -53,7 +55,9 @@ export function ConsentPage() {
         <section className="kg-card overflow-hidden">
           <div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4">
             <Database aria-hidden="true" className="text-teal-700" size={20} />
-            <h2 className="font-bold text-slate-900">{t('consent.storageTitle')}</h2>
+            <h2 className="font-bold text-slate-900">
+              {t('consent.storageTitle')}
+            </h2>
           </div>
           <div className="p-5">
             <p className="text-sm leading-6 text-slate-700">

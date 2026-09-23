@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
-import { QueryError } from '@/components/QueryState'
 import i18n from '@/lib/i18n'
 import { AppShell } from './AppShell'
 
@@ -44,24 +43,30 @@ describe('AppShell', () => {
     expect(logoutMock).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps exactly five MVP destinations and puts deferred features outside primary navigation', async () => {
+  it('includes the KineGuide AI assistant in primary navigation', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
     render(
-      <MemoryRouter initialEntries={['/app']}>
+      <MemoryRouter initialEntries={['/app/chat']}>
         <Routes>
           <Route element={<AppShell />} path="/app">
             <Route index element={<h1>หน้าแรก</h1>} />
+            <Route element={<h1>ผู้ช่วย KineGuide AI</h1>} path="chat" />
           </Route>
         </Routes>
       </MemoryRouter>
     )
 
     const navigation = screen.getByRole('navigation', { name: 'เมนูหลัก' })
-    expect(within(navigation).getAllByRole('link')).toHaveLength(5)
+    expect(within(navigation).getAllByRole('link')).toHaveLength(6)
     expect(
       within(navigation).getByRole('link', { name: 'หน้าแรก' })
     ).toBeInTheDocument()
+    const assistantLink = within(navigation).getByRole('link', {
+      name: 'ผู้ช่วย KineGuide AI'
+    })
+    expect(assistantLink).toHaveAttribute('href', '/app/chat')
+    expect(assistantLink).toHaveAttribute('aria-current', 'page')
     expect(
       within(navigation).getByRole('link', { name: 'ตรวจท่าทาง' })
     ).toBeInTheDocument()

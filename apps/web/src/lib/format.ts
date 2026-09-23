@@ -14,3 +14,10 @@ export function formatDate(value: string, language: string) {
     timeStyle: 'short'
   }).format(new Date(value))
 }
+
+export function formatTime(value: string | Date, language: string) {
+  return new Intl.DateTimeFormat(language === 'th' ? 'th-TH' : 'en-GB', {
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(value))
+}

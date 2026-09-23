@@ -101,27 +101,37 @@ html {
     border-color: var(--glass-border);
     background: var(--glass-bg);
     backdrop-filter: blur(var(--blur-glass)) saturate(var(--glass-saturation));
-    -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--blur-glass))
+      saturate(var(--glass-saturation));
   }
 
   .ui-transition {
     transition-duration: var(--motion-standard);
-    transition-property: color, background-color, border-color, box-shadow, opacity, transform, translate;
+    transition-property:
+      color, background-color, border-color, box-shadow, opacity, transform,
+      translate;
     transition-timing-function: var(--ease-standard);
   }
 
-  .pressable:active:not(:disabled, [aria-disabled="true"]) {
+  .pressable:active:not(:disabled, [aria-disabled='true']) {
     transform: scale(var(--press-scale));
   }
 
   .app-backdrop {
     background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--color-kg-primary) 15%, transparent), transparent 34rem),
-      radial-gradient(circle at 82% 8%, color-mix(in srgb, var(--color-kg-primary) 8%, transparent), transparent 28rem),
+      radial-gradient(
+        circle at top left,
+        color-mix(in srgb, var(--color-kg-primary) 15%, transparent),
+        transparent 34rem
+      ),
+      radial-gradient(
+        circle at 82% 8%,
+        color-mix(in srgb, var(--color-kg-primary) 8%, transparent),
+        transparent 28rem
+      ),
       var(--color-kg-canvas);
   }
 }
-
 
 /* KineGuide Components */
 
@@ -167,7 +177,8 @@ html {
   background: var(--glass-bg);
   box-shadow: var(--shadow-floating);
   backdrop-filter: blur(var(--blur-glass)) saturate(var(--glass-saturation));
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--blur-glass))
+    saturate(var(--glass-saturation));
 }
 
 a {
@@ -207,7 +218,9 @@ button:disabled {
   line-height: 1.35;
   text-decoration: none;
   transition-duration: var(--motion-standard);
-  transition-property: color, background-color, border-color, box-shadow, opacity, transform, translate;
+  transition-property:
+    color, background-color, border-color, box-shadow, opacity, transform,
+    translate;
   transition-timing-function: var(--ease-standard);
 }
 
@@ -248,7 +261,9 @@ button:disabled {
     rgb(255 255 255 / 62%),
     rgb(226 232 240 / 44%)
   );
-  box-shadow: var(--shadow-floating), inset 0 1px 0 rgb(255 255 255 / 90%);
+  box-shadow:
+    var(--shadow-floating),
+    inset 0 1px 0 rgb(255 255 255 / 90%);
   backdrop-filter: blur(20px);
 }
 
@@ -275,7 +290,9 @@ button:disabled {
   line-height: 1.35;
   text-decoration: none;
   transition-duration: var(--motion-standard);
-  transition-property: color, background-color, border-color, box-shadow, opacity, transform, translate;
+  transition-property:
+    color, background-color, border-color, box-shadow, opacity, transform,
+    translate;
   transition-timing-function: var(--ease-standard);
 }
 

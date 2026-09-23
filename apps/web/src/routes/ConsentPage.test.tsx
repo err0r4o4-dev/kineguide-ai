@@ -34,14 +34,24 @@ describe('ConsentPage', () => {
     const user = userEvent.setup()
     renderRoute()
 
-    expect(screen.getByRole('heading', { name: 'การอนุญาตใช้กล้องและข้อมูล' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'ประมวลผลกล้องในอุปกรณ์' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'เก็บ session summary' })).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'การอนุญาตใช้กล้องและข้อมูล' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ประมวลผลกล้องในอุปกรณ์' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'เก็บ session summary' })
+    ).toBeVisible()
 
-    const submitBtn = screen.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' })
+    const submitBtn = screen.getByRole('button', {
+      name: 'ยอมรับและดำเนินการต่อ'
+    })
     expect(submitBtn).toBeDisabled()
 
-    const requiredCheckbox = screen.getByLabelText('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
+    const requiredCheckbox = screen.getByLabelText(
+      'ยอมรับการประมวลผลกล้องและการเก็บ session summary'
+    )
     await user.click(requiredCheckbox)
 
     expect(submitBtn).toBeEnabled()
@@ -54,7 +64,9 @@ describe('ConsentPage', () => {
       research_use: false
     })
 
-    expect(await screen.findByRole('heading', { name: 'หน้าแรก' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: 'หน้าแรก' })
+    ).toBeInTheDocument()
   })
 
   it('allows optional research consent', async () => {
@@ -62,13 +74,19 @@ describe('ConsentPage', () => {
     const user = userEvent.setup()
     renderRoute()
 
-    const requiredCheckbox = screen.getByLabelText('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
+    const requiredCheckbox = screen.getByLabelText(
+      'ยอมรับการประมวลผลกล้องและการเก็บ session summary'
+    )
     await user.click(requiredCheckbox)
 
-    const researchCheckbox = screen.getByLabelText('อนุญาตใช้ข้อมูลแบบไม่ระบุตัวตนเพื่อการวิจัย (ทางเลือก)')
+    const researchCheckbox = screen.getByLabelText(
+      'อนุญาตใช้ข้อมูลแบบไม่ระบุตัวตนเพื่อการวิจัย (ทางเลือก)'
+    )
     await user.click(researchCheckbox)
 
-    await user.click(screen.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' }))
+    await user.click(
+      screen.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' })
+    )
     expect(product.saveConsent).toHaveBeenCalledWith({
       camera_processing: true,
       session_summary_storage: true,

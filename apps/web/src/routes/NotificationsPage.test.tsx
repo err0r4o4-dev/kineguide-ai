@@ -6,16 +6,21 @@ import { vi } from 'vitest'
 import i18n from '@/lib/i18n'
 import { NotificationsPage } from './NotificationsPage'
 
+const { markAllReadMock } = vi.hoisted(() => ({
+  markAllReadMock: vi.fn()
+}))
+
 vi.mock('@/features/notifications/NotificationContext', () => ({
   useNotifications: () => ({
     unreadCount: 1,
-    markAllAsRead: vi.fn()
+    markAllRead: markAllReadMock
   })
 }))
 
 describe('NotificationsPage', () => {
   it('renders posture notification items and filters', async () => {
     await i18n.changeLanguage('th')
+    markAllReadMock.mockClear()
     const user = userEvent.setup()
 
     render(
@@ -25,6 +30,8 @@ describe('NotificationsPage', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'การแจ้งเตือน' })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'อ่านทั้งหมดแล้ว' }))
+    expect(markAllReadMock).toHaveBeenCalledOnce()
 
     // Default 'all' filter shows activity and system
     expect(screen.getByText('ข้อเสนอแนะในการปรับท่าทาง')).toBeVisible()
@@ -35,12 +42,16 @@ describe('NotificationsPage', () => {
     await user.click(activityFilter)
     expect(activityFilter).toHaveClass('bg-teal-800')
     expect(screen.getByText('ข้อเสนอแนะในการปรับท่าทาง')).toBeVisible()
-    expect(screen.queryByText('ตรวจสอบสิทธิ์การใช้กล้อง')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('ตรวจสอบสิทธิ์การใช้กล้อง')
+    ).not.toBeInTheDocument()
 
     // Test system filter
     const systemFilter = screen.getByRole('button', { name: 'ระบบ' })
     await user.click(systemFilter)
-    expect(screen.queryByText('ข้อเสนอแนะในการปรับท่าทาง')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('ข้อเสนอแนะในการปรับท่าทาง')
+    ).not.toBeInTheDocument()
     expect(screen.getByText('ตรวจสอบสิทธิ์การใช้กล้อง')).toBeVisible()
   })
 })

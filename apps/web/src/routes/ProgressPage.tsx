@@ -16,10 +16,7 @@ import { PageHeader } from '@/components/PageHeader'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { StatCard } from '@/components/StatCard'
 import { formatDate, formatDuration } from '@/lib/format'
-import {
-  getDashboard,
-  getSessions
-} from '@/services/product'
+import { getDashboard, getSessions } from '@/services/product'
 
 const HISTORY_PAGE_SIZE = 10
 
@@ -41,10 +38,8 @@ export function ProgressPage() {
   const visibleSessions = useMemo(
     () =>
       (sessions.data ?? [])
-        .filter((session) =>
-          t('dashboard.todayName')
-            .toLowerCase()
-            .includes(search.toLowerCase())
+        .filter(() =>
+          t('dashboard.todayName').toLowerCase().includes(search.toLowerCase())
         )
         .filter(
           (session) =>
@@ -79,7 +74,10 @@ export function ProgressPage() {
 
   return (
     <div>
-      <PageHeader title={t('progress.title')} subtitle={t('progress.subtitle')} />
+      <PageHeader
+        title={t('progress.title')}
+        subtitle={t('progress.subtitle')}
+      />
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           icon={CalendarCheck2}
@@ -128,7 +126,10 @@ export function ProgressPage() {
             .slice(0, 12)
             .reverse()
             .map((session) => {
-              const heightPercentage = Math.max(8, Math.min(100, (session.metrics.duration_seconds / 3600) * 100))
+              const heightPercentage = Math.max(
+                8,
+                Math.min(100, (session.metrics.duration_seconds / 3600) * 100)
+              )
               return (
                 <div
                   className="flex h-full flex-1 flex-col justify-end"
@@ -190,7 +191,11 @@ export function ProgressPage() {
                   </span>
                   <span
                     className={`size-2 rounded-full ${session.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-400'}`}
-                    title={session.status === 'completed' ? t('history.completed') : t('history.stopped')}
+                    title={
+                      session.status === 'completed'
+                        ? t('history.completed')
+                        : t('history.stopped')
+                    }
                     aria-hidden="true"
                   />
                 </span>

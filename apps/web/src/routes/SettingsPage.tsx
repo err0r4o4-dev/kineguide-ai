@@ -1,13 +1,13 @@
-import { Settings, LogOut, CheckCircle2, ChevronRight } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { PageHeader } from '@/components/PageHeader'
 import { LanguageButton } from '@/components/LanguageButton'
 import { useAuth } from '@/features/auth/AuthContext'
-import { revokeConsent, deleteAccount, getConsent, CURRENT_CONSENT_POLICY_VERSION } from '@/services/product'
+import { deleteAccount, getConsent, revokeConsent } from '@/services/product'
 import { confirmNotification } from '@/lib/notification'
 
 export function SettingsPage() {
@@ -70,25 +70,40 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-3xl pb-8">
-      <PageHeader title={t('settings.title')} subtitle={t('profile.subtitle')} />
+      <PageHeader
+        title={t('settings.title')}
+        subtitle={t('profile.subtitle')}
+      />
 
       <div className="mt-8 flex flex-col gap-6">
         <section className="kg-card p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">{t('settings.language')}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t('settings.languageBody')}</p>
+          <h2 className="text-lg font-bold text-slate-900">
+            {t('settings.language')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('settings.languageBody')}
+          </p>
           <div className="mt-4">
             <LanguageButton />
           </div>
         </section>
 
         <section className="kg-card p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">{t('settings.cameraPrefs')}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t('settings.preferencesBody', { defaultValue: 'Manage camera preferences for tracking posture.' })}</p>
+          <h2 className="text-lg font-bold text-slate-900">
+            {t('settings.cameraPrefs')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('settings.preferencesBody', {
+              defaultValue: 'Manage camera preferences for tracking posture.'
+            })}
+          </p>
 
           <div className="mt-5 space-y-4">
             {/* Placeholder toggles */}
             <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm font-medium text-slate-700">Auto-start camera when monitoring</span>
+              <span className="text-sm font-medium text-slate-700">
+                Auto-start camera when monitoring
+              </span>
               <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-teal-600">
                 <span className="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition" />
               </div>
@@ -97,19 +112,29 @@ export function SettingsPage() {
         </section>
 
         <section className="kg-card p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">{t('settings.breakPrefs')}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t('settings.preferencesBody', { defaultValue: 'Configure when to receive notifications.' })}</p>
+          <h2 className="text-lg font-bold text-slate-900">
+            {t('settings.breakPrefs')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('settings.preferencesBody', {
+              defaultValue: 'Configure when to receive notifications.'
+            })}
+          </p>
 
           <div className="mt-5 space-y-4">
             {/* Placeholder toggles */}
             <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm font-medium text-slate-700">{t('notifications.preference.activityReminder')}</span>
+              <span className="text-sm font-medium text-slate-700">
+                {t('notifications.preference.activityReminder')}
+              </span>
               <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-teal-600">
                 <span className="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition" />
               </div>
             </label>
             <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm font-medium text-slate-700">{t('notifications.preference.progressSummary')}</span>
+              <span className="text-sm font-medium text-slate-700">
+                {t('notifications.preference.progressSummary')}
+              </span>
               <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200">
                 <span className="inline-block h-4 w-4 translate-x-1 transform rounded-full bg-white transition" />
               </div>
@@ -118,24 +143,38 @@ export function SettingsPage() {
         </section>
 
         <section className="kg-card p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">{t('settings.consent')}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t('settings.consentBody')}</p>
+          <h2 className="text-lg font-bold text-slate-900">
+            {t('settings.consent')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('settings.consentBody')}
+          </p>
 
           <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
             {consent.data ? (
               <div className="flex items-start gap-3">
-                <CheckCircle2 aria-hidden="true" className="mt-0.5 text-emerald-600" size={18} />
+                <CheckCircle2
+                  aria-hidden="true"
+                  className="mt-0.5 text-emerald-600"
+                  size={18}
+                />
                 <div>
                   <p className="text-sm font-semibold text-emerald-900">
-                    {t('settings.consentActive', { version: consent.data.policy_version })}
+                    {t('settings.consentActive', {
+                      version: consent.data.policy_version
+                    })}
                   </p>
                   <p className="mt-1 text-xs text-slate-600">
-                    {new Date(consent.data.accepted_at).toLocaleString(i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB')}
+                    {new Date(consent.data.accepted_at).toLocaleString(
+                      i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB'
+                    )}
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-500">{t('settings.noActiveConsent')}</p>
+              <p className="text-sm text-slate-500">
+                {t('settings.noActiveConsent')}
+              </p>
             )}
           </div>
 
@@ -152,8 +191,12 @@ export function SettingsPage() {
         </section>
 
         <section className="kg-card p-5 sm:p-6 border-red-100">
-          <h2 className="text-lg font-bold text-red-700">{t('settings.delete')}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t('settings.retention')}</p>
+          <h2 className="text-lg font-bold text-red-700">
+            {t('settings.delete')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('settings.retention')}
+          </p>
 
           <div className="mt-5">
             <button

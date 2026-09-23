@@ -39,7 +39,9 @@ describe('LandingPage', () => {
     ).toBeVisible()
 
     expect(
-      screen.getByRole('heading', { name: 'ควบคุมข้อมูลของคุณ' })
+      screen.getByRole('heading', {
+        name: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม'
+      })
     ).toBeVisible()
 
     expect(
@@ -49,7 +51,9 @@ describe('LandingPage', () => {
       screen.getByRole('heading', { name: 'สรุปการใช้งานหน้าจอ' })
     ).toBeVisible()
     expect(
-      screen.getByRole('heading', { name: 'พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด' })
+      screen.getByRole('heading', {
+        name: 'พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด'
+      })
     ).toBeVisible()
   })
 

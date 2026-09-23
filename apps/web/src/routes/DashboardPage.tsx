@@ -18,10 +18,7 @@ import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
 import { useAuth } from '@/features/auth/AuthContext'
 import { formatDate, formatDuration } from '@/lib/format'
-import {
-  getDashboard,
-  type PostureSession
-} from '@/services/product'
+import { getDashboard, type PostureSession } from '@/services/product'
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
@@ -107,7 +104,10 @@ function ActivityStartCard() {
         <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
           {t('dashboard.exploreBody')}
         </p>
-        <Link className="kg-button-primary mt-6 min-h-12 w-full sm:w-auto" to="/app/monitor">
+        <Link
+          className="kg-button-primary mt-6 min-h-12 w-full sm:w-auto"
+          to="/app/monitor"
+        >
           <Activity aria-hidden="true" size={20} />
           {t('dashboard.start')}
         </Link>

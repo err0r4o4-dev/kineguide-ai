@@ -46,12 +46,24 @@ describe('SettingsPage', () => {
     await i18n.changeLanguage('th')
     renderRoute()
 
-    expect(screen.getByRole('heading', { name: 'ตั้งค่าและความเป็นส่วนตัว' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'ภาษาและการแสดงผล' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'การตั้งค่ากล้อง' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'การแจ้งเตือนหยุดพัก' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'จัดการ consent' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'ลบบัญชีและข้อมูลทั้งหมด' })).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ตั้งค่าและความเป็นส่วนตัว' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ภาษาและการแสดงผล' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'การตั้งค่ากล้อง' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'การแจ้งเตือนหยุดพัก' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'จัดการ consent' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ลบบัญชีและข้อมูลทั้งหมด' })
+    ).toBeVisible()
   })
 
   it('handles consent revocation with confirmation', async () => {
@@ -73,7 +85,9 @@ describe('SettingsPage', () => {
     vi.mocked(notification.confirmNotification).mockResolvedValue(true)
     renderRoute()
 
-    const deleteBtn = screen.getByRole('button', { name: 'ลบบัญชีและข้อมูลทั้งหมด' })
+    const deleteBtn = screen.getByRole('button', {
+      name: 'ลบบัญชีและข้อมูลทั้งหมด'
+    })
     await user.click(deleteBtn)
 
     expect(notification.confirmNotification).toHaveBeenCalled()
