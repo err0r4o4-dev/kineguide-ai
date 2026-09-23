@@ -33,6 +33,9 @@ describe('LandingPage', () => {
     ).toBeInTheDocument()
 
     expect(screen.getByText('Real-Time Posture Monitoring')).toBeVisible()
+    expect(
+      screen.getByText(/ติดตามขณะนั่งและตรวจความพร้อมของจุดอ้างอิง/)
+    ).toBeVisible()
 
     expect(
       screen.getByRole('heading', { name: 'กล้องทำงานในอุปกรณ์' })
@@ -45,7 +48,7 @@ describe('LandingPage', () => {
     ).toBeVisible()
 
     expect(
-      screen.getByRole('heading', { name: 'ติดตามท่าทางแบบเรียลไทม์' })
+      screen.getByRole('heading', { name: 'ติดตามขณะนั่งแบบเรียลไทม์' })
     ).toBeVisible()
     expect(
       screen.getByRole('heading', { name: 'สรุปการใช้งานหน้าจอ' })

@@ -41,8 +41,9 @@ function renderRoute() {
 }
 
 describe('CameraSetupPage', () => {
-  it('shows permission step first', async () => {
+  it('requires explicit seated-mode confirmation before camera permission', async () => {
     await i18n.changeLanguage('th')
+    const user = userEvent.setup()
     vi.mocked(camera.useCamera).mockReturnValue({
       state: 'idle',
       start: vi.fn(),
@@ -53,10 +54,22 @@ describe('CameraSetupPage', () => {
     renderRoute()
 
     expect(
-      screen.getByRole('heading', { name: 'ประมวลผลกล้องในอุปกรณ์' })
+      screen.getByRole('heading', { name: 'ตั้งค่ากล้องสำหรับโหมดนั่ง' })
     ).toBeVisible()
+    const startButton = screen.getByRole('button', {
+      name: 'ตรวจความพร้อมของกล้อง'
+    })
+    expect(startButton).toBeDisabled()
+
+    await user.click(
+      screen.getByLabelText(
+        'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+      )
+    )
+
+    expect(startButton).toBeEnabled()
     expect(
-      screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+      screen.getByText(/ไม่ยืนยันว่าคุณกำลังนั่งหรือท่านั่งถูกต้อง/)
     ).toBeVisible()
   })
 
@@ -74,8 +87,13 @@ describe('CameraSetupPage', () => {
     renderRoute()
 
     const startBtn = screen.getByRole('button', {
-      name: 'เริ่ม Live Monitoring'
+      name: 'ตรวจความพร้อมของกล้อง'
     })
+    await user.click(
+      screen.getByLabelText(
+        'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+      )
+    )
     await user.click(startBtn)
 
     expect(screen.getByText('ความพร้อมของระบบ')).toBeVisible()
@@ -83,7 +101,7 @@ describe('CameraSetupPage', () => {
     expect(screen.getByText('การตรวจจับจุดอ้างอิง')).toBeVisible()
     expect(screen.getByText('จะตรวจเมื่อเริ่มเซสชัน')).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'เริ่มเซสชันเชิงเทคนิค' })
+      screen.getByRole('button', { name: 'เริ่มเซสชันโหมดนั่ง' })
     ).toBeEnabled()
   })
 
@@ -100,10 +118,15 @@ describe('CameraSetupPage', () => {
     renderRoute()
 
     await user.click(
-      screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+      screen.getByLabelText(
+        'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+      )
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' })
     )
     expect(
-      screen.getByRole('button', { name: 'เริ่มเซสชันเชิงเทคนิค' })
+      screen.getByRole('button', { name: 'เริ่มเซสชันโหมดนั่ง' })
     ).toBeDisabled()
     expect(screen.getByText('ถูกปฏิเสธ')).toBeVisible()
   })
@@ -138,10 +161,15 @@ describe('CameraSetupPage', () => {
     renderRoute()
 
     await user.click(
-      screen.getByRole('button', { name: 'เริ่ม Live Monitoring' })
+      screen.getByLabelText(
+        'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+      )
     )
     await user.click(
-      screen.getByRole('button', { name: 'เริ่มเซสชันเชิงเทคนิค' })
+      screen.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' })
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'เริ่มเซสชันโหมดนั่ง' })
     )
 
     expect(product.createSession).toHaveBeenCalledWith({ camera_used: true })

@@ -69,8 +69,9 @@ describe('DashboardPage', () => {
       screen.getByRole('link', { name: 'ดูประวัติทั้งหมด' })
     ).toHaveAttribute('href', '/app/history')
     expect(
-      screen.getByRole('heading', { name: 'เริ่มติดตามท่าทาง' })
+      screen.getByRole('heading', { name: 'เริ่มติดตามขณะนั่ง' })
     ).toBeInTheDocument()
+    expect(screen.getByText(/เปิดกล้องสำหรับเซสชันขณะนั่ง/)).toBeVisible()
     expect(
       screen.getByText('สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย')
     ).toBeInTheDocument()

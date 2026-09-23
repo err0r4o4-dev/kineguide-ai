@@ -95,10 +95,13 @@ describe('LiveSessionPage', () => {
     renderRoute()
 
     expect(
-      await screen.findByRole('heading', { name: 'Live Posture Monitoring' })
+      await screen.findByRole('heading', {
+        name: 'ติดตามขณะนั่งแบบเรียลไทม์'
+      })
     ).toBeVisible()
-    expect(screen.getByText('เซสชันตรวจจับจุดอ้างอิง')).toBeVisible()
-    expect(screen.getByText('มองเห็นจุดอ้างอิงชัดเจน')).toBeVisible()
+    expect(screen.getByText('โหมดติดตามขณะนั่ง')).toBeVisible()
+    expect(screen.getByText(/โหมดนี้ถูกเลือกโดยผู้ใช้/)).toBeVisible()
+    expect(screen.getByText('มองเห็นจุดอ้างอิงสำหรับโหมดนั่งครบ')).toBeVisible()
     expect(
       screen.getByText('ยังไม่มี Baseline สำหรับเปรียบเทียบ')
     ).toBeVisible()
@@ -125,7 +128,9 @@ describe('LiveSessionPage', () => {
 
     renderRoute()
 
-    const startButton = await screen.findByRole('button', { name: 'เปิดกล้อง' })
+    const startButton = await screen.findByRole('button', {
+      name: 'เปิดกล้องสำหรับโหมดนั่ง'
+    })
     expect(start).not.toHaveBeenCalled()
 
     await user.click(startButton)
@@ -160,7 +165,9 @@ describe('LiveSessionPage', () => {
     const user = userEvent.setup()
     renderRoute()
 
-    await screen.findByRole('heading', { name: 'Live Posture Monitoring' })
+    await screen.findByRole('heading', {
+      name: 'ติดตามขณะนั่งแบบเรียลไทม์'
+    })
     await user.click(screen.getByRole('button', { name: 'จบเซสชัน' }))
 
     expect(product.updateSession).toHaveBeenCalledWith('session-1', {

@@ -7,6 +7,12 @@ landmark sequences are not uploaded or persisted. The current implementation
 uses landmarks only for technical visibility and framing. It does not diagnose,
 prescribe, or certify movement as clinically correct.
 
+The camera-monitoring product is intentionally limited to a user-selected
+seated mode. The user confirms the seated setup before camera permission is
+requested; the browser does not classify sitting, standing, or transitions.
+Landmark visibility therefore cannot be interpreted as proof that the user is
+seated or that their posture is correct.
+
 ## Implemented research method
 
 The shoulder research profile records the method described by Pereira et al.,
@@ -49,7 +55,7 @@ exist:
 The reported 90% threshold must not be reused for sit-to-stand, knee extension,
 or another exercise without exercise-specific validation.
 
-The daily-movement catalog therefore declares `analysis_available: false` for sitting, standing, sit-to-stand, and walking. The browser may report only whether the required landmarks are technically visible. It does not report posture correctness, gait quality, movement phase, or automatic counts.
+The daily-movement catalog therefore declares `analysis_available: false` for sitting, standing, sit-to-stand, and walking. The browser may report only whether the required landmarks are technically visible. It does not report posture correctness, gait quality, movement phase, automatic counts, or an automatically inferred sitting state.
 
 ## Residual implementation risk
 

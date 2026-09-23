@@ -155,7 +155,7 @@ const th = {
     titleRest:
       'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
-      'ทดลองกล้องในอุปกรณ์ ติดตามท่าทางการนั่งและยืนแบบเรียลไทม์ และแจ้งเตือนเมื่อนั่งต่อเนื่องเป็นเวลานาน โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
+      'ทดลองกล้องในอุปกรณ์สำหรับติดตามขณะนั่งและตรวจความพร้อมของจุดอ้างอิงแบบเรียลไทม์ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มตรวจท่าทาง',
     learn: 'ดูวิธีการทำงาน',
     heroNote:
@@ -188,21 +188,22 @@ const th = {
     consentStepBody:
       'ตรวจสอบการใช้กล้อง การจัดเก็บสรุปเซสชัน และ AI chat แยกตามวัตถุประสงค์',
     exploreStepTitle: 'เริ่มตรวจท่าทาง',
-    exploreStepBody: 'เปิดใช้งานกล้องเพื่อติดตามท่าทางและการจัดสรรเวลาหน้าจอ',
+    exploreStepBody:
+      'ยืนยันโหมดนั่งก่อนเปิดกล้องเพื่อตรวจความพร้อมของจุดอ้างอิงและติดตามระยะเวลา',
     capabilitiesEyebrow: 'ขอบเขตของต้นแบบ',
     capabilitiesTitle: 'สิ่งที่คุณทำได้ใน KineGuide AI',
     capabilitiesBody:
       'เครื่องมือสำหรับตรวจสอบและแจ้งเตือนตามหลักสรีรศาสตร์ ไม่ใช่แผนการรักษาเฉพาะบุคคล',
-    movementTitle: 'ติดตามท่าทางแบบเรียลไทม์',
+    movementTitle: 'ติดตามขณะนั่งแบบเรียลไทม์',
     movementBody:
-      'วิเคราะห์ท่านั่ง ท่ายืนผ่านกล้องในเบราว์เซอร์โดยไม่ประเมินโรค',
+      'ตรวจความพร้อมของจุดอ้างอิงสำหรับโหมดนั่งผ่านกล้องในเบราว์เซอร์ โดยไม่ตัดสินว่าท่านั่งถูกต้อง',
     aiTitle: 'พูดคุยกับผู้ช่วย AI ภายใต้ข้อจำกัด',
     aiBody:
       'ใช้เพื่อข้อมูลสนับสนุนทั่วไป คำตอบอาจไม่สมบูรณ์และไม่ใช้แทนคำแนะนำจากแพทย์',
     demoChoiceTitle: 'ติดตามประวัติศาสตร์การใช้งานหน้าจอ',
-    demoChoiceBody: 'ดูระยะเวลาการใช้งาน การนั่ง การยืน และความถี่การหยุดพัก',
+    demoChoiceBody: 'ดูระยะเวลาการใช้งานและความถี่การหยุดพัก',
     summaryTitle: 'สรุปการใช้งานหน้าจอ',
-    summaryBody: 'ดูสถิติเกี่ยวกับท่าทางการทำงานตามที่คุณยินยอมให้จัดเก็บ',
+    summaryBody: 'ดูระยะเวลาและสถานะของเซสชันขณะนั่งตามที่คุณยินยอมให้จัดเก็บ',
     privacyTitle: 'ข้อมูลของคุณ คุณเป็นผู้ควบคุม',
     privacyBody:
       'ระบบลดข้อมูลตั้งแต่ต้น แยกความยินยอมตามวัตถุประสงค์ และให้คุณกลับมาจัดการข้อมูลได้',
@@ -267,7 +268,7 @@ const th = {
       'ใช้ภาพชั่วคราวในเบราว์เซอร์เท่านั้น ไม่มีการอัปโหลดหรือบันทึกวิดีโอ',
     storageTitle: 'เก็บ session summary',
     storageBody:
-      'เก็บสถิติระยะเวลาท่านั่งท่ายืนและการแจ้งเตือนเป็นเวลาไม่เกิน 365 วัน',
+      'เก็บระยะเวลา สถานะเซสชัน และข้อมูลสรุปที่จำเป็นเป็นเวลาไม่เกิน 365 วัน โดยไม่เก็บการยืนยันโหมดนั่ง',
     researchTitle: 'อนุญาตใช้ข้อมูลแบบไม่ระบุตัวตนเพื่อการวิจัย (ทางเลือก)',
     required: 'ยอมรับการประมวลผลกล้องและการเก็บ session summary',
     aiChat: 'ยอมรับการใช้ AI chat และการเก็บประวัติ',
@@ -321,9 +322,9 @@ const th = {
     today: 'การติดตามวันนี้',
     todayName: 'เซสชันติดตามท่าทาง',
     todayIllustrationAlt: 'ภาพประกอบเซสชันติดตามท่าทาง',
-    exploreTitle: 'เริ่มติดตามท่าทาง',
+    exploreTitle: 'เริ่มติดตามขณะนั่ง',
     exploreBody:
-      'เปิดกล้องเพื่อติดตามท่าทางการนั่งหรือยืนแบบเรียลไทม์ และรับการแจ้งเตือนให้หยุดพัก',
+      'เปิดกล้องสำหรับเซสชันขณะนั่ง เพื่อตรวจว่ามองเห็นจุดอ้างอิงที่จำเป็นและติดตามระยะเวลา โดยไม่ประเมินว่าท่านั่งถูกต้อง',
     viewDetails: 'ดูรายละเอียด',
     completed: 'เซสชันเสร็จสิ้น',
     start: 'เริ่มตรวจท่าทาง',
@@ -341,12 +342,16 @@ const th = {
     manual: 'สถิติเหล่านี้เป็นข้อมูลการใช้งาน ไม่ใช่ผลการวินิจฉัย'
   },
   monitor: {
-    title: 'เริ่มตรวจท่าทาง',
-    setupTitle: 'ตั้งค่ากล้อง',
+    title: 'เริ่มติดตามขณะนั่ง',
+    setupTitle: 'ตั้งค่ากล้องสำหรับโหมดนั่ง',
     setupSubtitle:
-      'จัดตำแหน่งอุปกรณ์ในพื้นที่มั่นคงให้เห็นศีรษะ ไหล่ และลำตัวส่วนบนชัดเจน',
-    start: 'เริ่ม Live Monitoring',
-    continue: 'เริ่มเซสชันเชิงเทคนิค',
+      'วางอุปกรณ์บนพื้นผิวมั่นคง ให้เห็นศีรษะ ไหล่ สะโพก และเข่าชัดเจน',
+    seatedConfirmation:
+      'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ',
+    seatedConfirmationBody:
+      'การยืนยันนี้ใช้เฉพาะในหน้านี้และไม่ถูกบันทึก ระบบตรวจเพียงความพร้อมของจุดอ้างอิง ไม่ยืนยันว่าคุณกำลังนั่งหรือท่านั่งถูกต้อง',
+    start: 'ตรวจความพร้อมของกล้อง',
+    continue: 'เริ่มเซสชันโหมดนั่ง',
     readiness: 'ความพร้อมของระบบ',
     secure: 'ภาพประมวลผลบนอุปกรณ์ของคุณเท่านั้น',
     permission: 'สิทธิ์กล้อง',
@@ -358,7 +363,7 @@ const th = {
     waiting: 'รออนุญาต',
     denied: 'ถูกปฏิเสธ',
     unsupported: 'เบราว์เซอร์ไม่รองรับ',
-    instructions: 'เริ่มเซสชันเพื่อดูสถานะการตรวจจับจุดอ้างอิงเชิงเทคนิค',
+    instructions: 'เริ่มเซสชันเพื่อดูสถานะจุดอ้างอิงสำหรับโหมดนั่งเชิงเทคนิค',
     startSessionFailed: 'ไม่สามารถเริ่มเซสชันได้ โปรดลองอีกครั้ง'
   },
   calibration: {
@@ -386,8 +391,8 @@ const th = {
     researchSource: 'เปิดบทความงานวิจัยต้นฉบับ'
   },
   session: {
-    live: 'Live Posture Monitoring',
-    technicalOnly: 'เซสชันเชิงเทคนิค ไม่ใช่การประเมินทางคลินิก',
+    live: 'ติดตามขณะนั่งแบบเรียลไทม์',
+    technicalOnly: 'โหมดนั่งเชิงเทคนิค ไม่ใช่การประเมินทางคลินิก',
     timer: 'ระยะเวลา',
     pause: 'พักการตรวจจับ',
     resume: 'ตรวจจับต่อ',
@@ -396,7 +401,7 @@ const th = {
     poseTitle: 'ข้อมูลท่าทาง',
     poseIdle: 'ยังไม่ได้เปิดกล้อง',
     poseLoading: 'กำลังโหลดโมเดล...',
-    poseReady: 'มองเห็นจุดอ้างอิงชัดเจน',
+    poseReady: 'มองเห็นจุดอ้างอิงสำหรับโหมดนั่งครบ',
     poseAdjust: 'โปรดปรับกล้องให้เห็นจุดอ้างอิงที่จำเป็น',
     poseMissing: 'ไม่พบผู้ใช้งาน',
     poseMultiple: 'พบหลายคน โปรดอยู่คนเดียวในเฟรม',
@@ -408,10 +413,10 @@ const th = {
     cameraDenied: 'ไม่ได้รับสิทธิ์ใช้งานกล้อง',
     cameraUnsupported: 'เบราว์เซอร์นี้ไม่รองรับกล้อง',
     cameraError: 'ไม่สามารถเปิดกล้องได้',
-    startCamera: 'เปิดกล้อง',
+    startCamera: 'เปิดกล้องสำหรับโหมดนั่ง',
     startCameraBody:
-      'กดเปิดกล้องเมื่อต้องการเริ่มประมวลผลจุดอ้างอิงบนอุปกรณ์นี้',
-    poseVisualLabel: 'ภาพกล้องพร้อมโครงร่างจุดอ้างอิงเชิงเทคนิค',
+      'เปิดกล้องเมื่อคุณอยู่ในท่านั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ ระบบจะตรวจเฉพาะความพร้อมทางเทคนิค',
+    poseVisualLabel: 'ภาพกล้องโหมดนั่งพร้อมโครงร่างจุดอ้างอิงเชิงเทคนิค',
     posePrivacy: 'เฟรมทำงานในอุปกรณ์ ไม่บันทึกหรือส่งไปเซิร์ฟเวอร์',
     summary: 'สรุปเซสชัน',
     completed: 'บันทึกเซสชัน',
@@ -422,13 +427,13 @@ const th = {
     backHome: 'กลับหน้าหลัก',
     viewHistory: 'ดูสถิติ',
     saveFailed: 'บันทึกเซสชันไม่สำเร็จ',
-    currentActivity: 'สถานะปัจจุบัน',
-    technicalSession: 'เซสชันตรวจจับจุดอ้างอิง',
+    currentActivity: 'โหมดของเซสชัน',
+    technicalSession: 'โหมดติดตามขณะนั่ง',
     technicalSessionBody:
-      'ระบบตรวจเฉพาะการมองเห็นจุดอ้างอิง และยังไม่ประเมินความถูกต้องของท่าทาง',
+      'โหมดนี้ถูกเลือกโดยผู้ใช้ กล้องตรวจเฉพาะการมองเห็นจุดอ้างอิง ไม่ยืนยันว่ากำลังนั่งหรือท่านั่งถูกต้อง',
     technicalStatus: 'สถานะการตรวจจับ',
     technicalStatusBody:
-      'สถานะนี้สะท้อนคุณภาพการตรวจจับของกล้อง ไม่ใช่ผลว่าท่าทางดีหรือไม่ดี',
+      'สถานะนี้สะท้อนคุณภาพการตรวจจับสำหรับการตั้งค่าขณะนั่ง ไม่ใช่ผลว่าท่าทางดีหรือไม่ดี',
     baselineTitle: 'Baseline',
     baselineUnavailable: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
     baselineUnavailableBody:
@@ -701,7 +706,7 @@ const en: typeof th = {
     titleAccent: 'privacy-first support',
     titleRest: 'Monitor your posture confidently with',
     subtitle:
-      'Try an on-device camera flow, track real-time sitting and standing posture, and get break reminders without uploading photos or video.',
+      'Try an on-device seated monitoring flow and check landmark visibility in real time without uploading photos or video.',
     start: 'Start Monitoring',
     learn: 'How it works',
     heroNote:
@@ -735,23 +740,22 @@ const en: typeof th = {
       'Review camera use, session-summary storage, and AI chat as separate purposes.',
     exploreStepTitle: 'Start monitoring',
     exploreStepBody:
-      'Activate your camera to track your posture and screen time.',
+      'Confirm seated mode before starting the camera to check landmark visibility and track duration.',
     capabilitiesEyebrow: 'Prototype boundaries',
     capabilitiesTitle: 'What you can do in KineGuide AI',
     capabilitiesBody:
       'Tools for ergonomic awareness and monitoring—not a personalized treatment plan.',
-    movementTitle: 'Real-time posture monitoring',
+    movementTitle: 'Real-time seated monitoring',
     movementBody:
-      'Analyze sitting and standing posture via the browser camera without medical assessment.',
+      'Check landmark visibility for a user-selected seated mode without claiming that sitting posture is correct.',
     aiTitle: 'Talk with a bounded AI assistant',
     aiBody:
       'Use it for general support information. Answers may be incomplete and do not replace qualified advice.',
     demoChoiceTitle: 'Track your screen time history',
-    demoChoiceBody:
-      'View total monitoring time, sitting vs standing duration, and break frequency.',
+    demoChoiceBody: 'View total monitoring time and break frequency.',
     summaryTitle: 'Review monitoring sessions',
     summaryBody:
-      'See stats about your working posture history based on your consent.',
+      'Review duration and status for seated sessions stored with your consent.',
     privacyTitle: 'Your data stays under your control',
     privacyBody:
       'The system minimizes data from the start, separates consent by purpose, and lets you return to manage saved information.',
@@ -817,7 +821,7 @@ const en: typeof th = {
       'Frames are temporary in the browser and no video is uploaded or recorded.',
     storageTitle: 'Store session summaries',
     storageBody:
-      'Store duration, alerts, and sitting/standing states for up to 365 days.',
+      'Store duration, session status, and required summary data for up to 365 days. The seated-mode confirmation is not stored.',
     researchTitle: 'Allow de-identified research use (optional)',
     required: 'Allow camera processing and session-summary storage',
     aiChat: 'Allow AI chat and conversation-history storage',
@@ -873,9 +877,9 @@ const en: typeof th = {
     today: 'Today’s monitoring',
     todayName: 'Posture Monitoring Session',
     todayIllustrationAlt: 'Posture monitoring session illustration',
-    exploreTitle: 'Start Monitoring',
+    exploreTitle: 'Start Seated Monitoring',
     exploreBody:
-      'Turn on your camera to track your sitting and standing posture in real-time, and get reminders to take breaks.',
+      'Use the camera during a seated session to check required landmark visibility and track duration without assessing posture correctness.',
     viewDetails: 'View details',
     completed: 'Completed sessions',
     start: 'Start Monitoring',
@@ -893,12 +897,16 @@ const en: typeof th = {
     manual: 'These stats are usage data, not medical outcomes.'
   },
   monitor: {
-    title: 'Start Monitoring',
-    setupTitle: 'Camera Setup',
+    title: 'Start Seated Monitoring',
+    setupTitle: 'Seated Mode Camera Setup',
     setupSubtitle:
-      'Place your device securely so your head, shoulders, and upper torso are visible.',
-    start: 'Start Live Monitoring',
-    continue: 'Start technical session',
+      'Place your device securely so your head, shoulders, hips, and knees are visible.',
+    seatedConfirmation:
+      'I will use the camera while seated and frame the required landmarks as instructed',
+    seatedConfirmationBody:
+      'This confirmation stays on this page and is not stored. The system checks landmark visibility only; it does not confirm that you are seated or that your posture is correct.',
+    start: 'Check camera readiness',
+    continue: 'Start seated session',
     readiness: 'System readiness',
     secure: 'Camera data stays on-device',
     permission: 'Camera permission',
@@ -911,7 +919,7 @@ const en: typeof th = {
     denied: 'Denied',
     unsupported: 'Browser unsupported',
     instructions:
-      'Start a session to view technical landmark-detection status.',
+      'Start a session to view technical landmark status for seated mode.',
     startSessionFailed: 'The session could not be started. Please try again.'
   },
   calibration: {
@@ -940,8 +948,8 @@ const en: typeof th = {
     researchSource: 'Open the original research article'
   },
   session: {
-    live: 'Live Posture Monitoring',
-    technicalOnly: 'Technical session, not a clinical assessment',
+    live: 'Live Seated Monitoring',
+    technicalOnly: 'Technical seated mode, not a clinical assessment',
     timer: 'Duration',
     pause: 'Pause',
     resume: 'Resume',
@@ -950,7 +958,7 @@ const en: typeof th = {
     poseTitle: 'Posture Data',
     poseIdle: 'Camera is not started',
     poseLoading: 'Loading model...',
-    poseReady: 'Landmarks clearly visible',
+    poseReady: 'Seated-mode landmarks are visible',
     poseAdjust: 'Adjust the camera so the required landmarks are visible',
     poseMissing: 'No user detected',
     poseMultiple: 'Multiple people detected. Please be alone in frame.',
@@ -963,10 +971,11 @@ const en: typeof th = {
     cameraDenied: 'Camera permission was not granted',
     cameraUnsupported: 'This browser does not support camera access',
     cameraError: 'The camera could not be started',
-    startCamera: 'Start camera',
+    startCamera: 'Start seated-mode camera',
     startCameraBody:
-      'Start the camera when you are ready to process technical landmarks on this device.',
-    poseVisualLabel: 'Camera view with a technical landmark overlay',
+      'Start the camera while seated and frame the required landmarks as instructed. The system checks technical visibility only.',
+    poseVisualLabel:
+      'Seated-mode camera view with a technical landmark overlay',
     posePrivacy: 'Frames process on-device. No data is sent to the server.',
     summary: 'Session Summary',
     completed: 'Session saved',
@@ -978,13 +987,13 @@ const en: typeof th = {
     backHome: 'Back to Dashboard',
     viewHistory: 'View Analytics',
     saveFailed: 'Failed to save session',
-    currentActivity: 'Current Activity',
-    technicalSession: 'Technical landmark session',
+    currentActivity: 'Session mode',
+    technicalSession: 'Seated monitoring mode',
     technicalSessionBody:
-      'The system checks landmark visibility only and does not assess whether posture is correct.',
+      'The user selected this mode. The camera checks landmark visibility only; it does not confirm that the user is seated or that posture is correct.',
     technicalStatus: 'Detection status',
     technicalStatusBody:
-      'This status describes camera detection quality, not whether posture is good or bad.',
+      'This status describes detection quality for the seated setup, not whether posture is good or bad.',
     baselineTitle: 'Baseline',
     baselineUnavailable: 'No baseline is available for comparison',
     baselineUnavailableBody:

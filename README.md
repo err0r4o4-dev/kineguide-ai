@@ -4,9 +4,9 @@
 
 **KineGuide AI: A Real-Time Posture Monitoring & Ergonomic Awareness System**
 
-**ระบบ AI สำหรับติดตามท่าทางการนั่งและยืนแบบเรียลไทม์ด้วยกล้อง เพื่อช่วยให้ผู้ใช้ตระหนักและปรับพฤติกรรมการใช้งานหน้าจอ**
+**ระบบ AI สำหรับติดตามการใช้งานขณะนั่งแบบเรียลไทม์ด้วยกล้อง เพื่อช่วยให้ผู้ใช้ตระหนักและปรับพฤติกรรมการใช้งานหน้าจอ**
 
-> KineGuide AI is an ergonomic-awareness and posture-monitoring prototype. It analyzes visible posture patterns and session duration; it does not diagnose pain, disease, injury, or medical conditions and does not prescribe treatment.
+> KineGuide AI is an ergonomic-awareness prototype for user-selected seated sessions. It checks technical landmark visibility and session duration; it does not automatically determine whether a user is seated, judge posture correctness, diagnose a condition, or prescribe treatment.
 
 ## Table of contents
 
@@ -33,9 +33,9 @@
 
 ## Overview
 
-KineGuide AI is a university AI/computer-vision project for real-time posture monitoring during desk work, gaming, studying, and other prolonged screen use. The product uses the browser camera to estimate body landmarks, classify a session as sitting, standing, or unavailable, derive posture metrics, compare them with a user-specific calibration baseline, and provide non-diagnostic ergonomic feedback.
+KineGuide AI is a university AI/computer-vision project for real-time awareness during seated desk work, gaming, studying, and other prolonged screen use. The user explicitly selects seated mode before camera permission is requested. The browser then estimates body landmarks for technical visibility and framing only; it does not automatically determine whether the user is seated or judge whether posture is correct.
 
-The project is **not** a symptom checker and no longer uses the flow `symptom → diagnosis → treatment/exercise plan`. The core product flow is `camera → pose estimation → posture metrics → sit/stand state → baseline comparison → feedback/reminder → session summary → history/analytics`.
+The project is **not** a symptom checker and no longer uses the flow `symptom → diagnosis → treatment/exercise plan`. The current camera flow is `seated-mode confirmation → camera permission → pose estimation → landmark-visibility status → session duration → session summary`.
 
 Privacy remains a primary design boundary: raw camera frames stay on-device in the browser. The backend receives only explicitly approved derived session metrics needed for history or analytics.
 
@@ -44,29 +44,15 @@ Privacy remains a primary design boundary: raw camera frames stay on-device in t
 ```mermaid
 flowchart TD
     Start[Open KineGuide AI] --> Consent[Camera and privacy consent]
-    Consent --> Setup[Camera setup]
-    Setup --> Calibration[Personal posture calibration]
-    Calibration --> Camera[Browser camera]
+    Consent --> Setup[Confirm seated mode and camera framing]
+    Setup --> Camera[Browser camera]
     Camera --> Pose[MediaPipe Pose Landmarker]
     Pose --> Quality{Pose usable?}
     Quality -- No --> Unavailable[Unable to assess / camera guidance]
-    Quality -- Yes --> Metrics[Derived posture metrics]
-    Metrics --> Activity{Activity state}
-    Activity --> Sitting[Sitting]
-    Activity --> Standing[Standing]
-    Activity --> Unknown[Unknown / transition]
-    Sitting --> Compare[Compare with personal baseline]
-    Standing --> Compare
-    Unknown --> Observe[Continue observing]
-    Compare --> State{Posture state}
-    State --> Good[Good alignment]
-    State --> Adjust[Needs adjustment]
-    State --> Low[Low confidence]
-    Good --> Duration[Duration monitoring]
-    Adjust --> Duration
-    Low --> Duration
-    Duration --> Reminder[Posture or break reminder when rules are met]
-    Reminder --> Summary[Session summary]
+    Quality -- Yes --> Visible[Required landmarks visible]
+    Unavailable --> Duration[Session duration]
+    Visible --> Duration
+    Duration --> Summary[Session summary]
     Summary --> API[Go API]
     API --> DB[(PostgreSQL)]
     DB --> History[History and analytics]
@@ -74,14 +60,13 @@ flowchart TD
 
 ### Real-time behavior
 
-The first release should focus on observable, explainable posture signals rather than medical interpretation:
+The seated camera mode focuses on observable technical signals rather than medical interpretation:
 
-- detect whether the user is sitting, standing, transitioning, or cannot be assessed;
-- estimate head/neck orientation, shoulder alignment, torso lean, hip alignment, and left/right body symmetry when the camera view supports those metrics;
-- compare stable metrics with a per-user calibration baseline instead of assuming one body angle fits every user;
-- debounce short movements so reaching for an object or briefly looking down does not immediately trigger an alert;
-- track continuous sitting/standing time and configurable reminder intervals;
-- show honest states such as **Good alignment**, **Needs adjustment**, **Low confidence**, and **Unable to assess**;
+- require the user to confirm seated use and camera framing before requesting camera permission;
+- check whether the required landmarks are technically visible;
+- never infer sitting, standing, or transition state from the current camera flow;
+- never present landmark visibility as posture correctness;
+- track session duration and show honest **Low confidence** or **Unable to assess** states;
 - store session summaries and posture events only when required for product features; never store raw camera video.
 
 Posture thresholds, debounce durations, and reminder intervals are product parameters, not medical facts. They must be documented, testable, configurable where appropriate, and evaluated with representative users before being presented as reliable guidance.
@@ -105,6 +90,8 @@ Implemented foundation:
 - Versioned consent records and account deletion
 - Responsive routes for landing, dashboard, camera setup, live session, history, and progress
 - Browser camera lifecycle with explicit permission and cleanup; raw media remains on-device
+- Explicit seated-mode confirmation kept only in local page state
+- Browser MediaPipe landmark processing with technical visibility and unavailable states
 
 Legacy behavior to remove or migrate during the posture-monitoring pivot:
 
@@ -114,13 +101,10 @@ Legacy behavior to remove or migrate during the posture-monitoring pivot:
 
 Not implemented yet:
 
-- MediaPipe Pose Landmarker inference in the production browser flow
-- camera-quality and landmark-visibility validation
-- sitting / standing / transition classification
 - personal posture calibration and baseline persistence policy
 - posture metrics engine for head, shoulders, torso, hips, and symmetry
 - stable posture-state evaluation with debounce/hysteresis and confidence handling
-- continuous sitting/standing duration monitoring
+- validated seated-posture interpretation beyond technical landmark visibility
 - posture notifications and configurable break reminders
 - posture session summaries, event history, and analytics dashboard backed by the Go API
 - optional LLM-generated natural-language summaries constrained to non-medical session metrics
@@ -132,11 +116,9 @@ Not implemented yet:
 flowchart LR
     Camera[Browser camera] --> Pose[MediaPipe Pose Landmarker]
     Pose --> Quality[Pose quality / visibility gate]
-    Quality --> Metrics[Derived posture metrics]
-    Metrics --> Activity[Sit / stand / transition classifier]
-    Activity --> Baseline[Personal baseline comparison]
-    Baseline --> Feedback[Posture state + reminders]
-    Feedback --> Web[React Web / PWA]
+    Quality --> Seated[User-selected seated technical status]
+    Seated --> Duration[Session duration]
+    Duration --> Web[React Web / PWA]
     Web -->|REST/JSON; never raw video| API[Go Main API]
     API --> DB[(PostgreSQL)]
     API -->|Optional internal REST/JSON| AI[Python AI Service]
@@ -145,7 +127,7 @@ flowchart LR
 
 | Component | Responsibility | Prohibited responsibility |
 | --- | --- | --- |
-| React Web/PWA | UI, localization, consent, browser camera, MediaPipe inference, derived posture metrics, calibration, sit/stand state, local feedback | Direct database access, raw-video upload, medical diagnosis or treatment claims |
+| React Web/PWA | UI, localization, consent, user-selected seated mode, browser camera, MediaPipe inference, technical landmark visibility, and local session timing | Direct database access, raw-video upload, automatic seated-state claims, posture-correctness claims, medical diagnosis, or treatment claims |
 | Go Main API | Public REST API, authentication, user settings, posture-session summaries, history/analytics orchestration, PostgreSQL access | Browser camera processing, inventing pose results, medical diagnosis |
 | Python AI Service | Optional bounded natural-language summaries from approved structured metrics | Primary database access, primary posture classification, diagnosis, treatment, or overriding deterministic posture results |
 | PostgreSQL | Go-owned user settings, consent, posture-session summaries, approved events/metrics | Raw camera media, credentials, model artifacts |
@@ -948,7 +930,7 @@ This repository does not claim HIPAA, GDPR, PDPA, medical-device, ergonomic cert
 
 ## Known limitations
 
-- MediaPipe posture inference, sit/stand classification, calibration, and posture-state scoring are not yet completed in the production flow.
+- Seated mode is user-selected; the camera does not verify that the user is seated or score posture correctness.
 - Camera placement, occlusion, lighting, clothing, body proportions, mobility differences, and limited field of view can reduce pose-estimation quality.
 - A single 2D camera cannot reliably infer every ergonomic property or diagnose the cause of pain or discomfort.
 - Product posture thresholds and timing rules still require evaluation; they must not be described as universal medical or ergonomic truths.
@@ -963,9 +945,9 @@ This repository does not claim HIPAA, GDPR, PDPA, medical-device, ergonomic cert
 2. Remove or migrate legacy symptom-assessment, rehabilitation-plan, and movement-demo flows
 3. Browser camera setup, permission states, quality guidance, and cleanup
 4. MediaPipe Pose Landmarker integration with confidence/visibility handling
-5. Sitting / standing / transition classification
-6. Personal posture calibration and derived posture metrics
-7. Real-time posture feedback with debounce/hysteresis and honest unavailable states
+5. Seated-mode camera framing and deterministic landmark-visibility states
+6. Clinically reviewed seated calibration and derived metrics, if evidence and ownership are approved
+7. Real-time seated feedback with debounce/hysteresis and honest unavailable states, only after validation
 8. Sitting-duration tracking, configurable posture alerts, and break reminders
 9. Session summaries, history, analytics, and optional constrained AI summaries
 10. Accuracy, usability, privacy, accessibility, performance, and security validation
@@ -980,13 +962,13 @@ This repository does not claim HIPAA, GDPR, PDPA, medical-device, ergonomic cert
 
 Camera frames are sensitive and unnecessary for the intended architecture. Pose inference runs in the browser. Only explicitly approved derived metrics or session summaries may be transmitted.
 
-### Why use a personal calibration baseline?
+### Why might a future version use a personal calibration baseline?
 
-Camera height, distance, chair/desk geometry, body proportions, and natural posture vary. A calibration baseline allows the product to detect meaningful change relative to the current user and setup rather than pretending that one fixed angle is correct for everyone.
+Camera height, distance, chair/desk geometry, body proportions, and natural posture vary. A future reviewed baseline could compare change relative to the current user and setup rather than pretending that one fixed angle is correct for everyone. The current camera flow does not perform this comparison.
 
 ### Does KineGuide diagnose back pain or tell users what treatment they need?
 
-No. The system observes visible posture and session duration. It does not determine the cause of pain, diagnose a condition, prescribe exercise, or replace medical advice.
+No. The system observes technical landmark visibility and session duration in a user-selected seated mode. It does not determine the cause of pain, diagnose a condition, prescribe exercise, or replace medical advice.
 
 ### What happens when the pose estimate is unreliable?
 
@@ -1014,6 +996,6 @@ Wait until the owner and visibility are explicitly confirmed. Do not invent orga
 
 ## Safety and scope disclaimer
 
-KineGuide AI is a posture-monitoring and ergonomic-awareness prototype. It provides non-diagnostic feedback from camera-derived pose estimates and session duration. It does not diagnose disease or injury, determine the cause of pain, prescribe treatment or exercise, or replace a physician, physiotherapist, ergonomist, or other qualified professional.
+KineGuide AI is a seated-session monitoring and ergonomic-awareness prototype. Its current camera flow reports technical landmark visibility and session duration without verifying sitting or posture correctness. It does not diagnose disease or injury, determine the cause of pain, prescribe treatment or exercise, or replace a physician, physiotherapist, ergonomist, or other qualified professional.
 
-KineGuide AI เป็นระบบต้นแบบสำหรับติดตามท่าทางและสร้างความตระหนักด้านการยศาสตร์จากข้อมูลท่าทางที่ประเมินผ่านกล้อง ระบบไม่ได้วินิจฉัยโรคหรือการบาดเจ็บ ไม่ระบุสาเหตุของอาการปวด ไม่สั่งการรักษาหรือท่าออกกำลังกาย และไม่สามารถใช้แทนแพทย์ นักกายภาพบำบัด นักการยศาสตร์ หรือผู้เชี่ยวชาญที่เหมาะสมได้
+KineGuide AI เป็นระบบต้นแบบสำหรับติดตามเซสชันขณะนั่งและสร้างความตระหนักด้านการยศาสตร์ กล้องรายงานเพียงความพร้อมของจุดอ้างอิงและระยะเวลา โดยไม่ยืนยันว่าผู้ใช้กำลังนั่งหรือท่านั่งถูกต้อง ระบบไม่ได้วินิจฉัยโรคหรือการบาดเจ็บ ไม่ระบุสาเหตุของอาการปวด ไม่สั่งการรักษาหรือท่าออกกำลังกาย และไม่สามารถใช้แทนแพทย์ นักกายภาพบำบัด นักการยศาสตร์ หรือผู้เชี่ยวชาญที่เหมาะสมได้

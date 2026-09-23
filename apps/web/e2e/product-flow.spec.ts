@@ -265,8 +265,14 @@ test('new user completes registration and consent', async ({ page }) => {
 
   await expect(page).toHaveURL('/app/monitor')
   await expect(
-    page.getByRole('heading', { name: 'ตั้งค่ากล้อง' })
+    page.getByRole('heading', { name: 'ตั้งค่ากล้องสำหรับโหมดนั่ง' })
   ).toBeVisible()
+  await expect(
+    page.getByLabel('ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ')
+  ).not.toBeChecked()
+  await expect(
+    page.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' })
+  ).toBeDisabled()
 
   await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(

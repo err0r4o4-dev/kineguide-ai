@@ -22,6 +22,7 @@ export function CameraSetupPage() {
   const navigate = useNavigate()
   const camera = useCamera()
   const [permissionStep, setPermissionStep] = useState(true)
+  const [seatedSetupConfirmed, setSeatedSetupConfirmed] = useState(false)
 
   const startSession = useMutation({
     mutationFn: async () => {
@@ -47,10 +48,38 @@ export function CameraSetupPage() {
           <p className="mt-4 max-w-md text-slate-600 leading-relaxed">
             {t('consent.cameraBody')}
           </p>
-          <div className="mt-8 flex gap-4">
+          <div className="mt-6 flex w-full max-w-xl items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left">
+            <input
+              aria-describedby="seated-mode-description"
+              checked={seatedSetupConfirmed}
+              className="mt-0.5 size-5 shrink-0 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
+              id="seated-mode-confirmation"
+              onChange={(event) =>
+                setSeatedSetupConfirmed(event.target.checked)
+              }
+              type="checkbox"
+            />
+            <div>
+              <label
+                className="cursor-pointer text-sm font-semibold leading-6 text-slate-900"
+                htmlFor="seated-mode-confirmation"
+              >
+                {t('monitor.seatedConfirmation')}
+              </label>
+              <p
+                className="mt-1 text-sm leading-6 text-slate-600"
+                id="seated-mode-description"
+              >
+                {t('monitor.seatedConfirmationBody')}
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 flex gap-4">
             <button
               className="kg-button-primary"
+              disabled={!seatedSetupConfirmed}
               onClick={() => {
+                if (!seatedSetupConfirmed) return
                 setPermissionStep(false)
                 void camera.start()
               }}

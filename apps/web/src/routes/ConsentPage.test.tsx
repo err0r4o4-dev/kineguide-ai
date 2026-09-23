@@ -43,6 +43,7 @@ describe('ConsentPage', () => {
     expect(
       screen.getByRole('heading', { name: 'เก็บ session summary' })
     ).toBeVisible()
+    expect(screen.getByText(/โดยไม่เก็บการยืนยันโหมดนั่ง/)).toBeVisible()
 
     const submitBtn = screen.getByRole('button', {
       name: 'ยอมรับและดำเนินการต่อ'
