@@ -1,6 +1,29 @@
 import { expect, test } from '@playwright/test'
 
 test('new user completes registration and consent', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: {
+        getUserMedia: async () => {
+          const canvas = document.createElement('canvas')
+          canvas.width = 640
+          canvas.height = 480
+          const context = canvas.getContext('2d')
+          if (context) {
+            context.fillStyle = '#0f766e'
+            context.fillRect(0, 0, canvas.width, canvas.height)
+          }
+          Object.defineProperty(window, '__kineguideTestCameraCanvas', {
+            configurable: true,
+            value: canvas
+          })
+          return canvas.captureStream(5)
+        }
+      }
+    })
+  })
+
   await page.route('http://localhost:8080/v1/**', async (route) => {
     const url = route.request().url()
     const method = route.request().method()
@@ -273,6 +296,25 @@ test('new user completes registration and consent', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' })
   ).toBeDisabled()
+
+  await page
+    .getByLabel('ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ')
+    .check()
+  await page.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' }).click()
+  await expect(page.getByText('อนุญาตแล้ว')).toBeVisible()
+
+  const cameraPreview = page.locator('video')
+  await expect(cameraPreview).toHaveCount(1)
+  await expect
+    .poll(() =>
+      cameraPreview.evaluate((video) =>
+        Boolean((video as HTMLVideoElement).srcObject)
+      )
+    )
+    .toBe(true)
+  await expect
+    .poll(() => cameraPreview.evaluate((video) => video.readyState))
+    .toBeGreaterThanOrEqual(2)
 
   await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(

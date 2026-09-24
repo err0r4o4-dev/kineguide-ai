@@ -19,19 +19,23 @@ export function useCamera() {
   const streamRef = useRef<MediaStream | null>(null)
   const [state, setState] = useState<CameraState>('idle')
 
-  const stop = useCallback(() => {
+  const releaseStream = useCallback(() => {
     stopMediaStream(streamRef.current)
     streamRef.current = null
     if (videoRef.current) videoRef.current.srcObject = null
-    setState('idle')
   }, [])
+
+  const stop = useCallback(() => {
+    releaseStream()
+    setState('idle')
+  }, [releaseStream])
 
   const start = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
       setState('unsupported')
       return false
     }
-    stopMediaStream(streamRef.current)
+    releaseStream()
     setState('requesting')
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -47,12 +51,31 @@ export function useCamera() {
       return true
     } catch (error) {
       const name = error instanceof DOMException ? error.name : ''
+      releaseStream()
       setState(name === 'NotAllowedError' ? 'denied' : 'error')
-      stopMediaStream(streamRef.current)
-      streamRef.current = null
       return false
     }
-  }, [])
+  }, [releaseStream])
+
+  useEffect(() => {
+    if (state !== 'ready') return
+
+    const video = videoRef.current
+    const stream = streamRef.current
+    if (!video || !stream || video.srcObject === stream) return
+
+    let cancelled = false
+    video.srcObject = stream
+    void video.play().catch(() => {
+      if (cancelled) return
+      releaseStream()
+      setState('error')
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [releaseStream, state])
 
   useEffect(() => stop, [stop])
 
