@@ -106,7 +106,7 @@ export function CameraSetupPage() {
             {camera.state === 'ready' && (
               <video
                 autoPlay
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full -scale-x-100 object-cover"
                 muted
                 playsInline
                 ref={camera.videoRef}

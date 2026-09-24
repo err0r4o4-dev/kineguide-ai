@@ -105,6 +105,30 @@ describe('CameraSetupPage', () => {
     ).toBeEnabled()
   })
 
+  it('mirrors the front-camera preview once for natural movement', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'ready',
+      start: vi.fn(),
+      stop: vi.fn(),
+      videoRef: { current: null }
+    })
+
+    const user = userEvent.setup()
+    const { container } = renderRoute()
+
+    await user.click(
+      screen.getByLabelText(
+        'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+      )
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' })
+    )
+
+    expect(container.querySelector('video')).toHaveClass('-scale-x-100')
+  })
+
   it('disables continue when camera is denied', async () => {
     await i18n.changeLanguage('th')
     vi.mocked(camera.useCamera).mockReturnValue({
