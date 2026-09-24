@@ -346,6 +346,28 @@ const th = {
     setupTitle: 'ตั้งค่ากล้องสำหรับโหมดนั่ง',
     setupSubtitle:
       'วางอุปกรณ์บนพื้นผิวมั่นคง ให้เห็นศีรษะ ไหล่ สะโพก และเข่าชัดเจน',
+    eyebrow: 'ตรวจความพร้อมก่อนเริ่ม',
+    stepsLabel: 'ขั้นตอนการตั้งค่ากล้อง',
+    stepItemLabel: 'ขั้นตอนที่ {{number}} {{label}}',
+    stepSetup: 'ตั้งค่ากล้อง',
+    stepCheck: 'ตรวจสอบภาพ',
+    stepStart: 'เริ่มติดตาม',
+    processingTitle: 'ประมวลผลกล้องบนอุปกรณ์',
+    processingBody:
+      'ระบบใช้ภาพชั่วคราวเพื่อตรวจความพร้อมของจุดอ้างอิงเท่านั้น ไม่มีการบันทึกหรืออัปโหลดวิดีโอ',
+    frameHead: 'เห็นศีรษะ',
+    frameUpperBody: 'เห็นไหล่และลำตัว',
+    frameLowerBody: 'เห็นสะโพกและเข่า',
+    setupTipsLabel: 'คำแนะนำสำหรับการตั้งค่ากล้อง',
+    tipLightTitle: 'แสงสว่างเพียงพอ',
+    tipLightBody: 'หลีกเลี่ยงแสงย้อนและจัดให้ร่างกายสว่างสม่ำเสมอ',
+    tipDeviceTitle: 'วางอุปกรณ์ให้มั่นคง',
+    tipDeviceBody: 'ใช้ขาตั้งหรือพื้นผิวราบเพื่อให้มุมภาพคงที่',
+    tipFrameTitle: 'ให้เห็นทั้งตัว',
+    tipFrameBody: 'จัดเฟรมให้เห็นศีรษะ ไหล่ ลำตัว สะโพก และเข่า',
+    tipClothingTitle: 'สวมเสื้อผ้าที่มองเห็นแนวร่างกาย',
+    tipClothingBody:
+      'หลีกเลี่ยงเสื้อผ้าที่หลวมมากเพื่อให้ตรวจพบจุดอ้างอิงได้ชัดขึ้น',
     seatedConfirmation:
       'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ',
     seatedConfirmationBody:
@@ -901,6 +923,29 @@ const en: typeof th = {
     setupTitle: 'Seated Mode Camera Setup',
     setupSubtitle:
       'Place your device securely so your head, shoulders, hips, and knees are visible.',
+    eyebrow: 'Check your setup before starting',
+    stepsLabel: 'Camera setup steps',
+    stepItemLabel: 'Step {{number}} {{label}}',
+    stepSetup: 'Set up camera',
+    stepCheck: 'Check preview',
+    stepStart: 'Start monitoring',
+    processingTitle: 'On-device camera processing',
+    processingBody:
+      'Temporary frames are used only to check landmark readiness. Video is not recorded or uploaded.',
+    frameHead: 'Head visible',
+    frameUpperBody: 'Shoulders and torso visible',
+    frameLowerBody: 'Hips and knees visible',
+    setupTipsLabel: 'Camera setup guidance',
+    tipLightTitle: 'Use even lighting',
+    tipLightBody: 'Avoid backlighting and keep your body evenly lit.',
+    tipDeviceTitle: 'Keep the device stable',
+    tipDeviceBody:
+      'Use a stand or flat surface to keep the camera angle steady.',
+    tipFrameTitle: 'Keep your body in frame',
+    tipFrameBody: 'Frame your head, shoulders, torso, hips, and knees.',
+    tipClothingTitle: 'Wear clothes that show your outline',
+    tipClothingBody:
+      'Avoid very loose clothing so required landmarks are easier to detect.',
     seatedConfirmation:
       'I will use the camera while seated and frame the required landmarks as instructed',
     seatedConfirmationBody:

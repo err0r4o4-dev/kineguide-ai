@@ -34,7 +34,7 @@ export function ConsentPage() {
   })
 
   return (
-    <div className="mx-auto max-w-3xl pb-8">
+    <div className="kg-content-width pb-8">
       <PageHeader title={t('consent.title')} subtitle={t('consent.intro')} />
 
       <div className="mt-8 flex flex-col gap-5">

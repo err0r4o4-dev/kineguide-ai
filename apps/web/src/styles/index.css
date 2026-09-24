@@ -147,16 +147,24 @@ html {
   background-size: cover;
 }
 
-.kg-landing-content {
-  width: 70%;
+.kg-content-width,
+.kg-landing-content,
+.kg-public-header-content {
+  width: min(calc(100% - 2rem), 80rem);
+  margin-inline: auto;
 }
 
 .kg-public-header {
   isolation: isolate;
 }
 
-.kg-public-header-content {
-  width: min(calc(100% - 2rem), 80rem);
+@media (min-width: 64rem) {
+  .kg-content-width,
+  .kg-landing-content,
+  .kg-public-header-content {
+    width: 80%;
+    max-width: none;
+  }
 }
 
 .kg-public-header::before {

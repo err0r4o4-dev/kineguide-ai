@@ -132,11 +132,11 @@ export function AppShell() {
             </div>
           </aside>
 
-          <main className="min-w-0 px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10 xl:px-12">
+          <main className="min-w-0 py-6 sm:py-8 lg:py-10">
             <a className="sr-only focus:not-sr-only" href="#page-content">
               {t('common.skip')}
             </a>
-            <div className="mx-auto max-w-[82rem]" id="page-content">
+            <div className="kg-content-width" id="page-content">
               <Outlet />
             </div>
           </main>

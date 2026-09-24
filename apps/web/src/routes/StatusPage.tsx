@@ -61,7 +61,7 @@ export function StatusPage() {
 
   return (
     <div className="min-h-screen bg-kg-canvas">
-      <header className="mx-auto flex max-w-6xl items-center justify-between border-b border-slate-200/80 px-5 py-5 sm:px-8">
+      <header className="kg-content-width flex items-center justify-between border-b border-slate-200/80 py-5">
         <div className="flex items-center gap-3 font-semibold text-slate-900">
           <LogoMark />
           KineGuide AI
@@ -75,7 +75,7 @@ export function StatusPage() {
         </button>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-8 sm:pt-16">
+      <main className="kg-content-width pb-16 pt-10 sm:pt-16">
         <div className="max-w-2xl">
           <p className="font-medium text-teal-700">KineGuide AI</p>
           <h1 className="mt-2 text-4xl font-bold leading-tight tracking-[-0.03em] text-slate-950 sm:text-5xl">

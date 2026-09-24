@@ -41,6 +41,40 @@ function renderRoute() {
 }
 
 describe('CameraSetupPage', () => {
+  it('presents the camera setup journey and practical setup guidance', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'idle',
+      start: vi.fn(),
+      stop: vi.fn(),
+      videoRef: { current: null }
+    })
+
+    renderRoute()
+
+    const progress = screen.getByRole('navigation', {
+      name: 'ขั้นตอนการตั้งค่ากล้อง'
+    })
+    expect(progress).toHaveTextContent('ตั้งค่ากล้อง')
+    expect(progress).toHaveTextContent('ตรวจสอบภาพ')
+    expect(progress).toHaveTextContent('เริ่มติดตาม')
+    expect(
+      screen.getByRole('heading', { name: 'ประมวลผลกล้องบนอุปกรณ์' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'แสงสว่างเพียงพอ' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'วางอุปกรณ์ให้มั่นคง' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ให้เห็นทั้งตัว' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'สวมเสื้อผ้าที่มองเห็นแนวร่างกาย' })
+    ).toBeVisible()
+  })
+
   it('requires explicit seated-mode confirmation before camera permission', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
@@ -96,6 +130,9 @@ describe('CameraSetupPage', () => {
     )
     await user.click(startBtn)
 
+    expect(
+      screen.getByRole('listitem', { name: 'ขั้นตอนที่ 2 ตรวจสอบภาพ' })
+    ).toHaveAttribute('aria-current', 'step')
     expect(screen.getByText('ความพร้อมของระบบ')).toBeVisible()
     expect(screen.getByText('สิทธิ์กล้อง')).toBeVisible()
     expect(screen.getByText('การตรวจจับจุดอ้างอิง')).toBeVisible()

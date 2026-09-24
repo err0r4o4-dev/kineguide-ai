@@ -107,8 +107,8 @@ export function AuthPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-kg-canvas p-4 sm:p-6">
-      <div className="w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 lg:grid lg:min-h-[760px] lg:grid-cols-[0.95fr_1.05fr]">
+    <main className="grid min-h-screen place-items-center bg-kg-canvas py-4 sm:py-6">
+      <div className="kg-content-width overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 lg:grid lg:min-h-[760px] lg:grid-cols-[0.95fr_1.05fr]">
         <section className="relative isolate hidden h-full flex-col justify-between overflow-hidden p-10 text-white lg:flex">
           <img
             alt=""
