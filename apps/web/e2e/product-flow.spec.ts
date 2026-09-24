@@ -266,10 +266,10 @@ test('new user completes registration and consent', async ({ page }) => {
           document.documentElement.clientWidth
       )
     if (width >= 1024) {
-      expect(homeHeaderWidthRatio).toBeGreaterThan(0.79)
-      expect(homeHeaderWidthRatio).toBeLessThan(0.81)
-      expect(homeContentWidthRatio).toBeGreaterThan(0.79)
-      expect(homeContentWidthRatio).toBeLessThan(0.81)
+      expect(homeHeaderWidthRatio).toBeGreaterThan(0.69)
+      expect(homeHeaderWidthRatio).toBeLessThan(0.71)
+      expect(homeContentWidthRatio).toBeGreaterThan(0.69)
+      expect(homeContentWidthRatio).toBeLessThan(0.71)
     } else {
       expect(homeHeaderWidthRatio).toBeGreaterThan(0.89)
       expect(homeContentWidthRatio).toBeGreaterThan(0.89)
@@ -289,8 +289,8 @@ test('new user completes registration and consent', async ({ page }) => {
         element.getBoundingClientRect().width /
         document.documentElement.clientWidth
     )
-  expect(authWidthRatio).toBeGreaterThan(0.79)
-  expect(authWidthRatio).toBeLessThan(0.81)
+  expect(authWidthRatio).toBeGreaterThan(0.69)
+  expect(authWidthRatio).toBeLessThan(0.71)
   await page.getByLabel('ชื่อที่ใช้แสดง').fill('ผู้ใช้ทดสอบ')
   await page.getByLabel('อีเมล').fill('student@example.com')
   await page.getByLabel('รหัสผ่าน').fill('safe-demo-password')
@@ -306,8 +306,8 @@ test('new user completes registration and consent', async ({ page }) => {
         element.getBoundingClientRect().width /
         document.documentElement.clientWidth
     )
-  expect(consentWidthRatio).toBeGreaterThan(0.79)
-  expect(consentWidthRatio).toBeLessThan(0.81)
+  expect(consentWidthRatio).toBeGreaterThan(0.69)
+  expect(consentWidthRatio).toBeLessThan(0.71)
   await page
     .getByLabel('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
     .check()
@@ -344,8 +344,8 @@ test('new user completes registration and consent', async ({ page }) => {
         return element.getBoundingClientRect().width / parentWidth
       })
     if (width >= 1024) {
-      expect(contentWidthRatio).toBeGreaterThan(0.79)
-      expect(contentWidthRatio).toBeLessThan(0.81)
+      expect(contentWidthRatio).toBeGreaterThan(0.69)
+      expect(contentWidthRatio).toBeLessThan(0.71)
     } else {
       expect(contentWidthRatio).toBeGreaterThan(0.89)
     }

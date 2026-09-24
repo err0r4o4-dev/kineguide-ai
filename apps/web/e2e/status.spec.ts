@@ -52,14 +52,14 @@ test('landing page explains privacy before authentication', async ({
   expect(initialHeaderBox?.y).toBe(0)
   expect(initialHeaderBox?.height).toBeLessThanOrEqual(72)
   expect(initialHeaderContentBox?.width).toBeCloseTo(
-    (await page.evaluate(() => window.innerWidth)) * 0.8,
+    (await page.evaluate(() => window.innerWidth)) * 0.7,
     0
   )
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     const responsiveHeaderContentBox = await headerContent.boundingBox()
     if (width >= 1024) {
-      expect(responsiveHeaderContentBox?.width).toBeCloseTo(width * 0.8, 0)
+      expect(responsiveHeaderContentBox?.width).toBeCloseTo(width * 0.7, 0)
     } else {
       expect(responsiveHeaderContentBox?.width).toBeGreaterThan(width * 0.89)
     }
@@ -71,7 +71,7 @@ test('landing page explains privacy before authentication', async ({
     expect(landingContentWidths.length).toBeGreaterThanOrEqual(4)
     for (const contentWidth of landingContentWidths) {
       if (width >= 1024) {
-        expect(contentWidth).toBeCloseTo(width * 0.8, 0)
+        expect(contentWidth).toBeCloseTo(width * 0.7, 0)
       } else {
         expect(contentWidth).toBeGreaterThan(width * 0.89)
       }

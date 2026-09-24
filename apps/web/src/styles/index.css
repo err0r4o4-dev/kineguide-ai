@@ -196,7 +196,7 @@ html {
   .kg-content-width,
   .kg-landing-content,
   .kg-public-header-content {
-    width: 80%;
+    width: 70%;
     max-width: none;
   }
 }
