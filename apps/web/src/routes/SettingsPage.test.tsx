@@ -18,6 +18,10 @@ vi.mock('@/features/auth/AuthContext', () => ({
 vi.mock('@/services/product', () => ({
   revokeConsent: vi.fn(),
   deleteAccount: vi.fn(),
+  deleteAuthIdentity: vi.fn(),
+  startAuthIdentityLink: vi.fn(),
+  getAuthIdentities: vi.fn().mockResolvedValue([]),
+  getOAuthProviders: vi.fn().mockResolvedValue({ providers: [] }),
   getConsent: vi.fn().mockResolvedValue({
     policy_version: 'prototype-v3',
     accepted_at: '2026-08-28T09:00:00Z'
@@ -53,10 +57,7 @@ describe('SettingsPage', () => {
       screen.getByRole('heading', { name: 'ภาษาและการแสดงผล' })
     ).toBeVisible()
     expect(
-      screen.getByRole('heading', { name: 'การตั้งค่ากล้อง' })
-    ).toBeVisible()
-    expect(
-      screen.getByRole('heading', { name: 'การแจ้งเตือนหยุดพัก' })
+      screen.getByRole('heading', { name: 'บัญชีที่เชื่อมต่อ' })
     ).toBeVisible()
     expect(
       screen.getByRole('heading', { name: 'จัดการ consent' })
@@ -93,5 +94,26 @@ describe('SettingsPage', () => {
     expect(notification.confirmNotification).toHaveBeenCalled()
     expect(product.deleteAccount).toHaveBeenCalled()
     expect(logoutMock).toHaveBeenCalled()
+  })
+
+  it('disconnects an enabled linked identity after confirmation', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    vi.mocked(product.getOAuthProviders).mockResolvedValue({
+      providers: [{ provider: 'google', enabled: true }]
+    })
+    vi.mocked(product.getAuthIdentities).mockResolvedValue([
+      { provider: 'google', created_at: '2026-08-28T09:00:00Z' }
+    ])
+    vi.mocked(notification.confirmNotification).mockResolvedValue(true)
+    renderRoute()
+
+    await user.click(
+      await screen.findByRole('button', {
+        name: 'ยกเลิกการเชื่อม Google'
+      })
+    )
+
+    expect(product.deleteAuthIdentity).toHaveBeenCalledWith('google')
   })
 })

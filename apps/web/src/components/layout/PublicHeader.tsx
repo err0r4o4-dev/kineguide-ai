@@ -82,6 +82,14 @@ export function PublicHeader() {
         </nav>
         <nav aria-label={t('nav.public')} className="flex items-center gap-2">
           <LanguageButton appearance="public" />
+          {!auth.user && (
+            <Link
+              className="hidden min-h-11 items-center rounded-xl px-3 font-semibold text-slate-700 no-underline transition-colors hover:bg-white hover:text-teal-900 sm:inline-flex"
+              to="/login"
+            >
+              {t('auth.signIn')}
+            </Link>
+          )}
           <Link
             aria-label={t('nav.getStarted')}
             className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-800 bg-teal-700 px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_22%)] transition-colors hover:bg-teal-800 sm:px-4"

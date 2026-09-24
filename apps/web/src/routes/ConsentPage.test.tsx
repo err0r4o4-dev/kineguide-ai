@@ -61,7 +61,7 @@ describe('ConsentPage', () => {
     expect(product.saveConsent).toHaveBeenCalledWith({
       camera_processing: true,
       session_summary_storage: true,
-      ai_chat_storage: true,
+      ai_chat_storage: false,
       research_use: false
     })
 
@@ -91,8 +91,31 @@ describe('ConsentPage', () => {
     expect(product.saveConsent).toHaveBeenCalledWith({
       camera_processing: true,
       session_summary_storage: true,
-      ai_chat_storage: true,
+      ai_chat_storage: false,
       research_use: true
+    })
+  })
+
+  it('records AI chat storage only after separate consent', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    renderRoute()
+
+    await user.click(
+      screen.getByLabelText('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
+    )
+    await user.click(
+      screen.getByLabelText('ยอมรับการใช้ AI chat และการเก็บประวัติ')
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'ยอมรับและดำเนินการต่อ' })
+    )
+
+    expect(product.saveConsent).toHaveBeenCalledWith({
+      camera_processing: true,
+      session_summary_storage: true,
+      ai_chat_storage: true,
+      research_use: false
     })
   })
 })

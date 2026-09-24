@@ -29,9 +29,9 @@ export function StatusCard({ label, state, icon }: StatusCardProps) {
         : 'bg-slate-100 text-slate-600'
 
   return (
-    <article className="kg-card p-5 sm:p-6">
+    <article className="kg-card kg-card-interactive p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
-        <span className="rounded-xl bg-teal-50 p-3 text-teal-700 ring-1 ring-inset ring-teal-100">
+        <span className="rounded-xl bg-[var(--color-kg-night)] p-3 text-[var(--color-kg-accent)]">
           {icon}
         </span>
         <span
@@ -60,8 +60,8 @@ export function StatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-kg-canvas">
-      <header className="kg-content-width flex items-center justify-between border-b border-slate-200/80 py-5">
+    <div className="kg-landing-page min-h-screen">
+      <header className="kg-content-width flex items-center justify-between border-b border-white/70 py-5">
         <div className="flex items-center gap-3 font-semibold text-slate-900">
           <LogoMark />
           KineGuide AI
@@ -77,7 +77,9 @@ export function StatusPage() {
 
       <main className="kg-content-width pb-16 pt-10 sm:pt-16">
         <div className="max-w-2xl">
-          <p className="font-medium text-teal-700">KineGuide AI</p>
+          <p className="inline-flex rounded-full border border-teal-100 bg-white/75 px-3 py-1 text-sm font-bold text-teal-800">
+            KineGuide AI
+          </p>
           <h1 className="mt-2 text-4xl font-bold leading-tight tracking-[-0.03em] text-slate-950 sm:text-5xl">
             {t('status')}
           </h1>

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ChevronDown,
-  ClipboardList,
+  CircleHelp,
   MessageCircle,
   Plus,
   Send,
@@ -179,20 +179,20 @@ export function ChatPage() {
   )
 
   return (
-    <div className="flex min-h-[calc(100dvh-7.5rem)] flex-col overflow-hidden rounded-[1.5rem] border border-kg-border bg-white shadow-sm lg:h-[calc(100dvh-5rem)] lg:min-h-[44rem]">
-      <header className="flex flex-col gap-4 border-b border-kg-border px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-7">
+    <div className="flex min-h-[calc(100dvh-7.5rem)] flex-col overflow-hidden rounded-[var(--radius-feature)] border border-kg-border bg-white shadow-[var(--shadow-floating)] lg:h-[calc(100dvh-5rem)] lg:min-h-[44rem]">
+      <header className="flex flex-col gap-4 border-b border-white/10 bg-[var(--color-kg-night)] px-4 py-5 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-7">
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold leading-tight tracking-[-0.02em] text-kg-ink sm:text-3xl">
+          <h1 className="text-2xl font-bold leading-tight tracking-[-0.03em] text-white sm:text-3xl">
             {t('chat.title')}
           </h1>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-kg-muted">
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-white/70">
             {t('chat.subtitle')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link className="kg-button-secondary" to="/app/educational-flow">
-            <ClipboardList aria-hidden="true" size={18} />
-            {t('chat.educationalFlow')}
+          <Link className="kg-button-secondary" to="/app/help">
+            <CircleHelp aria-hidden="true" size={18} />
+            {t('nav.help')}
           </Link>
           <button
             className="kg-button-secondary"
@@ -346,7 +346,7 @@ export function ChatPage() {
                   <label className="sr-only" htmlFor="chat-message">
                     {t('chat.messageLabel')}
                   </label>
-                  <div className="flex items-end gap-2 rounded-2xl border-none bg-white p-2 shadow-sm focus-within:ring-0 focus-within:ring-offset-0">
+                  <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-inner focus-within:border-teal-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-teal-100">
                     <textarea
                       aria-describedby="chat-composer-hint"
                       className="max-h-36 min-h-11 min-w-0 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-kg-ink outline-none placeholder:text-slate-400"

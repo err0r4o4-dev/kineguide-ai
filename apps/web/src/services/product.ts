@@ -267,10 +267,10 @@ export async function getSession(id: string, signal?: AbortSignal) {
 }
 
 export async function createSession(input: { camera_used: boolean }) {
-  // Map input to match old backend requirement for now
+  // The current public contract represents seated monitoring with activity fields.
   const payload = {
     camera_used: input.camera_used,
-    activity_slug: 'seated-posture-demo', // Use existing slug to bypass validation
+    activity_slug: 'seated-posture-demo',
     measurement_mode: 'observation'
   }
   const response = await http.post<SessionResponse>('/sessions', payload)
@@ -281,7 +281,7 @@ export async function updateSession(
   id: string,
   input: Pick<PostureSession, 'status'> & { metrics: Partial<PostureMetrics> }
 ) {
-  // Map input to match old backend requirement for now
+  // Persist only the duration supported by the current public contract.
   const payload = {
     status: input.status,
     elapsed_seconds: input.metrics.duration_seconds ?? 0,

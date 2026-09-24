@@ -17,23 +17,23 @@ export function ProfilePage() {
   const language = i18n.resolvedLanguage === 'th' ? 'th' : 'en'
 
   return (
-    <div className="mx-auto max-w-3xl pb-4">
+    <div className="mx-auto max-w-5xl pb-4">
       <PageHeader title={t('profile.title')} subtitle={t('profile.subtitle')} />
 
       <section className="kg-card mt-8 overflow-hidden">
-        <div className="flex items-start justify-between border-b border-slate-200 bg-slate-50/50 px-5 py-4 sm:px-6">
+        <div className="flex items-start justify-between border-b border-white/10 bg-[var(--color-kg-night)] px-5 py-6 text-white sm:px-6">
           <div className="flex items-center gap-4">
             <span
-              className="grid size-14 place-items-center rounded-full bg-teal-50 text-xl font-bold text-teal-800 shadow-sm ring-1 ring-inset ring-teal-100"
+              className="grid size-14 place-items-center rounded-2xl bg-[var(--color-kg-accent)] text-xl font-bold text-[var(--color-kg-night)] shadow-sm"
               aria-hidden="true"
             >
               {auth.user?.display_name.charAt(0).toUpperCase()}
             </span>
             <div>
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-white">
                 {auth.user?.display_name}
               </h2>
-              <p className="mt-1 text-sm font-medium text-slate-500">
+              <p className="mt-1 text-sm font-medium text-white/65">
                 {t('profile.accountProtected')}
               </p>
             </div>
@@ -66,13 +66,13 @@ export function ProfilePage() {
         </div>
       </section>
 
-      <section className="mt-6 flex flex-col gap-4">
+      <section className="mt-6 grid gap-4 md:grid-cols-2">
         <Link
-          className="kg-card flex items-center justify-between p-5 no-underline hover:bg-slate-50 transition-colors"
+          className="kg-card kg-card-interactive flex items-center justify-between p-5 no-underline"
           to="/app/settings"
         >
           <div className="flex items-center gap-4">
-            <span className="grid size-10 place-items-center rounded-xl bg-teal-50 text-teal-700">
+            <span className="grid size-10 place-items-center rounded-xl bg-[var(--color-kg-night)] text-[var(--color-kg-accent)]">
               <ShieldCheck aria-hidden="true" size={20} />
             </span>
             <div>
@@ -89,7 +89,7 @@ export function ProfilePage() {
           />
         </Link>
         <Link
-          className="kg-card flex items-center justify-between p-5 no-underline hover:bg-slate-50 transition-colors"
+          className="kg-card kg-card-interactive flex items-center justify-between p-5 no-underline"
           to="/app/monitor/calibration"
         >
           <div className="flex items-center gap-4">

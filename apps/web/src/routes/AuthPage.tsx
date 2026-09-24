@@ -107,8 +107,8 @@ export function AuthPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-kg-canvas py-4 sm:py-6">
-      <div className="kg-content-width overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 lg:grid lg:min-h-[760px] lg:grid-cols-[0.95fr_1.05fr]">
+    <main className="kg-landing-page grid min-h-screen place-items-center py-4 sm:py-6">
+      <div className="kg-content-width overflow-hidden rounded-[2rem] border border-white/80 bg-white/95 shadow-[var(--shadow-floating)] backdrop-blur lg:grid lg:min-h-[760px] lg:grid-cols-[0.95fr_1.05fr]">
         <section className="relative isolate hidden h-full flex-col justify-between overflow-hidden p-10 text-white lg:flex">
           <img
             alt=""
@@ -118,7 +118,7 @@ export function AuthPage() {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,118,110,0.08)_20%,rgba(15,118,110,0.76)_60%,rgba(15,118,110,0.96)_80%,#0f766e_100%)]"
+            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(18,53,45,0.08)_15%,rgba(18,53,45,0.78)_58%,#12352d_100%)]"
           />
           <Brand inverted />
           <div className="max-w-md pb-2">

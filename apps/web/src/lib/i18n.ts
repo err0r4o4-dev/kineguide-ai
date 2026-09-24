@@ -262,6 +262,7 @@ const th = {
   },
   consent: {
     title: 'การอนุญาตใช้กล้องและข้อมูล',
+    choicesTitle: 'ตัวเลือกการอนุญาต',
     intro: 'โปรดอ่านและเลือกด้วยตนเองก่อนที่เบราว์เซอร์จะขอสิทธิ์กล้อง',
     cameraTitle: 'ประมวลผลกล้องในอุปกรณ์',
     cameraBody:
@@ -540,6 +541,8 @@ const th = {
     connectedAccounts: 'บัญชีที่เชื่อมต่อ',
     connectedAccountsBody:
       'เชื่อม Google หรือ Facebook เพื่อใช้เป็นวิธีเข้าสู่ระบบ โดยระบบไม่เก็บ token ของผู้ให้บริการ',
+    noConnectedProviders:
+      'ยังไม่มีผู้ให้บริการเข้าสู่ระบบภายนอกที่เปิดใช้งานในสภาพแวดล้อมนี้',
     connect: 'เชื่อม {{provider}}',
     disconnect: 'ยกเลิกการเชื่อม {{provider}}',
     connected: 'เชื่อมแล้ว',
@@ -837,6 +840,7 @@ const en: typeof th = {
   },
   consent: {
     title: 'Camera and data consent',
+    choicesTitle: 'Consent choices',
     intro: 'Read and choose before the browser asks for camera access.',
     cameraTitle: 'On-device camera processing',
     cameraBody:
@@ -1123,6 +1127,8 @@ const en: typeof th = {
     connectedAccounts: 'Connected accounts',
     connectedAccountsBody:
       'Connect Google or Facebook as a sign-in method. Provider tokens are not stored.',
+    noConnectedProviders:
+      'No external sign-in provider is enabled in this environment.',
     connect: 'Connect {{provider}}',
     disconnect: 'Disconnect {{provider}}',
     connected: 'Connected',

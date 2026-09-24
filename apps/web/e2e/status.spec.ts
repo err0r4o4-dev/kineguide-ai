@@ -23,13 +23,12 @@ test('landing page explains privacy before authentication', async ({
 }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'สำรวจการเคลื่อนไหว'
+    'ความเป็นส่วน'
   )
   await expect(page.getByText(/ไม่อัปโหลดรูปหรือวิดีโอ/)).toBeVisible()
-  await expect(page.getByRole('link', { name: 'เริ่มใช้งาน' })).toHaveAttribute(
-    'href',
-    '/register'
-  )
+  await expect(
+    page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true })
+  ).toHaveAttribute('href', '/register')
   const backgrounds = await page.evaluate(() => ({
     page: getComputedStyle(document.querySelector('.kg-landing-page')!)
       .backgroundImage,
@@ -41,7 +40,7 @@ test('landing page explains privacy before authentication', async ({
   }))
   expect(backgrounds.page).not.toBe('none')
   expect(
-    backgrounds.attachment.split(', ').every((value) => value === 'fixed')
+    backgrounds.attachment.split(', ').every((value) => value === 'scroll')
   ).toBe(true)
   expect(backgrounds.hero).toBe('none')
   expect(backgrounds.footer).toBe('none')
@@ -53,13 +52,17 @@ test('landing page explains privacy before authentication', async ({
   expect(initialHeaderBox?.y).toBe(0)
   expect(initialHeaderBox?.height).toBeLessThanOrEqual(72)
   expect(initialHeaderContentBox?.width).toBeCloseTo(
-    (await page.evaluate(() => window.innerWidth)) * 0.7,
+    (await page.evaluate(() => window.innerWidth)) * 0.8,
     0
   )
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     const responsiveHeaderContentBox = await headerContent.boundingBox()
-    expect(responsiveHeaderContentBox?.width).toBeCloseTo(width * 0.7, 0)
+    if (width >= 1024) {
+      expect(responsiveHeaderContentBox?.width).toBeCloseTo(width * 0.8, 0)
+    } else {
+      expect(responsiveHeaderContentBox?.width).toBeGreaterThan(width * 0.89)
+    }
     const landingContentWidths = await page
       .locator('.kg-landing-content')
       .evaluateAll((elements) =>
@@ -67,7 +70,11 @@ test('landing page explains privacy before authentication', async ({
       )
     expect(landingContentWidths.length).toBeGreaterThanOrEqual(4)
     for (const contentWidth of landingContentWidths) {
-      expect(contentWidth).toBeCloseTo(width * 0.7, 0)
+      if (width >= 1024) {
+        expect(contentWidth).toBeCloseTo(width * 0.8, 0)
+      } else {
+        expect(contentWidth).toBeGreaterThan(width * 0.89)
+      }
     }
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth)

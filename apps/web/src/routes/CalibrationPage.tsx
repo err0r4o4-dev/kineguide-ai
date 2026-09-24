@@ -24,18 +24,18 @@ export function CalibrationPage() {
   )
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-5xl pb-4">
       <PageHeader
         title={t('calibration.title')}
         subtitle={t('calibration.subtitle')}
       />
 
       <section
-        className="kg-card mt-8 p-6 sm:p-8"
+        className="kg-card mt-8 overflow-hidden border-amber-200 p-6 sm:p-8"
         aria-labelledby="calibration-status-title"
       >
         <div className="flex items-start gap-4">
-          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-amber-50 text-amber-700">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-amber-400 text-amber-950 shadow-sm">
             <CircleAlert aria-hidden="true" size={26} />
           </span>
           <div className="min-w-0">

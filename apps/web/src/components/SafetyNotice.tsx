@@ -10,7 +10,7 @@ export function SafetyNotice({
 }) {
   return (
     <p
-      className={`mt-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-6 text-amber-950 sm:px-5 ${className}`}
+      className={`mt-6 flex items-start gap-3 rounded-[var(--radius-card)] border border-amber-200 bg-[linear-gradient(135deg,#fffbeb,#fff7db)] px-4 py-4 text-sm leading-6 text-amber-950 shadow-[0_8px_25px_rgb(146_64_14_/_0.05)] sm:px-5 ${className}`}
     >
       <CircleAlert
         aria-hidden="true"

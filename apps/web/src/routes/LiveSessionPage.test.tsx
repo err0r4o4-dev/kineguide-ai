@@ -154,7 +154,9 @@ describe('LiveSessionPage', () => {
 
     renderRoute()
 
-    const technicalStatus = await screen.findByRole('status')
+    const technicalStatus = await screen.findByRole('status', {
+      name: 'สถานะการตรวจจับ'
+    })
     expect(technicalStatus).toBeVisible()
     expect(technicalStatus).toHaveTextContent(message)
     expect(screen.queryByText('อยู่ในเกณฑ์ดี')).not.toBeInTheDocument()

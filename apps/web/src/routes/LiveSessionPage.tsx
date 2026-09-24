@@ -108,18 +108,18 @@ export function LiveSessionPage() {
 
   return (
     <div className="mx-auto max-w-[82rem] pb-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-5 rounded-[var(--radius-feature)] border border-emerald-950/10 bg-[var(--color-kg-night)] p-5 text-white shadow-[var(--shadow-floating)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-[-0.03em] text-white sm:text-3xl">
             {t('session.live')}
           </h1>
-          <p className="mt-1 flex items-center gap-2 text-sm text-teal-800">
-            <span className="size-2.5 rounded-full bg-teal-600" />
+          <p className="mt-2 flex items-center gap-2 text-sm text-white/70">
+            <span className="size-2.5 rounded-full bg-[var(--color-kg-accent)] shadow-[0_0_0_5px_rgb(223_243_108_/_0.10)]" />
             {t('session.technicalOnly')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 font-semibold tabular-nums text-slate-700 shadow-sm">
+          <div className="flex min-h-11 items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 font-semibold tabular-nums text-white shadow-sm">
             {formatDuration(seconds)}
           </div>
           <button
@@ -143,11 +143,11 @@ export function LiveSessionPage() {
             {t('session.finish')}
           </button>
         </div>
-      </div>
+      </header>
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_22rem] xl:grid-cols-[1fr_24rem]">
         <div className="flex flex-col gap-4">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-950 shadow-sm">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[var(--radius-feature)] border border-emerald-950/20 bg-slate-950 shadow-[var(--shadow-floating)]">
             {camera.state === 'ready' && (
               <CameraPoseLayer
                 canvasRef={cameraCanvasRef}
@@ -215,6 +215,7 @@ export function LiveSessionPage() {
             </div>
             <div className="p-5">
               <p
+                aria-label={t('session.technicalStatus')}
                 aria-live="polite"
                 className={`rounded-xl border px-4 py-3 text-sm font-semibold ${toneClasses[technicalStatus.tone]}`}
                 role="status"

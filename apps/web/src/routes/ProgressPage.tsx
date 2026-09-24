@@ -96,7 +96,7 @@ export function ProgressPage() {
         />
       </section>
 
-      <section className="kg-card mt-6 p-5 sm:p-7">
+      <section className="kg-card mt-6 overflow-hidden p-5 sm:p-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold">{t('progress.chart')}</h2>
           <div className="flex gap-2" aria-label={t('progress.chart')}>
@@ -118,7 +118,7 @@ export function ProgressPage() {
           </div>
         </div>
         <div
-          className="mt-7 flex h-52 items-end gap-3 border-b border-slate-200 px-2"
+          className="mt-7 flex h-60 items-end gap-3 rounded-2xl border border-slate-200 bg-[linear-gradient(180deg,#f8fbf9,#ffffff)] px-4 pt-5"
           aria-label={t('progress.subtitle')}
           role="img"
         >
@@ -136,7 +136,7 @@ export function ProgressPage() {
                   key={session.id}
                 >
                   <span
-                    className="rounded-t-lg bg-teal-700 transition-all hover:bg-teal-600"
+                    className="rounded-t-xl bg-[linear-gradient(180deg,#dff36c,#0b6b5c)] shadow-[0_8px_18px_rgb(11_107_92_/_0.12)] transition-all hover:brightness-105"
                     style={{ height: `${heightPercentage}%` }}
                     title={formatDuration(session.metrics.duration_seconds)}
                   />
@@ -177,11 +177,11 @@ export function ProgressPage() {
         <div className="divide-y divide-slate-100">
           {paginatedSessions.map((session) => (
             <Link
-              className="flex items-center gap-3 p-4 no-underline hover:bg-slate-50 sm:px-6"
+              className="flex min-h-20 items-center gap-3 p-4 no-underline transition-colors hover:bg-emerald-50/40 sm:px-6"
               key={session.id}
               to={`/app/monitor/summary/${session.id}`}
             >
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--color-kg-night)] text-[var(--color-kg-accent)]">
                 <Monitor aria-hidden="true" size={18} />
               </span>
               <span className="min-w-0 flex-1">
