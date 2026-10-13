@@ -23,6 +23,7 @@ export default defineConfig({
   ],
   use: {
     baseURL,
+    locale: 'th-TH',
     trace: 'on-first-retry'
   },
   webServer: {

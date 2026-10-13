@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next'
 
-import { saveLanguagePreference } from '@/lib/languagePreference'
-
 export function LanguageButton({
   appearance = 'default'
 }: {
@@ -10,7 +8,6 @@ export function LanguageButton({
   const { t, i18n } = useTranslation()
   const activeLanguage = i18n.resolvedLanguage === 'en' ? 'en' : 'th'
   const changeLanguage = (language: 'th' | 'en') => {
-    saveLanguagePreference(language)
     void i18n.changeLanguage(language)
     document.documentElement.lang = language
   }

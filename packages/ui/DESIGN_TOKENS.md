@@ -16,3 +16,9 @@ The web application uses a calm, Thai-first healthcare-support direction:
 The primary web typeface is the self-hosted Noto Sans Thai variable family. Use real weights 400, 500, 600, and 700, comfortable Thai line height, and tabular numerals for timers and activity statistics. Runtime pages must not depend on a third-party font request.
 
 Shared web cards use a 20 px radius, quiet borders, and restrained depth. Buttons and fields retain a minimum 44 px target. Prefer hierarchy and whitespace over adding cards, pills, gradients, or shadows.
+
+## Browser language
+
+At each page load, select the first supported Thai or English language from `navigator.languages`, including regional variants such as `th-TH` and `en-US`. Use `navigator.language` when the list is empty. Fall back to English if no supported language is found or browser preferences cannot be read.
+
+Manual language changes stay in the existing i18n instance during client-side navigation. Reloading re-evaluates browser preferences. Do not read, write, or delete a language preference in browser storage. Unit tests and existing Thai browser journeys explicitly use a Thai browser locale; language-specific tests override it to exercise the other startup paths.

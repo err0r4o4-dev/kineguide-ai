@@ -1171,7 +1171,7 @@ void i18n
   .use(initReactI18next)
   .init({
     resources: { th: { translation: th }, en: { translation: en } },
-    lng: getLanguagePreference() ?? 'th',
+    lng: getLanguagePreference(),
     fallbackLng: 'en',
     interpolation: { escapeValue: false }
   })
