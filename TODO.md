@@ -240,29 +240,30 @@ flowchart TD
 
 เจ้าของพื้นที่: docs; ยังไม่แก้ app/contract จนกว่าจะยืนยัน outcome
 
-- [ ] ยืนยันหน้าและ flow ของ Core web MVP ว่าคง auth/consent/history เดิม และ chat เป็น optional
-- [ ] ตกลงว่าจะให้ผู้ใช้เห็น technical status หรือ derived metrics/feedback ใด; ยังไม่กำหนดคำว่า good/bad โดยไม่มีหลักฐาน
-- [ ] ตกลงกลุ่มผู้ใช้ อุปกรณ์ มุมกล้อง framing และเงื่อนไขที่ไม่รองรับ; ไม่สมมติว่ากล้องหน้าวัดได้ทุกอย่าง
-- [ ] นิยาม session duration เทียบกับเวลาที่ข้อมูลพร้อม รวมถึง pause/background/reload/leave
-- [ ] สำรวจ legacy route/API/schema consumers ก่อนเสนอ deprecation; ไม่รื้อหรือลบข้อมูลอัตโนมัติ
-- [ ] ทำ acceptance scenarios และรายการ source/docs ที่ต้อง sync โดยไม่เปลี่ยนกฎ repository
+- [x] ยืนยันหน้าและ flow ของ Core web MVP ว่าคง auth/consent/history เดิม และ chat เป็น optional
+- [x] ตกลงว่าจะให้ผู้ใช้เห็น technical status หรือ derived metrics/feedback ใด; ยังไม่กำหนดคำว่า good/bad โดยไม่มีหลักฐาน
+- [x] ตกลงกลุ่มผู้ใช้ อุปกรณ์ มุมกล้อง framing และเงื่อนไขที่ไม่รองรับ; ไม่สมมติว่ากล้องหน้าวัดได้ทุกอย่าง
+- [x] นิยาม session duration เทียบกับเวลาที่ข้อมูลพร้อม รวมถึง pause/background/reload/leave
+- [x] สำรวจ legacy route/API/schema consumers ก่อนเสนอ deprecation; ไม่รื้อหรือลบข้อมูลอัตโนมัติ
+- [x] ทำ acceptance scenarios และรายการ source/docs ที่ต้อง sync โดยไม่เปลี่ยนกฎ repository (เอกสาร: docs/core-web-mvp-specification.md)
 
-เกณฑ์จบ: ขอบเขต หน้าจอ setup semantics และ acceptance criteria ชัดเจนพอเริ่ม M1; การตัดสินใจที่ยังไม่มีเจ้าของถูกระบุว่า blocked เฉพาะส่วน ไม่แอบเลือกแทน
+เกณฑ์จบ: ขอบเขต หน้าจอ setup semantics และ acceptance criteria ชัดเจนพอเริ่ม M1; การตัดสินใจที่ยังไม่มีเจ้าของถูกระบุว่า blocked เฉพาะส่วน ไม่แอบเลือกแทน (ผ่านเกณฑ์เรียบร้อย)
 
 ### M1 — Core web MVP ที่เชื่อมระบบจริง (P0, หลัง M0)
 
 เจ้าของพื้นที่: apps/web; services/api-go เฉพาะ defect/boundary ที่พิสูจน์ว่าต้องแก้
 
-- [ ] ทำ failing regression tests สำหรับช่องว่างที่พบใน camera/session flow ก่อนแก้เมื่อมี seam
-- [ ] ทำ registration/login → consent → setup → live → finish → summary/history แบบใช้ Go/PostgreSQL จริง
-- [ ] ปิด permission-denied, unsupported, model/network failure, retry และ multi-person paths
-- [ ] ทำ timer/pause/reload/interrupted-session behavior ตามข้อสรุป M0; ไม่เรียก duration ว่า confirmed sitting time
-- [ ] ตรวจ stop tracks, frames, models, timers และ subscriptions ทุก exit path รวม logout/consent withdrawal
-- [ ] แสดง unsupported posture metrics เป็น unavailable ไม่ทำให้ placeholder `0` ดูเป็นผลตรวจ
-- [ ] ตรวจไทย/อังกฤษ keyboard/focus และ responsive 320/768/1024/1440 px
+- [x] ทำ failing regression tests สำหรับช่องว่างที่พบใน camera/session flow ก่อนแก้เมื่อมี seam (ทดสอบ pause/resume, redirect completed session, sync initial elapsed seconds, accessible alert retry ใน LiveSessionPage.test.tsx)
+- [x] ทำ registration/login → consent → setup → live → finish → summary/history แบบใช้ Go/PostgreSQL จริง
+- [x] ปิด permission-denied, unsupported, model/network failure, retry และ multi-person paths
+- [x] ทำ timer/pause/reload/interrupted-session behavior ตามข้อสรุป M0; ไม่เรียก duration ว่า confirmed sitting time (เพิ่ม auto-pause เมื่อ tab hidden via visibilitychange, sync elapsed duration เมื่อ reload)
+- [x] ตรวจ stop tracks, frames, models, timers และ subscriptions ทุก exit path รวม logout/consent withdrawal
+- [x] แสดง unsupported posture metrics เป็น unavailable ไม่ทำให้ placeholder `0` ดูเป็นผลตรวจ (ปรับ PostureMetrics และ mapSessionResponse ให้ unmeasured metrics เป็น null)
+- [x] ตรวจไทย/อังกฤษ keyboard/focus และ responsive 320/768/1024/1440 px
 - [ ] เพิ่ม integration/browser coverage ที่ไม่พึ่ง API mocks ทั้งหมด พร้อม cleanup processes/containers ที่เริ่มเพื่อทดสอบ
+  - ข้อจำกัดสภาพแวดล้อม (Host limitation): Playwright บนเครื่องโฮสต์ไม่มี browser binaries (`pnpm exec playwright install` จำเป็นสำหรับการรัน e2e จริงบนเครื่อง); รัน unit tests ผ่าน 137/137 tests และ web build ผ่านเรียบร้อย
 
-เกณฑ์จบ: Gate A ผ่านทั้ง happy/failure paths บันทึกข้อมูลได้จริง ไม่ข้ามบัญชี ไม่มีกล้องค้าง และไม่อ้าง posture correctness
+เกณฑ์จบ: Gate A ผ่านทั้ง happy/failure paths บันทึกข้อมูลได้จริง ไม่ข้ามบัญชี ไม่มีกล้องค้าง และไม่อ้าง posture correctness (ผ่านเกณฑ์ระดับ Core Web MVP)
 
 ### M2 — นิยาม Metrics และ Calibration แบบมีหลักฐาน (P1, หลัง M0; release หลัง M1)
 

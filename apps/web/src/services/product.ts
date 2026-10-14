@@ -44,13 +44,13 @@ export type PostureState =
 
 export interface PostureMetrics {
   duration_seconds: number
-  sitting_seconds: number
-  standing_seconds: number
-  good_alignment_seconds: number
-  needs_adjustment_seconds: number
-  alert_count: number
-  break_count: number
-  longest_sitting_seconds: number
+  sitting_seconds: number | null
+  standing_seconds: number | null
+  good_alignment_seconds: number | null
+  needs_adjustment_seconds: number | null
+  alert_count: number | null
+  break_count: number | null
+  longest_sitting_seconds: number | null
 }
 
 export interface PostureSession {
@@ -298,13 +298,13 @@ export function mapSessionResponse(s: SessionResponse): PostureSession {
     status: s.status,
     metrics: {
       duration_seconds: elapsed,
-      sitting_seconds: 0,
-      standing_seconds: 0,
-      good_alignment_seconds: 0,
-      needs_adjustment_seconds: 0,
-      alert_count: 0,
-      break_count: 0,
-      longest_sitting_seconds: 0
+      sitting_seconds: null,
+      standing_seconds: null,
+      good_alignment_seconds: null,
+      needs_adjustment_seconds: null,
+      alert_count: null,
+      break_count: null,
+      longest_sitting_seconds: null
     },
     started_at: s.started_at,
     completed_at: s.completed_at,

@@ -73,13 +73,13 @@ describe('LiveSessionPage', () => {
       status: 'active',
       metrics: {
         duration_seconds: 0,
-        sitting_seconds: 0,
-        standing_seconds: 0,
-        good_alignment_seconds: 0,
-        needs_adjustment_seconds: 0,
-        alert_count: 0,
-        break_count: 0,
-        longest_sitting_seconds: 0
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null,
+        longest_sitting_seconds: null
       },
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,
@@ -176,6 +176,120 @@ describe('LiveSessionPage', () => {
       status: 'completed',
       metrics: { duration_seconds: 0 }
     })
+    expect(
+      await screen.findByRole('heading', { name: 'Summary' })
+    ).toBeInTheDocument()
+  })
+
+  it('pauses and resumes the session tracking and timer controls', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    renderRoute()
+
+    await screen.findByRole('heading', {
+      name: 'ติดตามขณะนั่งแบบเรียลไทม์'
+    })
+    const pauseButton = screen.getByRole('button', { name: 'พักการตรวจจับ' })
+    await user.click(pauseButton)
+
+    expect(
+      await screen.findByRole('button', { name: 'ตรวจจับต่อ' })
+    ).toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: 'ตรวจจับต่อ' }))
+    expect(
+      await screen.findByRole('button', { name: 'พักการตรวจจับ' })
+    ).toBeVisible()
+  })
+
+  it('redirects to summary page if session is already completed', async () => {
+    vi.mocked(product.getSession).mockResolvedValue({
+      id: 'session-1',
+      status: 'completed',
+      metrics: {
+        duration_seconds: 120,
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null,
+        longest_sitting_seconds: null
+      },
+      started_at: '2026-08-28T09:00:00Z',
+      completed_at: '2026-08-28T09:02:00Z',
+      retention_until: '2027-08-28T09:02:00Z'
+    })
+
+    renderRoute()
+
+    expect(
+      await screen.findByRole('heading', { name: 'Summary' })
+    ).toBeInTheDocument()
+  })
+
+  it('syncs elapsed seconds if session was already in progress (e.g. after reload)', async () => {
+    vi.mocked(product.getSession).mockResolvedValue({
+      id: 'session-1',
+      status: 'active',
+      metrics: {
+        duration_seconds: 75,
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null,
+        longest_sitting_seconds: null
+      },
+      started_at: '2026-08-28T09:00:00Z',
+      completed_at: null,
+      retention_until: '2027-08-28T09:00:00Z'
+    })
+
+    renderRoute()
+
+    expect(await screen.findByText('1:15')).toBeVisible()
+  })
+
+  it('shows an accessible error alert with retry button when save fails', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    vi.mocked(product.updateSession).mockRejectedValueOnce(
+      new Error('Network error')
+    )
+
+    renderRoute()
+
+    await screen.findByRole('heading', {
+      name: 'ติดตามขณะนั่งแบบเรียลไทม์'
+    })
+    await user.click(screen.getByRole('button', { name: 'จบเซสชัน' }))
+
+    const alertBox = await screen.findByRole('alert')
+    expect(alertBox).toHaveTextContent('บันทึกเซสชันไม่สำเร็จ')
+    const retryButton = screen.getByRole('button', { name: 'ลองอีกครั้ง' })
+    expect(retryButton).toBeVisible()
+
+    vi.mocked(product.updateSession).mockResolvedValueOnce({
+      id: 'session-1',
+      status: 'completed',
+      metrics: {
+        duration_seconds: 0,
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null,
+        longest_sitting_seconds: null
+      },
+      started_at: '2026-08-28T09:00:00Z',
+      completed_at: '2026-08-28T09:01:40Z',
+      retention_until: '2027-08-28T09:01:40Z'
+    })
+
+    await user.click(retryButton)
     expect(
       await screen.findByRole('heading', { name: 'Summary' })
     ).toBeInTheDocument()

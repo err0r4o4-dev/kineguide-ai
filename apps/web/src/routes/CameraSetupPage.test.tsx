@@ -205,13 +205,13 @@ describe('CameraSetupPage', () => {
       status: 'active',
       metrics: {
         duration_seconds: 0,
-        sitting_seconds: 0,
-        standing_seconds: 0,
-        good_alignment_seconds: 0,
-        needs_adjustment_seconds: 0,
-        alert_count: 0,
-        break_count: 0,
-        longest_sitting_seconds: 0
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null,
+        longest_sitting_seconds: null
       },
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,

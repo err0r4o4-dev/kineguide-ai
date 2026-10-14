@@ -41,12 +41,40 @@ export function LiveSessionPage() {
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
   const [seconds, setSeconds] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [syncedInitial, setSyncedInitial] = useState(false)
+  const [saveError, setSaveError] = useState(false)
+  const [isFinishing, setIsFinishing] = useState(false)
 
   const session = useQuery({
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal),
     enabled: id.length > 0
   })
+
+  useEffect(() => {
+    if (session.data?.status === 'completed' || session.data?.status === 'stopped') {
+      navigate(`/app/sessions/${id}/summary`, { replace: true })
+    }
+  }, [id, navigate, session.data?.status])
+
+  useEffect(() => {
+    if (!syncedInitial && session.data?.metrics?.duration_seconds) {
+      setSeconds(session.data.metrics.duration_seconds)
+      setSyncedInitial(true)
+    }
+  }, [session.data?.metrics?.duration_seconds, syncedInitial])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setPaused(true)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
 
   const pose = usePoseTracking(
     camera.videoRef,
@@ -66,6 +94,8 @@ export function LiveSessionPage() {
   }, [id, paused])
 
   const finishSession = async () => {
+    setIsFinishing(true)
+    setSaveError(false)
     try {
       await updateSession(id, {
         status: 'completed',
@@ -73,7 +103,9 @@ export function LiveSessionPage() {
       })
       navigate(`/app/sessions/${id}/summary`)
     } catch {
-      alert(t('session.saveFailed'))
+      setSaveError(true)
+    } finally {
+      setIsFinishing(false)
     }
   }
 
@@ -136,14 +168,39 @@ export function LiveSessionPage() {
           </button>
           <button
             className="kg-button-primary"
+            disabled={isFinishing}
             onClick={() => void finishSession()}
             type="button"
           >
-            <Square aria-hidden="true" size={18} />
+            {isFinishing ? (
+              <Loader2 aria-hidden="true" className="animate-spin" size={18} />
+            ) : (
+              <Square aria-hidden="true" size={18} />
+            )}
             {t('session.finish')}
           </button>
         </div>
       </header>
+
+      {saveError && (
+        <div
+          className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-900"
+          role="alert"
+        >
+          <div className="flex items-center gap-2">
+            <CircleAlert aria-hidden="true" className="text-red-700" size={18} />
+            <p>{t('session.saveFailed')}</p>
+          </div>
+          <button
+            className="kg-button-secondary px-3 py-1.5 text-xs text-red-900 border-red-300 hover:bg-red-100"
+            disabled={isFinishing}
+            onClick={() => void finishSession()}
+            type="button"
+          >
+            {t('common.retry')}
+          </button>
+        </div>
+      )}
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_22rem] xl:grid-cols-[1fr_24rem]">
         <div className="flex flex-col gap-4">
