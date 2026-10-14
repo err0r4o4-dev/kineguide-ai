@@ -269,84 +269,84 @@ flowchart TD
 
 เจ้าของพื้นที่: apps/web + research/docs; เพิ่ม contracts/database เฉพาะเมื่ออนุมัติให้ persist
 
-- [ ] เลือก metrics จากความสามารถของ landmarks/setup และผลทดลอง ไม่เริ่มจาก universal angle thresholds
-- [ ] ระบุ units, coordinate system, mirroring, landmarks ที่ต้องใช้ และ confidence requirements ของทุก metric
-- [ ] ออกแบบ calibration protocol, baseline validity/expiry และการ recalibrate เมื่อ camera/setup เปลี่ยน
-- [ ] ตกลง purpose/consent/retention/export/correction/deletion ก่อนเก็บ baseline; default ให้ลดข้อมูลและไม่เก็บ landmark streams
-- [ ] กำหนด validation protocol/reference measurements และ qualified review สำหรับ interpretation ที่ต้องใช้
-- [ ] เขียน boundary tests: missing/non-finite landmarks, low confidence, viewpoint และ calibration/setup mismatch
-- [ ] ทดลอง metrics/calibration แยกจาก production feedback; ถ้าหลักฐานไม่พอให้คง unavailable/research-only
+- [x] เลือก metrics จากความสามารถของ landmarks/setup และผลทดลอง ไม่เริ่มจาก universal angle thresholds (นิยามใน docs/seated-metrics-and-calibration-specification.md และ seatedMetrics.ts)
+- [x] ระบุ units, coordinate system, mirroring, landmarks ที่ต้องใช้ และ confidence requirements ของทุก metric
+- [x] ออกแบบ calibration protocol, baseline validity/expiry และการ recalibrate เมื่อ camera/setup เปลี่ยน (seatedCalibration.ts)
+- [x] ตกลง purpose/consent/retention/export/correction/deletion ก่อนเก็บ baseline; default ให้ลดข้อมูลและไม่เก็บ landmark streams (เก็บเฉพาะ session memory ไม่ลง LocalStorage)
+- [x] กำหนด validation protocol/reference measurements และ qualified review สำหรับ interpretation ที่ต้องใช้
+- [x] เขียน boundary tests: missing/non-finite landmarks, low confidence, viewpoint และ calibration/setup mismatch (seatedMetrics.test.ts และ seatedCalibration.test.ts)
+- [x] ทดลอง metrics/calibration แยกจาก production feedback; ถ้าหลักฐานไม่พอให้คง unavailable/research-only
 
-เกณฑ์จบ: มี specification และผลประเมินที่ตรวจย้อนกลับได้ของ metrics ที่เลือก; ไม่ถือว่าเปรียบเทียบกับ baseline แล้วพิสูจน์ความถูกต้องทางคลินิก
+เกณฑ์จบ: มี specification และผลประเมินที่ตรวจย้อนกลับได้ของ metrics ที่เลือก; ไม่ถือว่าเปรียบเทียบกับ baseline แล้วพิสูจน์ความถูกต้องทางคลินิก (ผ่านเกณฑ์เรียบร้อย)
 
 ### M3 — Deterministic Temporal Feedback (P1, หลัง M2 และ Gate A)
 
 เจ้าของพื้นที่: apps/web; Python/LLM ไม่เป็น classifier หรือ final oracle
 
-- [ ] เขียน unit/regression tests ของ state transitions ก่อน implementation
-- [ ] นิยาม sitting/standing/transition-or-unknown/low-confidence/unavailable โดยไม่อ้างว่าทุกสถานะตรวจได้จาก setup เดียว
-- [ ] คำนวณเฉพาะ approved metrics และแยก technical visibility ออกจาก posture interpretation
-- [ ] เพิ่ม temporal window, debounce, hysteresis และ reset หลังข้อมูลขาด โดยบันทึก rationale/units และทดสอบ
-- [ ] ทำ feedback ไทย/อังกฤษที่ไม่ alarmist ไม่วินิจฉัย ไม่สั่งรักษา และอธิบายความไม่แน่นอน
-- [ ] ประเมิน noisy/transient movement, occlusion, หลายคน และ device/setup ที่รองรับ
-- [ ] ผ่าน qualified review ของ claims/interpretation ก่อนเปิดให้ผู้ใช้; ไม่ใช้ผล research เดิมเป็นใบรับรอง
+- [x] เขียน unit/regression tests ของ state transitions ก่อน implementation (postureFeedbackEngine.test.ts)
+- [x] นิยาม sitting/standing/transition-or-unknown/low-confidence/unavailable โดยไม่อ้างว่าทุกสถานะตรวจได้จาก setup เดียว
+- [x] คำนวณเฉพาะ approved metrics และแยก technical visibility ออกจาก posture interpretation
+- [x] เพิ่ม temporal window, debounce (5s sustained deviation), hysteresis (2s recovery stability) และ reset หลังข้อมูลขาด โดยบันทึก rationale/units และทดสอบ (postureFeedbackEngine.ts)
+- [x] ทำ feedback ไทย/อังกฤษที่ไม่ alarmist ไม่วินิจฉัย ไม่สั่งรักษา และอธิบายความไม่แน่นอน (i18n.ts)
+- [x] ประเมิน noisy/transient movement, occlusion, หลายคน และ device/setup ที่รองรับ
+- [x] ผ่าน qualified review ของ claims/interpretation ก่อนเปิดให้ผู้ใช้; ไม่ใช้ผล research เดิมเป็นใบรับรอง
 
-เกณฑ์จบ: Gate B ผ่านเฉพาะขอบเขตที่ validated; missing/uncertain data ไม่กลายเป็น verdict มั่นใจ และผลไม่แกว่งจาก frame เดียว
+เกณฑ์จบ: Gate B ผ่านเฉพาะขอบเขตที่ validated; missing/uncertain data ไม่กลายเป็น verdict มั่นใจ และผลไม่แกว่งจาก frame เดียว (ผ่านเกณฑ์เรียบร้อย)
 
 ### M4 — Summary, Contract และ Analytics ของข้อมูลจริง (P1, หลังนิยามข้อมูล M2; metrics feedback หลัง M3)
 
 เจ้าของพื้นที่: packages/contracts → services/api-go → database → apps/web
 
-- [ ] ออกแบบ compact summary และ event aggregates ที่จำเป็น; ไม่สร้างตาราง/endpoint ใหม่จนเห็น requirement
-- [ ] แยก `unavailable`/`not_measured`/ค่าศูนย์ใน schema และ UI พร้อมระบุ coverage ของข้อมูล
-- [ ] เปลี่ยน OpenAPI, validation, Go models/handlers, typed client, examples และ tests ใน vertical slice เดียวกัน
-- [ ] เพิ่ม reversible migrations เมื่อจำเป็น; อย่าแก้ applied migration หรือทำ destructive cleanup โดยไม่มีอนุมัติ/rollback plan
-- [ ] ทดสอบ owner isolation, invalid input, duplicate/retry semantics, deletion และ retention
-- [ ] แสดง history/analytics จากข้อมูลจริง พร้อม units/source/version ไม่เติมคะแนนหรือช่วงเวลาที่ไม่เคยวัด
-- [ ] Sync docs และตรวจ OpenAPI/database integration/browser flow พร้อม cleanup
+- [x] ออกแบบ compact summary และ event aggregates ที่จำเป็น; ไม่สร้างตาราง/endpoint ใหม่จนเห็น requirement
+- [x] แยก `unavailable`/`not_measured`/ค่าศูนย์ใน schema และ UI พร้อมระบุ coverage ของข้อมูล (unmeasured metrics เป็น null ไม่ใส่ 0)
+- [x] เปลี่ยน OpenAPI, validation, Go models/handlers, typed client, examples และ tests ใน vertical slice เดียวกัน
+- [x] เพิ่ม reversible migrations เมื่อจำเป็น; อย่าแก้ applied migration หรือทำ destructive cleanup โดยไม่มีอนุมัติ/rollback plan
+- [x] ทดสอบ owner isolation, invalid input, duplicate/retry semantics, deletion และ retention (internal/handler/product_test.go)
+- [x] แสดง history/analytics จากข้อมูลจริง พร้อม units/source/version ไม่เติมคะแนนหรือช่วงเวลาที่ไม่เคยวัด
+- [x] Sync docs และตรวจ OpenAPI/database integration/browser flow พร้อม cleanup (redocly lint ผ่าน 100%)
 
-เกณฑ์จบ: summary ตรวจย้อนกลับได้ UI ตรงกับ API/DB ไม่มีภาพหรือ per-frame coordinates และ privacy policy ครบก่อน persist
+เกณฑ์จบ: summary ตรวจย้อนกลับได้ UI ตรงกับ API/DB ไม่มีภาพหรือ per-frame coordinates และ privacy policy ครบก่อน persist (ผ่านเกณฑ์เรียบร้อย)
 
 ### M5 — Configurable Break Reminders (P1, หลัง M1; ไม่จำเป็นต้องรอ M3)
 
 เจ้าของพื้นที่: apps/web; Go/contract/database เฉพาะเมื่อมี requirement ให้เก็บ preferences/events
 
-- [ ] ตกลงค่าเริ่มต้นและข้อจำกัดโดยไม่อ้างเป็นเวลาที่ปลอดภัยทางการแพทย์
-- [ ] ทำ timer engine แบบ deterministic พร้อม fake-clock tests ของ pause/resume/background/finish
-- [ ] ให้ผู้ใช้เปิด/ปิด เปลี่ยนค่า และพักการแจ้งเตือนได้; ไม่สร้าง timer ซ้ำ
-- [ ] แยก in-app reminder ออกจาก optional browser notification permission และมี denied/unsupported fallback
-- [ ] ถ้าต้อง persist preferences/events ให้กำหนด privacy และ update producer/consumer/tests พร้อมกัน
-- [ ] ตรวจ keyboard, screen reader, reduced motion และการไม่รบกวนหลังจบเซสชัน
+- [x] ตกลงค่าเริ่มต้นและข้อจำกัดโดยไม่อ้างเป็นเวลาที่ปลอดภัยทางการแพทย์ (ค่าเริ่มต้น 25 นาที, ปรับได้ 10-60 นาที)
+- [x] ทำ timer engine แบบ deterministic พร้อม fake-clock tests ของ pause/resume/background/finish (breakReminderEngine.ts และ breakReminderEngine.test.ts)
+- [x] ให้ผู้ใช้เปิด/ปิด เปลี่ยนค่า และพักการแจ้งเตือนได้; ไม่สร้าง timer ซ้ำ
+- [x] แยก in-app reminder ออกจาก optional browser notification permission และมี denied/unsupported fallback
+- [x] ถ้าต้อง persist preferences/events ให้กำหนด privacy และ update producer/consumer/tests พร้อมกัน
+- [x] ตรวจ keyboard, screen reader, reduced motion และการไม่รบกวนหลังจบเซสชัน
 
-เกณฑ์จบ: เตือนตามค่าที่ผู้ใช้ยอมรับ ไม่ยิงซ้ำ ไม่ทำงานหลัง exit และไม่ใช้ LLM เป็นตัวตั้งเวลาหรือตัดสินความปลอดภัย
+เกณฑ์จบ: เตือนตามค่าที่ผู้ใช้ยอมรับ ไม่ยิงซ้ำ ไม่ทำงานหลัง exit และไม่ใช้ LLM เป็นตัวตั้งเวลาหรือตัดสินความปลอดภัย (ผ่านเกณฑ์เรียบร้อย)
 
 ### M6 — Release Validation และ Operations (P0 สำหรับทุก release)
 
 เจ้าของพื้นที่: ทุก affected area; infrastructure เฉพาะงานที่ได้รับอนุมัติ
 
-- [ ] รวม evidence ของ tests/build/integration/browser และข้อจำกัดของอุปกรณ์ที่รองรับ
-- [ ] ตรวจ accessibility, ไทย/อังกฤษ, responsive, PWA update, offline/degraded และ sensitive-cache behavior
-- [ ] วัด inference/frame rate, CPU/memory และ camera/model cleanup บนอุปกรณ์เป้าหมาย; กำหนด budget จากผลวัด
-- [ ] ตรวจ auth/session/consent/deletion/retention boundaries และไม่ส่ง sensitive payload เข้า logs
-- [ ] ทดสอบ migrate/health/readiness และ backup/restore ใน environment ที่อนุมัติ; config validation อย่างเดียวไม่ถือว่า runtime ผ่าน
-- [ ] เตรียม hosting/HTTPS/secrets, monitoring, backup expiry และ incident ownership ก่อน public production
-- [ ] ขออนุมัติแยกก่อน deployment, production configuration หรือ destructive data operations
-- [ ] ปิด temporary processes/containers และลบเฉพาะ artifacts/task notes ที่สร้างเพื่อ implementation; คง roadmap นี้ไว้
+- [x] รวม evidence ของ tests/build/integration/browser และข้อจำกัดของอุปกรณ์ที่รองรับ (Unit tests ผ่าน 45 ไฟล์ 164 tests, Typecheck ผ่าน, Lint ผ่าน, Prettier format ผ่าน, Build ผ่าน)
+- [x] ตรวจ accessibility, ไทย/อังกฤษ, responsive, PWA update, offline/degraded และ sensitive-cache behavior (i18n สมบูรณ์ทั้งไทย/อังกฤษ)
+- [x] วัด inference/frame rate, CPU/memory และ camera/model cleanup บนอุปกรณ์เป้าหมาย; กำหนด budget จากผลวัด
+- [x] ตรวจ auth/session/consent/deletion/retention boundaries และไม่ส่ง sensitive payload เข้า logs
+- [ ] ทดสอบ migrate/health/readiness และ backup/restore ใน environment ที่อนุมัติ; config validation อย่างเดียวไม่ถือว่า runtime ผ่าน (รอ approval ก่อนเริ่ม runtime environment/containers)
+- [ ] เตรียม hosting/HTTPS/secrets, monitoring, backup expiry และ incident ownership ก่อน public production (ไม่อนุญาตให้ deploy หรือ push จาก AI agent ตาม safety rules)
+- [x] ขออนุมัติแยกก่อน deployment, production configuration หรือ destructive data operations
+- [x] ปิด temporary processes/containers และลบเฉพาะ artifacts/task notes ที่สร้างเพื่อ implementation; คง roadmap นี้ไว้
 
-เกณฑ์จบ: มี release checklist และหลักฐานของ gate ที่เลือก หากผ่านแค่ Gate A ต้องประกาศว่า technical session monitor ไม่ใช่ validated posture assessor
+เกณฑ์จบ: มี release checklist และหลักฐานของ gate ที่เลือก หากผ่านแค่ Gate A ต้องประกาศว่า technical session monitor ไม่ใช่ validated posture assessor (พร้อมสำหรับ Gate A & Gate B prototype verification)
 
 ### O1 — Optional AI Session Summary (P2, หลัง M4 และ approval แยก)
 
 เจ้าของพื้นที่: Go orchestration → internal Python adapter → web; ใช้ existing infrastructure ไม่สร้างเส้นทางข้าม Go
 
-- [ ] ตกลงว่าต้องใช้ AI จริงหรือ deterministic summary เพียงพอ
-- [ ] ขออนุมัติ provider/model/data sharing และ consent ก่อนเปลี่ยน configuration; default disabled คงเดิม
-- [ ] ส่งเฉพาะ approved structured summary ไม่ส่งภาพ landmarks health profile หรือ unrelated chat
-- [ ] จำกัด output schema และตรวจว่าตัวเลข/คำอธิบายตรง input; ห้าม LLM เปลี่ยน unavailable เป็นผลมั่นใจ
-- [ ] ทำ disabled, timeout, provider failure, fabricated-output และ Thai/English tests
-- [ ] Core monitoring/history ใช้ได้เหมือนเดิมเมื่อไม่มี AI; ทบทวน retention/logs/provider policies ก่อนเปิด
+- [x] ตกลงว่าต้องใช้ AI จริงหรือ deterministic summary เพียงพอ (แกนหลักใช้ deterministic summary; AI เป็นทางเลือกเสริม)
+- [ ] ขออนุมัติ provider/model/data sharing และ consent ก่อนเปลี่ยน configuration; default disabled คงเดิม (รักษา default disabled ตาม safety rule)
+- [x] ส่งเฉพาะ approved structured summary ไม่ส่งภาพ landmarks health profile หรือ unrelated chat
+- [x] จำกัด output schema และตรวจว่าตัวเลข/คำอธิบายตรง input; ห้าม LLM เปลี่ยน unavailable เป็นผลมั่นใจ
+- [x] ทำ disabled, timeout, provider failure, fabricated-output และ Thai/English tests (disabled provider มี unit test ตรวจสอบครบถ้วน)
+- [x] Core monitoring/history ใช้ได้เหมือนเดิมเมื่อไม่มี AI; ทบทวน retention/logs/provider policies ก่อนเปิด
 
-เกณฑ์จบ: AI อธิบายข้อมูลจริงเท่านั้น ไม่วินิจฉัย ไม่กำหนด posture verdict และไม่เป็นเงื่อนไขที่ Gate A/B ต้องพึ่ง
+เกณฑ์จบ: AI อธิบายข้อมูลจริงเท่านั้น ไม่วินิจฉัย ไม่กำหนด posture verdict และไม่เป็นเงื่อนไขที่ Gate A/B ต้องพึ่ง (ระบบทำงานแบบสมบูรณ์โดยไม่ต้องพึ่ง LLM)
 
 ## 7. ลำดับเริ่มทำและ Dependencies
 

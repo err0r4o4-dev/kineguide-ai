@@ -52,7 +52,10 @@ export function LiveSessionPage() {
   })
 
   useEffect(() => {
-    if (session.data?.status === 'completed' || session.data?.status === 'stopped') {
+    if (
+      session.data?.status === 'completed' ||
+      session.data?.status === 'stopped'
+    ) {
       navigate(`/app/sessions/${id}/summary`, { replace: true })
     }
   }, [id, navigate, session.data?.status])
@@ -188,7 +191,11 @@ export function LiveSessionPage() {
           role="alert"
         >
           <div className="flex items-center gap-2">
-            <CircleAlert aria-hidden="true" className="text-red-700" size={18} />
+            <CircleAlert
+              aria-hidden="true"
+              className="text-red-700"
+              size={18}
+            />
             <p>{t('session.saveFailed')}</p>
           </div>
           <button

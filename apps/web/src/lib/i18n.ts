@@ -411,9 +411,22 @@ const th = {
       'ระบบจึงไม่เริ่มการเปรียบเทียบ ไม่สร้างคะแนน และไม่ตัดสินว่าการเคลื่อนไหวถูกหรือผิด',
     researchBoundary:
       'วิธีนี้เป็นเครื่องมือวัดเพื่อการวิจัย ไม่ใช่หลักฐานว่าการเคลื่อนไหวปลอดภัยหรือถูกต้องทางคลินิก และหน้านี้ไม่เปิดกล้องหรือเก็บข้อมูลจุดอ้างอิง',
-    researchSource: 'เปิดบทความงานวิจัยต้นฉบับ'
+    researchSource: 'เปิดบทความงานวิจัยต้นฉบับ',
+    expiredNotice:
+      'Baseline หมดอายุแล้ว (เกิน 8 ชั่วโมง) แนะนำให้ปรับเทียบใหม่',
+    framingShiftNotice: 'มุมกล้องหรือระยะห่างเปลี่ยนไป แนะนำให้ปรับเทียบใหม่'
   },
   session: {
+    goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
+    noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
+    feedback: {
+      general: 'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจาก Baseline',
+      shoulderSlopeDegrees: 'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจาก Baseline',
+      headTiltDegrees: 'สังเกตเห็นศีรษะเอียงต่อเนื่องจาก Baseline',
+      torsoInclinationDegrees: 'สังเกตเห็นลำตัวเอียงต่อเนื่องจาก Baseline',
+      eyeShoulderDistanceRatio:
+        'สังเกตเห็นการโน้มศีรษะ/ลำตัวต่อเนื่องจาก Baseline'
+    },
     live: 'ติดตามขณะนั่งแบบเรียลไทม์',
     technicalOnly: 'โหมดนั่งเชิงเทคนิค ไม่ใช่การประเมินทางคลินิก',
     timer: 'ระยะเวลา',
@@ -476,6 +489,11 @@ const th = {
     needsAdjustmentDuration: 'ระยะเวลาควรปรับท่า',
     alertCount: 'จำนวนการแจ้งเตือน',
     breakCount: 'จำนวนการหยุดพัก',
+    breakDueTitle: 'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ',
+    breakDueBody:
+      'คุณนั่งต่อเนื่องมาเป็นเวลา {{minutes}} นาทีแล้ว แนะนำให้ลุกขึ้นยืดเส้นยืดสายหรือพักสายตา',
+    breakAcknowledge: 'พักเรียบร้อยแล้ว',
+    breakSnooze: 'เตือนอีกครั้งใน 5 นาที',
     longestSitting: 'ช่วงเวลานั่งนานที่สุด',
     headAlignment: 'ศีรษะ: ปกติ',
     shoulderAlignment: 'ไหล่: สมดุล',
@@ -994,9 +1012,25 @@ const en: typeof th = {
       'The system therefore does not start comparison, produce a score, or label movement as correct or incorrect.',
     researchBoundary:
       'This is a research measurement method, not proof that movement is safe or clinically correct. This page does not start the camera or retain landmark data.',
-    researchSource: 'Open the original research article'
+    researchSource: 'Open the original research article',
+    expiredNotice:
+      'Personal baseline has expired (over 8h). Recalibration recommended.',
+    framingShiftNotice:
+      'Camera angle or distance shifted. Recalibration recommended.'
   },
   session: {
+    goodAlignment: 'Good alignment relative to personal baseline',
+    noBaseline: 'Personal baseline not established',
+    feedback: {
+      general: 'Sustained posture deviation observed relative to baseline',
+      shoulderSlopeDegrees:
+        'Sustained shoulder tilt observed relative to baseline',
+      headTiltDegrees: 'Sustained head tilt observed relative to baseline',
+      torsoInclinationDegrees:
+        'Sustained torso inclination observed relative to baseline',
+      eyeShoulderDistanceRatio:
+        'Sustained forward head posture observed relative to baseline'
+    },
     live: 'Live Seated Monitoring',
     technicalOnly: 'Technical seated mode, not a clinical assessment',
     timer: 'Duration',
@@ -1063,6 +1097,11 @@ const en: typeof th = {
     needsAdjustmentDuration: 'Needs Adjustment Time',
     alertCount: 'Alert Count',
     breakCount: 'Break Count',
+    breakDueTitle: 'Time for an ergonomic break',
+    breakDueBody:
+      'You have been seated for {{minutes}} minutes. Consider standing up, stretching, or resting your eyes.',
+    breakAcknowledge: 'Break completed',
+    breakSnooze: 'Remind me in 5 min',
     longestSitting: 'Longest Sitting Period',
     headAlignment: 'Head: Normal',
     shoulderAlignment: 'Shoulders: Balanced',
