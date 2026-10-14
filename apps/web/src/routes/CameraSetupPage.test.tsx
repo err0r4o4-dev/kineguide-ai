@@ -41,6 +41,40 @@ function renderRoute() {
 }
 
 describe('CameraSetupPage', () => {
+  it('presents the camera setup journey and practical setup guidance', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'idle',
+      start: vi.fn(),
+      stop: vi.fn(),
+      videoRef: { current: null }
+    })
+
+    renderRoute()
+
+    const progress = screen.getByRole('navigation', {
+      name: 'ขั้นตอนการตั้งค่ากล้อง'
+    })
+    expect(progress).toHaveTextContent('ตั้งค่ากล้อง')
+    expect(progress).toHaveTextContent('ตรวจสอบภาพ')
+    expect(progress).toHaveTextContent('เริ่มติดตาม')
+    expect(
+      screen.getByRole('heading', { name: 'ประมวลผลกล้องบนอุปกรณ์' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'แสงสว่างเพียงพอ' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'วางอุปกรณ์ให้มั่นคง' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'ให้เห็นทั้งตัว' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'สวมเสื้อผ้าที่มองเห็นแนวร่างกาย' })
+    ).toBeVisible()
+  })
+
   it('requires explicit seated-mode confirmation before camera permission', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
@@ -96,6 +130,9 @@ describe('CameraSetupPage', () => {
     )
     await user.click(startBtn)
 
+    expect(
+      screen.getByRole('listitem', { name: 'ขั้นตอนที่ 2 ตรวจสอบภาพ' })
+    ).toHaveAttribute('aria-current', 'step')
     expect(screen.getByText('ความพร้อมของระบบ')).toBeVisible()
     expect(screen.getByText('สิทธิ์กล้อง')).toBeVisible()
     expect(screen.getByText('การตรวจจับจุดอ้างอิง')).toBeVisible()
@@ -103,6 +140,30 @@ describe('CameraSetupPage', () => {
     expect(
       screen.getByRole('button', { name: 'เริ่มเซสชันโหมดนั่ง' })
     ).toBeEnabled()
+  })
+
+  it('mirrors the front-camera preview once for natural movement', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'ready',
+      start: vi.fn(),
+      stop: vi.fn(),
+      videoRef: { current: null }
+    })
+
+    const user = userEvent.setup()
+    const { container } = renderRoute()
+
+    await user.click(
+      screen.getByLabelText(
+        'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+      )
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' })
+    )
+
+    expect(container.querySelector('video')).toHaveClass('-scale-x-100')
   })
 
   it('disables continue when camera is denied', async () => {
@@ -144,13 +205,13 @@ describe('CameraSetupPage', () => {
       status: 'active',
       metrics: {
         duration_seconds: 0,
-        sitting_seconds: 0,
-        standing_seconds: 0,
-        good_alignment_seconds: 0,
-        needs_adjustment_seconds: 0,
-        alert_count: 0,
-        break_count: 0,
-        longest_sitting_seconds: 0
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null,
+        longest_sitting_seconds: null
       },
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,

@@ -60,7 +60,7 @@ export function UserAccountMenu() {
       {open && (
         <div
           aria-label={t('account.menu')}
-          className="absolute bottom-[calc(100%+1rem)] left-0 z-20 w-full min-w-56 overflow-hidden rounded-[1.25rem] border border-kg-border bg-kg-surface p-3 shadow-[0_16px_40px_rgb(20_35_33_/_0.12)]"
+          className="absolute bottom-[calc(100%+1rem)] left-0 z-20 w-full min-w-56 overflow-hidden rounded-[1.25rem] border border-kg-border bg-white/95 p-3 shadow-[var(--shadow-floating)] backdrop-blur-xl"
           role="menu"
         >
           <p className="px-3 pb-2 pt-1 text-sm font-bold text-slate-700">
@@ -117,25 +117,25 @@ export function UserAccountMenu() {
             ? t('account.menuWithUnread', { count: unreadCount })
             : t('account.menu')
         }
-        className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-teal-100 bg-teal-50/60 px-3 text-left transition-colors hover:border-teal-200 hover:bg-teal-50"
+        className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-emerald-950/10 bg-[var(--color-kg-night)] px-3 text-left text-white shadow-lg shadow-emerald-950/10 transition hover:bg-[var(--color-kg-primary-strong)]"
         onClick={() => setOpen((current) => !current)}
         ref={triggerRef}
         type="button"
       >
         <span
-          className="relative grid size-11 shrink-0 place-items-center rounded-full bg-white text-sm font-bold text-teal-800 shadow-sm"
+          className="relative grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--color-kg-accent)] text-sm font-bold text-[var(--color-kg-night)] shadow-sm"
           aria-hidden="true"
         >
           {initials(auth.user?.display_name)}
-          <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-white bg-emerald-500" />
+          <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-[var(--color-kg-night)] bg-emerald-400" />
         </span>
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
           {label}
         </span>
         <div className="relative flex items-center justify-center pl-1">
           <Bell
             aria-hidden="true"
-            className="shrink-0 text-slate-600"
+            className="shrink-0 text-white/75"
             data-testid="account-notification-bell"
             size={21}
           />
@@ -150,7 +150,7 @@ export function UserAccountMenu() {
         </div>
         <ChevronUp
           aria-hidden="true"
-          className={`shrink-0 text-slate-600 transition-transform ${open ? '' : 'rotate-180'}`}
+          className={`shrink-0 text-white/65 transition-transform ${open ? '' : 'rotate-180'}`}
           size={18}
         />
       </button>

@@ -41,12 +41,43 @@ export function LiveSessionPage() {
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
   const [seconds, setSeconds] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [syncedInitial, setSyncedInitial] = useState(false)
+  const [saveError, setSaveError] = useState(false)
+  const [isFinishing, setIsFinishing] = useState(false)
 
   const session = useQuery({
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal),
     enabled: id.length > 0
   })
+
+  useEffect(() => {
+    if (
+      session.data?.status === 'completed' ||
+      session.data?.status === 'stopped'
+    ) {
+      navigate(`/app/sessions/${id}/summary`, { replace: true })
+    }
+  }, [id, navigate, session.data?.status])
+
+  useEffect(() => {
+    if (!syncedInitial && session.data?.metrics?.duration_seconds) {
+      setSeconds(session.data.metrics.duration_seconds)
+      setSyncedInitial(true)
+    }
+  }, [session.data?.metrics?.duration_seconds, syncedInitial])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setPaused(true)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
 
   const pose = usePoseTracking(
     camera.videoRef,
@@ -66,6 +97,8 @@ export function LiveSessionPage() {
   }, [id, paused])
 
   const finishSession = async () => {
+    setIsFinishing(true)
+    setSaveError(false)
     try {
       await updateSession(id, {
         status: 'completed',
@@ -73,7 +106,9 @@ export function LiveSessionPage() {
       })
       navigate(`/app/sessions/${id}/summary`)
     } catch {
-      alert(t('session.saveFailed'))
+      setSaveError(true)
+    } finally {
+      setIsFinishing(false)
     }
   }
 
@@ -108,18 +143,18 @@ export function LiveSessionPage() {
 
   return (
     <div className="mx-auto max-w-[82rem] pb-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-5 rounded-[var(--radius-feature)] border border-emerald-950/10 bg-[var(--color-kg-night)] p-5 text-white shadow-[var(--shadow-floating)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-[-0.03em] text-white sm:text-3xl">
             {t('session.live')}
           </h1>
-          <p className="mt-1 flex items-center gap-2 text-sm text-teal-800">
-            <span className="size-2.5 rounded-full bg-teal-600" />
+          <p className="mt-2 flex items-center gap-2 text-sm text-white/70">
+            <span className="size-2.5 rounded-full bg-[var(--color-kg-accent)] shadow-[0_0_0_5px_rgb(223_243_108_/_0.10)]" />
             {t('session.technicalOnly')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 font-semibold tabular-nums text-slate-700 shadow-sm">
+          <div className="flex min-h-11 items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 font-semibold tabular-nums text-white shadow-sm">
             {formatDuration(seconds)}
           </div>
           <button
@@ -136,18 +171,47 @@ export function LiveSessionPage() {
           </button>
           <button
             className="kg-button-primary"
+            disabled={isFinishing}
             onClick={() => void finishSession()}
             type="button"
           >
-            <Square aria-hidden="true" size={18} />
+            {isFinishing ? (
+              <Loader2 aria-hidden="true" className="animate-spin" size={18} />
+            ) : (
+              <Square aria-hidden="true" size={18} />
+            )}
             {t('session.finish')}
           </button>
         </div>
-      </div>
+      </header>
+
+      {saveError && (
+        <div
+          className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-900"
+          role="alert"
+        >
+          <div className="flex items-center gap-2">
+            <CircleAlert
+              aria-hidden="true"
+              className="text-red-700"
+              size={18}
+            />
+            <p>{t('session.saveFailed')}</p>
+          </div>
+          <button
+            className="kg-button-secondary px-3 py-1.5 text-xs text-red-900 border-red-300 hover:bg-red-100"
+            disabled={isFinishing}
+            onClick={() => void finishSession()}
+            type="button"
+          >
+            {t('common.retry')}
+          </button>
+        </div>
+      )}
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_22rem] xl:grid-cols-[1fr_24rem]">
         <div className="flex flex-col gap-4">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-950 shadow-sm">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[var(--radius-feature)] border border-emerald-950/20 bg-slate-950 shadow-[var(--shadow-floating)]">
             {camera.state === 'ready' && (
               <CameraPoseLayer
                 canvasRef={cameraCanvasRef}
@@ -215,6 +279,7 @@ export function LiveSessionPage() {
             </div>
             <div className="p-5">
               <p
+                aria-label={t('session.technicalStatus')}
                 aria-live="polite"
                 className={`rounded-xl border px-4 py-3 text-sm font-semibold ${toneClasses[technicalStatus.tone]}`}
                 role="status"

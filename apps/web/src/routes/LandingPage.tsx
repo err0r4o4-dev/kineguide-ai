@@ -269,10 +269,10 @@ export function LandingPage() {
             <div className="mt-8 grid gap-4 lg:grid-cols-3">
               {capabilities.map(({ icon: Icon, title, body, href }) => (
                 <article
-                  className="flex min-h-64 flex-col rounded-[1.25rem] border border-kg-border bg-white p-6"
+                  className="kg-card kg-card-interactive flex min-h-64 flex-col p-6"
                   key={title}
                 >
-                  <span className="grid size-12 place-items-center rounded-2xl bg-kg-soft text-teal-700">
+                  <span className="grid size-12 place-items-center rounded-2xl bg-[var(--color-kg-night)] text-[var(--color-kg-accent)]">
                     <Icon aria-hidden="true" size={23} />
                   </span>
                   <h3 className="mt-5 text-lg font-bold text-slate-950">

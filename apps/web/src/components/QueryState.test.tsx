@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react'
 
+import '@/lib/i18n'
+
 import { QueryLoading } from './QueryState'
 
-it('does not render an in-app query loading screen', () => {
-  const { container } = render(<QueryLoading />)
+it('renders an accessible in-page loading state', () => {
+  render(<QueryLoading />)
 
-  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-  expect(container).toBeEmptyDOMElement()
+  expect(screen.getByRole('status')).toHaveTextContent('กำลังโหลด')
 })

@@ -50,13 +50,13 @@ export function DashboardPage() {
 
       {query.data && (
         <>
-          <section className="mt-7 grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.8fr)]">
+          <section className="mt-7 grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.8fr)]">
             <ActivityStartCard />
             <div className="flex flex-col gap-4">
               <AIChatCard />
               <div
                 aria-label={t('dashboard.activitySummary')}
-                className="kg-card grid min-h-24 grid-cols-3 divide-x divide-slate-200 overflow-hidden"
+                className="kg-card grid min-h-28 grid-cols-3 divide-x divide-slate-200/80 overflow-hidden"
                 role="group"
               >
                 <DashboardStat
@@ -93,24 +93,43 @@ function ActivityStartCard() {
   const { t } = useTranslation()
 
   return (
-    <article className="kg-card flex flex-col gap-6 overflow-hidden p-6 sm:p-8 md:flex-row md:items-center">
-      <div className="min-w-0 flex-1">
-        <span className="grid size-12 place-items-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-100">
-          <Monitor aria-hidden="true" size={24} />
+    <article className="relative isolate flex min-h-[23rem] flex-col justify-between overflow-hidden rounded-[var(--radius-feature)] border border-emerald-950/10 bg-[var(--color-kg-night)] p-6 text-white shadow-[var(--shadow-floating)] sm:p-8 md:flex-row md:items-center">
+      <span
+        aria-hidden="true"
+        className="absolute -right-16 -top-24 -z-10 size-72 rounded-full border-[3rem] border-white/5 bg-[var(--color-kg-accent)]/10"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute -bottom-32 left-1/3 -z-10 size-64 rounded-full bg-teal-300/10 blur-2xl"
+      />
+      <div className="min-w-0 flex-1 md:max-w-[62%]">
+        <span className="grid size-12 place-items-center rounded-xl bg-[var(--color-kg-accent)] text-[var(--color-kg-night)] shadow-lg shadow-black/10">
+          <Monitor aria-hidden="true" size={24} strokeWidth={2.3} />
         </span>
-        <h2 className="mt-5 text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
+        <h2 className="mt-5 text-3xl font-bold leading-tight tracking-[-0.04em] text-white sm:text-4xl">
           {t('dashboard.exploreTitle')}
         </h2>
-        <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
+        <p className="mt-4 text-base leading-7 text-white/75 sm:text-lg">
           {t('dashboard.exploreBody')}
         </p>
         <Link
-          className="kg-button-primary mt-6 min-h-12 w-full sm:w-auto"
+          className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-kg-accent-strong)] bg-[var(--color-kg-accent)] px-5 font-bold text-[var(--color-kg-night)] no-underline shadow-[0_12px_28px_rgb(0_0_0_/_0.18)] transition hover:bg-[var(--color-kg-accent-strong)] sm:w-auto"
           to="/app/monitor"
         >
           <Activity aria-hidden="true" size={20} />
           {t('dashboard.start')}
         </Link>
+      </div>
+      <div
+        aria-hidden="true"
+        className="relative mx-auto mt-8 grid size-48 shrink-0 place-items-center md:mt-0 md:size-56"
+      >
+        <span className="absolute inset-0 rounded-full border border-dashed border-white/25" />
+        <span className="absolute inset-5 rounded-full border border-white/15" />
+        <span className="absolute inset-10 animate-pulse rounded-full bg-teal-300/15 motion-reduce:animate-none" />
+        <span className="grid size-24 place-items-center rounded-[2rem] bg-white/10 text-[var(--color-kg-accent)] ring-1 ring-inset ring-white/20 backdrop-blur">
+          <Activity size={44} strokeWidth={1.6} />
+        </span>
       </div>
     </article>
   )
@@ -144,7 +163,7 @@ function RecentActivity({ sessions }: { sessions: PostureSession[] }) {
   const { t, i18n } = useTranslation()
 
   return (
-    <article className="kg-card p-5 sm:p-6">
+    <article className="kg-card overflow-hidden p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-slate-950 sm:text-xl">
           {t('dashboard.recent')}
@@ -186,9 +205,14 @@ function RecentActivity({ sessions }: { sessions: PostureSession[] }) {
           </Link>
         ))}
         {sessions.length === 0 && (
-          <p className="py-12 text-center text-sm text-slate-500">
-            {t('dashboard.noRecent')}
-          </p>
+          <div className="py-10 text-center">
+            <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-[var(--color-kg-soft)] text-[var(--color-kg-primary)]">
+              <Clock3 aria-hidden="true" size={22} />
+            </span>
+            <p className="mt-3 text-sm text-slate-500">
+              {t('dashboard.noRecent')}
+            </p>
+          </div>
         )}
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-500">
@@ -202,9 +226,9 @@ function AIChatCard() {
   const { t } = useTranslation()
 
   return (
-    <article className="kg-card flex flex-1 flex-col justify-center border-teal-200 bg-teal-50/60 p-5 sm:p-6">
+    <article className="kg-card flex flex-1 flex-col justify-center overflow-hidden border-teal-200 bg-[linear-gradient(135deg,#ffffff,#eaf7f1)] p-5 sm:p-6">
       <div className="flex gap-4">
-        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-teal-700 text-white shadow-sm">
+        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[var(--color-kg-night)] text-[var(--color-kg-accent)] shadow-sm">
           <MessageCircle aria-hidden="true" size={23} />
         </span>
         <div className="min-w-0">

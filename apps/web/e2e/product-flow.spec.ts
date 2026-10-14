@@ -251,6 +251,29 @@ test('new user completes registration and consent', async ({ page }) => {
   ).toBeVisible()
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 })
+    const homeHeaderWidthRatio = await page
+      .locator('.kg-public-header-content')
+      .evaluate(
+        (element) =>
+          element.getBoundingClientRect().width /
+          document.documentElement.clientWidth
+      )
+    const homeContentWidthRatio = await page
+      .locator('#landing-home .kg-landing-content')
+      .evaluate(
+        (element) =>
+          element.getBoundingClientRect().width /
+          document.documentElement.clientWidth
+      )
+    if (width >= 1024) {
+      expect(homeHeaderWidthRatio).toBeGreaterThan(0.69)
+      expect(homeHeaderWidthRatio).toBeLessThan(0.71)
+      expect(homeContentWidthRatio).toBeGreaterThan(0.69)
+      expect(homeContentWidthRatio).toBeLessThan(0.71)
+    } else {
+      expect(homeHeaderWidthRatio).toBeGreaterThan(0.89)
+      expect(homeContentWidthRatio).toBeGreaterThan(0.89)
+    }
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth
@@ -259,6 +282,15 @@ test('new user completes registration and consent', async ({ page }) => {
   }
   await page.setViewportSize({ width: 1280, height: 1000 })
   await page.getByRole('link', { name: 'เริ่มต้นใช้งาน', exact: true }).click()
+  const authWidthRatio = await page
+    .locator('main > .kg-content-width')
+    .evaluate(
+      (element) =>
+        element.getBoundingClientRect().width /
+        document.documentElement.clientWidth
+    )
+  expect(authWidthRatio).toBeGreaterThan(0.69)
+  expect(authWidthRatio).toBeLessThan(0.71)
   await page.getByLabel('ชื่อที่ใช้แสดง').fill('ผู้ใช้ทดสอบ')
   await page.getByLabel('อีเมล').fill('student@example.com')
   await page.getByLabel('รหัสผ่าน').fill('safe-demo-password')
@@ -267,6 +299,15 @@ test('new user completes registration and consent', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'การอนุญาตใช้กล้องและข้อมูล' })
   ).toBeVisible()
+  const consentWidthRatio = await page
+    .locator('.kg-content-width')
+    .evaluate(
+      (element) =>
+        element.getBoundingClientRect().width /
+        document.documentElement.clientWidth
+    )
+  expect(consentWidthRatio).toBeGreaterThan(0.69)
+  expect(consentWidthRatio).toBeLessThan(0.71)
   await page
     .getByLabel('ยอมรับการประมวลผลกล้องและการเก็บ session summary')
     .check()
@@ -290,6 +331,39 @@ test('new user completes registration and consent', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'ตั้งค่ากล้องสำหรับโหมดนั่ง' })
   ).toBeVisible()
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 })
+    await expect(
+      page.getByRole('navigation', { name: 'ขั้นตอนการตั้งค่ากล้อง' })
+    ).toBeVisible()
+    const contentWidthRatio = await page
+      .locator('#page-content')
+      .evaluate((element) => {
+        const parentWidth = element.parentElement?.getBoundingClientRect().width
+        if (!parentWidth) return 0
+        return element.getBoundingClientRect().width / parentWidth
+      })
+    if (width >= 1024) {
+      expect(contentWidthRatio).toBeGreaterThan(0.69)
+      expect(contentWidthRatio).toBeLessThan(0.71)
+    } else {
+      expect(contentWidthRatio).toBeGreaterThan(0.89)
+    }
+    const monitorWidthRatio = await page
+      .getByTestId('camera-setup-content')
+      .evaluate((element) => {
+        const parentWidth = element.parentElement?.getBoundingClientRect().width
+        if (!parentWidth) return 0
+        return element.getBoundingClientRect().width / parentWidth
+      })
+    expect(monitorWidthRatio).toBeGreaterThan(0.99)
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true)
+  }
+  await page.setViewportSize({ width: 1280, height: 1000 })
   await expect(
     page.getByLabel('ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ')
   ).not.toBeChecked()

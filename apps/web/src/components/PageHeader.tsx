@@ -12,18 +12,20 @@ export function PageHeader({
   actions?: ReactNode
 }) {
   return (
-    <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <header className="relative flex flex-col gap-5 border-b border-[var(--color-kg-border)] pb-6 sm:flex-row sm:items-end sm:justify-between sm:pb-7">
       <div className="min-w-0">
         {eyebrow && (
-          <p className="text-sm font-semibold tracking-wide text-teal-700">
+          <p className="inline-flex min-h-8 items-center rounded-full border border-teal-100 bg-white/80 px-3 text-xs font-bold uppercase tracking-[0.12em] text-teal-800 shadow-sm">
             {eyebrow}
           </p>
         )}
-        <h1 className="mt-1 max-w-4xl text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-950 sm:text-[2.5rem]">
+        <h1
+          className={`${eyebrow ? 'mt-3' : ''} max-w-4xl text-[2rem] font-bold leading-[1.2] tracking-[-0.04em] text-[var(--color-kg-ink)] sm:text-[2.65rem]`}
+        >
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-2 max-w-3xl text-[0.95rem] leading-7 text-slate-600 sm:text-base">
+          <p className="mt-3 max-w-3xl text-[0.95rem] leading-7 text-[var(--color-kg-muted)] sm:text-base">
             {subtitle}
           </p>
         )}

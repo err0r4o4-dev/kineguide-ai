@@ -124,6 +124,10 @@ describe('ChatPage', () => {
         'พิมพ์สนทนาต่อเนื่องโดยใช้ประวัติในบัญชีนี้ ข้อความจะเก็บจนกว่าคุณจะลบบทสนทนาหรือลบบัญชี'
       )
     ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'ช่วยเหลือ' })).toHaveAttribute(
+      'href',
+      '/app/help'
+    )
 
     await user.click(
       await screen.findByRole('button', { name: 'เริ่มบทสนทนาใหม่' })

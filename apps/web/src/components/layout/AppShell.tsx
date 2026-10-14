@@ -78,8 +78,8 @@ export function AppShell() {
           }
           hidden={Boolean(pageError)}
         >
-          <header className="sticky top-0 z-[var(--z-index-sticky)] flex h-[var(--layout-mobile-nav,4.5rem)] items-center justify-between border-b border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 backdrop-blur-[var(--blur-glass)] saturate-[var(--glass-saturation)] lg:hidden">
-            <Brand compact />
+          <header className="sticky top-0 z-[var(--z-index-sticky)] flex h-[var(--layout-mobile-nav,4.5rem)] items-center justify-between border-b border-white/10 bg-[var(--color-kg-night)] px-4 text-white shadow-lg shadow-emerald-950/10 lg:hidden">
+            <Brand compact inverted />
             <div className="flex items-center gap-2">
               <LanguageButton />
               <button
@@ -106,16 +106,16 @@ export function AppShell() {
 
           <aside
             id="app-navigation"
-            className={`fixed bottom-0 left-0 top-[var(--layout-mobile-nav,4.5rem)] z-[var(--z-index-navigation)] flex w-[var(--layout-sidebar,280px)] flex-col overflow-y-auto border-r border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 py-5 shadow-[var(--shadow-floating)] backdrop-blur-[var(--blur-glass)] saturate-[var(--glass-saturation)] transition-transform duration-[var(--motion-standard)] ease-[var(--ease-standard)] sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:px-6 lg:py-7 lg:shadow-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
+            className={`fixed bottom-0 left-0 top-[var(--layout-mobile-nav,4.5rem)] z-[var(--z-index-navigation)] flex w-[var(--layout-sidebar,280px)] flex-col overflow-y-auto border-r border-[var(--color-kg-border)] bg-white/95 px-4 py-5 shadow-[var(--shadow-floating)] backdrop-blur-xl transition-transform duration-[var(--motion-standard)] ease-[var(--ease-standard)] sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:bg-[linear-gradient(180deg,#ffffff_0%,#f7faf7_70%,#eef5f0_100%)] lg:px-6 lg:py-7 lg:shadow-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
           >
-            <div className="hidden lg:block">
+            <div className="hidden rounded-[1.35rem] border border-teal-100 bg-white p-3 shadow-sm lg:block">
               <Brand />
             </div>
-            <nav aria-label={t('nav.main')} className="space-y-1.5 lg:mt-10">
+            <nav aria-label={t('nav.main')} className="space-y-1.5 lg:mt-8">
               {links.map(({ to, key, icon: Icon, end }) => (
                 <NavLink
                   className={({ isActive }) =>
-                    `ui-transition pressable flex min-h-11 items-center gap-3.5 rounded-[var(--radius-control)] px-4 text-[0.95rem] font-semibold no-underline ${isActive ? 'bg-[var(--color-kg-primary)] text-white shadow-[var(--shadow-card)]' : 'text-[var(--color-kg-muted)] hover:bg-[var(--color-kg-soft)] hover:text-[var(--color-kg-ink)]'}`
+                    `ui-transition pressable relative flex min-h-12 items-center gap-3.5 rounded-[var(--radius-control)] px-4 text-[0.95rem] font-semibold no-underline ${isActive ? 'bg-[var(--color-kg-night)] text-white shadow-[0_10px_24px_rgb(18_53_45_/_0.18)] before:absolute before:-left-1 before:h-7 before:w-1 before:rounded-full before:bg-[var(--color-kg-accent)]' : 'text-[var(--color-kg-muted)] hover:bg-[var(--color-kg-soft)] hover:text-[var(--color-kg-ink)]'}`
                   }
                   end={end}
                   key={to}
@@ -132,11 +132,11 @@ export function AppShell() {
             </div>
           </aside>
 
-          <main className="min-w-0 px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10 xl:px-12">
+          <main className="kg-app-main min-w-0 overflow-hidden py-6 sm:py-8 lg:py-10">
             <a className="sr-only focus:not-sr-only" href="#page-content">
               {t('common.skip')}
             </a>
-            <div className="mx-auto max-w-[82rem]" id="page-content">
+            <div className="kg-content-width" id="page-content">
               <Outlet />
             </div>
           </main>

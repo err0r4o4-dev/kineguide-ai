@@ -35,20 +35,20 @@ export function SessionSummaryPage() {
         {t('nav.history')}
       </Link>
 
-      <section className="kg-card mt-5 p-6 sm:p-8">
-        <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+      <section className="kg-card mt-5 overflow-hidden">
+        <div className="flex flex-col gap-5 border-b border-white/10 bg-[var(--color-kg-night)] p-6 text-white sm:flex-row sm:items-start sm:justify-between sm:p-8">
           <div className="flex gap-4">
-            <span className="grid size-14 place-items-center rounded-2xl bg-teal-50 text-teal-800">
+            <span className="grid size-14 place-items-center rounded-2xl bg-[var(--color-kg-accent)] text-[var(--color-kg-night)]">
               <CheckCircle2 aria-hidden="true" size={29} />
             </span>
             <div>
-              <p className="text-sm font-semibold text-teal-700">
+              <p className="text-sm font-semibold text-[var(--color-kg-accent)]">
                 {t('session.summary')}
               </p>
-              <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.025em]">
+              <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.035em] text-white">
                 {t('dashboard.todayName')}
               </h1>
-              <p className="mt-2 text-sm text-slate-600">
+              <p className="mt-2 text-sm text-white/65">
                 {t('dashboard.manual')}
               </p>
             </div>
@@ -60,7 +60,7 @@ export function SessionSummaryPage() {
           </span>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-[minmax(0,18rem)_1fr]">
+        <div className="grid gap-4 p-6 sm:p-8 md:grid-cols-[minmax(0,18rem)_1fr]">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <Clock3 aria-hidden="true" className="text-teal-700" size={24} />
             <p className="mt-3 text-sm text-slate-500">
@@ -88,7 +88,7 @@ export function SessionSummaryPage() {
           </div>
         </div>
 
-        <p className="mt-6 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+        <p className="mx-6 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 sm:mx-8">
           <ShieldCheck
             aria-hidden="true"
             className="mt-0.5 shrink-0"
@@ -97,7 +97,7 @@ export function SessionSummaryPage() {
           {t('dashboard.manual')}
         </p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-6">
+        <div className="mx-6 mt-6 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-6 sm:mx-8">
           <CalendarDays
             aria-hidden="true"
             className="text-slate-400"
@@ -113,7 +113,7 @@ export function SessionSummaryPage() {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 p-6 pt-5 sm:p-8 sm:pt-5">
           <Link className="kg-button-primary" to="/app/monitor">
             {t('dashboard.start')}
           </Link>

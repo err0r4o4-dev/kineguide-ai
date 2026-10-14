@@ -1,12 +1,17 @@
-export const languagePreferenceKey = 'kineguide-language'
-
 export type SupportedLanguage = 'th' | 'en'
 
-export function getLanguagePreference(): SupportedLanguage | null {
-  const language = window.localStorage.getItem(languagePreferenceKey)
-  return language === 'th' || language === 'en' ? language : null
-}
+export function getLanguagePreference(): SupportedLanguage {
+  try {
+    const languages = navigator.languages
+    const preferences = languages?.length ? languages : [navigator.language]
 
-export function saveLanguagePreference(language: SupportedLanguage) {
-  window.localStorage.setItem(languagePreferenceKey, language)
+    for (const preference of preferences) {
+      const language = preference.toLowerCase().split('-')[0]
+      if (language === 'th' || language === 'en') return language
+    }
+  } catch {
+    return 'en'
+  }
+
+  return 'en'
 }

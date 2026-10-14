@@ -262,6 +262,7 @@ const th = {
   },
   consent: {
     title: 'การอนุญาตใช้กล้องและข้อมูล',
+    choicesTitle: 'ตัวเลือกการอนุญาต',
     intro: 'โปรดอ่านและเลือกด้วยตนเองก่อนที่เบราว์เซอร์จะขอสิทธิ์กล้อง',
     cameraTitle: 'ประมวลผลกล้องในอุปกรณ์',
     cameraBody:
@@ -346,6 +347,28 @@ const th = {
     setupTitle: 'ตั้งค่ากล้องสำหรับโหมดนั่ง',
     setupSubtitle:
       'วางอุปกรณ์บนพื้นผิวมั่นคง ให้เห็นศีรษะ ไหล่ สะโพก และเข่าชัดเจน',
+    eyebrow: 'ตรวจความพร้อมก่อนเริ่ม',
+    stepsLabel: 'ขั้นตอนการตั้งค่ากล้อง',
+    stepItemLabel: 'ขั้นตอนที่ {{number}} {{label}}',
+    stepSetup: 'ตั้งค่ากล้อง',
+    stepCheck: 'ตรวจสอบภาพ',
+    stepStart: 'เริ่มติดตาม',
+    processingTitle: 'ประมวลผลกล้องบนอุปกรณ์',
+    processingBody:
+      'ระบบใช้ภาพชั่วคราวเพื่อตรวจความพร้อมของจุดอ้างอิงเท่านั้น ไม่มีการบันทึกหรืออัปโหลดวิดีโอ',
+    frameHead: 'เห็นศีรษะ',
+    frameUpperBody: 'เห็นไหล่และลำตัว',
+    frameLowerBody: 'เห็นสะโพกและเข่า',
+    setupTipsLabel: 'คำแนะนำสำหรับการตั้งค่ากล้อง',
+    tipLightTitle: 'แสงสว่างเพียงพอ',
+    tipLightBody: 'หลีกเลี่ยงแสงย้อนและจัดให้ร่างกายสว่างสม่ำเสมอ',
+    tipDeviceTitle: 'วางอุปกรณ์ให้มั่นคง',
+    tipDeviceBody: 'ใช้ขาตั้งหรือพื้นผิวราบเพื่อให้มุมภาพคงที่',
+    tipFrameTitle: 'ให้เห็นทั้งตัว',
+    tipFrameBody: 'จัดเฟรมให้เห็นศีรษะ ไหล่ ลำตัว สะโพก และเข่า',
+    tipClothingTitle: 'สวมเสื้อผ้าที่มองเห็นแนวร่างกาย',
+    tipClothingBody:
+      'หลีกเลี่ยงเสื้อผ้าที่หลวมมากเพื่อให้ตรวจพบจุดอ้างอิงได้ชัดขึ้น',
     seatedConfirmation:
       'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ',
     seatedConfirmationBody:
@@ -388,9 +411,22 @@ const th = {
       'ระบบจึงไม่เริ่มการเปรียบเทียบ ไม่สร้างคะแนน และไม่ตัดสินว่าการเคลื่อนไหวถูกหรือผิด',
     researchBoundary:
       'วิธีนี้เป็นเครื่องมือวัดเพื่อการวิจัย ไม่ใช่หลักฐานว่าการเคลื่อนไหวปลอดภัยหรือถูกต้องทางคลินิก และหน้านี้ไม่เปิดกล้องหรือเก็บข้อมูลจุดอ้างอิง',
-    researchSource: 'เปิดบทความงานวิจัยต้นฉบับ'
+    researchSource: 'เปิดบทความงานวิจัยต้นฉบับ',
+    expiredNotice:
+      'Baseline หมดอายุแล้ว (เกิน 8 ชั่วโมง) แนะนำให้ปรับเทียบใหม่',
+    framingShiftNotice: 'มุมกล้องหรือระยะห่างเปลี่ยนไป แนะนำให้ปรับเทียบใหม่'
   },
   session: {
+    goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
+    noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
+    feedback: {
+      general: 'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจาก Baseline',
+      shoulderSlopeDegrees: 'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจาก Baseline',
+      headTiltDegrees: 'สังเกตเห็นศีรษะเอียงต่อเนื่องจาก Baseline',
+      torsoInclinationDegrees: 'สังเกตเห็นลำตัวเอียงต่อเนื่องจาก Baseline',
+      eyeShoulderDistanceRatio:
+        'สังเกตเห็นการโน้มศีรษะ/ลำตัวต่อเนื่องจาก Baseline'
+    },
     live: 'ติดตามขณะนั่งแบบเรียลไทม์',
     technicalOnly: 'โหมดนั่งเชิงเทคนิค ไม่ใช่การประเมินทางคลินิก',
     timer: 'ระยะเวลา',
@@ -453,6 +489,11 @@ const th = {
     needsAdjustmentDuration: 'ระยะเวลาควรปรับท่า',
     alertCount: 'จำนวนการแจ้งเตือน',
     breakCount: 'จำนวนการหยุดพัก',
+    breakDueTitle: 'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ',
+    breakDueBody:
+      'คุณนั่งต่อเนื่องมาเป็นเวลา {{minutes}} นาทีแล้ว แนะนำให้ลุกขึ้นยืดเส้นยืดสายหรือพักสายตา',
+    breakAcknowledge: 'พักเรียบร้อยแล้ว',
+    breakSnooze: 'เตือนอีกครั้งใน 5 นาที',
     longestSitting: 'ช่วงเวลานั่งนานที่สุด',
     headAlignment: 'ศีรษะ: ปกติ',
     shoulderAlignment: 'ไหล่: สมดุล',
@@ -518,6 +559,8 @@ const th = {
     connectedAccounts: 'บัญชีที่เชื่อมต่อ',
     connectedAccountsBody:
       'เชื่อม Google หรือ Facebook เพื่อใช้เป็นวิธีเข้าสู่ระบบ โดยระบบไม่เก็บ token ของผู้ให้บริการ',
+    noConnectedProviders:
+      'ยังไม่มีผู้ให้บริการเข้าสู่ระบบภายนอกที่เปิดใช้งานในสภาพแวดล้อมนี้',
     connect: 'เชื่อม {{provider}}',
     disconnect: 'ยกเลิกการเชื่อม {{provider}}',
     connected: 'เชื่อมแล้ว',
@@ -815,6 +858,7 @@ const en: typeof th = {
   },
   consent: {
     title: 'Camera and data consent',
+    choicesTitle: 'Consent choices',
     intro: 'Read and choose before the browser asks for camera access.',
     cameraTitle: 'On-device camera processing',
     cameraBody:
@@ -901,6 +945,29 @@ const en: typeof th = {
     setupTitle: 'Seated Mode Camera Setup',
     setupSubtitle:
       'Place your device securely so your head, shoulders, hips, and knees are visible.',
+    eyebrow: 'Check your setup before starting',
+    stepsLabel: 'Camera setup steps',
+    stepItemLabel: 'Step {{number}} {{label}}',
+    stepSetup: 'Set up camera',
+    stepCheck: 'Check preview',
+    stepStart: 'Start monitoring',
+    processingTitle: 'On-device camera processing',
+    processingBody:
+      'Temporary frames are used only to check landmark readiness. Video is not recorded or uploaded.',
+    frameHead: 'Head visible',
+    frameUpperBody: 'Shoulders and torso visible',
+    frameLowerBody: 'Hips and knees visible',
+    setupTipsLabel: 'Camera setup guidance',
+    tipLightTitle: 'Use even lighting',
+    tipLightBody: 'Avoid backlighting and keep your body evenly lit.',
+    tipDeviceTitle: 'Keep the device stable',
+    tipDeviceBody:
+      'Use a stand or flat surface to keep the camera angle steady.',
+    tipFrameTitle: 'Keep your body in frame',
+    tipFrameBody: 'Frame your head, shoulders, torso, hips, and knees.',
+    tipClothingTitle: 'Wear clothes that show your outline',
+    tipClothingBody:
+      'Avoid very loose clothing so required landmarks are easier to detect.',
     seatedConfirmation:
       'I will use the camera while seated and frame the required landmarks as instructed',
     seatedConfirmationBody:
@@ -945,9 +1012,25 @@ const en: typeof th = {
       'The system therefore does not start comparison, produce a score, or label movement as correct or incorrect.',
     researchBoundary:
       'This is a research measurement method, not proof that movement is safe or clinically correct. This page does not start the camera or retain landmark data.',
-    researchSource: 'Open the original research article'
+    researchSource: 'Open the original research article',
+    expiredNotice:
+      'Personal baseline has expired (over 8h). Recalibration recommended.',
+    framingShiftNotice:
+      'Camera angle or distance shifted. Recalibration recommended.'
   },
   session: {
+    goodAlignment: 'Good alignment relative to personal baseline',
+    noBaseline: 'Personal baseline not established',
+    feedback: {
+      general: 'Sustained posture deviation observed relative to baseline',
+      shoulderSlopeDegrees:
+        'Sustained shoulder tilt observed relative to baseline',
+      headTiltDegrees: 'Sustained head tilt observed relative to baseline',
+      torsoInclinationDegrees:
+        'Sustained torso inclination observed relative to baseline',
+      eyeShoulderDistanceRatio:
+        'Sustained forward head posture observed relative to baseline'
+    },
     live: 'Live Seated Monitoring',
     technicalOnly: 'Technical seated mode, not a clinical assessment',
     timer: 'Duration',
@@ -1014,6 +1097,11 @@ const en: typeof th = {
     needsAdjustmentDuration: 'Needs Adjustment Time',
     alertCount: 'Alert Count',
     breakCount: 'Break Count',
+    breakDueTitle: 'Time for an ergonomic break',
+    breakDueBody:
+      'You have been seated for {{minutes}} minutes. Consider standing up, stretching, or resting your eyes.',
+    breakAcknowledge: 'Break completed',
+    breakSnooze: 'Remind me in 5 min',
     longestSitting: 'Longest Sitting Period',
     headAlignment: 'Head: Normal',
     shoulderAlignment: 'Shoulders: Balanced',
@@ -1078,6 +1166,8 @@ const en: typeof th = {
     connectedAccounts: 'Connected accounts',
     connectedAccountsBody:
       'Connect Google or Facebook as a sign-in method. Provider tokens are not stored.',
+    noConnectedProviders:
+      'No external sign-in provider is enabled in this environment.',
     connect: 'Connect {{provider}}',
     disconnect: 'Disconnect {{provider}}',
     connected: 'Connected',
@@ -1120,7 +1210,7 @@ void i18n
   .use(initReactI18next)
   .init({
     resources: { th: { translation: th }, en: { translation: en } },
-    lng: getLanguagePreference() ?? 'th',
+    lng: getLanguagePreference(),
     fallbackLng: 'en',
     interpolation: { escapeValue: false }
   })

@@ -45,6 +45,10 @@ describe('PublicHeader', () => {
     expect(
       screen.getByRole('link', { name: 'เริ่มต้นใช้งาน' })
     ).toHaveAttribute('href', '/register')
+    expect(screen.getByRole('link', { name: 'เข้าสู่ระบบ' })).toHaveAttribute(
+      'href',
+      '/login'
+    )
     expect(screen.getByRole('link', { name: 'หน้าแรก' })).toHaveAttribute(
       'href',
       '#landing-home'
