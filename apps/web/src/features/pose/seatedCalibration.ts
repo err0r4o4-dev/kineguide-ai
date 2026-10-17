@@ -1,4 +1,4 @@
-import type { RawSeatedMetrics } from './seatedMetrics'
+import type { RawSeatedMetrics, SeatedFramingMode } from './seatedMetrics'
 
 export interface MetricSummary {
   readonly mean: number
@@ -12,16 +12,20 @@ export interface PersonalBaseline {
   readonly metrics: {
     readonly shoulderSlopeDegrees: MetricSummary
     readonly headTiltDegrees: MetricSummary
-    readonly torsoInclinationDegrees: MetricSummary
+    /** `null` for an `upper_body` baseline, where hips were not observed. */
+    readonly torsoInclinationDegrees: MetricSummary | null
     readonly eyeShoulderDistanceRatio: MetricSummary
   }
   readonly framing: {
     readonly shoulderWidth: number
+    readonly mode: SeatedFramingMode
   }
 }
 
+export type BaselineMetricKey = keyof PersonalBaseline['metrics']
+
 export interface MetricDeviation {
-  readonly metric: keyof PersonalBaseline['metrics']
+  readonly metric: BaselineMetricKey
   readonly observed: number
   readonly baselineMean: number
   readonly diff: number
@@ -45,13 +49,23 @@ export const MIN_CALIBRATION_SAMPLES = 15
 export const BASELINE_MAX_AGE_MS = 8 * 60 * 60 * 1000 // 8 hours
 export const FRAMING_SHIFT_THRESHOLD = 0.35 // 35% shoulder width change indicates camera/distance move
 
-// Default tolerances for deviation from personal baseline (in standard deviation units or minimum degree thresholds)
-const TOLERANCES = {
-  shoulderSlopeDegrees: { minDegreeDiff: 5, zThreshold: 2.5 },
-  headTiltDegrees: { minDegreeDiff: 6, zThreshold: 2.5 },
-  torsoInclinationDegrees: { minDegreeDiff: 7, zThreshold: 2.5 },
-  eyeShoulderDistanceRatio: { minRatioDiff: 0.15, zThreshold: 2.5 }
-} as const
+/**
+ * Product engineering tolerances for deviation from the user's own baseline.
+ *
+ * A metric counts as deviated only when it exceeds BOTH an absolute minimum
+ * difference (filters landmark jitter) and a z-score against the user's
+ * calibration variability. These are configurable product values chosen to
+ * suppress noise; they are NOT medical or ergonomic thresholds, carry no
+ * clinical meaning, and have not been clinically validated.
+ */
+export const BASELINE_TOLERANCES: Readonly<
+  Record<BaselineMetricKey, { minDiff: number; zThreshold: number }>
+> = {
+  shoulderSlopeDegrees: { minDiff: 5, zThreshold: 2.5 }, // degrees
+  headTiltDegrees: { minDiff: 6, zThreshold: 2.5 }, // degrees
+  torsoInclinationDegrees: { minDiff: 7, zThreshold: 2.5 }, // degrees
+  eyeShoulderDistanceRatio: { minDiff: 0.15, zThreshold: 2.5 } // unitless ratio
+}
 
 function calculateSummary(values: readonly number[]): MetricSummary {
   if (values.length === 0) {
@@ -69,6 +83,9 @@ function calculateSummary(values: readonly number[]): MetricSummary {
 
 /**
  * Creates a personal calibration baseline from collected raw seated metric samples.
+ *
+ * Returns `null` when there are too few samples or when the samples mix
+ * framing modes (the user moved in or out of a full-torso view mid-calibration).
  */
 export function buildPersonalBaseline(
   samples: readonly RawSeatedMetrics[],
@@ -78,28 +95,64 @@ export function buildPersonalBaseline(
     return null
   }
 
-  const shoulderSlopes = samples.map((s) => s.shoulderSlopeDegrees)
-  const headTilts = samples.map((s) => s.headTiltDegrees)
-  const torsoInclinations = samples.map((s) => s.torsoInclinationDegrees)
-  const eyeRatios = samples.map((s) => s.eyeShoulderDistanceRatio)
-  const shoulderWidths = samples.map((s) => s.shoulderWidth)
+  const mode = samples[0].framingMode
+  if (samples.some((s) => s.framingMode !== mode)) {
+    return null
+  }
 
+  const torsoValues = samples
+    .map((s) => s.torsoInclinationDegrees)
+    .filter((v): v is number => v !== null)
   const avgWidth =
-    shoulderWidths.reduce((sum, w) => sum + w, 0) / shoulderWidths.length
+    samples.reduce((sum, s) => sum + s.shoulderWidth, 0) / samples.length
 
   return {
     id: `baseline-${calibratedAt}`,
     calibratedAt,
     sampleCount: samples.length,
     metrics: {
-      shoulderSlopeDegrees: calculateSummary(shoulderSlopes),
-      headTiltDegrees: calculateSummary(headTilts),
-      torsoInclinationDegrees: calculateSummary(torsoInclinations),
-      eyeShoulderDistanceRatio: calculateSummary(eyeRatios)
+      shoulderSlopeDegrees: calculateSummary(
+        samples.map((s) => s.shoulderSlopeDegrees)
+      ),
+      headTiltDegrees: calculateSummary(samples.map((s) => s.headTiltDegrees)),
+      torsoInclinationDegrees:
+        mode === 'full_torso' && torsoValues.length === samples.length
+          ? calculateSummary(torsoValues)
+          : null,
+      eyeShoulderDistanceRatio: calculateSummary(
+        samples.map((s) => s.eyeShoulderDistanceRatio)
+      )
     },
     framing: {
-      shoulderWidth: Number(avgWidth.toFixed(4))
+      shoulderWidth: Number(avgWidth.toFixed(4)),
+      mode
     }
+  }
+}
+
+function evaluateMetric(
+  metric: BaselineMetricKey,
+  observed: number,
+  summary: MetricSummary
+): { z: number; deviation: MetricDeviation | null } {
+  const tolerance = BASELINE_TOLERANCES[metric]
+  const diff = Math.abs(observed - summary.mean)
+  const z = summary.stdDev > 0 ? diff / summary.stdDev : 0
+  const deviated =
+    diff > tolerance.minDiff &&
+    (summary.stdDev > 0 ? z > tolerance.zThreshold : true)
+  return {
+    z,
+    deviation: deviated
+      ? {
+          metric,
+          observed,
+          baselineMean: summary.mean,
+          diff: Number(
+            diff.toFixed(metric === 'eyeShoulderDistanceRatio' ? 3 : 2)
+          )
+        }
+      : null
   }
 }
 
@@ -122,6 +175,14 @@ export function evaluateAgainstBaseline(
     }
   }
 
+  // A different framing mode means the camera view no longer matches the baseline.
+  if (current.framingMode !== baseline.framing.mode) {
+    return {
+      status: 'recalibration_recommended',
+      reason: 'framing_shift'
+    }
+  }
+
   // Check significant framing shift (user stood up, changed chair, or moved camera)
   const widthRatioDiff =
     Math.abs(current.shoulderWidth - baseline.framing.shoulderWidth) /
@@ -133,101 +194,41 @@ export function evaluateAgainstBaseline(
     }
   }
 
-  const deviations: MetricDeviation[] = []
-  let maxZ = 0
-
-  // Check shoulder slope
-  const shoulderDiff = Math.abs(
-    current.shoulderSlopeDegrees - baseline.metrics.shoulderSlopeDegrees.mean
-  )
-  const shoulderZ =
-    baseline.metrics.shoulderSlopeDegrees.stdDev > 0
-      ? shoulderDiff / baseline.metrics.shoulderSlopeDegrees.stdDev
-      : 0
-  maxZ = Math.max(maxZ, shoulderZ)
-  const shoulderDeviated =
-    baseline.metrics.shoulderSlopeDegrees.stdDev > 0
-      ? shoulderDiff > TOLERANCES.shoulderSlopeDegrees.minDegreeDiff &&
-        shoulderZ > TOLERANCES.shoulderSlopeDegrees.zThreshold
-      : shoulderDiff > TOLERANCES.shoulderSlopeDegrees.minDegreeDiff
-  if (shoulderDeviated) {
-    deviations.push({
+  const checks: Array<{
+    metric: BaselineMetricKey
+    observed: number | null
+    summary: MetricSummary | null
+  }> = [
+    {
       metric: 'shoulderSlopeDegrees',
       observed: current.shoulderSlopeDegrees,
-      baselineMean: baseline.metrics.shoulderSlopeDegrees.mean,
-      diff: Number(shoulderDiff.toFixed(2))
-    })
-  }
-
-  // Check head tilt
-  const headDiff = Math.abs(
-    current.headTiltDegrees - baseline.metrics.headTiltDegrees.mean
-  )
-  const headZ =
-    baseline.metrics.headTiltDegrees.stdDev > 0
-      ? headDiff / baseline.metrics.headTiltDegrees.stdDev
-      : 0
-  maxZ = Math.max(maxZ, headZ)
-  const headDeviated =
-    baseline.metrics.headTiltDegrees.stdDev > 0
-      ? headDiff > TOLERANCES.headTiltDegrees.minDegreeDiff &&
-        headZ > TOLERANCES.headTiltDegrees.zThreshold
-      : headDiff > TOLERANCES.headTiltDegrees.minDegreeDiff
-  if (headDeviated) {
-    deviations.push({
+      summary: baseline.metrics.shoulderSlopeDegrees
+    },
+    {
       metric: 'headTiltDegrees',
       observed: current.headTiltDegrees,
-      baselineMean: baseline.metrics.headTiltDegrees.mean,
-      diff: Number(headDiff.toFixed(2))
-    })
-  }
-
-  // Check torso inclination
-  const torsoDiff = Math.abs(
-    current.torsoInclinationDegrees -
-      baseline.metrics.torsoInclinationDegrees.mean
-  )
-  const torsoZ =
-    baseline.metrics.torsoInclinationDegrees.stdDev > 0
-      ? torsoDiff / baseline.metrics.torsoInclinationDegrees.stdDev
-      : 0
-  maxZ = Math.max(maxZ, torsoZ)
-  const torsoDeviated =
-    baseline.metrics.torsoInclinationDegrees.stdDev > 0
-      ? torsoDiff > TOLERANCES.torsoInclinationDegrees.minDegreeDiff &&
-        torsoZ > TOLERANCES.torsoInclinationDegrees.zThreshold
-      : torsoDiff > TOLERANCES.torsoInclinationDegrees.minDegreeDiff
-  if (torsoDeviated) {
-    deviations.push({
+      summary: baseline.metrics.headTiltDegrees
+    },
+    {
       metric: 'torsoInclinationDegrees',
       observed: current.torsoInclinationDegrees,
-      baselineMean: baseline.metrics.torsoInclinationDegrees.mean,
-      diff: Number(torsoDiff.toFixed(2))
-    })
-  }
-
-  // Check eye to shoulder ratio (forward head / slouching)
-  const eyeDiff = Math.abs(
-    current.eyeShoulderDistanceRatio -
-      baseline.metrics.eyeShoulderDistanceRatio.mean
-  )
-  const eyeZ =
-    baseline.metrics.eyeShoulderDistanceRatio.stdDev > 0
-      ? eyeDiff / baseline.metrics.eyeShoulderDistanceRatio.stdDev
-      : 0
-  maxZ = Math.max(maxZ, eyeZ)
-  const eyeDeviated =
-    baseline.metrics.eyeShoulderDistanceRatio.stdDev > 0
-      ? eyeDiff > TOLERANCES.eyeShoulderDistanceRatio.minRatioDiff &&
-        eyeZ > TOLERANCES.eyeShoulderDistanceRatio.zThreshold
-      : eyeDiff > TOLERANCES.eyeShoulderDistanceRatio.minRatioDiff
-  if (eyeDeviated) {
-    deviations.push({
+      summary: baseline.metrics.torsoInclinationDegrees
+    },
+    {
+      // Forward head / slouching changes the eye-to-shoulder distance ratio.
       metric: 'eyeShoulderDistanceRatio',
       observed: current.eyeShoulderDistanceRatio,
-      baselineMean: baseline.metrics.eyeShoulderDistanceRatio.mean,
-      diff: Number(eyeDiff.toFixed(3))
-    })
+      summary: baseline.metrics.eyeShoulderDistanceRatio
+    }
+  ]
+
+  const deviations: MetricDeviation[] = []
+  let maxZ = 0
+  for (const { metric, observed, summary } of checks) {
+    if (observed === null || summary === null) continue
+    const result = evaluateMetric(metric, observed, summary)
+    maxZ = Math.max(maxZ, result.z)
+    if (result.deviation) deviations.push(result.deviation)
   }
 
   if (deviations.length > 0) {

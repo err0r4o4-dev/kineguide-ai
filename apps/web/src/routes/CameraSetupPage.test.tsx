@@ -213,6 +213,7 @@ describe('CameraSetupPage', () => {
         break_count: null,
         longest_sitting_seconds: null
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,
       retention_until: '2027-08-28T09:00:00Z'

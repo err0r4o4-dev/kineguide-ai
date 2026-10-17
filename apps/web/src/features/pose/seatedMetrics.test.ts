@@ -90,15 +90,54 @@ describe('seatedMetrics', () => {
     }
   })
 
-  it('rejects non-finite landmark coordinates (NaN or Infinity)', () => {
+  it('rejects non-finite required landmark coordinates (NaN or Infinity)', () => {
     const landmarks = createSyntheticPose({
-      23: { x: NaN, y: 0.65, visibility: 0.95 }
+      11: { x: NaN, y: 0.35, visibility: 0.95 }
     })
     const result = calculateSeatedMetrics(landmarks)
 
     expect(result.status).toBe('insufficient_landmarks')
     if (result.status === 'insufficient_landmarks') {
-      expect(result.missingIndices).toContain(23)
+      expect(result.missingIndices).toContain(11)
+    }
+  })
+
+  it('reports full_torso framing when both hips are reliable', () => {
+    const result = calculateSeatedMetrics(createSyntheticPose())
+
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.framingMode).toBe('full_torso')
+  })
+
+  it('assesses upper-body framing when hips are hidden by a desk', () => {
+    const landmarks = createSyntheticPose({
+      23: { visibility: 0.1 },
+      24: { visibility: 0.1 }
+    })
+    const result = calculateSeatedMetrics(landmarks)
+
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.framingMode).toBe('upper_body')
+    expect(result.metrics.torsoInclinationDegrees).toBeNull()
+    expect(result.metrics.shoulderSlopeDegrees).toBe(0)
+    expect(result.metrics.eyeShoulderDistanceRatio).toBeGreaterThan(0)
+  })
+
+  it('falls back to upper_body when only one hip or a non-finite hip is available', () => {
+    const oneHip = calculateSeatedMetrics(
+      createSyntheticPose({ 24: { visibility: 0.2 } })
+    )
+    const nanHip = calculateSeatedMetrics(
+      createSyntheticPose({ 23: { x: NaN } })
+    )
+
+    for (const result of [oneHip, nanHip]) {
+      expect(result.status).toBe('valid')
+      if (result.status !== 'valid') continue
+      expect(result.metrics.framingMode).toBe('upper_body')
+      expect(result.metrics.torsoInclinationDegrees).toBeNull()
     }
   })
 

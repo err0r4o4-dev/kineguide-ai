@@ -30,12 +30,17 @@
 | :--- | :--- | :--- | :--- | :--- |
 | `shoulderSlopeDegrees` | Left Shoulder (11), Right Shoulder (12) | $\theta = \arctan\left(\frac{y_{12} - y_{11}}{x_{12} - x_{11}}\right) \times \frac{180}{\pi}$ | องศา (deg) | ความเอียงของแนวระดับไหล่ทั้งสองข้างเทียบกับแนวราบ (ค่า 0 = ขนานแนวราบ) |
 | `headTiltDegrees` | Left Ear (7) หรือ Eye (2), Right Ear (8) หรือ Eye (5) | $\theta = \arctan\left(\frac{y_{8} - y_{7}}{x_{8} - x_{7}}\right) \times \frac{180}{\pi}$ | องศา (deg) | ความเอียงของศีรษะเทียบกับแนวราบ |
-| `torsoInclinationDegrees` | Midpoint Shoulders $\frac{P_{11}+P_{12}}{2}$, Midpoint Hips $\frac{P_{23}+P_{24}}{2}$ | มุมของเวกเตอร์แกนลำตัวเทียบกับแนวดิ่ง ($y$-axis) | องศา (deg) | ความเอียงของแนวกระดูกสันหลัง/ลำตัวส่วนบนเทียบกับแนวดิ่ง |
+| `torsoInclinationDegrees` | Midpoint Shoulders $\frac{P_{11}+P_{12}}{2}$, Midpoint Hips $\frac{P_{23}+P_{24}}{2}$ (เฉพาะโหมด `full_torso`) | มุมของเวกเตอร์แกนลำตัวเทียบกับแนวดิ่ง ($y$-axis) | องศา (deg) | ความเอียงของแนวกระดูกสันหลัง/ลำตัวส่วนบนเทียบกับแนวดิ่ง (เป็น `null` ในโหมด `upper_body`) |
 | `eyeShoulderDistanceRatio` | Eye Midpoint, Shoulder Midpoint, Shoulder Width | $\frac{\text{dist}(\text{Eyes}, \text{Shoulders})}{\text{dist}(P_{11}, P_{12})}$ | ไร้หน่วย (Ratio) | สัดส่วนระยะห่างระหว่างระดับสายตากับแนวไหล่เทียบกับความกว้างไหล่ ใช้ตรวจจับการก้มศีรษะหรือการห่อไหล่เทียบกับ Baseline |
+
+### โหมดมุมมอง (Framing Modes)
+
+1. **`upper_body` (ค่าเริ่มต้นเมื่อโต๊ะบังสะโพก):** ใช้จุดอ้างอิง `[0, 2, 5, 11, 12]` รองรับกล้องหน้า/แล็ปท็อปทั่วไป ตัวชี้วัดลำตัว (`torsoInclinationDegrees`) เป็น `null`
+2. **`full_torso`:** เมื่อจุดสะโพก `[23, 24]` มีความเชื่อมั่น $\ge 0.5$ ระบบจะเพิ่มการสังเกตมุมเอียงของลำตัวโดยอัตโนมัติ
 
 ---
 
-## 4. โพรโทคอลการสอบเทียบเฉพาะบุคคล (Personal Calibration Protocol)
+## 4. โพรโทคอลการสอบเทียบเฉพาะบุคคล (Personal Calibration Protocol) — `seated-baseline-v1`
 
 1. **ขั้นตอนการสอบเทียบ (Calibration Steps):**
    - ผู้ใช้นั่งในท่าที่สบายและตั้งตรงในตำแหน่งทำงานปกติ

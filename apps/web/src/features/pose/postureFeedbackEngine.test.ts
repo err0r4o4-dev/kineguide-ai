@@ -47,9 +47,52 @@ describe('PostureFeedbackEngine', () => {
       headTiltDegrees: 0,
       torsoInclinationDegrees: 0,
       eyeShoulderDistanceRatio: 0.8,
-      shoulderWidth: 0.2
+      shoulderWidth: 0.2,
+      framingMode: 'full_torso' as const
     }))
     baseline = buildPersonalBaseline(baselineSamples, 1000000)!
+  })
+
+  it('reports low_confidence when a person is visible but required landmarks are unreliable', () => {
+    engine.setBaseline(baseline)
+    const result = engine.update(
+      createSyntheticPose({ 11: { visibility: 0.2 } }),
+      1000000
+    )
+
+    expect(result.state).toBe('low_confidence')
+    expect(result.feedbackMessageKey).toBe('session.poseAdjust')
+  })
+
+  it('reports unable_to_assess for geometrically impossible coordinates', () => {
+    engine.setBaseline(baseline)
+    const result = engine.update(
+      createSyntheticPose({
+        11: { y: 0.75 },
+        12: { y: 0.75 },
+        23: { y: 0.55 },
+        24: { y: 0.55 }
+      }),
+      1000000
+    )
+
+    expect(result.state).toBe('unable_to_assess')
+  })
+
+  it('refuses to assess when multiple people are in frame and resets the debounce timer', () => {
+    engine.setBaseline(baseline)
+    const tiltedPose = createSyntheticPose({
+      12: { x: 0.6, y: 0.28, visibility: 0.95 }
+    })
+    engine.update(tiltedPose, 1000000)
+
+    const multiple = engine.update(null, 1003000, { multiplePeople: true })
+    expect(multiple.state).toBe('unable_to_assess')
+    expect(multiple.feedbackMessageKey).toBe('session.poseMultiple')
+
+    // The earlier deviation must not carry over across the ambiguous frame.
+    const afterwards = engine.update(tiltedPose, 1005500)
+    expect(afterwards.state).toBe('good_alignment')
   })
 
   it('reports unable_to_assess when no baseline is set', () => {
@@ -106,6 +149,15 @@ describe('PostureFeedbackEngine', () => {
     )
     expect(sustainedResult.state).toBe('needs_adjustment')
     expect(sustainedResult.deviatedMetric).toBe('shoulderSlopeDegrees')
+    expect(sustainedResult.alertTriggered).toBe(true)
+
+    // Continuing in the alerted state does not trigger a second alert.
+    const continued = engine.update(
+      tiltedPose,
+      1001000 + SUSTAINED_DEVIATION_THRESHOLD_MS + 600
+    )
+    expect(continued.state).toBe('needs_adjustment')
+    expect(continued.alertTriggered).toBeUndefined()
   })
 
   it('applies hysteresis before returning from needs_adjustment to good_alignment', () => {

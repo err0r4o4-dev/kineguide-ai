@@ -81,6 +81,7 @@ describe('LiveSessionPage', () => {
         break_count: null,
         longest_sitting_seconds: null
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,
       retention_until: '2027-08-28T09:00:00Z'
@@ -174,11 +175,32 @@ describe('LiveSessionPage', () => {
 
     expect(product.updateSession).toHaveBeenCalledWith('session-1', {
       status: 'completed',
-      metrics: { duration_seconds: 0 }
+      metrics: {
+        duration_seconds: 0,
+        good_alignment_seconds: null,
+        needs_adjustment_seconds: null,
+        alert_count: null,
+        break_count: null
+      },
+      posture_summary: null
     })
     expect(
       await screen.findByRole('heading', { name: 'Summary' })
     ).toBeInTheDocument()
+  })
+
+  it('allows the user to start calibration from the baseline section', async () => {
+    await i18n.changeLanguage('th')
+    const user = userEvent.setup()
+    renderRoute()
+
+    const calibrateButton = await screen.findByRole('button', {
+      name: 'ปรับเทียบ Baseline'
+    })
+    expect(calibrateButton).toBeEnabled()
+
+    await user.click(calibrateButton)
+    expect(await screen.findByText(/กำลังเก็บค่า Baseline/)).toBeInTheDocument()
   })
 
   it('pauses and resumes the session tracking and timer controls', async () => {
@@ -216,6 +238,7 @@ describe('LiveSessionPage', () => {
         break_count: null,
         longest_sitting_seconds: null
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: '2026-08-28T09:02:00Z',
       retention_until: '2027-08-28T09:02:00Z'
@@ -242,6 +265,7 @@ describe('LiveSessionPage', () => {
         break_count: null,
         longest_sitting_seconds: null
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,
       retention_until: '2027-08-28T09:00:00Z'
@@ -284,6 +308,7 @@ describe('LiveSessionPage', () => {
         break_count: null,
         longest_sitting_seconds: null
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: '2026-08-28T09:01:40Z',
       retention_until: '2027-08-28T09:01:40Z'

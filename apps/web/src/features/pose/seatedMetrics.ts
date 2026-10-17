@@ -1,12 +1,21 @@
 import type { PoseLandmark } from './poseGeometry'
 import { TECHNICAL_VISIBILITY_GATE } from './poseGeometry'
 
+/**
+ * `upper_body`: typical desk/laptop webcam — head and shoulders visible, hips
+ * hidden by the desk. Torso inclination cannot be observed.
+ * `full_torso`: both hips are reliable, so torso inclination is also observed.
+ */
+export type SeatedFramingMode = 'upper_body' | 'full_torso'
+
 export interface RawSeatedMetrics {
   readonly shoulderSlopeDegrees: number
   readonly headTiltDegrees: number
-  readonly torsoInclinationDegrees: number
+  /** `null` when hips are not reliably visible (`upper_body` framing). */
+  readonly torsoInclinationDegrees: number | null
   readonly eyeShoulderDistanceRatio: number
   readonly shoulderWidth: number
+  readonly framingMode: SeatedFramingMode
 }
 
 export type SeatedMetricsResult =
@@ -22,9 +31,10 @@ export type SeatedMetricsResult =
       readonly status: 'invalid_coordinates'
     }
 
-export const SEATED_METRICS_REQUIRED_LANDMARKS = [
-  0, 2, 5, 11, 12, 23, 24
-] as const
+/** Nose, both eyes, both shoulders: the minimum upper-body set. */
+export const SEATED_METRICS_REQUIRED_LANDMARKS = [0, 2, 5, 11, 12] as const
+/** Hips: optional; enables torso inclination when both are reliable. */
+export const SEATED_METRICS_OPTIONAL_TORSO_LANDMARKS = [23, 24] as const
 
 function toDegrees(radians: number): number {
   return (radians * 180) / Math.PI
@@ -47,7 +57,11 @@ function isValidLandmark(
 
 /**
  * Calculates deterministic observational posture metrics for a seated individual
- * from normalized MediaPipe pose landmarks.
+ * from normalized MediaPipe pose landmarks (x right, y down, both in [0, 1]).
+ *
+ * The live pipeline detects on a mirrored frame, so anatomical left/right are
+ * swapped consistently. Metrics are only ever compared with a baseline produced
+ * by the same pipeline, so the mirroring does not affect the comparison.
  *
  * This function returns observational geometry only and makes no medical diagnosis
  * or universal correctness judgment.
@@ -80,8 +94,6 @@ export function calculateSeatedMetrics(
   const rightEye = landmarks[5]
   const leftShoulder = landmarks[11]
   const rightShoulder = landmarks[12]
-  const leftHip = landmarks[23]
-  const rightHip = landmarks[24]
 
   const shoulderDx = rightShoulder.x - leftShoulder.x
   const shoulderDy = rightShoulder.y - leftShoulder.y
@@ -106,22 +118,29 @@ export function calculateSeatedMetrics(
   const headAngle = toDegrees(Math.atan2(headDy, headDx))
   const headTiltDegrees = Number(headAngle.toFixed(2))
 
-  // 3. Torso inclination: midpoint of shoulders vs midpoint of hips relative to vertical
   const midShoulderX = (leftShoulder.x + rightShoulder.x) / 2
   const midShoulderY = (leftShoulder.y + rightShoulder.y) / 2
-  const midHipX = (leftHip.x + rightHip.x) / 2
-  const midHipY = (leftHip.y + rightHip.y) / 2
 
-  const torsoDx = midShoulderX - midHipX
-  const torsoDy = midHipY - midShoulderY // In image coordinates, hip Y > shoulder Y
+  // 3. Torso inclination (optional): shoulder midpoint vs hip midpoint relative to vertical
+  const leftHip = landmarks[23]
+  const rightHip = landmarks[24]
+  const hasTorso = isValidLandmark(leftHip) && isValidLandmark(rightHip)
+  let torsoInclinationDegrees: number | null = null
 
-  if (torsoDy <= 0) {
-    // Shoulders below or level with hips indicates non-seated or inverted posture
-    return { status: 'invalid_coordinates' }
+  if (hasTorso) {
+    const midHipX = (leftHip.x + rightHip.x) / 2
+    const midHipY = (leftHip.y + rightHip.y) / 2
+    const torsoDx = midShoulderX - midHipX
+    const torsoDy = midHipY - midShoulderY // In image coordinates, hip Y > shoulder Y
+
+    if (torsoDy <= 0) {
+      // Shoulders below or level with hips indicates non-seated or inverted posture
+      return { status: 'invalid_coordinates' }
+    }
+
+    const torsoInclination = toDegrees(Math.atan2(Math.abs(torsoDx), torsoDy))
+    torsoInclinationDegrees = Number(torsoInclination.toFixed(2))
   }
-
-  const torsoInclination = toDegrees(Math.atan2(Math.abs(torsoDx), torsoDy))
-  const torsoInclinationDegrees = Number(torsoInclination.toFixed(2))
 
   // 4. Eye to shoulder ratio: distance between eye midpoint and shoulder midpoint normalized by shoulder width
   const midEyeX = (leftEye.x + rightEye.x) / 2
@@ -141,7 +160,8 @@ export function calculateSeatedMetrics(
       headTiltDegrees,
       torsoInclinationDegrees,
       eyeShoulderDistanceRatio,
-      shoulderWidth: Number(shoulderWidth.toFixed(4))
+      shoulderWidth: Number(shoulderWidth.toFixed(4)),
+      framingMode: hasTorso ? 'full_torso' : 'upper_body'
     }
   }
 }

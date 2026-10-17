@@ -1,11 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 import {
+  AlertTriangle,
   ArrowLeft,
   CalendarDays,
+  Camera,
   CheckCircle2,
   Clock3,
+  Coffee,
   EyeOff,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
@@ -24,6 +28,8 @@ export function SessionSummaryPage() {
 
   if (query.isLoading) return <QueryLoading />
   if (query.isError) return <QueryError retry={() => void query.refetch()} />
+
+  const postureSummary = query.data?.posture_summary
 
   return (
     <div className="mx-auto max-w-4xl pb-4">
@@ -71,21 +77,95 @@ export function SessionSummaryPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="flex items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-600">
-                <EyeOff aria-hidden="true" size={22} />
-              </span>
-              <div>
-                <h2 className="font-bold text-slate-900">
-                  {t('session.summaryUnavailableTitle')}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {t('session.summaryUnavailableBody')}
-                </p>
+          {postureSummary ? (
+            <div className="rounded-2xl border border-teal-200 bg-teal-50/50 p-5">
+              <div className="flex items-center justify-between border-b border-teal-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles
+                    aria-hidden="true"
+                    className="text-teal-700"
+                    size={20}
+                  />
+                  <h2 className="font-bold text-teal-950">
+                    {t('session.postureStatus')}
+                  </h2>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-semibold text-teal-900">
+                  <Camera aria-hidden="true" size={12} />
+                  {t(
+                    postureSummary.framing_mode === 'full_torso'
+                      ? 'calibration.modeFullTorso'
+                      : 'calibration.modeUpperBody'
+                  )}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <p className="text-xs text-slate-500">
+                    {t('session.goodAlignmentDuration')}
+                  </p>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-teal-800">
+                    {formatDuration(postureSummary.good_alignment_seconds)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <p className="text-xs text-slate-500">
+                    {t('session.needsAdjustmentDuration')}
+                  </p>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-amber-800">
+                    {formatDuration(postureSummary.needs_adjustment_seconds)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                    <AlertTriangle
+                      aria-hidden="true"
+                      size={12}
+                      className="text-amber-600"
+                    />
+                    <span>{t('session.alertCount')}</span>
+                  </div>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-slate-900">
+                    {postureSummary.alert_count}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                    <Coffee
+                      aria-hidden="true"
+                      size={12}
+                      className="text-teal-700"
+                    />
+                    <span>{t('session.breakCount')}</span>
+                  </div>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-slate-900">
+                    {postureSummary.break_count}
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs leading-5 text-slate-600">
+                {t('session.observationalDisclaimer')}
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="flex items-start gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-600">
+                  <EyeOff aria-hidden="true" size={22} />
+                </span>
+                <div>
+                  <h2 className="font-bold text-slate-900">
+                    {t('session.summaryUnavailableTitle')}
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {t('session.summaryUnavailableBody')}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <p className="mx-6 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 sm:mx-8">

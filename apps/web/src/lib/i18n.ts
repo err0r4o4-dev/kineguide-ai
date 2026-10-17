@@ -414,11 +414,28 @@ const th = {
     researchSource: 'เปิดบทความงานวิจัยต้นฉบับ',
     expiredNotice:
       'Baseline หมดอายุแล้ว (เกิน 8 ชั่วโมง) แนะนำให้ปรับเทียบใหม่',
-    framingShiftNotice: 'มุมกล้องหรือระยะห่างเปลี่ยนไป แนะนำให้ปรับเทียบใหม่'
+    framingShiftNotice: 'มุมกล้องหรือระยะห่างเปลี่ยนไป แนะนำให้ปรับเทียบใหม่',
+    calibrate: 'ปรับเทียบ Baseline',
+    recalibrate: 'ปรับเทียบใหม่',
+    calibrating: 'กำลังเก็บค่า Baseline ({{current}}/{{total}})...',
+    calibratedSummary: 'บันทึก Baseline แล้ว ({{mode}})',
+    modeUpperBody: 'มุมมองส่วนบน (ไหล่/ศีรษะ)',
+    modeFullTorso: 'มุมมองลำตัวเต็มส่วน',
+    failedNotice: 'การปรับเทียบไม่สำเร็จ: {{reason}}',
+    reasonNotEnough: 'จุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งๆ ในตำแหน่งปกติ',
+    reasonMixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่',
+    notCalibratedHint:
+      'นั่งตัวตรงในตำแหน่งทำงานปกติ แล้วกดปรับเทียบเพื่อสร้าง Baseline เฉพาะบุคคลของคุณ'
   },
   session: {
     goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
     noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
+    postureStatus: 'สถานะท่าทาง',
+    unassessedDuration: 'ระยะเวลาที่ยังประเมินไม่ได้',
+    framingMode: 'โหมดมุมมองกล้อง',
+    calibratedAt: 'ปรับเทียบเมื่อ',
+    observationalDisclaimer:
+      'การประเมินนี้เทียบกับ Baseline ส่วนบุคคลของคุณเพื่อส่งเสริมความตระหนักรู้ ไม่ใช่การวินิจฉัยทางการแพทย์',
     feedback: {
       general: 'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจาก Baseline',
       shoulderSlopeDegrees: 'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจาก Baseline',
@@ -1016,11 +1033,28 @@ const en: typeof th = {
     expiredNotice:
       'Personal baseline has expired (over 8h). Recalibration recommended.',
     framingShiftNotice:
-      'Camera angle or distance shifted. Recalibration recommended.'
+      'Camera angle or distance shifted. Recalibration recommended.',
+    calibrate: 'Calibrate Baseline',
+    recalibrate: 'Recalibrate',
+    calibrating: 'Collecting baseline samples ({{current}}/{{total}})...',
+    calibratedSummary: 'Baseline established ({{mode}})',
+    modeUpperBody: 'Upper body (shoulders/head)',
+    modeFullTorso: 'Full torso',
+    failedNotice: 'Calibration failed: {{reason}}',
+    reasonNotEnough: 'Landmarks were interrupted. Please sit still and retry.',
+    reasonMixed: 'Framing changed mid-calibration. Please retry.',
+    notCalibratedHint:
+      'Sit upright in your normal working posture and calibrate to establish your personal baseline.'
   },
   session: {
     goodAlignment: 'Good alignment relative to personal baseline',
     noBaseline: 'Personal baseline not established',
+    postureStatus: 'Posture Status',
+    unassessedDuration: 'Unassessed Time',
+    framingMode: 'Framing Mode',
+    calibratedAt: 'Calibrated at',
+    observationalDisclaimer:
+      'This observational assessment compares with your personal baseline for ergonomic awareness and is not a medical diagnosis.',
     feedback: {
       general: 'Sustained posture deviation observed relative to baseline',
       shoulderSlopeDegrees:

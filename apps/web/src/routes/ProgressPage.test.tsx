@@ -49,7 +49,7 @@ describe('ProgressPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'สถิติท่าทาง' })
     ).toBeVisible()
-    expect(screen.getByText('15')).toBeVisible() // sessions
+    expect(screen.getAllByText('15')[0]).toBeVisible() // sessions
     expect(screen.getByText('5')).toBeVisible() // streak
 
     // Test chart filters

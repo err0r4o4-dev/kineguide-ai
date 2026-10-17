@@ -146,3 +146,110 @@ func TestObservationActivityRejectsManualCycles(t *testing.T) {
 	assert.Empty(t, store.updatedSession.ID)
 	assert.Contains(t, response.Body.String(), `"code":"VALIDATION_ERROR"`)
 }
+
+func TestUpdateSessionPostureSummaryValidation(t *testing.T) {
+	testCases := []struct {
+		name       string
+		body       string
+		expectCode int
+	}{
+		{
+			name: "valid upper_body posture summary",
+			body: `{
+				"status": "completed",
+				"manual_cycles": 0,
+				"elapsed_seconds": 60,
+				"posture_summary": {
+					"good_alignment_seconds": 40,
+					"needs_adjustment_seconds": 15,
+					"unassessed_seconds": 5,
+					"alert_count": 2,
+					"break_count": 0,
+					"framing_mode": "upper_body",
+					"method_version": "seated-baseline-v1"
+				}
+			}`,
+			expectCode: http.StatusOK,
+		},
+		{
+			name: "rejects posture durations exceeding elapsed seconds",
+			body: `{
+				"status": "completed",
+				"manual_cycles": 0,
+				"elapsed_seconds": 30,
+				"posture_summary": {
+					"good_alignment_seconds": 25,
+					"needs_adjustment_seconds": 10,
+					"unassessed_seconds": 0,
+					"alert_count": 1,
+					"break_count": 0,
+					"framing_mode": "upper_body",
+					"method_version": "seated-baseline-v1"
+				}
+			}`,
+			expectCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "rejects unapproved framing mode",
+			body: `{
+				"status": "completed",
+				"manual_cycles": 0,
+				"elapsed_seconds": 30,
+				"posture_summary": {
+					"good_alignment_seconds": 20,
+					"needs_adjustment_seconds": 5,
+					"unassessed_seconds": 5,
+					"alert_count": 1,
+					"break_count": 0,
+					"framing_mode": "side_view",
+					"method_version": "seated-baseline-v1"
+				}
+			}`,
+			expectCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "rejects unapproved method version",
+			body: `{
+				"status": "completed",
+				"manual_cycles": 0,
+				"elapsed_seconds": 30,
+				"posture_summary": {
+					"good_alignment_seconds": 20,
+					"needs_adjustment_seconds": 5,
+					"unassessed_seconds": 5,
+					"alert_count": 1,
+					"break_count": 0,
+					"framing_mode": "upper_body",
+					"method_version": "custom-v2"
+				}
+			}`,
+			expectCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "allows null posture summary",
+			body: `{
+				"status": "completed",
+				"manual_cycles": 0,
+				"elapsed_seconds": 30,
+				"posture_summary": null
+			}`,
+			expectCode: http.StatusOK,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			store := &clinicalFlowStore{session: product.Session{
+				ID:              "864cb7ae-64dd-4db4-8200-12b44e5bcab1",
+				UserID:          chatTestUserID,
+				ActivitySlug:    "seated-posture-demo",
+				MeasurementMode: "observation",
+			}}
+			router := clinicalFlowRouter(t, store, technicalFeedbackStub{})
+			response := httptest.NewRecorder()
+
+			router.ServeHTTP(response, authenticatedChatRequest(t, http.MethodPatch, "/v1/sessions/864cb7ae-64dd-4db4-8200-12b44e5bcab1", tc.body))
+			require.Equal(t, tc.expectCode, response.Code)
+		})
+	}
+}

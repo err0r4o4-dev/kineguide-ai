@@ -45,6 +45,7 @@ describe('SessionSummaryPage', () => {
         break_count: 1,
         longest_sitting_seconds: 1800 // 30m
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: '2026-08-28T10:00:00Z',
       retention_until: '2027-08-28T10:00:00Z'
@@ -81,6 +82,7 @@ describe('SessionSummaryPage', () => {
         break_count: 0,
         longest_sitting_seconds: 60
       },
+      posture_summary: null,
       started_at: '2026-08-28T09:00:00Z',
       completed_at: null,
       retention_until: '2027-08-28T09:00:00Z'
@@ -92,5 +94,50 @@ describe('SessionSummaryPage', () => {
       await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
     ).toBeVisible()
     expect(screen.getByText('หยุดก่อนเสร็จ')).toBeVisible()
+  })
+
+  it('renders real posture aggregates when posture_summary is available', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(product.getSession).mockResolvedValue({
+      id: 'session-1',
+      status: 'completed',
+      metrics: {
+        duration_seconds: 3600,
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: 2400,
+        needs_adjustment_seconds: 900,
+        alert_count: 4,
+        break_count: 2,
+        longest_sitting_seconds: null
+      },
+      posture_summary: {
+        good_alignment_seconds: 2400,
+        needs_adjustment_seconds: 900,
+        unassessed_seconds: 300,
+        alert_count: 4,
+        break_count: 2,
+        framing_mode: 'upper_body',
+        method_version: 'seated-baseline-v1'
+      },
+      started_at: '2026-08-28T09:00:00Z',
+      completed_at: '2026-08-28T10:00:00Z',
+      retention_until: '2027-08-28T10:00:00Z'
+    })
+
+    renderRoute()
+
+    expect(
+      await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
+    ).toBeVisible()
+    expect(screen.getByText('สถานะท่าทาง')).toBeVisible()
+    expect(screen.getByText('มุมมองส่วนบน (ไหล่/ศีรษะ)')).toBeVisible()
+    expect(screen.getByText('40:00')).toBeVisible() // 2400s
+    expect(screen.getByText('15:00')).toBeVisible() // 900s
+    expect(screen.getByText('4')).toBeVisible() // alert_count
+    expect(screen.getByText('2')).toBeVisible() // break_count
+    expect(
+      screen.queryByText('ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้')
+    ).not.toBeInTheDocument()
   })
 })

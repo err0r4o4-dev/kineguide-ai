@@ -18,17 +18,27 @@ export interface PostureFeedbackUpdate {
   readonly state: PostureFeedbackState
   readonly feedbackMessageKey: string
   readonly deviatedMetric?: string
+  /** True only on the update where a debounced alert begins. */
+  readonly alertTriggered?: boolean
   readonly evaluation?: PostureAlignmentEvaluation
   readonly rawMetrics?: RawSeatedMetrics
 }
 
 export const SUSTAINED_DEVIATION_THRESHOLD_MS = 5000 // 5 seconds of sustained deviation to alert
 export const REALIGNMENT_STABILITY_THRESHOLD_MS = 2000 // 2 seconds of good alignment to clear alert
-export const DISCONNECT_RESET_THRESHOLD_MS = 2000 // 2 seconds of lost pose resets deviation timer
+export const DISCONNECT_RESET_THRESHOLD_MS = 2000 // 2 seconds without an assessable pose resets deviation timer
+
+export interface PostureFeedbackInput {
+  /** More than one person detected: never assess one person from a group. */
+  readonly multiplePeople?: boolean
+}
 
 /**
  * Deterministic posture feedback engine implementing temporal smoothing, debounce,
  * and hysteresis over raw MediaPipe seated metrics relative to a personal baseline.
+ *
+ * Timing values are configurable product engineering choices to suppress
+ * transient movement; they are not medical thresholds.
  *
  * This engine operates in-browser, is non-diagnostic, and does not require an LLM.
  */
@@ -37,7 +47,7 @@ export class PostureFeedbackEngine {
   private currentState: PostureFeedbackState = 'unable_to_assess'
   private deviationStartTime: number | null = null
   private realignmentStartTime: number | null = null
-  private lastPoseTime: number | null = null
+  private lastAssessableTime: number | null = null
   private lastDeviatedMetric: string | undefined
 
   public setBaseline(baseline: PersonalBaseline | null): void {
@@ -53,30 +63,50 @@ export class PostureFeedbackEngine {
     this.currentState = this.baseline ? 'good_alignment' : 'unable_to_assess'
     this.deviationStartTime = null
     this.realignmentStartTime = null
-    this.lastPoseTime = null
+    this.lastAssessableTime = null
     this.lastDeviatedMetric = undefined
+  }
+
+  private clearTemporalState(state: PostureFeedbackState): void {
+    this.deviationStartTime = null
+    this.realignmentStartTime = null
+    this.lastDeviatedMetric = undefined
+    this.currentState = state
+  }
+
+  /** Resets debounce timers once the pose has been unassessable for too long. */
+  private markUnassessable(
+    timestamp: number,
+    state: PostureFeedbackState
+  ): void {
+    if (
+      this.lastAssessableTime !== null &&
+      timestamp - this.lastAssessableTime > DISCONNECT_RESET_THRESHOLD_MS
+    ) {
+      this.clearTemporalState(state)
+    }
   }
 
   public update(
     landmarks: readonly PoseLandmark[] | null | undefined,
-    timestamp: number = Date.now()
+    timestamp: number = Date.now(),
+    input: PostureFeedbackInput = {}
   ): PostureFeedbackUpdate {
-    if (!landmarks || landmarks.length === 0) {
-      if (
-        this.lastPoseTime !== null &&
-        timestamp - this.lastPoseTime > DISCONNECT_RESET_THRESHOLD_MS
-      ) {
-        this.deviationStartTime = null
-        this.realignmentStartTime = null
-        this.currentState = 'not_visible'
+    if (input.multiplePeople) {
+      this.clearTemporalState('unable_to_assess')
+      return {
+        state: 'unable_to_assess',
+        feedbackMessageKey: 'session.poseMultiple'
       }
+    }
+
+    if (!landmarks || landmarks.length === 0) {
+      this.markUnassessable(timestamp, 'not_visible')
       return {
         state: 'not_visible',
         feedbackMessageKey: 'session.poseMissing'
       }
     }
-
-    this.lastPoseTime = timestamp
 
     if (!this.baseline) {
       this.currentState = 'unable_to_assess'
@@ -87,12 +117,23 @@ export class PostureFeedbackEngine {
     }
 
     const metricsResult = calculateSeatedMetrics(landmarks)
+    if (metricsResult.status === 'insufficient_landmarks') {
+      // A person is present but required landmarks are unreliable.
+      this.markUnassessable(timestamp, 'low_confidence')
+      return {
+        state: 'low_confidence',
+        feedbackMessageKey: 'session.poseAdjust'
+      }
+    }
     if (metricsResult.status !== 'valid') {
+      this.markUnassessable(timestamp, 'unable_to_assess')
       return {
         state: 'unable_to_assess',
         feedbackMessageKey: 'session.poseAdjust'
       }
     }
+
+    this.lastAssessableTime = timestamp
 
     const evaluation = evaluateAgainstBaseline(
       metricsResult.metrics,
@@ -141,6 +182,7 @@ export class PostureFeedbackEngine {
           state: 'needs_adjustment',
           feedbackMessageKey: `session.feedback.${this.lastDeviatedMetric ?? 'general'}`,
           deviatedMetric: this.lastDeviatedMetric,
+          alertTriggered: true,
           evaluation,
           rawMetrics: metricsResult.metrics
         }

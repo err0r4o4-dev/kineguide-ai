@@ -15,8 +15,19 @@ function createSample(
     torsoInclinationDegrees: 0,
     eyeShoulderDistanceRatio: 0.8,
     shoulderWidth: 0.2,
+    framingMode: 'full_torso',
     ...overrides
   }
+}
+
+function createUpperBodySample(
+  overrides: Partial<RawSeatedMetrics> = {}
+): RawSeatedMetrics {
+  return createSample({
+    torsoInclinationDegrees: null,
+    framingMode: 'upper_body',
+    ...overrides
+  })
 }
 
 describe('seatedCalibration', () => {
@@ -45,7 +56,62 @@ describe('seatedCalibration', () => {
     expect(baseline.sampleCount).toBe(20)
     expect(baseline.calibratedAt).toBe(1000000)
     expect(baseline.framing.shoulderWidth).toBe(0.22)
-    expect(baseline.metrics.torsoInclinationDegrees.mean).toBe(2)
+    expect(baseline.metrics.torsoInclinationDegrees?.mean).toBe(2)
+    expect(baseline.framing.mode).toBe('full_torso')
+  })
+
+  it('rejects calibration samples that mix framing modes', () => {
+    const samples = [
+      ...Array.from({ length: 10 }, () => createSample()),
+      ...Array.from({ length: 10 }, () => createUpperBodySample())
+    ]
+    expect(buildPersonalBaseline(samples)).toBeNull()
+  })
+
+  it('builds an upper-body baseline without torso inclination', () => {
+    const samples = Array.from({ length: 20 }, () => createUpperBodySample())
+    const baseline = buildPersonalBaseline(samples, 1000000)
+
+    expect(baseline?.framing.mode).toBe('upper_body')
+    expect(baseline?.metrics.torsoInclinationDegrees).toBeNull()
+  })
+
+  it('evaluates upper-body posture and detects a forward head change', () => {
+    const baseline = buildPersonalBaseline(
+      Array.from({ length: 20 }, () => createUpperBodySample()),
+      1000000
+    )!
+
+    expect(
+      evaluateAgainstBaseline(createUpperBodySample(), baseline, 1060000).status
+    ).toBe('good_alignment')
+
+    const leaning = evaluateAgainstBaseline(
+      createUpperBodySample({ eyeShoulderDistanceRatio: 0.55 }),
+      baseline,
+      1060000
+    )
+    expect(leaning.status).toBe('needs_adjustment')
+    if (leaning.status === 'needs_adjustment') {
+      expect(leaning.deviations[0]?.metric).toBe('eyeShoulderDistanceRatio')
+    }
+  })
+
+  it('recommends recalibration when framing mode differs from the baseline', () => {
+    const baseline = buildPersonalBaseline(
+      Array.from({ length: 20 }, () => createSample()),
+      1000000
+    )!
+
+    const evaluation = evaluateAgainstBaseline(
+      createUpperBodySample(),
+      baseline,
+      1060000
+    )
+    expect(evaluation).toEqual({
+      status: 'recalibration_recommended',
+      reason: 'framing_shift'
+    })
   })
 
   it('evaluates current posture as good_alignment when matching baseline', () => {

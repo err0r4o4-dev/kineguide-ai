@@ -633,14 +633,28 @@ func (a *productAPI) createSession(c *gin.Context) {
 
 func (a *productAPI) updateSession(c *gin.Context) {
 	var request struct {
-		Status            string `json:"status"`
-		ManualCycles      *int   `json:"manual_cycles"`
-		ManualRepetitions *int   `json:"manual_repetitions"`
-		ElapsedSeconds    int    `json:"elapsed_seconds"`
+		Status            string                  `json:"status"`
+		ManualCycles      *int                    `json:"manual_cycles"`
+		ManualRepetitions *int                    `json:"manual_repetitions"`
+		ElapsedSeconds    int                     `json:"elapsed_seconds"`
+		PostureSummary    *product.PostureSummary `json:"posture_summary"`
 	}
 	if err := c.ShouldBindJSON(&request); err != nil || !oneOf(request.Status, "active", "completed", "stopped") || (request.ManualCycles == nil && request.ManualRepetitions == nil) || request.ElapsedSeconds < 0 || request.ElapsedSeconds > 86400 {
 		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Session values are outside the accepted range.")
 		return
+	}
+	if ps := request.PostureSummary; ps != nil {
+		if ps.GoodAlignmentSeconds < 0 || ps.GoodAlignmentSeconds > 86400 ||
+			ps.NeedsAdjustmentSeconds < 0 || ps.NeedsAdjustmentSeconds > 86400 ||
+			ps.UnassessedSeconds < 0 || ps.UnassessedSeconds > 86400 ||
+			ps.AlertCount < 0 || ps.AlertCount > 10000 ||
+			ps.BreakCount < 0 || ps.BreakCount > 1000 ||
+			!oneOf(ps.FramingMode, "upper_body", "full_torso") ||
+			ps.MethodVersion != "seated-baseline-v1" ||
+			ps.GoodAlignmentSeconds+ps.NeedsAdjustmentSeconds+ps.UnassessedSeconds > request.ElapsedSeconds {
+			writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Posture summary values are outside the accepted range.")
+			return
+		}
 	}
 	manualCycles := 0
 	if request.ManualCycles != nil {
@@ -670,7 +684,15 @@ func (a *productAPI) updateSession(c *gin.Context) {
 		writeError(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "Manual cycles are not supported for this activity.")
 		return
 	}
-	session, err := a.store.UpdateSession(c.Request.Context(), product.Session{ID: c.Param("id"), UserID: c.GetString(userIDKey), Status: request.Status, ManualCycles: manualCycles, ManualRepetitions: manualCycles, ElapsedSeconds: request.ElapsedSeconds})
+	session, err := a.store.UpdateSession(c.Request.Context(), product.Session{
+		ID:                c.Param("id"),
+		UserID:            c.GetString(userIDKey),
+		Status:            request.Status,
+		ManualCycles:      manualCycles,
+		ManualRepetitions: manualCycles,
+		ElapsedSeconds:    request.ElapsedSeconds,
+		PostureSummary:    request.PostureSummary,
+	})
 	if errors.Is(err, product.ErrNotFound) {
 		writeError(c, http.StatusNotFound, "SESSION_NOT_FOUND", "The session was not found.")
 		return

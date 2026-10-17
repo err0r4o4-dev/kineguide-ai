@@ -42,6 +42,17 @@ describe('pose geometry', () => {
     )
   })
 
+  it('accepts an upper-body desk-webcam frame for seated monitoring', () => {
+    const pose = syntheticPose()
+    for (const index of [23, 24, 25, 26, 27, 28]) {
+      pose[index] = { ...pose[index], visibility: 0.05 }
+    }
+
+    expect(classifyPoseFrame([pose], 'seated-posture-demo').status).toBe(
+      'ready'
+    )
+  })
+
   it('asks for camera adjustment when a required landmark is unreliable', () => {
     const pose = syntheticPose()
     pose[25] = { ...pose[25], visibility: 0.1 }
