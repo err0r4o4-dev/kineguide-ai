@@ -47,6 +47,7 @@ describe('PostureFeedbackEngine', () => {
       headTiltDegrees: 0,
       torsoInclinationDegrees: 0,
       eyeShoulderDistanceRatio: 0.8,
+      forwardHeadRatio: 0.2,
       shoulderWidth: 0.2,
       framingMode: 'full_torso' as const
     }))
@@ -82,7 +83,7 @@ describe('PostureFeedbackEngine', () => {
   it('refuses to assess when multiple people are in frame and resets the debounce timer', () => {
     engine.setBaseline(baseline)
     const tiltedPose = createSyntheticPose({
-      12: { x: 0.6, y: 0.28, visibility: 0.95 }
+      12: { x: 0.6, y: 0.31, visibility: 0.95 }
     })
     engine.update(tiltedPose, 1000000)
 
@@ -163,7 +164,7 @@ describe('PostureFeedbackEngine', () => {
   it('applies hysteresis before returning from needs_adjustment to good_alignment', () => {
     engine.setBaseline(baseline)
     const tiltedPose = createSyntheticPose({
-      12: { x: 0.6, y: 0.28, visibility: 0.95 }
+      12: { x: 0.6, y: 0.31, visibility: 0.95 }
     })
     const normalPose = createSyntheticPose()
 
@@ -194,7 +195,7 @@ describe('PostureFeedbackEngine', () => {
   it('resets posture evaluation when landmarks are lost for longer than disconnect grace period', () => {
     engine.setBaseline(baseline)
     const tiltedPose = createSyntheticPose({
-      12: { x: 0.6, y: 0.28, visibility: 0.95 }
+      12: { x: 0.6, y: 0.31, visibility: 0.95 }
     })
 
     // Sustained deviation
@@ -214,5 +215,58 @@ describe('PostureFeedbackEngine', () => {
       1000000 + SUSTAINED_DEVIATION_THRESHOLD_MS + 4000
     )
     expect(returnResult.state).toBe('good_alignment')
+  })
+
+  it('detects camera framing error when user moves too close to camera', () => {
+    engine.setBaseline(baseline)
+    const tooClosePose = createSyntheticPose({
+      11: { x: 0.1, y: 0.35 },
+      12: { x: 0.9, y: 0.35 } // shoulder width = 0.8 > 0.65
+    })
+    const result = engine.update(tooClosePose, 1000000)
+
+    expect(result.state).toBe('camera_framing_error')
+    expect(result.framingError).toBe('too_close')
+    expect(result.feedbackMessageKey).toBe('camera.tooClose')
+  })
+
+  it('triggers specific forward-head feedback message key when head juts forward', () => {
+    engine.setBaseline(baseline)
+    // Interpupillary distance widens relative to shoulders as face juts forward toward webcam
+    const forwardHeadPose = createSyntheticPose({
+      2: { x: 0.44, y: 0.18 },
+      5: { x: 0.56, y: 0.18 }
+    })
+
+    engine.update(forwardHeadPose, 1000000)
+    const alert = engine.update(
+      forwardHeadPose,
+      1000000 + SUSTAINED_DEVIATION_THRESHOLD_MS + 200
+    )
+
+    expect(alert.state).toBe('needs_adjustment')
+    expect(alert.deviatedMetric).toBe('forwardHead')
+    expect(alert.feedbackMessageKey).toBe('session.feedback.forwardHead')
+  })
+
+  it('triggers specific slouching feedback message key when torso inclines forward', () => {
+    engine.setBaseline(baseline)
+    // Shoulders moved forward/down relative to hips
+    const slouchingPose = createSyntheticPose({
+      11: { x: 0.48, y: 0.35 },
+      12: { x: 0.68, y: 0.35 },
+      23: { x: 0.42, y: 0.65 },
+      24: { x: 0.58, y: 0.65 }
+    })
+
+    engine.update(slouchingPose, 1000000)
+    const alert = engine.update(
+      slouchingPose,
+      1000000 + SUSTAINED_DEVIATION_THRESHOLD_MS + 200
+    )
+
+    expect(alert.state).toBe('needs_adjustment')
+    expect(alert.deviatedMetric).toBe('slouching')
+    expect(alert.feedbackMessageKey).toBe('session.feedback.slouching')
   })
 })

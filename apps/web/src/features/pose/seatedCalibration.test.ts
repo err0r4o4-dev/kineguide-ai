@@ -14,6 +14,7 @@ function createSample(
     headTiltDegrees: 0,
     torsoInclinationDegrees: 0,
     eyeShoulderDistanceRatio: 0.8,
+    forwardHeadRatio: 0.4,
     shoulderWidth: 0.2,
     framingMode: 'full_torso',
     ...overrides
@@ -94,6 +95,16 @@ describe('seatedCalibration', () => {
     expect(leaning.status).toBe('needs_adjustment')
     if (leaning.status === 'needs_adjustment') {
       expect(leaning.deviations[0]?.metric).toBe('eyeShoulderDistanceRatio')
+    }
+
+    const turtleNeck = evaluateAgainstBaseline(
+      createUpperBodySample({ forwardHeadRatio: 0.55 }),
+      baseline,
+      1060000
+    )
+    expect(turtleNeck.status).toBe('needs_adjustment')
+    if (turtleNeck.status === 'needs_adjustment') {
+      expect(turtleNeck.deviations[0]?.metric).toBe('forwardHeadRatio')
     }
   })
 

@@ -279,6 +279,27 @@ export function LiveSessionPage() {
         </div>
       )}
 
+      {/* Camera angle & framing error banner */}
+      {monitor.feedback.state === 'camera_framing_error' && (
+        <div
+          aria-live="polite"
+          className="mt-4 flex items-start gap-3 rounded-2xl border border-red-300 bg-red-50 p-4 text-red-950 shadow-sm"
+          role="region"
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-red-200 text-red-900">
+            <Camera aria-hidden="true" size={20} />
+          </span>
+          <div>
+            <p className="font-bold text-red-950">
+              {t('session.cameraFramingAlert')}
+            </p>
+            <p className="mt-0.5 text-sm leading-6 text-red-900">
+              {t(monitor.feedback.feedbackMessageKey)}
+            </p>
+          </div>
+        </div>
+      )}
+
       {saveError && (
         <div
           className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-900"
@@ -358,6 +379,17 @@ export function LiveSessionPage() {
                 >
                   {t(monitor.feedback.feedbackMessageKey)}
                 </p>
+                {monitor.feedback.state === 'needs_adjustment' &&
+                  monitor.feedback.deviatedMetric && (
+                    <div className="mt-2.5 flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-900">
+                        {getDeviationBadgeText(
+                          t,
+                          monitor.feedback.deviatedMetric
+                        )}
+                      </span>
+                    </div>
+                  )}
                 <p className="mt-3 text-xs leading-5 text-slate-500">
                   {t('session.observationalDisclaimer')}
                 </p>
@@ -573,6 +605,11 @@ function getCalibrationReasonText(
   t: (key: string) => string,
   reason: CalibrationFailureReason
 ): string {
+  if (reason === 'too_close') return t('calibration.reasonTooClose')
+  if (reason === 'too_far') return t('calibration.reasonTooFar')
+  if (reason === 'not_facing_camera') return t('calibration.reasonNotFacing')
+  if (reason === 'camera_tilted') return t('calibration.reasonTilted')
+  if (reason === 'head_cropped') return t('calibration.reasonHeadCropped')
   if (reason === 'mixed_framing') return t('calibration.reasonMixed')
   return t('calibration.reasonNotEnough')
 }
@@ -587,10 +624,22 @@ const toneClasses: Record<TechnicalTone, string> = {
 const postureToneClasses: Record<string, string> = {
   good_alignment: 'border-teal-300 bg-teal-50 text-teal-950',
   needs_adjustment: 'border-amber-300 bg-amber-50 text-amber-950',
+  camera_framing_error: 'border-red-300 bg-red-50 text-red-950',
   low_confidence: 'border-slate-200 bg-slate-50 text-slate-700',
   unable_to_assess: 'border-slate-200 bg-slate-50 text-slate-700',
   not_visible: 'border-slate-200 bg-slate-50 text-slate-700',
   recalibration_recommended: 'border-amber-300 bg-amber-50 text-amber-950'
+}
+
+function getDeviationBadgeText(
+  t: (key: string) => string,
+  metric: string
+): string {
+  if (metric === 'forwardHead') return t('session.badgeForwardHead')
+  if (metric === 'slouching') return t('session.badgeSlouching')
+  if (metric === 'shoulderSlopeDegrees') return t('session.badgeShoulderSlope')
+  if (metric === 'headTiltDegrees') return t('session.badgeHeadTilt')
+  return metric
 }
 
 function getTechnicalStatus(

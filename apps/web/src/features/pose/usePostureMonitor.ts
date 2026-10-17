@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
+  checkCameraFraming,
+  type FramingErrorReason
+} from './cameraFramingQuality'
+import {
   PostureFeedbackEngine,
   type PostureFeedbackUpdate
 } from './postureFeedbackEngine'
@@ -23,7 +27,10 @@ export const CALIBRATION_SAMPLE_TARGET = 30
 export const METHOD_VERSION = 'seated-baseline-v1' as const
 
 export type CalibrationFailureReason =
-  'not_enough_samples' | 'mixed_framing' | 'unreliable_landmarks'
+  | 'not_enough_samples'
+  | 'mixed_framing'
+  | 'unreliable_landmarks'
+  | FramingErrorReason
 
 export type CalibrationState =
   | { readonly status: 'idle' }
@@ -138,6 +145,17 @@ export function usePostureMonitor(
     // 1. If actively calibrating, accumulate clean seated metrics.
     if (isCalibratingRef.current) {
       if (snapshot.landmarks && !multiplePeople) {
+        const framing = checkCameraFraming(snapshot.landmarks)
+        if (
+          framing.status === 'error' &&
+          framing.reason !== 'insufficient_landmarks'
+        ) {
+          isCalibratingRef.current = false
+          calibrationSamplesRef.current = []
+          setCalibrationState({ status: 'failed', reason: framing.reason })
+          return
+        }
+
         const result = calculateSeatedMetrics(snapshot.landmarks)
         if (result.status === 'valid') {
           calibrationSamplesRef.current.push(result.metrics)

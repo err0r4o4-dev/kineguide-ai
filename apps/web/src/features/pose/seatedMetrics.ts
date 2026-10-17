@@ -14,6 +14,8 @@ export interface RawSeatedMetrics {
   /** `null` when hips are not reliably visible (`upper_body` framing). */
   readonly torsoInclinationDegrees: number | null
   readonly eyeShoulderDistanceRatio: number
+  /** Ratio of eye distance to shoulder width (facial proximity scale for forward head / turtle neck). */
+  readonly forwardHeadRatio: number
   readonly shoulderWidth: number
   readonly framingMode: SeatedFramingMode
 }
@@ -153,6 +155,11 @@ export function calculateSeatedMetrics(
     (eyeToShoulderDist / shoulderWidth).toFixed(3)
   )
 
+  // 5. Forward head ratio: eye width (interpupillary distance) relative to shoulder width.
+  // Increases when the user juts head/face forward toward the screen relative to shoulders.
+  const eyeWidth = Math.hypot(rightEye.x - leftEye.x, rightEye.y - leftEye.y)
+  const forwardHeadRatio = Number((eyeWidth / shoulderWidth).toFixed(3))
+
   return {
     status: 'valid',
     metrics: {
@@ -160,6 +167,7 @@ export function calculateSeatedMetrics(
       headTiltDegrees,
       torsoInclinationDegrees,
       eyeShoulderDistanceRatio,
+      forwardHeadRatio,
       shoulderWidth: Number(shoulderWidth.toFixed(4)),
       framingMode: hasTorso ? 'full_torso' : 'upper_body'
     }

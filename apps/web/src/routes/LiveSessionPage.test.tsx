@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
 import * as camera from '@/features/camera/useCamera'
+import type { PoseLandmark } from '@/features/pose/poseGeometry'
 import type {
   PoseTrackingSnapshot,
   PoseTrackingStatus
@@ -31,10 +32,13 @@ vi.mock('@/features/pose/CameraPoseLayer', () => ({
   CameraPoseLayer: () => <div data-testid="pose-layer" />
 }))
 
-function poseSnapshot(status: PoseTrackingStatus): PoseTrackingSnapshot {
+function poseSnapshot(
+  status: PoseTrackingStatus,
+  landmarks: PoseLandmark[] | null = null
+): PoseTrackingSnapshot {
   return {
     status,
-    landmarks: null,
+    landmarks,
     bounds: null,
     unreliableLandmarks: [],
     faceLandmarks: null,
@@ -318,5 +322,35 @@ describe('LiveSessionPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Summary' })
     ).toBeInTheDocument()
+  })
+
+  it('displays a camera framing alert when the user is too close to camera', async () => {
+    await i18n.changeLanguage('th')
+    const tooCloseLandmarks: PoseLandmark[] = Array.from(
+      { length: 33 },
+      () => ({
+        x: 0.5,
+        y: 0.5,
+        visibility: 0.95
+      })
+    )
+    tooCloseLandmarks[0] = { x: 0.5, y: 0.2, visibility: 0.95 }
+    tooCloseLandmarks[2] = { x: 0.45, y: 0.18, visibility: 0.95 }
+    tooCloseLandmarks[5] = { x: 0.55, y: 0.18, visibility: 0.95 }
+    tooCloseLandmarks[11] = { x: 0.1, y: 0.35, visibility: 0.95 }
+    tooCloseLandmarks[12] = { x: 0.9, y: 0.35, visibility: 0.95 } // width = 0.8
+
+    vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+      poseSnapshot('ready', tooCloseLandmarks)
+    )
+
+    renderRoute()
+
+    expect(
+      await screen.findByText('มุมกล้องหรือตำแหน่งไม่เหมาะสม')
+    ).toBeVisible()
+    expect(
+      screen.getByText('คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย')
+    ).toBeVisible()
   })
 })

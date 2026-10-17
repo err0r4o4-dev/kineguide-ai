@@ -1,4 +1,8 @@
 import type { PoseLandmark } from './poseGeometry'
+import {
+  checkCameraFraming,
+  type FramingErrorReason
+} from './cameraFramingQuality'
 import { calculateSeatedMetrics, type RawSeatedMetrics } from './seatedMetrics'
 import {
   evaluateAgainstBaseline,
@@ -12,12 +16,14 @@ export type PostureFeedbackState =
   | 'low_confidence'
   | 'unable_to_assess'
   | 'not_visible'
+  | 'camera_framing_error'
   | 'recalibration_recommended'
 
 export interface PostureFeedbackUpdate {
   readonly state: PostureFeedbackState
   readonly feedbackMessageKey: string
   readonly deviatedMetric?: string
+  readonly framingError?: FramingErrorReason
   /** True only on the update where a debounced alert begins. */
   readonly alertTriggered?: boolean
   readonly evaluation?: PostureAlignmentEvaluation
@@ -108,6 +114,20 @@ export class PostureFeedbackEngine {
       }
     }
 
+    // Check camera angle, distance, tilt, and facing direction
+    const framing = checkCameraFraming(landmarks)
+    if (
+      framing.status === 'error' &&
+      framing.reason !== 'insufficient_landmarks'
+    ) {
+      this.markUnassessable(timestamp, 'camera_framing_error')
+      return {
+        state: 'camera_framing_error',
+        feedbackMessageKey: framing.messageKey,
+        framingError: framing.reason
+      }
+    }
+
     if (!this.baseline) {
       this.currentState = 'unable_to_assess'
       return {
@@ -158,13 +178,14 @@ export class PostureFeedbackEngine {
     if (evaluation.status === 'needs_adjustment') {
       this.realignmentStartTime = null
       this.lastDeviatedMetric = evaluation.deviations[0]?.metric
+      const resolved = resolveFeedback(this.lastDeviatedMetric)
 
       if (this.currentState === 'needs_adjustment') {
         // Already in alerted state, stay alerted
         return {
           state: 'needs_adjustment',
-          feedbackMessageKey: `session.feedback.${this.lastDeviatedMetric ?? 'general'}`,
-          deviatedMetric: this.lastDeviatedMetric,
+          feedbackMessageKey: resolved.key,
+          deviatedMetric: resolved.name,
           evaluation,
           rawMetrics: metricsResult.metrics
         }
@@ -180,8 +201,8 @@ export class PostureFeedbackEngine {
         this.currentState = 'needs_adjustment'
         return {
           state: 'needs_adjustment',
-          feedbackMessageKey: `session.feedback.${this.lastDeviatedMetric ?? 'general'}`,
-          deviatedMetric: this.lastDeviatedMetric,
+          feedbackMessageKey: resolved.key,
+          deviatedMetric: resolved.name,
           alertTriggered: true,
           evaluation,
           rawMetrics: metricsResult.metrics
@@ -220,10 +241,11 @@ export class PostureFeedbackEngine {
       }
 
       // Still in hysteresis recovery window
+      const resolved = resolveFeedback(this.lastDeviatedMetric)
       return {
         state: 'needs_adjustment',
-        feedbackMessageKey: `session.feedback.${this.lastDeviatedMetric ?? 'general'}`,
-        deviatedMetric: this.lastDeviatedMetric,
+        feedbackMessageKey: resolved.key,
+        deviatedMetric: resolved.name,
         evaluation,
         rawMetrics: metricsResult.metrics
       }
@@ -239,5 +261,33 @@ export class PostureFeedbackEngine {
       evaluation,
       rawMetrics: metricsResult.metrics
     }
+  }
+}
+
+function resolveFeedback(metric: string | undefined): {
+  key: string
+  name: string
+} {
+  if (metric === 'forwardHeadRatio') {
+    return { key: 'session.feedback.forwardHead', name: 'forwardHead' }
+  }
+  if (metric === 'torsoInclinationDegrees') {
+    return { key: 'session.feedback.slouching', name: 'slouching' }
+  }
+  if (metric === 'eyeShoulderDistanceRatio') {
+    return { key: 'session.feedback.forwardHead', name: 'forwardHead' }
+  }
+  if (metric === 'shoulderSlopeDegrees') {
+    return {
+      key: 'session.feedback.shoulderSlopeDegrees',
+      name: 'shoulderSlopeDegrees'
+    }
+  }
+  if (metric === 'headTiltDegrees') {
+    return { key: 'session.feedback.headTiltDegrees', name: 'headTiltDegrees' }
+  }
+  return {
+    key: `session.feedback.${metric ?? 'general'}`,
+    name: metric ?? 'general'
   }
 }

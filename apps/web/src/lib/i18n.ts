@@ -424,13 +424,30 @@ const th = {
     failedNotice: 'การปรับเทียบไม่สำเร็จ: {{reason}}',
     reasonNotEnough: 'จุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งๆ ในตำแหน่งปกติ',
     reasonMixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่',
+    reasonTooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมา',
+    reasonTooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+    reasonNotFacing: 'กรุณาหันหน้าตรงเข้าหากล้อง',
+    reasonTilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
+    reasonHeadCropped: 'ศีรษะหลุดขอบบน กรุณาปรับมุมก้ม-เงยของกล้อง',
     notCalibratedHint:
       'นั่งตัวตรงในตำแหน่งทำงานปกติ แล้วกดปรับเทียบเพื่อสร้าง Baseline เฉพาะบุคคลของคุณ'
+  },
+  camera: {
+    tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+    tooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+    notFacingCamera: 'กรุณาหันหน้าตรงเข้าหากล้อง (ไม่เอียงข้าง)',
+    tilted: 'มุมกล้องเอียงหรือไม่ตรงระดับ กรุณาตั้งระนาบกล้องให้ตรง',
+    headCropped: 'ศีรษะหลุดขอบบน กรุณาปรับมุมก้ม-เงยของกล้อง'
   },
   session: {
     goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
     noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
     postureStatus: 'สถานะท่าทาง',
+    cameraFramingAlert: 'มุมกล้องหรือตำแหน่งไม่เหมาะสม',
+    badgeForwardHead: 'คอยื่นเข้าหาจอ',
+    badgeSlouching: 'หลังค่อม / ไหล่ห่อ',
+    badgeShoulderSlope: 'ไหล่เอียง',
+    badgeHeadTilt: 'ศีรษะเอียง',
     unassessedDuration: 'ระยะเวลาที่ยังประเมินไม่ได้',
     framingMode: 'โหมดมุมมองกล้อง',
     calibratedAt: 'ปรับเทียบเมื่อ',
@@ -438,6 +455,10 @@ const th = {
       'การประเมินนี้เทียบกับ Baseline ส่วนบุคคลของคุณเพื่อส่งเสริมความตระหนักรู้ ไม่ใช่การวินิจฉัยทางการแพทย์',
     feedback: {
       general: 'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจาก Baseline',
+      forwardHead:
+        'สังเกตเห็นการโน้มศีรษะ/คอยื่นเข้าหาจอ — ลองดึงคอกลับให้อยู่ในแนวระดับไหล่',
+      slouching:
+        'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ — ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
       shoulderSlopeDegrees: 'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจาก Baseline',
       headTiltDegrees: 'สังเกตเห็นศีรษะเอียงต่อเนื่องจาก Baseline',
       torsoInclinationDegrees: 'สังเกตเห็นลำตัวเอียงต่อเนื่องจาก Baseline',
@@ -1043,13 +1064,31 @@ const en: typeof th = {
     failedNotice: 'Calibration failed: {{reason}}',
     reasonNotEnough: 'Landmarks were interrupted. Please sit still and retry.',
     reasonMixed: 'Framing changed mid-calibration. Please retry.',
+    reasonTooClose: 'Too close to camera. Please step back slightly.',
+    reasonTooFar: 'Too far from camera. Please move closer.',
+    reasonNotFacing: 'Please face the camera directly.',
+    reasonTilted: 'Camera angle is tilted. Please level your camera.',
+    reasonHeadCropped: 'Head is cut off at the top. Please tilt camera up.',
     notCalibratedHint:
       'Sit upright in your normal working posture and calibrate to establish your personal baseline.'
+  },
+  camera: {
+    tooClose: 'You are too close to the camera. Please step back slightly.',
+    tooFar: 'You are too far from the camera. Please move closer.',
+    notFacingCamera:
+      'Please face the camera directly (avoid turning sideways).',
+    tilted: 'Camera angle is tilted. Please level your camera.',
+    headCropped: 'Head is cut off at the top. Please adjust camera pitch.'
   },
   session: {
     goodAlignment: 'Good alignment relative to personal baseline',
     noBaseline: 'Personal baseline not established',
     postureStatus: 'Posture Status',
+    cameraFramingAlert: 'Camera angle or framing issue',
+    badgeForwardHead: 'Forward Head',
+    badgeSlouching: 'Slouching / Slump',
+    badgeShoulderSlope: 'Shoulder Tilt',
+    badgeHeadTilt: 'Head Tilt',
     unassessedDuration: 'Unassessed Time',
     framingMode: 'Framing Mode',
     calibratedAt: 'Calibrated at',
@@ -1057,6 +1096,10 @@ const en: typeof th = {
       'This observational assessment compares with your personal baseline for ergonomic awareness and is not a medical diagnosis.',
     feedback: {
       general: 'Sustained posture deviation observed relative to baseline',
+      forwardHead:
+        'Forward head posture observed — gently pull your head back in line with your shoulders.',
+      slouching:
+        'Slouching or rounded shoulders observed — gently lift your chest and roll shoulders back.',
       shoulderSlopeDegrees:
         'Sustained shoulder tilt observed relative to baseline',
       headTiltDegrees: 'Sustained head tilt observed relative to baseline',

@@ -48,6 +48,26 @@ describe('seatedMetrics', () => {
     expect(result.metrics.torsoInclinationDegrees).toBe(0)
     expect(result.metrics.shoulderWidth).toBeCloseTo(0.2, 2)
     expect(result.metrics.eyeShoulderDistanceRatio).toBeGreaterThan(0)
+    expect(result.metrics.forwardHeadRatio).toBeGreaterThan(0)
+  })
+
+  it('detects forward head magnification when face leans closer to camera', () => {
+    const normal = calculateSeatedMetrics(createSyntheticPose())
+    // Eyes spread wider relative to shoulders as face approaches camera
+    const leaningForward = calculateSeatedMetrics(
+      createSyntheticPose({
+        2: { x: 0.45, y: 0.18 },
+        5: { x: 0.55, y: 0.18 }
+      })
+    )
+
+    expect(normal.status).toBe('valid')
+    expect(leaningForward.status).toBe('valid')
+    if (normal.status !== 'valid' || leaningForward.status !== 'valid') return
+
+    expect(leaningForward.metrics.forwardHeadRatio).toBeGreaterThan(
+      normal.metrics.forwardHeadRatio
+    )
   })
 
   it('detects shoulder slope tilt correctly', () => {

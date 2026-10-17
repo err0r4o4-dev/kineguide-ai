@@ -105,6 +105,31 @@ describe('usePostureMonitor', () => {
     expect(result.current.calibrationState.status).toBe('failed')
   })
 
+  it('aborts calibration with specific error reason if user is too close to camera', () => {
+    const tooClosePose = createSyntheticPose({
+      11: { x: 0.1, y: 0.35 },
+      12: { x: 0.9, y: 0.35 } // shoulder width = 0.8
+    })
+
+    const { result, rerender } = renderHook(
+      ({ s }: { s: PoseTrackingSnapshot }) => usePostureMonitor(s, false),
+      { initialProps: { s: makeSnapshot(createSyntheticPose()) } }
+    )
+
+    act(() => {
+      result.current.startCalibration()
+    })
+    expect(result.current.calibrationState.status).toBe('calibrating')
+
+    // Feed a frame where user moved too close
+    rerender({ s: makeSnapshot(tooClosePose) })
+
+    expect(result.current.calibrationState.status).toBe('failed')
+    if (result.current.calibrationState.status === 'failed') {
+      expect(result.current.calibrationState.reason).toBe('too_close')
+    }
+  })
+
   it('produces a null summary input before calibration and real totals after', () => {
     const pose = createSyntheticPose()
     const { result, rerender } = renderHook(

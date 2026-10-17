@@ -15,6 +15,7 @@ export interface PersonalBaseline {
     /** `null` for an `upper_body` baseline, where hips were not observed. */
     readonly torsoInclinationDegrees: MetricSummary | null
     readonly eyeShoulderDistanceRatio: MetricSummary
+    readonly forwardHeadRatio: MetricSummary
   }
   readonly framing: {
     readonly shoulderWidth: number
@@ -64,7 +65,8 @@ export const BASELINE_TOLERANCES: Readonly<
   shoulderSlopeDegrees: { minDiff: 5, zThreshold: 2.5 }, // degrees
   headTiltDegrees: { minDiff: 6, zThreshold: 2.5 }, // degrees
   torsoInclinationDegrees: { minDiff: 7, zThreshold: 2.5 }, // degrees
-  eyeShoulderDistanceRatio: { minDiff: 0.15, zThreshold: 2.5 } // unitless ratio
+  eyeShoulderDistanceRatio: { minDiff: 0.15, zThreshold: 2.5 }, // unitless ratio
+  forwardHeadRatio: { minDiff: 0.04, zThreshold: 2.5 } // unitless scale ratio
 }
 
 function calculateSummary(values: readonly number[]): MetricSummary {
@@ -121,7 +123,8 @@ export function buildPersonalBaseline(
           : null,
       eyeShoulderDistanceRatio: calculateSummary(
         samples.map((s) => s.eyeShoulderDistanceRatio)
-      )
+      ),
+      forwardHeadRatio: calculateSummary(samples.map((s) => s.forwardHeadRatio))
     },
     framing: {
       shoulderWidth: Number(avgWidth.toFixed(4)),
@@ -219,6 +222,12 @@ export function evaluateAgainstBaseline(
       metric: 'eyeShoulderDistanceRatio',
       observed: current.eyeShoulderDistanceRatio,
       summary: baseline.metrics.eyeShoulderDistanceRatio
+    },
+    {
+      // Forward head magnification relative to shoulder width.
+      metric: 'forwardHeadRatio',
+      observed: current.forwardHeadRatio,
+      summary: baseline.metrics.forwardHeadRatio
     }
   ]
 
