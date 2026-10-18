@@ -1,5 +1,17 @@
 # KineGuide AI — Product Flow และ Roadmap
 
+
+## Seated dataset evaluation — 2026-10-19
+
+- [x] Investigation: verified geometry, research policy and baseline boundaries. Live `seated-baseline-v1` remains unchanged; no clinical claims or raw-media collection added.
+- [x] Regression tests: reproduced 45-degree image geometry as 53.13/60.64 degrees before correction. Explicit-dimension geometry tests pass, including mirroring, eye fallback, invalid dimensions and hidden hips.
+- [x] Implementation: opt-in geometry and bounded local evaluation use the web calculation; MAE, RMSE, bias, P95, units, coverage and missing-reference counts omit participant payloads.
+- [x] Final verification: web format/lint/OpenAPI/typecheck/build and 211 tests passed; evaluator 8 tests and synthetic CLI smoke passed. Independent read-only review found no concrete defects. Final diff checked; no live services, datasets or model artifacts added. Synthetic results are not real-user accuracy. Windows junction behavior and injected Vite/report-write failure cleanup were not tested; see `docs/research/evaluation-plan.md`.
+- [ ] Dataset gate: verify license, consent/provenance, joint mapping, independent references, subject-separated splits, retention and deletion before importing real data. MediaPipe-derived references cannot validate MediaPipe measurement error.
+- [ ] Live gate: independent held-out validation and tolerance review before migrating API/database versions or exposing benchmark values. Real-world error is not established.
+
+Diagnostic hypotheses: unequal x/y normalization distorts static image geometry; smoothing introduces temporal error but cannot explain static distortion; unknown joint mapping independently invalidates references. Test static geometry first.
+
 วันที่สำรวจ: 14 ตุลาคม 2026 · อ้างอิงโค้ดที่ commit `601cec0` บน branch `feature/fix-error-system`
 
 เอกสารนี้เป็นแผนงานตามคำขอ ไม่ใช่รายงานว่าฟีเจอร์ทั้งหมดทำเสร็จหรือทดสอบผ่านแล้ว การจัดทำเอกสารครั้งนี้ไม่เปลี่ยนโค้ด โมเดล provider ฐานข้อมูล หรือการตั้งค่าระบบ

@@ -8,6 +8,13 @@ import { TECHNICAL_VISIBILITY_GATE } from './poseGeometry'
  */
 export type SeatedFramingMode = 'upper_body' | 'full_torso'
 
+export const SEATED_METRICS_METHOD_VERSION = 'seated-image-v2' as const
+
+export interface SeatedFrameDimensions {
+  readonly width: number
+  readonly height: number
+}
+
 export interface RawSeatedMetrics {
   readonly shoulderSlopeDegrees: number
   readonly headTiltDegrees: number
@@ -74,8 +81,22 @@ function isValidLandmark(
  * or universal correctness judgment.
  */
 export function calculateSeatedMetrics(
-  landmarks: readonly PoseLandmark[] | null | undefined
+  landmarks: readonly PoseLandmark[] | null | undefined,
+  frameDimensions?: SeatedFrameDimensions
 ): SeatedMetricsResult {
+  if (
+    frameDimensions &&
+    (!Number.isSafeInteger(frameDimensions.width) ||
+      !Number.isSafeInteger(frameDimensions.height) ||
+      frameDimensions.width <= 0 ||
+      frameDimensions.height <= 0)
+  ) {
+    return { status: 'invalid_coordinates' }
+  }
+  const verticalScale = frameDimensions
+    ? frameDimensions.height / frameDimensions.width
+    : 1
+
   if (!landmarks || landmarks.length === 0) {
     return {
       status: 'insufficient_landmarks',
@@ -103,7 +124,7 @@ export function calculateSeatedMetrics(
   const rightShoulder = landmarks[12]
 
   const shoulderDx = rightShoulder.x - leftShoulder.x
-  const shoulderDy = rightShoulder.y - leftShoulder.y
+  const shoulderDy = (rightShoulder.y - leftShoulder.y) * verticalScale
   const shoulderWidth = Math.hypot(shoulderDx, shoulderDy)
 
   if (shoulderWidth < 0.02) {
@@ -121,7 +142,8 @@ export function calculateSeatedMetrics(
   const useEars = isValidLandmark(leftEar) && isValidLandmark(rightEar)
 
   const headDx = useEars ? rightEar.x - leftEar.x : rightEye.x - leftEye.x
-  const headDy = useEars ? rightEar.y - leftEar.y : rightEye.y - leftEye.y
+  const headDy =
+    (useEars ? rightEar.y - leftEar.y : rightEye.y - leftEye.y) * verticalScale
   const headAngle = angleFromHorizontal(headDy, headDx)
   const headTiltDegrees = Number(headAngle.toFixed(2))
 
@@ -145,7 +167,9 @@ export function calculateSeatedMetrics(
       return { status: 'invalid_coordinates' }
     }
 
-    const torsoInclination = toDegrees(Math.atan2(Math.abs(torsoDx), torsoDy))
+    const torsoInclination = toDegrees(
+      Math.atan2(Math.abs(torsoDx), torsoDy * verticalScale)
+    )
     torsoInclinationDegrees = Number(torsoInclination.toFixed(2))
   }
 
@@ -154,7 +178,7 @@ export function calculateSeatedMetrics(
   const midEyeY = (leftEye.y + rightEye.y) / 2
   const eyeToShoulderDist = Math.hypot(
     midEyeX - midShoulderX,
-    midEyeY - midShoulderY
+    (midEyeY - midShoulderY) * verticalScale
   )
   const eyeShoulderDistanceRatio = Number(
     (eyeToShoulderDist / shoulderWidth).toFixed(3)
@@ -162,7 +186,10 @@ export function calculateSeatedMetrics(
 
   // 5. Forward head ratio: eye width (interpupillary distance) relative to shoulder width.
   // Increases when the user juts head/face forward toward the screen relative to shoulders.
-  const eyeWidth = Math.hypot(rightEye.x - leftEye.x, rightEye.y - leftEye.y)
+  const eyeWidth = Math.hypot(
+    rightEye.x - leftEye.x,
+    (rightEye.y - leftEye.y) * verticalScale
+  )
   const forwardHeadRatio = Number((eyeWidth / shoulderWidth).toFixed(3))
 
   return {
