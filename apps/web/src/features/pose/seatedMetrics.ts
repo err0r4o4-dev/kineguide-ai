@@ -42,6 +42,11 @@ function toDegrees(radians: number): number {
   return (radians * 180) / Math.PI
 }
 
+function angleFromHorizontal(dy: number, dx: number): number {
+  if (dx === 0) return 90
+  return toDegrees(Math.atan(dy / dx))
+}
+
 function isValidLandmark(
   landmark: PoseLandmark | undefined
 ): landmark is PoseLandmark {
@@ -107,7 +112,7 @@ export function calculateSeatedMetrics(
 
   // 1. Shoulder slope: angle relative to horizontal plane
   // Normalized so 0 = level, positive/negative represents tilt.
-  const shoulderAngle = toDegrees(Math.atan2(shoulderDy, shoulderDx))
+  const shoulderAngle = angleFromHorizontal(shoulderDy, shoulderDx)
   const shoulderSlopeDegrees = Number(shoulderAngle.toFixed(2))
 
   // 2. Head tilt: use ears (7, 8) if visible; otherwise fallback to eyes (2, 5)
@@ -117,7 +122,7 @@ export function calculateSeatedMetrics(
 
   const headDx = useEars ? rightEar.x - leftEar.x : rightEye.x - leftEye.x
   const headDy = useEars ? rightEar.y - leftEar.y : rightEye.y - leftEye.y
-  const headAngle = toDegrees(Math.atan2(headDy, headDx))
+  const headAngle = angleFromHorizontal(headDy, headDx)
   const headTiltDegrees = Number(headAngle.toFixed(2))
 
   const midShoulderX = (leftShoulder.x + rightShoulder.x) / 2

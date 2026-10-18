@@ -42,6 +42,11 @@ function toDegrees(radians: number): number {
   return (radians * 180) / Math.PI
 }
 
+function angleFromHorizontal(dy: number, dx: number): number {
+  if (dx === 0) return 90
+  return toDegrees(Math.atan(dy / dx))
+}
+
 /**
  * Validates whether the user's position and camera angle/distance are technically
  * suitable for reliable seated posture observation.
@@ -120,8 +125,8 @@ export function checkCameraFraming(
     }
   }
 
-  // 3. Camera or body severe tilt (roll)
-  const shoulderSlope = Math.abs(toDegrees(Math.atan2(shoulderDy, shoulderDx)))
+  // 3. Camera or body severe tilt (roll relative to horizontal)
+  const shoulderSlope = Math.abs(angleFromHorizontal(shoulderDy, shoulderDx))
   if (shoulderSlope > MAX_CAMERA_TILT_DEGREES) {
     return {
       status: 'error',
