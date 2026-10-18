@@ -54,12 +54,25 @@ Datasets are deliberately excluded from Git. Before adding a local dataset, docu
 - Subject grouping exists, but no split, training or evaluation was performed.
   Class counts are unbalanced; do not use random frame splits as proof of
   generalization to new participants.
+
 - Download: direct HttpClient requests returned HTTP 403; PowerShell
   `Invoke-WebRequest` succeeded using the public download link on Zenodo.
   The initial Python audit could not run because Python is unavailable; the
   replacement Node audit completed successfully without added dependencies.
 - All four local data/provenance files passed `git check-ignore`. No application
   service, model, API, database or live classification behavior was changed.
+
+### Offline trainer — 2026-10-19
+
+`research/multiposture/` now provides a synthetic-tested, subject-separated
+nearest-centroid trainer and aggregate classification reports. The installed
+manifest remains blocked: public study-participation consent has been found, but
+release/downstream-training consent has not been verified under this policy.
+Actual training was denied with `KGMP_E_APPROVAL` and produced no artifacts.
+See the trainer README for the evidence, commands and review requirements.
+The paper describes reducing 33 joints to 11 for its model; the installed full
+99-coordinate CSV is not a reproduction of that reduced representation. The
+4,794/4,800 frame discrepancy and exact released preprocessing remain unresolved.
 
 **Not medical advice / ไม่ใช่คำแนะนำทางการแพทย์:** these dataset labels are
 research annotations, not diagnoses or proof that a sitting posture is safe.

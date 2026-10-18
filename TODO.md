@@ -1,5 +1,14 @@
 # KineGuide AI — Product Flow และ Roadmap
 
+## MultiPosture offline training — 2026-10-19
+
+- [x] Investigation: publisher review found study consent and 33-to-11 joint reduction, but public-release/downstream-training scope, exact released preprocessing and 4,794/4,800 frame discrepancy remain unresolved. User authorized offline work, not deployment or redistribution.
+- [x] Regression tests: 13 synthetic tests pass for malformed CSV, train-only scaling, subject separation, hand-computed metrics, determinism, redacted CLI denial, overwrite protection and failed-write cleanup.
+- [x] Implementation: dependency-free nearest-centroid LOSO baseline, separate upper/lower labels, majority comparator, aggregate metrics, hashed local-only model/report and staged publication.
+- [x] Synthetic verification: 13 trainer tests, 8 existing evaluator tests and 211 web tests pass; format checks pass. Real manifest invocation exits 1 with KGMP_E_APPROVAL, before CSV reading, and creates no output. No dataset/model is staged.
+- [ ] Real training blocked: obtain a reviewed consent/provenance basis for public release and downstream ML under research/datasets/README.md before authorizing the manifest. No real-data model or accuracy/error result produced; do not toggle approval flags without evidence.
+- [x] Review and cleanup: independent review checked split/metrics; partial-write finding fixed and tested. Editable approval is a local reviewer declaration, not trusted-signature enforcement. Concurrent empty-directory publication race remains documented; single-writer use only. No services started or dependencies added; temporary test artifacts cleaned. Live-web integration and measurement/clinical validation remain out of scope.
+
 
 ## Seated dataset evaluation — 2026-10-19
 
