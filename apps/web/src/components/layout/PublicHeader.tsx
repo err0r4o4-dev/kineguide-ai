@@ -92,7 +92,7 @@ export function PublicHeader() {
           )}
           <Link
             aria-label={t('nav.getStarted')}
-            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-teal-800 bg-teal-700 px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(15_118_110_/_22%)] transition-colors hover:bg-teal-800 sm:px-4"
+            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-[var(--color-kg-primary)] bg-[var(--color-kg-primary)] px-3 font-semibold text-white no-underline shadow-[0_8px_20px_rgb(72_167_184_/_18%)] transition-colors hover:bg-[var(--color-kg-primary-strong)] sm:px-4"
             to={auth.user ? '/app' : '/register'}
           >
             <CircleUserRound aria-hidden="true" size={19} />

@@ -55,6 +55,7 @@ export interface PostureSummarySubmission extends PostureTotals {
 
 export interface PostureMonitorResult {
   readonly feedback: PostureFeedbackUpdate
+  readonly observedMetrics: RawSeatedMetrics | null
   readonly calibrationState: CalibrationState
   readonly startCalibration: () => void
   readonly cancelCalibration: (reason?: CalibrationFailureReason) => void
@@ -71,8 +72,8 @@ const INITIAL_FEEDBACK: PostureFeedbackUpdate = {
  * Connects the real-time pose stream to the posture feedback engine, personal
  * baseline calibration, and session accumulator.
  *
- * State updates are dispatched only when the user-visible feedback changes,
- * keeping high-frequency per-frame processing out of React's render cycle.
+ * Feedback changes immediately; numeric readings refresh at most twice per
+ * second and expire after 1.5 seconds without a usable frame.
  */
 export function usePostureMonitor(
   snapshot: PoseTrackingSnapshot,
@@ -93,12 +94,24 @@ export function usePostureMonitor(
   })
   const [feedback, setFeedback] =
     useState<PostureFeedbackUpdate>(INITIAL_FEEDBACK)
+  const [observedMetrics, setObservedMetrics] =
+    useState<RawSeatedMetrics | null>(null)
+  const latestMetricsRef = useRef<{
+    metrics: RawSeatedMetrics
+    receivedAt: number
+  } | null>(null)
+
+  const clearObservedMetrics = useCallback(() => {
+    latestMetricsRef.current = null
+    setObservedMetrics(null)
+  }, [])
 
   const calibrationSamplesRef = useRef<RawSeatedMetrics[]>([])
   const isCalibratingRef = useRef(false)
   const activeBaselineRef = useRef<PersonalBaseline | null>(null)
 
   const startCalibration = useCallback(() => {
+    clearObservedMetrics()
     calibrationSamplesRef.current = []
     isCalibratingRef.current = true
     setCalibrationState({
@@ -106,18 +119,20 @@ export function usePostureMonitor(
       samplesCollected: 0,
       targetSamples: CALIBRATION_SAMPLE_TARGET
     })
-  }, [])
+  }, [clearObservedMetrics])
 
   const cancelCalibration = useCallback(
     (reason: CalibrationFailureReason = 'not_enough_samples') => {
+      clearObservedMetrics()
       isCalibratingRef.current = false
       calibrationSamplesRef.current = []
       setCalibrationState({ status: 'failed', reason })
     },
-    []
+    [clearObservedMetrics]
   )
 
   const reset = useCallback(() => {
+    clearObservedMetrics()
     isCalibratingRef.current = false
     calibrationSamplesRef.current = []
     activeBaselineRef.current = null
@@ -126,7 +141,18 @@ export function usePostureMonitor(
     accumulatorRef.current?.reset()
     setCalibrationState({ status: 'idle' })
     setFeedback(INITIAL_FEEDBACK)
-  }, [])
+  }, [clearObservedMetrics])
+
+  useEffect(() => {
+    if (paused || calibrationState.status !== 'calibrated') return
+    const interval = setInterval(() => {
+      const latest = latestMetricsRef.current
+      setObservedMetrics(
+        latest && Date.now() - latest.receivedAt < 1500 ? latest.metrics : null
+      )
+    }, 500)
+    return () => clearInterval(interval)
+  }, [paused, calibrationState.status])
 
   // Feed each incoming pose frame to calibration or the feedback engine.
   useEffect(() => {
@@ -136,6 +162,7 @@ export function usePostureMonitor(
 
     if (paused) {
       accumulator.pause()
+      clearObservedMetrics()
       return
     }
 
@@ -179,6 +206,12 @@ export function usePostureMonitor(
               setCalibrationState({ status: 'calibrated', baseline })
               const postUpdate = engine.update(snapshot.landmarks, now)
               setFeedback(postUpdate)
+              if (snapshot.status === 'ready' && postUpdate.rawMetrics) {
+                latestMetricsRef.current = {
+                  metrics: postUpdate.rawMetrics,
+                  receivedAt: now
+                }
+              }
             } else {
               setCalibrationState({
                 status: 'failed',
@@ -193,6 +226,15 @@ export function usePostureMonitor(
 
     // 2. Normal monitoring: update the engine and accumulate totals.
     const update = engine.update(snapshot.landmarks, now, { multiplePeople })
+    if (
+      snapshot.status === 'ready' &&
+      update.rawMetrics &&
+      update.evaluation?.status !== 'recalibration_recommended'
+    ) {
+      latestMetricsRef.current = { metrics: update.rawMetrics, receivedAt: now }
+    } else {
+      clearObservedMetrics()
+    }
 
     // Accumulate only once an active baseline exists.
     if (activeBaselineRef.current) {
@@ -211,7 +253,7 @@ export function usePostureMonitor(
       }
       return update
     })
-  }, [paused, snapshot])
+  }, [paused, snapshot, clearObservedMetrics])
 
   const getSummaryInput = useCallback((): PostureSummarySubmission | null => {
     const baseline = activeBaselineRef.current
@@ -226,6 +268,10 @@ export function usePostureMonitor(
 
   return {
     feedback,
+    observedMetrics:
+      !paused && calibrationState.status === 'calibrated'
+        ? observedMetrics
+        : null,
     calibrationState,
     startCalibration,
     cancelCalibration,

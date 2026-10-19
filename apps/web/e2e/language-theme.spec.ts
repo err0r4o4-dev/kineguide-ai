@@ -89,29 +89,38 @@ test('changes language without storage, keeps it across navigation, and resets o
 })
 
 for (const width of [320, 768, 1024, 1440]) {
-  test(`previous theme and responsive controls at ${width}px`, async ({
+  test(`logo theme and responsive controls at ${width}px`, async ({
     page
   }, testInfo) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/')
     const primaryAction = page.locator('a.kg-landing-primary-cta').first()
+    expect(
+      await page.locator('html').evaluate((element) => {
+        const theme = getComputedStyle(element)
+        return [
+          theme.getPropertyValue('--color-kg-brand').trim(),
+          theme.getPropertyValue('--color-kg-mint').trim()
+        ]
+      })
+    ).toEqual(['#48a7b8', '#74dfbd'])
 
     await expect(primaryAction).toHaveCSS(
       'background-image',
-      'linear-gradient(135deg, rgb(11, 107, 92), rgb(17, 134, 117))'
+      'linear-gradient(135deg, rgb(37, 112, 128), rgb(41, 118, 130))'
     )
     await expect(primaryAction).toHaveCSS('color', 'rgb(255, 255, 255)')
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
       'content',
-      '#0f766e'
+      '#48a7b8'
     )
     await expect(page.locator('header a[href="/register"]')).toHaveCSS(
       'background-color',
-      'oklch(0.511 0.096 186.391)'
+      'rgb(37, 112, 128)'
     )
     await primaryAction.focus()
     await expect(primaryAction).toHaveCSS('outline-style', 'solid')
-    await expect(primaryAction).toHaveCSS('outline-color', 'rgb(20, 184, 166)')
+    await expect(primaryAction).toHaveCSS('outline-color', 'rgb(37, 112, 128)')
     await expect(primaryAction).toHaveCSS('outline-width', '3px')
     await expect(primaryAction).toHaveCSS('outline-offset', '3px')
     expect(
@@ -126,11 +135,11 @@ for (const width of [320, 768, 1024, 1440]) {
     const submitAction = page.locator('button[type="submit"]')
     await expect(submitAction).toHaveCSS(
       'background-image',
-      'linear-gradient(135deg, rgb(11, 107, 92), rgb(17, 134, 117))'
+      'linear-gradient(135deg, rgb(37, 112, 128), rgb(41, 118, 130))'
     )
     await expect(submitAction).toHaveCSS('color', 'rgb(255, 255, 255)')
     await submitAction.focus()
-    await expect(submitAction).toHaveCSS('outline-color', 'rgb(20, 184, 166)')
+    await expect(submitAction).toHaveCSS('outline-color', 'rgb(37, 112, 128)')
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth)
     ).toBeLessThanOrEqual(width)

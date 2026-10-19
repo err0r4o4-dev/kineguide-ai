@@ -587,6 +587,22 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     page.getByRole('heading', { level: 1, name: 'โปรไฟล์' })
   ).toBeVisible()
   await expect(page.getByText(user.email)).toBeVisible()
+  const accountButton = page.getByRole('button', { name: /^เมนูบัญชี/ })
+  await expect(accountButton).toHaveCSS(
+    'background-color',
+    'rgb(255, 255, 255)'
+  )
+  await expect(accountButton).toHaveCSS('color', 'rgb(20, 43, 58)')
+  await expect(
+    accountButton.locator('span[aria-hidden=true]').first()
+  ).toHaveCSS(
+    'background-image',
+    'linear-gradient(135deg, rgb(72, 167, 184), rgb(116, 223, 189))'
+  )
+  await expect(accountButton.locator('svg').first()).toHaveCSS(
+    'color',
+    'rgb(88, 113, 126)'
+  )
   await expect(
     page.getByRole('link', { name: /ตั้งค่าและความเป็นส่วนตัว/ })
   ).toHaveAttribute('href', '/app/settings')

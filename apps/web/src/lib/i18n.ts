@@ -443,6 +443,28 @@ const th = {
     goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
     noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
     postureStatus: 'สถานะท่าทาง',
+    readings: {
+      title: 'ตัวเลขความต่างจาก Baseline',
+      explanation:
+        'ผลต่าง = |ค่าปัจจุบัน − ค่าเฉลี่ย Baseline| อัปเดตไม่เกิน 2 ครั้ง/วินาที ตัวเลขไม่ใช่สถานะแจ้งเตือน ซึ่งยังรอการเปลี่ยนแปลงต่อเนื่องตามกติกาเดิม',
+      current: 'ปัจจุบัน',
+      baseline: 'Baseline',
+      difference: 'ผลต่าง',
+      degreesValue: '{{value}}°',
+      ratioValue: '{{value}}',
+      unavailable: 'ประเมินไม่ได้',
+      waiting:
+        'ยังประเมินไม่ได้ — รอข้อมูลที่เชื่อถือได้และ Baseline ที่ใช้ได้',
+      limitation:
+        'เป็นค่าประมาณจากพิกัดภาพ 2 มิติแบบ normalized (seated-baseline-v1) ไม่ใช่มุมร่างกายจริงใน 3 มิติหรือค่าความแม่นยำ/ความคลาดเคลื่อนของกล้องเทียบค่าจริง อัตราส่วนไม่มีหน่วย ไม่ใช่เปอร์เซ็นต์ ข้อมูลที่ขาดหรือค้างจะไม่แสดงเป็นศูนย์',
+      metrics: {
+        headTiltDegrees: 'มุมเอียงศีรษะ',
+        shoulderSlopeDegrees: 'มุมเอียงไหล่',
+        torsoInclinationDegrees: 'มุมเอียงลำตัว',
+        eyeShoulderDistanceRatio: 'อัตราส่วนระยะตา–ไหล่ / ความกว้างไหล่',
+        forwardHeadRatio: 'อัตราส่วนความกว้างตา / ความกว้างไหล่'
+      }
+    },
     cameraFramingAlert: 'มุมกล้องหรือตำแหน่งไม่เหมาะสม',
     badgeForwardHead: 'คอยื่นเข้าหาจอ',
     badgeSlouching: 'หลังค่อม / ไหล่ห่อ',
@@ -1084,6 +1106,29 @@ const en: typeof th = {
     goodAlignment: 'Good alignment relative to personal baseline',
     noBaseline: 'Personal baseline not established',
     postureStatus: 'Posture Status',
+    readings: {
+      title: 'Numeric differences from Baseline',
+      explanation:
+        'Difference = |current − Baseline mean|. Updates at most twice per second. These readings are separate from alerts, which still require sustained changes under the existing rules.',
+      current: 'Current',
+      baseline: 'Baseline',
+      difference: 'Difference',
+      degreesValue: '{{value}}°',
+      ratioValue: '{{value}}',
+      unavailable: 'Unable to assess',
+      waiting:
+        'Unable to assess — waiting for reliable data and a usable Baseline',
+      limitation:
+        'Estimates from normalized 2D image coordinates (seated-baseline-v1), not real 3D body angles, and not camera accuracy or ground-truth measurement error. Ratios are unitless, not percentages. Missing or stale data is not shown as zero.',
+      metrics: {
+        headTiltDegrees: 'Head tilt',
+        shoulderSlopeDegrees: 'Shoulder slope',
+        torsoInclinationDegrees: 'Torso inclination',
+        eyeShoulderDistanceRatio:
+          'Eye–shoulder distance / shoulder-width ratio',
+        forwardHeadRatio: 'Eye-width / shoulder-width ratio'
+      }
+    },
     cameraFramingAlert: 'Camera angle or framing issue',
     badgeForwardHead: 'Forward Head',
     badgeSlouching: 'Slouching / Slump',

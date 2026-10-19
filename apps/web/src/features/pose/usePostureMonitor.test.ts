@@ -47,6 +47,82 @@ function makeSnapshot(
 }
 
 describe('usePostureMonitor', () => {
+  it('samples current metrics and clears unavailable or stale readings', () => {
+    vi.useFakeTimers()
+    try {
+      const pose = createSyntheticPose({
+        23: { visibility: 0 },
+        24: { visibility: 0 }
+      })
+      const { result, rerender, unmount } = renderHook(
+        ({ s, p }: { s: PoseTrackingSnapshot; p: boolean }) =>
+          usePostureMonitor(s, p),
+        { initialProps: { s: makeSnapshot(pose), p: false } }
+      )
+      expect(result.current.observedMetrics).toBeNull()
+      act(() => result.current.startCalibration())
+      for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+        rerender({ s: makeSnapshot(pose), p: false })
+      }
+      act(() => vi.advanceTimersByTime(500))
+      expect(result.current.observedMetrics?.headTiltDegrees).toBe(0)
+      expect(result.current.observedMetrics?.torsoInclinationDegrees).toBeNull()
+
+      const tilted = createSyntheticPose({
+        8: { y: 0.21 },
+        23: { visibility: 0 },
+        24: { visibility: 0 }
+      })
+      rerender({ s: makeSnapshot(tilted), p: false })
+      expect(result.current.observedMetrics?.headTiltDegrees).toBe(0)
+      act(() => vi.advanceTimersByTime(500))
+      expect(result.current.observedMetrics?.headTiltDegrees).toBeCloseTo(11.31)
+
+      const unavailable = [
+        makeSnapshot(null, 'no_pose'),
+        makeSnapshot(tilted, 'multiple_poses'),
+        makeSnapshot(tilted, 'error'),
+        makeSnapshot(createSyntheticPose({ 2: { visibility: 0 } })),
+        makeSnapshot(createSyntheticPose({ 12: { x: 0.48 } })),
+        makeSnapshot(createSyntheticPose())
+      ]
+      for (const snapshot of unavailable) {
+        rerender({ s: snapshot, p: false })
+        expect(result.current.observedMetrics).toBeNull()
+        act(() => vi.advanceTimersByTime(500))
+        expect(result.current.observedMetrics).toBeNull()
+        rerender({ s: makeSnapshot(pose), p: false })
+        act(() => vi.advanceTimersByTime(500))
+        expect(result.current.observedMetrics).not.toBeNull()
+      }
+      rerender({ s: makeSnapshot(pose), p: true })
+      expect(result.current.observedMetrics).toBeNull()
+      rerender({ s: makeSnapshot(pose), p: false })
+      act(() => vi.advanceTimersByTime(500))
+      expect(result.current.observedMetrics).not.toBeNull()
+      act(() => vi.advanceTimersByTime(2000))
+      expect(result.current.observedMetrics).toBeNull()
+      vi.setSystemTime(Date.now() + 9 * 60 * 60 * 1000)
+      rerender({ s: makeSnapshot(pose), p: false })
+      expect(result.current.feedback.state).toBe('recalibration_recommended')
+      act(() => vi.advanceTimersByTime(500))
+      expect(result.current.observedMetrics).toBeNull()
+      rerender({ s: makeSnapshot(pose), p: false })
+      act(() => vi.advanceTimersByTime(500))
+      act(() => result.current.startCalibration())
+      expect(result.current.observedMetrics).toBeNull()
+      act(() => result.current.cancelCalibration())
+      act(() => vi.advanceTimersByTime(500))
+      expect(result.current.observedMetrics).toBeNull()
+      act(() => result.current.reset())
+      expect(result.current.observedMetrics).toBeNull()
+      unmount()
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('starts uncalibrated with an unable_to_assess posture state', () => {
     const { result } = renderHook(() =>
       usePostureMonitor(makeSnapshot(createSyntheticPose()), false)

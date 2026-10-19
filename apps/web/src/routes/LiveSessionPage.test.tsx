@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
@@ -11,6 +11,7 @@ import type {
   PoseTrackingStatus
 } from '@/features/pose/usePoseTracking'
 import * as poseTracking from '@/features/pose/usePoseTracking'
+import { CALIBRATION_SAMPLE_TARGET } from '@/features/pose/usePostureMonitor'
 import i18n from '@/lib/i18n'
 import * as product from '@/services/product'
 import { LiveSessionPage } from './LiveSessionPage'
@@ -52,7 +53,7 @@ function renderRoute() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } }
   })
-  return render(
+  const content = () => (
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={['/app/sessions/session-1/live']}>
         <Routes>
@@ -62,6 +63,8 @@ function renderRoute() {
       </MemoryRouter>
     </QueryClientProvider>
   )
+  const view = render(content())
+  return { ...view, refresh: () => view.rerender(content()) }
 }
 
 describe('LiveSessionPage', () => {
@@ -205,6 +208,59 @@ describe('LiveSessionPage', () => {
 
     await user.click(calibrateButton)
     expect(await screen.findByText(/กำลังเก็บค่า Baseline/)).toBeInTheDocument()
+  })
+
+  it('connects live baseline differences and removes them when tracking is lost', async () => {
+    await i18n.changeLanguage('th')
+    const landmarks: PoseLandmark[] = Array.from({ length: 33 }, () => ({
+      x: 0.5,
+      y: 0.5,
+      visibility: 0
+    }))
+    landmarks[0] = { x: 0.5, y: 0.2, visibility: 1 }
+    landmarks[2] = { x: 0.48, y: 0.18, visibility: 1 }
+    landmarks[5] = { x: 0.52, y: 0.18, visibility: 1 }
+    landmarks[7] = { x: 0.45, y: 0.19, visibility: 1 }
+    landmarks[8] = { x: 0.55, y: 0.19, visibility: 1 }
+    landmarks[11] = { x: 0.4, y: 0.35, visibility: 1 }
+    landmarks[12] = { x: 0.6, y: 0.35, visibility: 1 }
+    vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+      poseSnapshot('ready', landmarks)
+    )
+    const user = userEvent.setup()
+    const view = renderRoute()
+    await user.click(
+      await screen.findByRole('button', { name: 'ปรับเทียบ Baseline' })
+    )
+    for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+      vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+        poseSnapshot('ready', landmarks)
+      )
+      view.refresh()
+    }
+    expect(await screen.findByText('ตัวเลขความต่างจาก Baseline')).toBeVisible()
+    const tilted = landmarks.map((landmark, index) =>
+      index === 8 ? { ...landmark, y: 0.21 } : landmark
+    )
+    vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+      poseSnapshot('ready', tilted)
+    )
+    view.refresh()
+    const head = within(
+      await screen.findByRole('group', { name: 'มุมเอียงศีรษะ' })
+    )
+    expect(await head.findAllByText('11.3°')).toHaveLength(2)
+    expect(head.getByText('0.0°')).toBeVisible()
+    vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+      poseSnapshot('no_pose')
+    )
+    view.refresh()
+    expect(
+      screen.getByText(
+        'ยังประเมินไม่ได้ — รอข้อมูลที่เชื่อถือได้และ Baseline ที่ใช้ได้'
+      )
+    ).toBeVisible()
+    expect(screen.queryByText('11.3°')).not.toBeInTheDocument()
   })
 
   it('pauses and resumes the session tracking and timer controls', async () => {

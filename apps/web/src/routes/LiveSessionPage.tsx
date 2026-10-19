@@ -23,6 +23,7 @@ import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
 import { useCamera, type CameraState } from '@/features/camera/useCamera'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
+import { BaselineReadings } from '@/features/pose/BaselineReadings'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
 import {
   usePostureMonitor,
@@ -393,6 +394,10 @@ export function LiveSessionPage() {
                 <p className="mt-3 text-xs leading-5 text-slate-500">
                   {t('session.observationalDisclaimer')}
                 </p>
+                <BaselineReadings
+                  baseline={monitor.calibrationState.baseline}
+                  metrics={monitor.observedMetrics}
+                />
               </div>
             </section>
           )}

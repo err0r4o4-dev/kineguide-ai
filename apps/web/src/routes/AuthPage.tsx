@@ -118,7 +118,7 @@ export function AuthPage() {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(18,53,45,0.08)_15%,rgba(18,53,45,0.78)_58%,#12352d_100%)]"
+            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(20,43,58,0.08)_15%,rgba(20,43,58,0.78)_58%,#142b3a_100%)]"
           />
           <Brand inverted />
           <div className="max-w-md pb-2">

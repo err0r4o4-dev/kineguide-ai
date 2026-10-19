@@ -136,7 +136,7 @@ export function ProgressPage() {
                   key={session.id}
                 >
                   <span
-                    className="rounded-t-xl bg-[linear-gradient(180deg,#dff36c,#0b6b5c)] shadow-[0_8px_18px_rgb(11_107_92_/_0.12)] transition-all hover:brightness-105"
+                    className="rounded-t-xl bg-[linear-gradient(180deg,var(--color-kg-mint),var(--color-kg-brand))] shadow-[0_8px_18px_rgb(72_167_184_/_0.12)] transition-all hover:brightness-105"
                     style={{ height: `${heightPercentage}%` }}
                     title={formatDuration(session.metrics.duration_seconds)}
                   />
