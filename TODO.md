@@ -1,5 +1,13 @@
 # KineGuide AI — Product Flow และ Roadmap
 
+## Consent current HTTP 500 — 2026-10-19
+
+- [ ] Investigation: reproduce repeated consent reads; distinguish nullable scanning, connection reuse, and stale runtime.
+- [ ] Regression: cover the verified failure with synthetic data only.
+- [ ] Implementation: apply the smallest causal fix without weakening consent or authorization.
+- [ ] Verification: run focused regression, affected Go checks, and inspect diff.
+- [ ] Cleanup: remove temporary artifacts and this section only after verification.
+
 ## MultiPosture offline training — 2026-10-19
 
 - [x] Investigation: publisher review found study consent and 33-to-11 joint reduction, but public-release/downstream-training scope, exact released preprocessing and 4,794/4,800 frame discrepancy remain unresolved. User authorized offline work, not deployment or redistribution.

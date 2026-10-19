@@ -82,7 +82,7 @@ func NewRouter(cfg config.Config, dependencies Dependencies, logger *slog.Logger
 	router.GET(apiV1Prefix+"/system/status", systemStatusHandler(cfg.Version, dependencies))
 	router.GET("/openapi.json", openAPIHandler)
 	router.GET("/docs", docsHandler)
-	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders, dependencies.ChatAI, dependencies.TechnicalAI)
+	registerProductRoutes(router, cfg, dependencies.Store, dependencies.Signer, dependencies.OAuthProviders, dependencies.ChatAI, dependencies.TechnicalAI, logger)
 	return router
 }
 

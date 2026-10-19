@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"log/slog"
 	"math"
 	"net/http"
 	"net/mail"
@@ -25,6 +27,7 @@ import (
 const userIDKey = "authenticated_user_id"
 
 type productAPI struct {
+	logger      *slog.Logger
 	cfg         config.Config
 	store       product.Store
 	signer      *security.TokenSigner
@@ -39,11 +42,11 @@ type authResponse struct {
 	User        product.User `json:"user"`
 }
 
-func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider, chatAI ChatResponder, technicalAI TechnicalPoseResponder) {
+func registerProductRoutes(router *gin.Engine, cfg config.Config, store product.Store, signer *security.TokenSigner, providers map[string]oauthprovider.Provider, chatAI ChatResponder, technicalAI TechnicalPoseResponder, logger *slog.Logger) {
 	if store == nil || signer == nil {
 		return
 	}
-	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers, chatAI: chatAI, technicalAI: technicalAI}
+	api := &productAPI{cfg: cfg, store: store, signer: signer, providers: providers, chatAI: chatAI, technicalAI: technicalAI, logger: logger}
 	v1 := router.Group(apiV1Prefix)
 	auth := v1.Group("/auth")
 	auth.POST("/register", api.register)
@@ -264,6 +267,12 @@ func (a *productAPI) currentConsent(c *gin.Context) {
 		return
 	}
 	if err != nil {
+		attributes := []any{"request_id", c.GetString(appmiddleware.RequestIDKey), "error_type", fmt.Sprintf("%T", err)}
+		var databaseError interface{ SQLState() string }
+		if errors.As(err, &databaseError) {
+			attributes = append(attributes, "sqlstate", databaseError.SQLState())
+		}
+		a.logger.ErrorContext(c.Request.Context(), "consent_lookup_failed", attributes...)
 		writeError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Unable to load consent.")
 		return
 	}
