@@ -99,7 +99,7 @@ export function CameraSetupPage() {
             </div>
 
             <button
-              className="ui-transition pressable mt-6 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-teal-700 bg-gradient-to-r from-teal-600 to-teal-700 px-5 font-bold text-white shadow-[0_14px_30px_rgb(15_118_110_/_0.22)] hover:from-teal-700 hover:to-teal-800"
+              className="kg-button-primary ui-transition pressable mt-6 min-h-14 w-full gap-3 rounded-2xl px-5 font-bold"
               disabled={!seatedSetupConfirmed}
               onClick={startCameraCheck}
               type="button"
@@ -336,7 +336,7 @@ function CameraReadinessPanel({
             </p>
           )}
           <button
-            className="ui-transition pressable inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-teal-700 bg-gradient-to-r from-teal-600 to-teal-700 px-5 font-bold text-white shadow-[0_14px_30px_rgb(15_118_110_/_0.22)] hover:from-teal-700 hover:to-teal-800"
+            className="kg-button-primary ui-transition pressable min-h-14 w-full gap-3 rounded-2xl px-5 font-bold"
             disabled={camera.state !== 'ready' || isPending}
             onClick={onContinue}
             type="button"

@@ -374,7 +374,16 @@ test('new user completes registration and consent', async ({ page }) => {
   await page
     .getByLabel('ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ')
     .check()
-  await page.getByRole('button', { name: 'ตรวจความพร้อมของกล้อง' }).click()
+  const cameraAction = page.getByRole('button', {
+    name: 'ตรวจความพร้อมของกล้อง'
+  })
+  await expect(cameraAction).toBeEnabled()
+  await expect(cameraAction).toHaveCSS(
+    'background-image',
+    'linear-gradient(135deg, rgb(120, 191, 188), rgb(125, 184, 180))'
+  )
+  await expect(cameraAction).toHaveCSS('color', 'rgb(15, 23, 42)')
+  await cameraAction.click()
   await expect(page.getByText('อนุญาตแล้ว')).toBeVisible()
 
   const cameraPreview = page.locator('video')
@@ -592,7 +601,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     'background-color',
     'rgb(255, 255, 255)'
   )
-  await expect(accountButton).toHaveCSS('color', 'rgb(20, 43, 58)')
+  await expect(accountButton).toHaveCSS('color', 'rgb(15, 23, 42)')
   await expect(
     accountButton.locator('span[aria-hidden=true]').first()
   ).toHaveCSS(
@@ -601,7 +610,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   )
   await expect(accountButton.locator('svg').first()).toHaveCSS(
     'color',
-    'rgb(88, 113, 126)'
+    'rgb(82, 99, 124)'
   )
   await expect(
     page.getByRole('link', { name: /ตั้งค่าและความเป็นส่วนตัว/ })

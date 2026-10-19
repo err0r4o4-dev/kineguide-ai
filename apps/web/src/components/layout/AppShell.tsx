@@ -106,7 +106,7 @@ export function AppShell() {
 
           <aside
             id="app-navigation"
-            className={`fixed bottom-0 left-0 top-[var(--layout-mobile-nav,4.5rem)] z-[var(--z-index-navigation)] flex w-[var(--layout-sidebar,280px)] flex-col overflow-y-auto border-r border-[var(--color-kg-border)] bg-white/95 px-4 py-5 shadow-[var(--shadow-floating)] backdrop-blur-xl transition-transform duration-[var(--motion-standard)] ease-[var(--ease-standard)] sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:bg-[linear-gradient(180deg,#ffffff_0%,#f5fbfc_70%,#eaf7f7_100%)] lg:px-6 lg:py-7 lg:shadow-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
+            className={`fixed bottom-0 left-0 top-[var(--layout-mobile-nav,4.5rem)] z-[var(--z-index-navigation)] flex w-[var(--layout-sidebar,280px)] flex-col overflow-y-auto border-r border-[var(--color-kg-border)] bg-white/95 px-4 py-5 shadow-[var(--shadow-floating)] backdrop-blur-xl transition-transform duration-[var(--motion-standard)] ease-[var(--ease-standard)] sm:px-5 lg:sticky lg:inset-y-0 lg:h-screen lg:translate-x-0 lg:bg-[linear-gradient(180deg,#ffffff_0%,#f5fbfa_70%,#effbf8_100%)] lg:px-6 lg:py-7 lg:shadow-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
           >
             <div className="hidden rounded-[1.35rem] border border-teal-100 bg-white p-3 shadow-sm lg:block">
               <Brand />

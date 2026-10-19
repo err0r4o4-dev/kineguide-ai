@@ -100,7 +100,7 @@ export function PwaUpdateNotice() {
           </p>
           {needRefresh || registrationFailed ? (
             <button
-              className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-teal-700 px-4 font-semibold text-white hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-wait disabled:opacity-70"
+              className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--color-kg-action)] px-4 font-semibold text-[var(--color-kg-ink)] hover:bg-[var(--color-kg-action-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-wait disabled:opacity-70"
               disabled={isUpdating}
               onClick={
                 registrationFailed && !needRefresh
