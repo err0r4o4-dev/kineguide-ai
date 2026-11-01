@@ -5,6 +5,10 @@ import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
 
 import i18n from '@/lib/i18n'
+import {
+  resetSoundAlertPreferencesStoreForTests,
+  SOUND_ALERT_STORAGE_KEY
+} from '@/features/notifications/soundAlertPreferences'
 import * as product from '@/services/product'
 import * as notification from '@/lib/notification'
 import { SettingsPage } from './SettingsPage'
@@ -46,6 +50,11 @@ function renderRoute() {
 }
 
 describe('SettingsPage', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+    resetSoundAlertPreferencesStoreForTests()
+  })
+
   it('renders settings sections', async () => {
     await i18n.changeLanguage('th')
     renderRoute()
@@ -115,5 +124,64 @@ describe('SettingsPage', () => {
     )
 
     expect(product.deleteAuthIdentity).toHaveBeenCalledWith('google')
+  })
+
+  it('configures sound alert preferences, previews sound, and clears preferences on account deletion', async () => {
+    await i18n.changeLanguage('th')
+    const speakMock = vi.fn()
+    Object.defineProperty(window, 'speechSynthesis', {
+      configurable: true,
+      value: {
+        speak: speakMock,
+        cancel: vi.fn(),
+        getVoices: () => [{ lang: 'th-TH', name: 'Thai Voice' }]
+      }
+    })
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      configurable: true,
+      value: class FakeUtterance {
+        text: string
+        lang = ''
+        volume = 1
+        rate = 1
+        pitch = 1
+        voice: unknown = null
+        onerror: unknown = null
+        onend: unknown = null
+        constructor(text: string) {
+          this.text = text
+        }
+      }
+    })
+
+    const user = userEvent.setup()
+    vi.mocked(notification.confirmNotification).mockResolvedValue(true)
+    renderRoute()
+
+    expect(
+      screen.getByRole('heading', { name: 'การแจ้งเตือนด้วยเสียง' })
+    ).toBeVisible()
+
+    // Preview TTS sound
+    await user.click(screen.getByRole('button', { name: 'ทดลองฟังเสียง' }))
+    expect(speakMock).toHaveBeenCalledTimes(1)
+
+    // Toggle an event checkbox and persist to localStorage
+    const framingCheckbox = screen.getByRole('checkbox', {
+      name: /เตือนเมื่อมุมกล้องไม่เหมาะสมต่อเนื่อง/
+    })
+    expect(framingCheckbox).toBeChecked()
+    await user.click(framingCheckbox)
+    expect(framingCheckbox).not.toBeChecked()
+    expect(window.localStorage.getItem(SOUND_ALERT_STORAGE_KEY)).toContain(
+      '"cameraFraming":false'
+    )
+
+    // Deleting account removes stored browser preferences
+    await user.click(
+      screen.getByRole('button', { name: 'ลบบัญชีและข้อมูลทั้งหมด' })
+    )
+    expect(product.deleteAccount).toHaveBeenCalled()
+    expect(window.localStorage.getItem(SOUND_ALERT_STORAGE_KEY)).toBeNull()
   })
 })

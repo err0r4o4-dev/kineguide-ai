@@ -2,11 +2,13 @@ import {
   CheckCircle2,
   Languages,
   Link2,
+  Play,
   ShieldCheck,
   Trash2,
-  Unlink
+  Unlink,
+  Volume2
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
@@ -16,6 +18,15 @@ import { PageHeader } from '@/components/PageHeader'
 import { LanguageButton } from '@/components/LanguageButton'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
+import {
+  createBrowserSoundAlertAdapter,
+  type SoundAlertAdapter
+} from '@/features/notifications/soundAlertAdapter'
+import {
+  clearSoundAlertPreferences,
+  useSoundAlertPreferences,
+  type SoundAlertEventKey
+} from '@/features/notifications/soundAlertPreferences'
 import {
   deleteAccount,
   deleteAuthIdentity,
@@ -51,6 +62,63 @@ export function SettingsPage() {
   const [revoking, setRevoking] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [identityBusy, setIdentityBusy] = useState<OAuthProvider | null>(null)
+  const sound = useSoundAlertPreferences()
+  const previewAdapterRef = useRef<SoundAlertAdapter | null>(null)
+  const [, setVoicesRevision] = useState(0)
+
+  useEffect(() => {
+    const adapter = createBrowserSoundAlertAdapter()
+    previewAdapterRef.current = adapter
+
+    const handleVoicesChanged = () => {
+      setVoicesRevision((current) => current + 1)
+    }
+
+    try {
+      window.speechSynthesis?.addEventListener?.(
+        'voiceschanged',
+        handleVoicesChanged
+      )
+    } catch {
+      // Ignore hosts where speechSynthesis does not implement EventTarget.
+    }
+
+    return () => {
+      try {
+        window.speechSynthesis?.removeEventListener?.(
+          'voiceschanged',
+          handleVoicesChanged
+        )
+      } catch {
+        // Ignore cleanup errors on restricted hosts.
+      }
+      adapter.dispose()
+      previewAdapterRef.current = null
+    }
+  }, [])
+
+  const activeLanguage = i18n.resolvedLanguage === 'en' ? 'en' : 'th'
+  const soundCapabilities = (
+    previewAdapterRef.current ?? createBrowserSoundAlertAdapter()
+  ).getCapabilities(activeLanguage)
+  const audioCompletelyUnsupported =
+    !soundCapabilities.webAudioSupported &&
+    soundCapabilities.speechStatus === 'unsupported'
+  const speechFallbackActive =
+    !audioCompletelyUnsupported &&
+    sound.preferences.mode === 'tts' &&
+    soundCapabilities.speechStatus !== 'supported'
+  const volumePercent = Math.round(sound.preferences.volume * 100)
+
+  const handlePreviewSound = () => {
+    previewAdapterRef.current?.play({
+      tone: 'preview',
+      text: t('sound.speech.preview'),
+      language: activeLanguage,
+      mode: sound.preferences.mode,
+      volume: sound.preferences.volume
+    })
+  }
 
   const connectIdentity = async (provider: OAuthProvider) => {
     setIdentityBusy(provider)
@@ -121,6 +189,7 @@ export function SettingsPage() {
     setDeleting(true)
     try {
       await deleteAccount()
+      clearSoundAlertPreferences()
       await auth.logout()
       navigate('/')
     } catch {
@@ -145,6 +214,141 @@ export function SettingsPage() {
             title={t('settings.language')}
           >
             <LanguageButton />
+          </SettingsSection>
+
+          <SettingsSection
+            body={t('settings.soundBody')}
+            icon={Volume2}
+            title={t('settings.soundTitle')}
+          >
+            <div className="space-y-5">
+              <label className="kg-check">
+                <input
+                  checked={sound.preferences.enabled}
+                  onChange={sound.toggleEnabled}
+                  type="checkbox"
+                />
+                <span>
+                  <strong className="text-sm text-slate-900">
+                    {t('settings.soundEnable')}
+                  </strong>
+                  <small>{t('settings.soundEnableBody')}</small>
+                </span>
+              </label>
+
+              {audioCompletelyUnsupported && (
+                <p
+                  className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950"
+                  role="status"
+                >
+                  {t('settings.soundUnsupportedNotice')}
+                </p>
+              )}
+
+              {speechFallbackActive && (
+                <p
+                  className="rounded-xl border border-teal-200 bg-teal-50/70 p-3 text-xs leading-5 text-teal-950"
+                  role="status"
+                >
+                  {t('settings.soundSpeechFallbackNotice')}
+                </p>
+              )}
+
+              <fieldset className="space-y-2.5 border-0 p-0">
+                <legend className="text-sm font-semibold text-slate-900">
+                  {t('settings.soundModeLabel')}
+                </legend>
+                <label
+                  className={`kg-choice mt-2 ${sound.preferences.mode === 'tts' ? 'kg-choice-selected' : ''}`}
+                >
+                  <input
+                    checked={sound.preferences.mode === 'tts'}
+                    name="sound-alert-mode"
+                    onChange={() => sound.setMode('tts')}
+                    type="radio"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {t('settings.soundModeTts')}
+                    </p>
+                    <p className="mt-0.5 text-xs leading-5 text-slate-500">
+                      {t('settings.soundModeTtsBody')}
+                    </p>
+                  </div>
+                </label>
+                <label
+                  className={`kg-choice ${sound.preferences.mode === 'chime' ? 'kg-choice-selected' : ''}`}
+                >
+                  <input
+                    checked={sound.preferences.mode === 'chime'}
+                    name="sound-alert-mode"
+                    onChange={() => sound.setMode('chime')}
+                    type="radio"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {t('settings.soundModeChime')}
+                    </p>
+                    <p className="mt-0.5 text-xs leading-5 text-slate-500">
+                      {t('settings.soundModeChimeBody')}
+                    </p>
+                  </div>
+                </label>
+              </fieldset>
+
+              <div className="space-y-1.5">
+                <label
+                  className="block text-sm font-semibold tabular-nums text-slate-900"
+                  htmlFor="sound-alert-volume"
+                >
+                  {t('settings.soundVolume', { percent: volumePercent })}
+                </label>
+                <input
+                  className="min-h-11 w-full cursor-pointer accent-[var(--color-kg-primary)]"
+                  id="sound-alert-volume"
+                  max={100}
+                  min={10}
+                  onChange={(event) =>
+                    sound.setVolume(Number(event.target.value) / 100)
+                  }
+                  step={10}
+                  type="range"
+                  value={volumePercent}
+                />
+              </div>
+
+              <fieldset className="space-y-3 border-0 p-0">
+                <legend className="text-sm font-semibold text-slate-900">
+                  {t('settings.soundEventsLabel')}
+                </legend>
+                <div className="mt-2 space-y-2.5">
+                  {soundEventOptions.map((option) => (
+                    <label className="kg-check" key={option.key}>
+                      <input
+                        checked={sound.preferences.events[option.key]}
+                        onChange={() => sound.toggleEvent(option.key)}
+                        type="checkbox"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        {t(option.labelKey)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <div className="pt-1">
+                <button
+                  className="kg-button-secondary text-sm"
+                  disabled={audioCompletelyUnsupported}
+                  onClick={handlePreviewSound}
+                  type="button"
+                >
+                  <Play aria-hidden="true" size={16} />
+                  {t('settings.soundPreview')}
+                </button>
+              </div>
+            </div>
           </SettingsSection>
 
           <SettingsSection
@@ -328,6 +532,16 @@ function SettingsSection({
     </section>
   )
 }
+
+const soundEventOptions: ReadonlyArray<{
+  key: SoundAlertEventKey
+  labelKey: string
+}> = [
+  { key: 'postureAlert', labelKey: 'settings.soundEventPosture' },
+  { key: 'breakReminder', labelKey: 'settings.soundEventBreak' },
+  { key: 'calibrationStatus', labelKey: 'settings.soundEventCalibration' },
+  { key: 'cameraFraming', labelKey: 'settings.soundEventFraming' }
+]
 
 function providerName(provider: OAuthProvider) {
   return provider === 'google' ? 'Google' : 'Facebook'

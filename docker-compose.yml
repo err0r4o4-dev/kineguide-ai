@@ -42,6 +42,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 15s
     mem_limit: 384m
 
   api-go:
@@ -81,6 +82,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 20s
     mem_limit: 256m
 
   web:
@@ -101,6 +103,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 15s
     mem_limit: 128m
 
   caddy:

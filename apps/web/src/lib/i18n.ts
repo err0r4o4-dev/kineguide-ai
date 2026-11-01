@@ -558,7 +558,17 @@ const th = {
     headAlignment: 'ศีรษะ: ปกติ',
     shoulderAlignment: 'ไหล่: สมดุล',
     torsoAlignment: 'ลำตัว: มั่นคง',
-    baselineComparison: 'เปรียบเทียบจากค่า Baseline'
+    baselineComparison: 'เปรียบเทียบจากค่า Baseline',
+    soundOn: 'เสียงเตือน: เปิด',
+    soundOff: 'เสียงเตือน: ปิด'
+  },
+  sound: {
+    speech: {
+      breakDue:
+        'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ หลังจากนั่งต่อเนื่องครบ {{minutes}} นาที',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานส่วนบุคคลเรียบร้อยแล้ว',
+      preview: 'ตัวอย่างเสียงแจ้งเตือนจากไคน์ไกด์ เอไอ'
+    }
   },
   history: {
     title: 'ประวัติเซสชัน',
@@ -629,7 +639,31 @@ const th = {
     identityFailed: 'ไม่สามารถเปลี่ยนบัญชีที่เชื่อมต่อได้',
     lastLoginMethod: 'ต้องมีวิธีเข้าสู่ระบบอื่นก่อนยกเลิกการเชื่อมบัญชีนี้',
     cameraPrefs: 'การตั้งค่ากล้อง',
-    breakPrefs: 'การแจ้งเตือนหยุดพัก'
+    breakPrefs: 'การแจ้งเตือนหยุดพัก',
+    soundTitle: 'การแจ้งเตือนด้วยเสียง',
+    soundBody:
+      'ควบคุมเสียงพูดแนะนำและเสียงสัญญาณระหว่างเซสชันติดตามท่าทาง การตั้งค่านี้เก็บเฉพาะในเบราว์เซอร์ของคุณ',
+    soundEnable: 'เปิดใช้เสียงแจ้งเตือนระหว่างเซสชัน',
+    soundEnableBody:
+      'ใช้เสียงเสริมข้อความบนหน้าจอ โดยไม่ส่งข้อมูลเสียงหรือภาพออกจากอุปกรณ์',
+    soundModeLabel: 'รูปแบบเสียงแจ้งเตือน',
+    soundModeTts: 'เสียงพูดอ่านคำแนะนำ (TTS)',
+    soundModeTtsBody:
+      'อ่านข้อความแจ้งเตือนตามภาษาที่เลือก และสลับเป็นเสียงสัญญาณอัตโนมัติเมื่อเบราว์เซอร์ไม่รองรับ',
+    soundModeChime: 'เสียงสัญญาณนุ่มนวล',
+    soundModeChimeBody:
+      'ใช้โทนเสียงสังเคราะห์สั้น ๆ แยกตามประเภทเหตุการณ์โดยไม่มีเสียงพูด',
+    soundVolume: 'ระดับความดังเสียง ({{percent}}%)',
+    soundEventsLabel: 'เหตุการณ์ที่ต้องการให้ส่งเสียง',
+    soundEventPosture: 'เตือนปรับท่านั่งเมื่อเบี่ยงเบนต่อเนื่อง',
+    soundEventBreak: 'เตือนเมื่อถึงเวลาพัก',
+    soundEventCalibration: 'สถานะการปรับเทียบ Baseline',
+    soundEventFraming: 'เตือนเมื่อมุมกล้องไม่เหมาะสมต่อเนื่อง',
+    soundPreview: 'ทดลองฟังเสียง',
+    soundSpeechFallbackNotice:
+      'เบราว์เซอร์หรืออุปกรณ์นี้ยังไม่รองรับเสียงพูดสำหรับภาษาปัจจุบัน ระบบจะใช้เสียงสัญญาณนุ่มนวลแทนอัตโนมัติ',
+    soundUnsupportedNotice:
+      'เบราว์เซอร์นี้ไม่รองรับระบบเสียง Web Speech และ Web Audio จึงแสดงเฉพาะข้อความแจ้งเตือนบนหน้าจอ'
   },
   help: {
     title: 'ช่วยเหลือ',
@@ -1228,7 +1262,17 @@ const en: typeof th = {
     headAlignment: 'Head: Normal',
     shoulderAlignment: 'Shoulders: Balanced',
     torsoAlignment: 'Torso: Stable',
-    baselineComparison: 'Comparison vs Baseline'
+    baselineComparison: 'Comparison vs Baseline',
+    soundOn: 'Sound: On',
+    soundOff: 'Sound: Off'
+  },
+  sound: {
+    speech: {
+      breakDue:
+        'Time for an ergonomic break after {{minutes}} minutes of seated monitoring.',
+      calibrationSuccess: 'Personal baseline recorded.',
+      preview: 'Sample sound notification from KineGuide AI.'
+    }
   },
   history: {
     title: 'Session history',
@@ -1299,7 +1343,31 @@ const en: typeof th = {
     lastLoginMethod:
       'Add another sign-in method before disconnecting this account.',
     cameraPrefs: 'Camera Preferences',
-    breakPrefs: 'Break Reminders'
+    breakPrefs: 'Break Reminders',
+    soundTitle: 'Sound notifications',
+    soundBody:
+      'Control voice guidance and gentle chimes during live monitoring sessions. These preferences are stored locally in your browser.',
+    soundEnable: 'Enable sound alerts during live sessions',
+    soundEnableBody:
+      'Play audio alongside on-screen alerts without sending audio or camera data off-device.',
+    soundModeLabel: 'Alert sound format',
+    soundModeTts: 'Voice guidance (TTS)',
+    soundModeTtsBody:
+      'Reads alert messages in your active language and falls back to a gentle chime if speech is unavailable.',
+    soundModeChime: 'Gentle chime',
+    soundModeChimeBody:
+      'Plays short synthesized tones per alert category without spoken voice.',
+    soundVolume: 'Alert volume ({{percent}}%)',
+    soundEventsLabel: 'Events with sound alerts',
+    soundEventPosture: 'Posture adjustment after sustained deviation',
+    soundEventBreak: 'Ergonomic break reminder',
+    soundEventCalibration: 'Baseline calibration status',
+    soundEventFraming: 'Sustained camera framing issue',
+    soundPreview: 'Test sound',
+    soundSpeechFallbackNotice:
+      'This browser or device does not expose a voice for the current language. Gentle chime tones will play automatically instead.',
+    soundUnsupportedNotice:
+      'This browser does not support Web Speech or Web Audio, so alerts will appear visually on screen only.'
   },
   help: {
     title: 'Help',

@@ -10,5 +10,5 @@ RUN addgroup -S kineguide && adduser -S -G kineguide kineguide
 COPY --from=build /out/api /api
 EXPOSE 8080
 USER kineguide:kineguide
-HEALTHCHECK --interval=10s --timeout=3s --retries=5 CMD wget -qO- http://127.0.0.1:8080/health >/dev/null || exit 1
+HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=5 CMD wget -qO- http://127.0.0.1:8080/health >/dev/null || exit 1
 ENTRYPOINT ["/api"]

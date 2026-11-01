@@ -13,7 +13,9 @@ import {
   RotateCcw,
   Scan,
   ShieldCheck,
-  Square
+  Square,
+  Volume2,
+  VolumeX
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -22,6 +24,11 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
 import { useCamera, type CameraState } from '@/features/camera/useCamera'
+import { useSoundAlertPreferences } from '@/features/notifications/soundAlertPreferences'
+import {
+  getCalibrationFailureReasonKey,
+  useSessionSoundAlerts
+} from '@/features/notifications/useSessionSoundAlerts'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
 import { BaselineReadings } from '@/features/pose/BaselineReadings'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
@@ -46,9 +53,11 @@ interface TechnicalStatus {
 
 export function LiveSessionPage() {
   const { id = '' } = useParams()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
+  const { preferences: soundPreferences, toggleEnabled: toggleSound } =
+    useSoundAlertPreferences()
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
   const [seconds, setSeconds] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -106,6 +115,19 @@ export function LiveSessionPage() {
   )
 
   const monitor = usePostureMonitor(pose, paused)
+
+  useSessionSoundAlerts({
+    cameraState: camera.state,
+    paused,
+    isFinishing,
+    breakDue,
+    breakIntervalMinutes: reminderEngineRef.current?.getIntervalMinutes() ?? 25,
+    feedback: monitor.feedback,
+    calibrationState: monitor.calibrationState,
+    preferences: soundPreferences,
+    language: i18n.resolvedLanguage === 'en' ? 'en' : 'th',
+    t: (key, options) => String(t(key, options))
+  })
 
   // Update break reminders every elapsed second
   useEffect(() => {
@@ -211,6 +233,21 @@ export function LiveSessionPage() {
           <div className="flex min-h-11 items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 font-semibold tabular-nums text-white shadow-sm">
             {formatDuration(seconds)}
           </div>
+          <button
+            aria-pressed={soundPreferences.enabled}
+            className="kg-button-secondary"
+            onClick={toggleSound}
+            type="button"
+          >
+            {soundPreferences.enabled ? (
+              <Volume2 aria-hidden="true" size={18} />
+            ) : (
+              <VolumeX aria-hidden="true" size={18} />
+            )}
+            {soundPreferences.enabled
+              ? t('session.soundOn')
+              : t('session.soundOff')}
+          </button>
           <button
             className="kg-button-secondary"
             onClick={() => setPaused((current) => !current)}
@@ -610,13 +647,7 @@ function getCalibrationReasonText(
   t: (key: string) => string,
   reason: CalibrationFailureReason
 ): string {
-  if (reason === 'too_close') return t('calibration.reasonTooClose')
-  if (reason === 'too_far') return t('calibration.reasonTooFar')
-  if (reason === 'not_facing_camera') return t('calibration.reasonNotFacing')
-  if (reason === 'camera_tilted') return t('calibration.reasonTilted')
-  if (reason === 'head_cropped') return t('calibration.reasonHeadCropped')
-  if (reason === 'mixed_framing') return t('calibration.reasonMixed')
-  return t('calibration.reasonNotEnough')
+  return t(getCalibrationFailureReasonKey(reason))
 }
 
 const toneClasses: Record<TechnicalTone, string> = {

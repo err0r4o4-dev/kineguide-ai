@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
 import * as camera from '@/features/camera/useCamera'
+import { resetSoundAlertPreferencesStoreForTests } from '@/features/notifications/soundAlertPreferences'
 import type { PoseLandmark } from '@/features/pose/poseGeometry'
 import type {
   PoseTrackingSnapshot,
@@ -69,6 +70,8 @@ function renderRoute() {
 
 describe('LiveSessionPage', () => {
   beforeEach(() => {
+    window.localStorage.clear()
+    resetSoundAlertPreferencesStoreForTests()
     vi.mocked(camera.useCamera).mockReturnValue({
       state: 'ready',
       start: vi.fn(),
@@ -408,5 +411,79 @@ describe('LiveSessionPage', () => {
     expect(
       screen.getByText('คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย')
     ).toBeVisible()
+  })
+
+  it('toggles live session sound alerts and speaks via TTS when unmuted', async () => {
+    await i18n.changeLanguage('th')
+    const speakMock = vi.fn()
+    const cancelMock = vi.fn()
+    Object.defineProperty(window, 'speechSynthesis', {
+      configurable: true,
+      value: {
+        speak: speakMock,
+        cancel: cancelMock,
+        getVoices: () => [{ lang: 'th-TH', name: 'Thai Voice' }]
+      }
+    })
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      configurable: true,
+      value: class FakeUtterance {
+        text: string
+        lang = ''
+        volume = 1
+        rate = 1
+        pitch = 1
+        voice: unknown = null
+        onerror: unknown = null
+        onend: unknown = null
+        constructor(text: string) {
+          this.text = text
+        }
+      }
+    })
+
+    const landmarks: PoseLandmark[] = Array.from({ length: 33 }, () => ({
+      x: 0.5,
+      y: 0.5,
+      visibility: 0
+    }))
+    landmarks[0] = { x: 0.5, y: 0.2, visibility: 1 }
+    landmarks[2] = { x: 0.48, y: 0.18, visibility: 1 }
+    landmarks[5] = { x: 0.52, y: 0.18, visibility: 1 }
+    landmarks[7] = { x: 0.45, y: 0.19, visibility: 1 }
+    landmarks[8] = { x: 0.55, y: 0.19, visibility: 1 }
+    landmarks[11] = { x: 0.4, y: 0.35, visibility: 1 }
+    landmarks[12] = { x: 0.6, y: 0.35, visibility: 1 }
+    vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+      poseSnapshot('ready', landmarks)
+    )
+
+    const user = userEvent.setup()
+    const view = renderRoute()
+
+    const soundToggle = await screen.findByRole('button', {
+      name: 'เสียงเตือน: เปิด'
+    })
+    expect(soundToggle).toHaveAttribute('aria-pressed', 'true')
+
+    // Complete calibration while unmuted -> speaks confirmation
+    await user.click(
+      await screen.findByRole('button', { name: 'ปรับเทียบ Baseline' })
+    )
+    for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+      vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
+        poseSnapshot('ready', landmarks)
+      )
+      view.refresh()
+    }
+    expect(speakMock).toHaveBeenCalledTimes(1)
+
+    // Mute via header button -> cancels speech and updates accessible state
+    await user.click(soundToggle)
+    const mutedToggle = await screen.findByRole('button', {
+      name: 'เสียงเตือน: ปิด'
+    })
+    expect(mutedToggle).toHaveAttribute('aria-pressed', 'false')
+    expect(cancelMock).toHaveBeenCalled()
   })
 })

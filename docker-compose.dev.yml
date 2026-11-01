@@ -19,6 +19,8 @@ services:
       dockerfile: services/api-go/Dockerfile.dev
     # A cold Go build of Gin's codec dependency exceeds 768 MB on Docker Desktop.
     mem_limit: 1536m
+    healthcheck:
+      start_period: 60s
     volumes:
       - ./services/api-go:/workspace/services/api-go:ro
 
@@ -31,6 +33,8 @@ services:
       CHOKIDAR_USEPOLLING: "true"
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/v1}
     mem_limit: 512m
+    healthcheck:
+      start_period: 30s
     volumes:
       - ./apps/web/src:/workspace/apps/web/src:ro
       - ./apps/web/public:/workspace/apps/web/public:ro

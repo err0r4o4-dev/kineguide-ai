@@ -8,12 +8,15 @@ RUN go install github.com/air-verse/air@${AIR_VERSION} \
 
 WORKDIR /workspace/services/api-go
 
-COPY services/api-go/go.mod services/api-go/go.sum ./
-RUN go mod download \
-    && mkdir -p /tmp/air /home/kineguide/.cache/go-build \
-    && chown -R kineguide:kineguide /go/pkg /tmp/air /home/kineguide /workspace
-
 ENV GOCACHE=/home/kineguide/.cache/go-build
+
+COPY services/api-go/go.mod services/api-go/go.sum ./
+RUN mkdir -p /tmp/air "${GOCACHE}" \
+    && go mod download
+
+COPY services/api-go ./
+RUN go build -p=1 -o /tmp/air/api ./cmd/server \
+    && chown -R kineguide:kineguide /go/pkg /tmp/air /home/kineguide /workspace
 
 USER kineguide:kineguide
 EXPOSE 8080
