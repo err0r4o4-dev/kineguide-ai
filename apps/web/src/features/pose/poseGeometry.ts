@@ -1,3 +1,5 @@
+import { KINEGUIDE_VISIBILITY_GATE } from './poseStandard'
+
 export interface PoseLandmark {
   x: number
   y: number
@@ -28,7 +30,7 @@ export interface ClassifiedPoseFrame {
 
 // This gate only describes whether a landmark is technically usable. It is not
 // an exercise-correctness or clinical threshold.
-export const TECHNICAL_VISIBILITY_GATE = 0.5
+export const TECHNICAL_VISIBILITY_GATE = KINEGUIDE_VISIBILITY_GATE
 
 const BOUNDS_PADDING = 0.05
 

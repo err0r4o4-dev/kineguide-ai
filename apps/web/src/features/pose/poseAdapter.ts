@@ -1,4 +1,8 @@
 import type { PoseLandmark } from './poseGeometry'
+import {
+  createKineGuidePoseFrame,
+  type KineGuidePoseFrame
+} from './poseStandard'
 
 export interface PoseAdapter {
   detect(frame: PoseFrameSource, timestampMs: number): PoseDetectionResult
@@ -15,6 +19,8 @@ export interface BlinkEstimate {
 
 export interface PoseDetectionResult {
   poses: PoseLandmark[][]
+  worldPoses?: PoseLandmark[][]
+  canonicalPose?: KineGuidePoseFrame | null
   faceLandmarks: PoseLandmark[] | null
   leftHandLandmarks: PoseLandmark[] | null
   rightHandLandmarks: PoseLandmark[] | null
@@ -59,6 +65,19 @@ function copyLandmarks(
   )
 }
 
+function copyLandmarkList(
+  landmarks: readonly PoseLandmark[] | undefined
+): PoseLandmark[] {
+  return (
+    landmarks?.map(({ x, y, z, visibility }) => ({
+      x,
+      y,
+      z,
+      visibility
+    })) ?? []
+  )
+}
+
 export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
   if (typeof WebAssembly === 'undefined') {
     throw new Error('POSE_UNSUPPORTED')
@@ -99,14 +118,14 @@ export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
   }
   let lastSafetyTimestamp: number | null = null
   let safetyPoses: PoseLandmark[][] = []
+  let safetyWorldPoses: PoseLandmark[][] = []
 
   return {
     detect(frame, timestampMs) {
       if (shouldRunSafetyPose(lastSafetyTimestamp, timestampMs)) {
         const poseResult = poseLandmarker.detectForVideo(frame, timestampMs)
-        safetyPoses = poseResult.landmarks.map((pose) =>
-          pose.map(({ x, y, z, visibility }) => ({ x, y, z, visibility }))
-        )
+        safetyPoses = poseResult.landmarks.map(copyLandmarkList)
+        safetyWorldPoses = poseResult.worldLandmarks.map(copyLandmarkList)
         lastSafetyTimestamp = timestampMs
       }
       const holisticResult = holisticLandmarker.detectForVideo(
@@ -120,21 +139,28 @@ export const createMediaPipePoseAdapter: PoseAdapterFactory = async () => {
       const right =
         blendshapes.find(({ categoryName }) => categoryName === 'eyeBlinkRight')
           ?.score ?? 0
+      const poses =
+        safetyPoses.length === 1
+          ? holisticResult.poseLandmarks.map(copyLandmarkList)
+          : safetyPoses
+      const worldPoses =
+        safetyPoses.length === 1
+          ? holisticResult.poseWorldLandmarks.map(copyLandmarkList)
+          : safetyWorldPoses
 
       return {
         // Multi-person detection remains authoritative. With exactly one
         // person, the faster Holistic pose drives the display landmarks.
-        poses:
-          safetyPoses.length === 1
-            ? holisticResult.poseLandmarks.map((pose) =>
-                pose.map(({ x, y, z, visibility }) => ({
-                  x,
-                  y,
-                  z,
-                  visibility
-                }))
+        poses,
+        worldPoses,
+        canonicalPose:
+          poses.length === 1
+            ? createKineGuidePoseFrame(
+                poses[0],
+                worldPoses[0] ?? null,
+                timestampMs
               )
-            : safetyPoses,
+            : null,
         faceLandmarks: copyLandmarks(holisticResult.faceLandmarks[0]),
         leftHandLandmarks: copyLandmarks(holisticResult.leftHandLandmarks[0]),
         rightHandLandmarks: copyLandmarks(holisticResult.rightHandLandmarks[0]),
