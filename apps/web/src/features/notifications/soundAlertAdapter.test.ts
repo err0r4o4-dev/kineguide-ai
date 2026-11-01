@@ -3,7 +3,9 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createBrowserSoundAlertAdapter,
   formatSpeechText,
+  resolveThaiSpeechClipUrl,
   type AudioContextLike,
+  type AudioElementLike,
   type OscillatorNodeLike,
   type SpeechSynthesisLike,
   type SpeechUtteranceLike
@@ -222,8 +224,89 @@ describe('soundAlertAdapter', () => {
     expect(audio.oscillators.length).toBeGreaterThanOrEqual(2)
   })
 
+  it('plays bundled Thai MP3 voice clip when OS lacks a th-TH speechSynthesis voice (e.g. Windows 11 en-US only or empty getVoices)', () => {
+    const speech = createFakeSpeechEnv([
+      { lang: 'en-US', name: 'Microsoft David - English (United States)' }
+    ])
+    const audio = createFakeAudioContext()
+    const createdClips: Array<AudioElementLike & { src: string }> = []
+
+    const adapter = createBrowserSoundAlertAdapter({
+      getSpeechSynthesis: () => speech.synth,
+      createUtterance: speech.createUtterance,
+      createAudioContext: () => audio.context,
+      createAudioElement: (src: string) => {
+        const el: AudioElementLike & { src: string } = {
+          src,
+          volume: 1,
+          currentTime: 0,
+          onerror: null,
+          onended: null,
+          play: vi.fn(() => Promise.resolve()),
+          pause: vi.fn()
+        }
+        createdClips.push(el)
+        return el
+      }
+    })
+
+    expect(adapter.getCapabilities('th').speechStatus).toBe('supported')
+
+    adapter.play({
+      tone: 'preview',
+      text: 'ตัวอย่างเสียงพูดแจ้งเตือนภาษาไทยจากไคน์ไกด์ เอไอ',
+      language: 'th',
+      mode: 'tts',
+      volume: 0.7
+    })
+
+    // Must not send Thai script to English SAPI voice
+    expect(speech.spoken).toHaveLength(0)
+    // Must play bundled Thai voice clip instead of beep chime
+    expect(createdClips).toHaveLength(1)
+    expect(createdClips[0]?.src).toBe('/sounds/th/preview.mp3')
+    expect(createdClips[0]?.volume).toBe(0.7)
+    expect(createdClips[0]?.play).toHaveBeenCalledOnce()
+    expect(audio.oscillators).toHaveLength(0)
+
+    adapter.stop()
+    expect(createdClips[0]?.pause).toHaveBeenCalledOnce()
+  })
+
+  it('resolves all Thai alert phrases and tones to bundled MP3 clip URLs', () => {
+    expect(
+      resolveThaiSpeechClipUrl({
+        tone: 'posture',
+        text: 'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
+        language: 'th',
+        mode: 'tts',
+        volume: 0.8
+      })
+    ).toBe('/sounds/th/posture-slouching.mp3')
+
+    expect(
+      resolveThaiSpeechClipUrl({
+        tone: 'break',
+        text: 'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากนั่งต่อเนื่องครบ 25 นาที',
+        language: 'th',
+        mode: 'tts',
+        volume: 0.8
+      })
+    ).toBe('/sounds/th/break-due.mp3')
+
+    expect(
+      resolveThaiSpeechClipUrl({
+        tone: 'break',
+        text: 'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากนั่งต่อเนื่องครบ 40 นาที',
+        language: 'th',
+        mode: 'tts',
+        volume: 0.8
+      })
+    ).toBe('/sounds/th/break-due-generic.mp3')
+  })
+
   it('falls back to Web Audio chime when an utterance emits a synthesis error, but not when canceled', () => {
-    const speech = createFakeSpeechEnv([])
+    const speech = createFakeSpeechEnv([{ lang: 'en-US', name: 'English' }])
     const audio = createFakeAudioContext()
 
     const adapter = createBrowserSoundAlertAdapter({

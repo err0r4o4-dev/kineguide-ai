@@ -56,6 +56,15 @@ export interface SpeechSynthesisLike {
   speak(utterance: SpeechUtteranceLike): void
 }
 
+export interface AudioElementLike {
+  volume: number
+  currentTime: number
+  onerror: (() => void) | null
+  onended: (() => void) | null
+  play(): Promise<void> | void
+  pause(): void
+}
+
 export interface OscillatorNodeLike {
   type: OscillatorType
   readonly frequency: { value: number }
@@ -91,6 +100,7 @@ export interface BrowserSoundEnvironment {
   readonly getSpeechSynthesis?: () => SpeechSynthesisLike | null
   readonly createUtterance?: (text: string) => SpeechUtteranceLike | null
   readonly createAudioContext?: () => AudioContextLike | null
+  readonly createAudioElement?: (src: string) => AudioElementLike | null
 }
 
 interface ChimeNote {
@@ -126,6 +136,109 @@ const CHIME_PATTERNS: Readonly<Record<SoundAlertTone, readonly ChimeNote[]>> = {
     { freq: 523.25, offset: 0, duration: 0.14 },
     { freq: 783.99, offset: 0.16, duration: 0.2 }
   ]
+}
+
+const THAI_CLIP_BY_TONE: Readonly<Record<SoundAlertTone, string>> = {
+  preview: '/sounds/th/preview.mp3',
+  break: '/sounds/th/break-due-generic.mp3',
+  calibration_success: '/sounds/th/calibration-success.mp3',
+  calibration_failed: '/sounds/th/calibration-failed-not-enough.mp3',
+  posture: '/sounds/th/posture-general.mp3',
+  camera_framing: '/sounds/th/camera-general.mp3'
+}
+
+export function resolveThaiSpeechClipUrl(
+  input: SoundAlertPlayInput
+): string | null {
+  if (input.language !== 'th') return null
+  const text = input.text.trim()
+
+  if (input.tone === 'preview' || text.includes('ตัวอย่างเสียงพูด')) {
+    return '/sounds/th/preview.mp3'
+  }
+
+  if (input.tone === 'break' || text.includes('ถึงเวลาพักสายตา')) {
+    if (text.includes('ครบ 25 นาที')) {
+      return '/sounds/th/break-due.mp3'
+    }
+    return '/sounds/th/break-due-generic.mp3'
+  }
+
+  if (
+    input.tone === 'calibration_success' ||
+    text.includes('บันทึกค่ามาตรฐาน')
+  ) {
+    return '/sounds/th/calibration-success.mp3'
+  }
+
+  if (
+    input.tone === 'calibration_failed' ||
+    text.includes('การปรับเทียบค่ามาตรฐานไม่สำเร็จ') ||
+    text.includes('การปรับเทียบไม่สำเร็จ')
+  ) {
+    if (text.includes('ใกล้กล้องเกินไป')) {
+      return '/sounds/th/calibration-failed-too-close.mp3'
+    }
+    if (text.includes('ไกลกล้องเกินไป')) {
+      return '/sounds/th/calibration-failed-too-far.mp3'
+    }
+    if (text.includes('หันหน้าตรงเข้าหากล้อง')) {
+      return '/sounds/th/calibration-failed-not-facing.mp3'
+    }
+    if (text.includes('มุมกล้องเอียง')) {
+      return '/sounds/th/calibration-failed-tilted.mp3'
+    }
+    if (text.includes('ศีรษะหลุดขอบ')) {
+      return '/sounds/th/calibration-failed-head-cropped.mp3'
+    }
+    if (text.includes('มุมมองกล้องเปลี่ยน')) {
+      return '/sounds/th/calibration-failed-mixed.mp3'
+    }
+    return '/sounds/th/calibration-failed-not-enough.mp3'
+  }
+
+  if (input.tone === 'posture') {
+    if (text.includes('คอยื่น')) {
+      return '/sounds/th/posture-forward-head.mp3'
+    }
+    if (text.includes('หลังค่อม') || text.includes('ห่อไหล่')) {
+      return '/sounds/th/posture-slouching.mp3'
+    }
+    if (text.includes('ไหล่เอียง')) {
+      return '/sounds/th/posture-shoulder-slope.mp3'
+    }
+    if (text.includes('ศีรษะเอียง')) {
+      return '/sounds/th/posture-head-tilt.mp3'
+    }
+    if (text.includes('ลำตัวเอียง')) {
+      return '/sounds/th/posture-torso-inclination.mp3'
+    }
+    if (text.includes('โน้มศีรษะหรือลำตัว') || text.includes('โน้มศีรษะ')) {
+      return '/sounds/th/posture-eye-shoulder.mp3'
+    }
+    return '/sounds/th/posture-general.mp3'
+  }
+
+  if (input.tone === 'camera_framing') {
+    if (text.includes('ใกล้กล้องเกินไป')) {
+      return '/sounds/th/camera-too-close.mp3'
+    }
+    if (text.includes('ไกลกล้องเกินไป')) {
+      return '/sounds/th/camera-too-far.mp3'
+    }
+    if (text.includes('หันหน้าตรงเข้าหากล้อง')) {
+      return '/sounds/th/camera-not-facing.mp3'
+    }
+    if (text.includes('มุมกล้องเอียง')) {
+      return '/sounds/th/camera-tilted.mp3'
+    }
+    if (text.includes('ศีรษะหลุดขอบ')) {
+      return '/sounds/th/camera-head-cropped.mp3'
+    }
+    return '/sounds/th/camera-general.mp3'
+  }
+
+  return THAI_CLIP_BY_TONE[input.tone] ?? null
 }
 
 export function formatSpeechText(
@@ -169,6 +282,31 @@ function defaultCreateUtterance(text: string): SpeechUtteranceLike | null {
     return null
   }
   return null
+}
+
+function isRealBrowserAudioEnvironment(): boolean {
+  try {
+    if (typeof window === 'undefined' || typeof window.Audio !== 'function') {
+      return false
+    }
+    const ua =
+      typeof navigator !== 'undefined' &&
+      typeof navigator.userAgent === 'string'
+        ? navigator.userAgent.toLowerCase()
+        : ''
+    return !ua.includes('jsdom')
+  } catch {
+    return false
+  }
+}
+
+function defaultCreateAudioElement(src: string): AudioElementLike | null {
+  try {
+    if (!isRealBrowserAudioEnvironment()) return null
+    return new window.Audio(src) as unknown as AudioElementLike
+  } catch {
+    return null
+  }
 }
 
 function hasBrowserAudioContextConstructor(): boolean {
@@ -293,7 +431,9 @@ export function createBrowserSoundAlertAdapter(
   const getSpeechSynthesis = env.getSpeechSynthesis ?? defaultGetSpeechSynthesis
   const createUtterance = env.createUtterance ?? defaultCreateUtterance
   const createAudioContext = env.createAudioContext ?? defaultCreateAudioContext
+  const createAudioElement = env.createAudioElement ?? defaultCreateAudioElement
   const hasInjectedAudioContext = env.createAudioContext !== undefined
+  const hasInjectedAudioElement = env.createAudioElement !== undefined
 
   // Eagerly trigger browser voice enumeration so Thai voices load promptly.
   const initialSynth = getSpeechSynthesis()
@@ -304,7 +444,22 @@ export function createBrowserSoundAlertAdapter(
   let disposed = false
   let audioContext: AudioContextLike | null = null
   let activeUtterance: SpeechUtteranceLike | null = null
+  let activeAudioElement: AudioElementLike | null = null
   const activeOscillators = new Set<OscillatorNodeLike>()
+
+  function stopActiveAudioElement(): void {
+    if (!activeAudioElement) return
+    const current = activeAudioElement
+    activeAudioElement = null
+    current.onerror = null
+    current.onended = null
+    try {
+      current.pause()
+      current.currentTime = 0
+    } catch {
+      // Ignore audio element pause errors on restricted hosts.
+    }
+  }
 
   function stopActiveOscillators(): void {
     for (const oscillator of activeOscillators) {
@@ -324,6 +479,7 @@ export function createBrowserSoundAlertAdapter(
 
   function stop(): void {
     activeUtterance = null
+    stopActiveAudioElement()
     const synth = getSpeechSynthesis()
     if (synth) {
       try {
@@ -392,6 +548,49 @@ export function createBrowserSoundAlertAdapter(
     }
   }
 
+  function playBundledThaiClipOrChime(
+    input: SoundAlertPlayInput,
+    volume: number
+  ): void {
+    if (disposed) return
+    const clipUrl = resolveThaiSpeechClipUrl(input)
+    const audioElement = clipUrl ? createAudioElement(clipUrl) : null
+    if (!audioElement) {
+      playChime(input.tone, volume)
+      return
+    }
+
+    activeAudioElement = audioElement
+    audioElement.volume = volume
+    audioElement.onended = () => {
+      if (activeAudioElement === audioElement) {
+        activeAudioElement = null
+      }
+    }
+    audioElement.onerror = () => {
+      if (disposed || activeAudioElement !== audioElement) return
+      activeAudioElement = null
+      playChime(input.tone, volume)
+    }
+
+    try {
+      const maybePromise = audioElement.play()
+      if (
+        maybePromise &&
+        typeof (maybePromise as Promise<void>).catch === 'function'
+      ) {
+        void (maybePromise as Promise<void>).catch(() => {
+          if (disposed || activeAudioElement !== audioElement) return
+          activeAudioElement = null
+          playChime(input.tone, volume)
+        })
+      }
+    } catch {
+      activeAudioElement = null
+      playChime(input.tone, volume)
+    }
+  }
+
   function getCapabilities(
     language: SoundAlertLanguage
   ): SoundAlertCapabilities {
@@ -399,19 +598,24 @@ export function createBrowserSoundAlertAdapter(
       ? Boolean(ensureAudioContext())
       : hasBrowserAudioContextConstructor()
 
+    const bundledThaiSupported =
+      language === 'th' &&
+      (hasInjectedAudioElement || isRealBrowserAudioEnvironment())
+
     const synth = getSpeechSynthesis()
     const probeUtterance = synth ? createUtterance('') : null
     if (!synth || !probeUtterance) {
       return {
-        speechStatus: 'unsupported',
+        speechStatus: bundledThaiSupported ? 'supported' : 'unsupported',
         webAudioSupported
       }
     }
 
     const voices = safeGetVoices(synth)
-    if (voices.length > 0 && !findVoiceForLanguage(voices, language)) {
+    const matchedVoice = findVoiceForLanguage(voices, language)
+    if (voices.length > 0 && !matchedVoice) {
       return {
-        speechStatus: 'voice_unavailable',
+        speechStatus: bundledThaiSupported ? 'supported' : 'voice_unavailable',
         webAudioSupported
       }
     }
@@ -436,8 +640,17 @@ export function createBrowserSoundAlertAdapter(
       if (synth) {
         const voices = safeGetVoices(synth)
         const matchedVoice = findVoiceForLanguage(voices, input.language)
-        if (voices.length > 0 && !matchedVoice) {
-          playChime(input.tone, volume)
+
+        // For Thai, require a verified Thai voice object so English-only SAPI5
+        // engines on Windows 11 do not silently swallow Thai script when
+        // getVoices() is initially empty or lacks th-TH.
+        const canSpeakWithSynth =
+          input.language === 'th'
+            ? matchedVoice !== null
+            : matchedVoice !== null || voices.length === 0
+
+        if (!canSpeakWithSynth) {
+          playBundledThaiClipOrChime(input, volume)
           return
         }
 
@@ -465,7 +678,7 @@ export function createBrowserSoundAlertAdapter(
             if (errorCode === 'canceled' || errorCode === 'interrupted') {
               return
             }
-            playChime(input.tone, volume)
+            playBundledThaiClipOrChime(input, volume)
           }
 
           try {
@@ -476,6 +689,9 @@ export function createBrowserSoundAlertAdapter(
           }
         }
       }
+
+      playBundledThaiClipOrChime(input, volume)
+      return
     }
 
     playChime(input.tone, volume)

@@ -1,5 +1,76 @@
 import { expect, test } from '@playwright/test'
 
+test('plays bundled Thai voice MP3 when host browser lacks an OS th-TH speechSynthesis voice', async ({
+  page
+}) => {
+  const requestedMp3s: Array<{ url: string; ok: boolean }> = []
+  page.on('response', (response) => {
+    if (response.url().includes('/sounds/th/')) {
+      requestedMp3s.push({
+        url: new URL(response.url()).pathname,
+        ok: response.ok()
+      })
+    }
+  })
+
+  const user = {
+    id: '3356dcec-f826-41f1-8dba-f434b74e75c8',
+    email: 'student@example.com',
+    display_name: 'ผู้ใช้ทดสอบ',
+    created_at: '2026-08-24T12:00:00Z'
+  }
+  const consent = {
+    id: 'a91da3f1-00ae-4d7c-8ea3-b4e9f2c20d90',
+    policy_version: 'prototype-v3',
+    camera_processing: true,
+    session_summary_storage: true,
+    ai_chat_storage: true,
+    research_use: false,
+    accepted_at: '2026-08-24T12:01:00Z',
+    revoked_at: null
+  }
+
+  await page.route('http://localhost:8080/v1/**', async (route) => {
+    const url = route.request().url()
+    if (url.endsWith('/auth/refresh')) {
+      await route.fulfill({
+        status: 200,
+        json: {
+          access_token: 'synthetic-access-token',
+          expires_in: 900,
+          user
+        }
+      })
+      return
+    }
+    if (url.endsWith('/consents/current')) {
+      await route.fulfill({ json: { consent } })
+      return
+    }
+    if (url.endsWith('/auth/providers')) {
+      await route.fulfill({ json: { providers: [] } })
+      return
+    }
+    if (url.endsWith('/me/auth-identities')) {
+      await route.fulfill({ json: { identities: [] } })
+      return
+    }
+    await route.abort()
+  })
+
+  await page.goto('/app/settings')
+  await expect(
+    page.getByRole('heading', { name: 'การแจ้งเตือนด้วยเสียง' })
+  ).toBeVisible()
+  // No fallback warning banner should appear because bundled Thai voice clips are available
+  await expect(page.getByText(/ยังไม่มีชุดเสียงพูดภาษาไทย/)).not.toBeVisible()
+
+  await page.getByRole('button', { name: 'ทดลองฟังเสียง' }).click()
+  await expect
+    .poll(() => requestedMp3s)
+    .toContainEqual({ url: '/sounds/th/preview.mp3', ok: true })
+})
+
 test('sound alert controls sync across live session and settings without overflow at 320/768/1024/1440px', async ({
   page
 }) => {
