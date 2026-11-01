@@ -303,6 +303,16 @@ describe('soundAlertAdapter', () => {
         volume: 0.8
       })
     ).toBe('/sounds/th/break-due-generic.mp3')
+
+    expect(
+      resolveThaiSpeechClipUrl({
+        tone: 'posture_recovered',
+        text: 'แนวจัดวางท่าทางกลับเข้าสู่เกณฑ์ปกติเทียบกับค่ามาตรฐานแล้ว',
+        language: 'th',
+        mode: 'tts',
+        volume: 0.8
+      })
+    ).toBe('/sounds/th/posture-good-alignment.mp3')
   })
 
   it('falls back to Web Audio chime when an utterance emits a synthesis error, but not when canceled', () => {

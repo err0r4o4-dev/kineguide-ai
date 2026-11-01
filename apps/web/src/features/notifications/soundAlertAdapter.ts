@@ -2,6 +2,7 @@ import type { SoundAlertMode } from './soundAlertPreferences'
 
 export type SoundAlertTone =
   | 'posture'
+  | 'posture_recovered'
   | 'break'
   | 'calibration_success'
   | 'calibration_failed'
@@ -120,6 +121,10 @@ const CHIME_PATTERNS: Readonly<Record<SoundAlertTone, readonly ChimeNote[]>> = {
     { freq: 659.25, offset: 0, duration: 0.14 },
     { freq: 587.33, offset: 0.18, duration: 0.18 }
   ],
+  posture_recovered: [
+    { freq: 587.33, offset: 0, duration: 0.12 },
+    { freq: 783.99, offset: 0.14, duration: 0.18 }
+  ],
   calibration_success: [
     { freq: 587.33, offset: 0, duration: 0.12 },
     { freq: 880, offset: 0.14, duration: 0.2 }
@@ -144,6 +149,7 @@ const THAI_CLIP_BY_TONE: Readonly<Record<SoundAlertTone, string>> = {
   calibration_success: '/sounds/th/calibration-success.mp3',
   calibration_failed: '/sounds/th/calibration-failed-not-enough.mp3',
   posture: '/sounds/th/posture-general.mp3',
+  posture_recovered: '/sounds/th/posture-good-alignment.mp3',
   camera_framing: '/sounds/th/camera-general.mp3'
 }
 
@@ -195,6 +201,13 @@ export function resolveThaiSpeechClipUrl(
       return '/sounds/th/calibration-failed-mixed.mp3'
     }
     return '/sounds/th/calibration-failed-not-enough.mp3'
+  }
+
+  if (
+    input.tone === 'posture_recovered' ||
+    text.includes('กลับเข้าสู่เกณฑ์ปกติ')
+  ) {
+    return '/sounds/th/posture-good-alignment.mp3'
   }
 
   if (input.tone === 'posture') {

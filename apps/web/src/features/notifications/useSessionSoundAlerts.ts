@@ -154,6 +154,7 @@ export function useSessionSoundAlerts({
     calibrationState.status
   )
   const prevFeedbackStateRef = useRef<PostureFeedbackState>(feedback.state)
+  const awaitingPostureRecoveryRef = useRef(false)
   const lastPostureAlertAtRef = useRef<number | null>(null)
   const lastFramingAlertAtRef = useRef<number | null>(null)
   const framingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -232,6 +233,10 @@ export function useSessionSoundAlerts({
     const previousStatus = prevCalibrationStatusRef.current
     prevCalibrationStatusRef.current = calibrationState.status
 
+    if (calibrationState.status === 'calibrating') {
+      awaitingPostureRecoveryRef.current = false
+    }
+
     if (
       previousStatus !== 'calibrating' ||
       paused ||
@@ -266,10 +271,41 @@ export function useSessionSoundAlerts({
     preferences.events.calibrationStatus
   ])
 
-  // 3. Debounced posture deviation alert
+  // 3. Debounced posture deviation alert and good-alignment recovery confirmation
   useEffect(() => {
     const previousState = prevFeedbackStateRef.current
     prevFeedbackStateRef.current = feedback.state
+
+    if (feedback.state === 'recalibration_recommended') {
+      awaitingPostureRecoveryRef.current = false
+      return
+    }
+
+    if (feedback.state === 'good_alignment') {
+      if (!awaitingPostureRecoveryRef.current) {
+        return
+      }
+      awaitingPostureRecoveryRef.current = false
+
+      if (
+        paused ||
+        isFinishing ||
+        !preferences.enabled ||
+        !preferences.events.postureAlert
+      ) {
+        return
+      }
+
+      emitAlert(
+        'posture_recovered',
+        latestRef.current.tThai('sound.speech.posture.goodAlignment')
+      )
+      return
+    }
+
+    if (feedback.state === 'needs_adjustment') {
+      awaitingPostureRecoveryRef.current = true
+    }
 
     if (
       feedback.state !== 'needs_adjustment' ||

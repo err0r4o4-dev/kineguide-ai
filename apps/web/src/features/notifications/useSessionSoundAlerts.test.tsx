@@ -184,7 +184,8 @@ describe('useSessionSoundAlerts', () => {
     )
     expect(spy.calls).toHaveLength(1)
 
-    // Returning to good alignment and immediately re-entering within cooldown is suppressed
+    // Returning to good alignment announces posture_recovered once;
+    // immediately re-entering needs_adjustment within posture cooldown is suppressed
     rerender(
       baseProps({
         createAdapter,
@@ -198,6 +199,10 @@ describe('useSessionSoundAlerts', () => {
         }
       })
     )
+    expect(spy.calls).toHaveLength(2)
+    expect(spy.calls[1]?.tone).toBe('posture_recovered')
+    expect(spy.calls[1]?.text).toContain('แนวจัดวางท่าทางกลับเข้าสู่เกณฑ์ปกติ')
+
     act(() => {
       vi.advanceTimersByTime(POSTURE_SOUND_COOLDOWN_MS - 1_000)
     })
@@ -211,9 +216,9 @@ describe('useSessionSoundAlerts', () => {
         feedback: alertFeedback
       })
     )
-    expect(spy.calls).toHaveLength(1)
+    expect(spy.calls).toHaveLength(2)
 
-    // After cooldown expires, a fresh transition into needs_adjustment speaks again
+    // Returning to good_alignment after a real needs_adjustment episode announces recovery
     rerender(
       baseProps({
         createAdapter,
@@ -227,6 +232,10 @@ describe('useSessionSoundAlerts', () => {
         }
       })
     )
+    expect(spy.calls).toHaveLength(3)
+    expect(spy.calls[2]?.tone).toBe('posture_recovered')
+
+    // After cooldown expires, a fresh transition into needs_adjustment speaks again
     act(() => {
       vi.advanceTimersByTime(2_000)
     })
@@ -240,7 +249,68 @@ describe('useSessionSoundAlerts', () => {
         feedback: alertFeedback
       })
     )
-    expect(spy.calls).toHaveLength(2)
+    expect(spy.calls).toHaveLength(4)
+    expect(spy.calls[3]?.tone).toBe('posture')
+
+    // Brief low_confidence dropout while adjusting followed by good_alignment still announces recovery,
+    // while low_confidence -> good_alignment when NOT in an active deviation stays silent
+    rerender(
+      baseProps({
+        createAdapter,
+        calibrationState: {
+          status: 'calibrated',
+          baseline: SYNTHETIC_BASELINE
+        },
+        feedback: {
+          state: 'low_confidence',
+          feedbackMessageKey: 'session.poseAdjust'
+        }
+      })
+    )
+    rerender(
+      baseProps({
+        createAdapter,
+        calibrationState: {
+          status: 'calibrated',
+          baseline: SYNTHETIC_BASELINE
+        },
+        feedback: {
+          state: 'good_alignment',
+          feedbackMessageKey: 'session.goodAlignment'
+        }
+      })
+    )
+    expect(spy.calls).toHaveLength(5)
+    expect(spy.calls[4]?.tone).toBe('posture_recovered')
+
+    // Subsequent low_confidence -> good_alignment without a deviation alert must stay silent
+    rerender(
+      baseProps({
+        createAdapter,
+        calibrationState: {
+          status: 'calibrated',
+          baseline: SYNTHETIC_BASELINE
+        },
+        feedback: {
+          state: 'low_confidence',
+          feedbackMessageKey: 'session.poseAdjust'
+        }
+      })
+    )
+    rerender(
+      baseProps({
+        createAdapter,
+        calibrationState: {
+          status: 'calibrated',
+          baseline: SYNTHETIC_BASELINE
+        },
+        feedback: {
+          state: 'good_alignment',
+          feedbackMessageKey: 'session.goodAlignment'
+        }
+      })
+    )
+    expect(spy.calls).toHaveLength(5)
   })
 
   it('announces calibration success and failure transitions only from calibrating state', () => {
