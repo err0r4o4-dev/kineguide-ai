@@ -413,14 +413,16 @@ describe('LiveSessionPage', () => {
     ).toBeVisible()
   })
 
-  it('toggles live session sound alerts and speaks via TTS when unmuted', async () => {
-    await i18n.changeLanguage('th')
-    const speakMock = vi.fn()
+  it('toggles live session sound alerts and always speaks Thai via TTS even when UI language is English', async () => {
+    await i18n.changeLanguage('en')
+    const spokenUtterances: Array<{ text: string; lang: string }> = []
     const cancelMock = vi.fn()
     Object.defineProperty(window, 'speechSynthesis', {
       configurable: true,
       value: {
-        speak: speakMock,
+        speak: vi.fn((utterance: { text: string; lang: string }) => {
+          spokenUtterances.push(utterance)
+        }),
         cancel: cancelMock,
         getVoices: () => [{ lang: 'th-TH', name: 'Thai Voice' }]
       }
@@ -462,13 +464,13 @@ describe('LiveSessionPage', () => {
     const view = renderRoute()
 
     const soundToggle = await screen.findByRole('button', {
-      name: 'เสียงเตือน: เปิด'
+      name: 'Sound: On'
     })
     expect(soundToggle).toHaveAttribute('aria-pressed', 'true')
 
-    // Complete calibration while unmuted -> speaks confirmation
+    // Complete calibration while unmuted -> speaks Thai confirmation even in English UI
     await user.click(
-      await screen.findByRole('button', { name: 'ปรับเทียบ Baseline' })
+      await screen.findByRole('button', { name: 'Calibrate Baseline' })
     )
     for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
       vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
@@ -476,12 +478,14 @@ describe('LiveSessionPage', () => {
       )
       view.refresh()
     }
-    expect(speakMock).toHaveBeenCalledTimes(1)
+    expect(spokenUtterances).toHaveLength(1)
+    expect(spokenUtterances[0]?.lang).toBe('th-TH')
+    expect(spokenUtterances[0]?.text).toMatch(/[฀-๿]/)
 
     // Mute via header button -> cancels speech and updates accessible state
     await user.click(soundToggle)
     const mutedToggle = await screen.findByRole('button', {
-      name: 'เสียงเตือน: ปิด'
+      name: 'Sound: Off'
     })
     expect(mutedToggle).toHaveAttribute('aria-pressed', 'false')
     expect(cancelMock).toHaveBeenCalled()

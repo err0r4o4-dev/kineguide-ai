@@ -10,6 +10,8 @@ export type SoundAlertTone =
 
 export type SoundAlertLanguage = 'th' | 'en'
 
+export const THAI_SPEECH_LANGUAGE: SoundAlertLanguage = 'th'
+
 export interface SoundAlertPlayInput {
   readonly tone: SoundAlertTone
   readonly text: string
@@ -206,21 +208,83 @@ function safeGetVoices(synth: SpeechSynthesisLike): SpeechSynthesisVoice[] {
   }
 }
 
+function normalizeVoiceLang(lang: string | undefined): string {
+  return (lang ?? '').replace(/_/g, '-').toLowerCase()
+}
+
+function toBcp47Locale(
+  voiceLang: string | undefined,
+  fallbackLanguage: SoundAlertLanguage
+): string {
+  const normalized = normalizeVoiceLang(voiceLang)
+  if (normalized === 'th' || normalized === 'th-th') return 'th-TH'
+  if (normalized.startsWith('th-')) {
+    const [, region = 'TH'] = normalized.split('-')
+    return `th-${region.toUpperCase()}`
+  }
+  if (normalized === 'en' || normalized === 'en-us') return 'en-US'
+  if (normalized.startsWith('en-')) {
+    const [, region = 'US'] = normalized.split('-')
+    return `en-${region.toUpperCase()}`
+  }
+  return fallbackLanguage === 'th' ? 'th-TH' : 'en-US'
+}
+
+function matchesLanguage(
+  voice: SpeechSynthesisVoice,
+  language: SoundAlertLanguage
+): boolean {
+  const normalizedLang = normalizeVoiceLang(voice.lang)
+  const name = voice.name ?? ''
+
+  if (language === 'th') {
+    return (
+      normalizedLang === 'th' ||
+      normalizedLang === 'th-th' ||
+      normalizedLang.startsWith('th-') ||
+      /thai|ไทย|premwadee|niwat|pattara|kanya|narisa/i.test(name)
+    )
+  }
+
+  return normalizedLang === 'en' || normalizedLang.startsWith('en-')
+}
+
+function scoreVoiceQuality(
+  voice: SpeechSynthesisVoice,
+  language: SoundAlertLanguage
+): number {
+  const normalizedLang = normalizeVoiceLang(voice.lang)
+  const name = voice.name ?? ''
+  let score = 0
+
+  if (/natural|neural/i.test(name)) score += 8
+  if (/premwadee|niwat|google|siri|kanya|narisa/i.test(name)) score += 4
+  if (normalizedLang === (language === 'th' ? 'th-th' : 'en-us')) score += 2
+  if (voice.default) score += 1
+
+  return score
+}
+
 function findVoiceForLanguage(
   voices: readonly SpeechSynthesisVoice[],
   language: SoundAlertLanguage
 ): SpeechSynthesisVoice | null {
-  const prefix = language.toLowerCase()
-  const exactLocale = language === 'th' ? 'th-th' : 'en-us'
+  const candidates = voices.filter((voice) => matchesLanguage(voice, language))
+  if (candidates.length === 0) return null
 
-  const exact = voices.find(
-    (voice) => voice.lang?.toLowerCase() === exactLocale
-  )
-  if (exact) return exact
+  let best = candidates[0]!
+  let bestScore = scoreVoiceQuality(best, language)
 
-  return (
-    voices.find((voice) => voice.lang?.toLowerCase().startsWith(prefix)) ?? null
-  )
+  for (let i = 1; i < candidates.length; i += 1) {
+    const candidate = candidates[i]!
+    const candidateScore = scoreVoiceQuality(candidate, language)
+    if (candidateScore > bestScore) {
+      best = candidate
+      bestScore = candidateScore
+    }
+  }
+
+  return best
 }
 
 export function createBrowserSoundAlertAdapter(
@@ -230,6 +294,12 @@ export function createBrowserSoundAlertAdapter(
   const createUtterance = env.createUtterance ?? defaultCreateUtterance
   const createAudioContext = env.createAudioContext ?? defaultCreateAudioContext
   const hasInjectedAudioContext = env.createAudioContext !== undefined
+
+  // Eagerly trigger browser voice enumeration so Thai voices load promptly.
+  const initialSynth = getSpeechSynthesis()
+  if (initialSynth) {
+    safeGetVoices(initialSynth)
+  }
 
   let disposed = false
   let audioContext: AudioContextLike | null = null
@@ -374,8 +444,7 @@ export function createBrowserSoundAlertAdapter(
         const spokenText = formatSpeechText(input.text, input.language)
         const utterance = createUtterance(spokenText)
         if (utterance) {
-          utterance.lang =
-            matchedVoice?.lang ?? (input.language === 'th' ? 'th-TH' : 'en-US')
+          utterance.lang = toBcp47Locale(matchedVoice?.lang, input.language)
           if (matchedVoice) {
             utterance.voice = matchedVoice
           }

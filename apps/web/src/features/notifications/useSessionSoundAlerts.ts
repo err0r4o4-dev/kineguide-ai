@@ -11,8 +11,8 @@ import type {
 } from '@/features/pose/usePostureMonitor'
 import {
   createBrowserSoundAlertAdapter,
+  THAI_SPEECH_LANGUAGE,
   type SoundAlertAdapter,
-  type SoundAlertLanguage,
   type SoundAlertTone
 } from './soundAlertAdapter'
 import type { SoundAlertPreferences } from './soundAlertPreferences'
@@ -38,6 +38,70 @@ export function getCalibrationFailureReasonKey(
   return 'calibration.reasonNotEnough'
 }
 
+function getThaiCalibrationSpeechReasonKey(
+  reason: CalibrationFailureReason
+): string {
+  if (reason === 'too_close') return 'sound.speech.calibrationReason.tooClose'
+  if (reason === 'too_far') return 'sound.speech.calibrationReason.tooFar'
+  if (reason === 'not_facing_camera')
+    return 'sound.speech.calibrationReason.notFacing'
+  if (reason === 'camera_tilted') return 'sound.speech.calibrationReason.tilted'
+  if (reason === 'head_cropped')
+    return 'sound.speech.calibrationReason.headCropped'
+  if (reason === 'mixed_framing') return 'sound.speech.calibrationReason.mixed'
+  return 'sound.speech.calibrationReason.notEnough'
+}
+
+function getThaiPostureSpeechKey(deviatedMetric: string | undefined): string {
+  if (
+    deviatedMetric === 'forwardHead' ||
+    deviatedMetric === 'forwardHeadRatio'
+  ) {
+    return 'sound.speech.posture.forwardHead'
+  }
+  if (deviatedMetric === 'slouching') {
+    return 'sound.speech.posture.slouching'
+  }
+  if (deviatedMetric === 'shoulderSlopeDegrees') {
+    return 'sound.speech.posture.shoulderSlopeDegrees'
+  }
+  if (deviatedMetric === 'headTiltDegrees') {
+    return 'sound.speech.posture.headTiltDegrees'
+  }
+  if (deviatedMetric === 'torsoInclinationDegrees') {
+    return 'sound.speech.posture.torsoInclinationDegrees'
+  }
+  if (deviatedMetric === 'eyeShoulderDistanceRatio') {
+    return 'sound.speech.posture.eyeShoulderDistanceRatio'
+  }
+  return 'sound.speech.posture.general'
+}
+
+function getThaiCameraFramingSpeechKey(
+  framingError: string | undefined,
+  messageKey: string
+): string {
+  if (framingError === 'too_close' || messageKey === 'camera.tooClose') {
+    return 'sound.speech.camera.tooClose'
+  }
+  if (framingError === 'too_far' || messageKey === 'camera.tooFar') {
+    return 'sound.speech.camera.tooFar'
+  }
+  if (
+    framingError === 'not_facing_camera' ||
+    messageKey === 'camera.notFacingCamera'
+  ) {
+    return 'sound.speech.camera.notFacingCamera'
+  }
+  if (framingError === 'camera_tilted' || messageKey === 'camera.tilted') {
+    return 'sound.speech.camera.tilted'
+  }
+  if (framingError === 'head_cropped' || messageKey === 'camera.headCropped') {
+    return 'sound.speech.camera.headCropped'
+  }
+  return 'sound.speech.camera.general'
+}
+
 export interface SessionSoundAlertsInput {
   readonly cameraState: CameraState
   readonly paused: boolean
@@ -47,8 +111,7 @@ export interface SessionSoundAlertsInput {
   readonly feedback: PostureFeedbackUpdate
   readonly calibrationState: CalibrationState
   readonly preferences: SoundAlertPreferences
-  readonly language: SoundAlertLanguage
-  readonly t: (key: string, options?: Record<string, unknown>) => string
+  readonly tThai: (key: string, options?: Record<string, unknown>) => string
   readonly createAdapter?: () => SoundAlertAdapter
 }
 
@@ -61,27 +124,29 @@ export function useSessionSoundAlerts({
   feedback,
   calibrationState,
   preferences,
-  language,
-  t,
+  tThai,
   createAdapter
 }: SessionSoundAlertsInput): void {
   const adapterRef = useRef<SoundAlertAdapter | null>(null)
   const createAdapterRef = useRef(createAdapter)
   createAdapterRef.current = createAdapter
 
+  const framingSpeechKey = getThaiCameraFramingSpeechKey(
+    feedback.framingError,
+    feedback.feedbackMessageKey
+  )
+
   const latestRef = useRef({
-    t,
-    language,
+    tThai,
     preferences,
     breakIntervalMinutes,
-    framingMessageKey: feedback.feedbackMessageKey
+    framingSpeechKey
   })
   latestRef.current = {
-    t,
-    language,
+    tThai,
     preferences,
     breakIntervalMinutes,
-    framingMessageKey: feedback.feedbackMessageKey
+    framingSpeechKey
   }
 
   const prevBreakDueRef = useRef(breakDue)
@@ -126,7 +191,7 @@ export function useSessionSoundAlerts({
     adapter.play({
       tone,
       text,
-      language: current.language,
+      language: THAI_SPEECH_LANGUAGE,
       mode: current.preferences.mode,
       volume: current.preferences.volume
     })
@@ -148,7 +213,7 @@ export function useSessionSoundAlerts({
       const current = latestRef.current
       emitAlert(
         'break',
-        current.t('sound.speech.breakDue', {
+        current.tThai('sound.speech.breakDue', {
           minutes: current.breakIntervalMinutes
         })
       )
@@ -181,15 +246,15 @@ export function useSessionSoundAlerts({
     if (calibrationState.status === 'calibrated') {
       emitAlert(
         'calibration_success',
-        current.t('sound.speech.calibrationSuccess')
+        current.tThai('sound.speech.calibrationSuccess')
       )
     } else if (calibrationState.status === 'failed') {
-      const reason = current.t(
-        getCalibrationFailureReasonKey(calibrationState.reason)
+      const reason = current.tThai(
+        getThaiCalibrationSpeechReasonKey(calibrationState.reason)
       )
       emitAlert(
         'calibration_failed',
-        current.t('calibration.failedNotice', { reason })
+        current.tThai('sound.speech.calibrationFailed', { reason })
       )
     }
   }, [
@@ -227,7 +292,10 @@ export function useSessionSoundAlerts({
     }
 
     lastPostureAlertAtRef.current = now
-    emitAlert('posture', latestRef.current.t(feedback.feedbackMessageKey))
+    emitAlert(
+      'posture',
+      latestRef.current.tThai(getThaiPostureSpeechKey(feedback.deviatedMetric))
+    )
   }, [
     emitAlert,
     feedback,
@@ -278,7 +346,7 @@ export function useSessionSoundAlerts({
 
       lastFramingAlertAtRef.current = now
       const current = latestRef.current
-      emitAlert('camera_framing', current.t(current.framingMessageKey))
+      emitAlert('camera_framing', current.tThai(current.framingSpeechKey))
     }, CAMERA_FRAMING_SOUND_DEBOUNCE_MS)
   }, [
     cameraState,

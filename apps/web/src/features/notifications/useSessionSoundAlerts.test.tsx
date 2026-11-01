@@ -70,8 +70,7 @@ function baseProps(
     } as PostureFeedbackUpdate,
     calibrationState: { status: 'idle' } as CalibrationState,
     preferences: DEFAULT_SOUND_ALERT_PREFERENCES as SoundAlertPreferences,
-    language: 'th',
-    t: (key, options) => String(i18n.t(key, options)),
+    tThai: (key, options) => String(i18n.getFixedT('th')(key, options)),
     ...overrides
   }
 }
@@ -359,5 +358,48 @@ describe('useSessionSoundAlerts', () => {
       vi.advanceTimersByTime(CAMERA_FRAMING_SOUND_DEBOUNCE_MS)
     })
     expect(spy.calls).toHaveLength(2)
+  })
+
+  it('always speaks pure Thai alerts with th language even when UI language is English', async () => {
+    await i18n.changeLanguage('en')
+    const spy = createSpyAdapter()
+    const createAdapter = () => spy.adapter
+    const { rerender } = renderHook(
+      (props: SessionSoundAlertsInput) => useSessionSoundAlerts(props),
+      {
+        initialProps: baseProps({
+          createAdapter,
+          calibrationState: {
+            status: 'calibrating',
+            samplesCollected: 29,
+            targetSamples: 30
+          }
+        })
+      }
+    )
+
+    rerender(
+      baseProps({
+        createAdapter,
+        breakDue: true,
+        calibrationState: {
+          status: 'calibrated',
+          baseline: SYNTHETIC_BASELINE
+        },
+        feedback: {
+          state: 'needs_adjustment',
+          feedbackMessageKey: 'session.feedback.headTiltDegrees',
+          deviatedMetric: 'headTiltDegrees',
+          alertTriggered: true
+        }
+      })
+    )
+
+    expect(spy.calls).toHaveLength(3)
+    for (const call of spy.calls) {
+      expect(call.language).toBe('th')
+      expect(call.text).toMatch(/[฀-๿]/)
+      expect(call.text).not.toMatch(/Baseline|Time for|Sustained/i)
+    }
   })
 })

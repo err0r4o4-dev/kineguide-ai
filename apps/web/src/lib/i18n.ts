@@ -565,9 +565,45 @@ const th = {
   sound: {
     speech: {
       breakDue:
-        'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ หลังจากนั่งต่อเนื่องครบ {{minutes}} นาที',
-      calibrationSuccess: 'บันทึกค่ามาตรฐานส่วนบุคคลเรียบร้อยแล้ว',
-      preview: 'ตัวอย่างเสียงแจ้งเตือนจากไคน์ไกด์ เอไอ'
+        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากนั่งต่อเนื่องครบ {{minutes}} นาที',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
+      calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
+      calibrationReason: {
+        tooClose: 'อยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'อยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacing: 'ไม่ได้หันหน้าตรงเข้าหากล้อง กรุณาหันหน้าเข้าหากล้อง',
+        tilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        mixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่อีกครั้ง',
+        notEnough:
+          'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
+      },
+      posture: {
+        forwardHead:
+          'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
+        slouching:
+          'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
+        shoulderSlopeDegrees:
+          'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับไหล่ทั้งสองข้างให้สมดุล',
+        headTiltDegrees:
+          'สังเกตเห็นศีรษะเอียงต่อเนื่องจากค่ามาตรฐาน ลองตั้งศีรษะให้อยู่ในแนวตรง',
+        torsoInclinationDegrees:
+          'สังเกตเห็นลำตัวเอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับลำตัวให้อยู่ในแนวตรง',
+        eyeShoulderDistanceRatio:
+          'สังเกตเห็นการโน้มศีรษะหรือลำตัวเข้าหาหน้าจอ ลองปรับท่านั่งให้อยู่ในแนวปกติ',
+        general:
+          'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
+      },
+      camera: {
+        tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacingCamera: 'กรุณาหันหน้าตรงเข้าหากล้อง โดยไม่หันเอียงข้าง',
+        tilted: 'มุมกล้องเอียงหรือไม่ตรงระดับ กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        general:
+          'มุมกล้องหรือตำแหน่งยังไม่เหมาะสม กรุณาจัดตำแหน่งให้อยู่ในกรอบภาพ'
+      },
+      preview: 'ตัวอย่างเสียงพูดแจ้งเตือนภาษาไทยจากไคน์ไกด์ เอไอ'
     }
   },
   history: {
@@ -647,9 +683,9 @@ const th = {
     soundEnableBody:
       'ใช้เสียงเสริมข้อความบนหน้าจอ โดยไม่ส่งข้อมูลเสียงหรือภาพออกจากอุปกรณ์',
     soundModeLabel: 'รูปแบบเสียงแจ้งเตือน',
-    soundModeTts: 'เสียงพูดอ่านคำแนะนำ (TTS)',
+    soundModeTts: 'เสียงพูดภาษาไทย (TTS)',
     soundModeTtsBody:
-      'อ่านข้อความแจ้งเตือนตามภาษาที่เลือก และสลับเป็นเสียงสัญญาณอัตโนมัติเมื่อเบราว์เซอร์ไม่รองรับ',
+      'อ่านคำแนะนำแจ้งเตือนเป็นเสียงพูดภาษาไทย และสลับเป็นเสียงสัญญาณอัตโนมัติเมื่อเบราว์เซอร์ไม่มีชุดเสียงภาษาไทย',
     soundModeChime: 'เสียงสัญญาณนุ่มนวล',
     soundModeChimeBody:
       'ใช้โทนเสียงสังเคราะห์สั้น ๆ แยกตามประเภทเหตุการณ์โดยไม่มีเสียงพูด',
@@ -661,7 +697,7 @@ const th = {
     soundEventFraming: 'เตือนเมื่อมุมกล้องไม่เหมาะสมต่อเนื่อง',
     soundPreview: 'ทดลองฟังเสียง',
     soundSpeechFallbackNotice:
-      'เบราว์เซอร์หรืออุปกรณ์นี้ยังไม่รองรับเสียงพูดสำหรับภาษาปัจจุบัน ระบบจะใช้เสียงสัญญาณนุ่มนวลแทนอัตโนมัติ',
+      'เบราว์เซอร์หรืออุปกรณ์นี้ยังไม่มีชุดเสียงพูดภาษาไทย (th-TH) เช่น อาจเปิดผ่าน Microsoft Edge หรือติดตั้งชุดเสียงภาษาไทยในระบบปฏิบัติการ ระบบจึงใช้เสียงสัญญาณนุ่มนวลแทนอัตโนมัติ',
     soundUnsupportedNotice:
       'เบราว์เซอร์นี้ไม่รองรับระบบเสียง Web Speech และ Web Audio จึงแสดงเฉพาะข้อความแจ้งเตือนบนหน้าจอ'
   },
@@ -1269,9 +1305,45 @@ const en: typeof th = {
   sound: {
     speech: {
       breakDue:
-        'Time for an ergonomic break after {{minutes}} minutes of seated monitoring.',
-      calibrationSuccess: 'Personal baseline recorded.',
-      preview: 'Sample sound notification from KineGuide AI.'
+        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากนั่งต่อเนื่องครบ {{minutes}} นาที',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
+      calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
+      calibrationReason: {
+        tooClose: 'อยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'อยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacing: 'ไม่ได้หันหน้าตรงเข้าหากล้อง กรุณาหันหน้าเข้าหากล้อง',
+        tilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        mixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่อีกครั้ง',
+        notEnough:
+          'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
+      },
+      posture: {
+        forwardHead:
+          'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
+        slouching:
+          'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
+        shoulderSlopeDegrees:
+          'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับไหล่ทั้งสองข้างให้สมดุล',
+        headTiltDegrees:
+          'สังเกตเห็นศีรษะเอียงต่อเนื่องจากค่ามาตรฐาน ลองตั้งศีรษะให้อยู่ในแนวตรง',
+        torsoInclinationDegrees:
+          'สังเกตเห็นลำตัวเอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับลำตัวให้อยู่ในแนวตรง',
+        eyeShoulderDistanceRatio:
+          'สังเกตเห็นการโน้มศีรษะหรือลำตัวเข้าหาหน้าจอ ลองปรับท่านั่งให้อยู่ในแนวปกติ',
+        general:
+          'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
+      },
+      camera: {
+        tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacingCamera: 'กรุณาหันหน้าตรงเข้าหากล้อง โดยไม่หันเอียงข้าง',
+        tilted: 'มุมกล้องเอียงหรือไม่ตรงระดับ กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        general:
+          'มุมกล้องหรือตำแหน่งยังไม่เหมาะสม กรุณาจัดตำแหน่งให้อยู่ในกรอบภาพ'
+      },
+      preview: 'ตัวอย่างเสียงพูดแจ้งเตือนภาษาไทยจากไคน์ไกด์ เอไอ'
     }
   },
   history: {
@@ -1351,9 +1423,9 @@ const en: typeof th = {
     soundEnableBody:
       'Play audio alongside on-screen alerts without sending audio or camera data off-device.',
     soundModeLabel: 'Alert sound format',
-    soundModeTts: 'Voice guidance (TTS)',
+    soundModeTts: 'Thai voice guidance (TTS)',
     soundModeTtsBody:
-      'Reads alert messages in your active language and falls back to a gentle chime if speech is unavailable.',
+      'Speaks alert guidance in Thai (th-TH) and falls back to a gentle chime if no Thai voice is available in this browser.',
     soundModeChime: 'Gentle chime',
     soundModeChimeBody:
       'Plays short synthesized tones per alert category without spoken voice.',
@@ -1365,7 +1437,7 @@ const en: typeof th = {
     soundEventFraming: 'Sustained camera framing issue',
     soundPreview: 'Test sound',
     soundSpeechFallbackNotice:
-      'This browser or device does not expose a voice for the current language. Gentle chime tones will play automatically instead.',
+      'This browser or device does not expose a Thai speech voice (th-TH)—for example, try Microsoft Edge or install the OS Thai speech pack. Gentle chime tones will play automatically instead.',
     soundUnsupportedNotice:
       'This browser does not support Web Speech or Web Audio, so alerts will appear visually on screen only.'
   },

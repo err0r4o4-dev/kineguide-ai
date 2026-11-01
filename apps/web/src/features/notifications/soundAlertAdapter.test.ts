@@ -120,10 +120,21 @@ describe('soundAlertAdapter', () => {
     ).toBe('Upper body (shoulders or head), baseline ready')
   })
 
-  it('speaks Thai text with matching Thai voice in TTS mode and cancels prior speech', () => {
-    const thaiVoice = { lang: 'th-TH', name: 'Premwadee' }
+  it('speaks Thai text with preferred natural Thai voice, warms voices on init, and cancels prior speech', () => {
+    const legacyThaiVoice = {
+      lang: 'th_TH',
+      name: 'Microsoft Pattara Desktop - Thai'
+    }
+    const naturalThaiVoice = {
+      lang: 'th-TH',
+      name: 'Microsoft Premwadee Online (Natural) - Thai (Thailand)'
+    }
     const englishVoice = { lang: 'en-US', name: 'Aria' }
-    const speech = createFakeSpeechEnv([englishVoice, thaiVoice])
+    const speech = createFakeSpeechEnv([
+      englishVoice,
+      legacyThaiVoice,
+      naturalThaiVoice
+    ])
     const audio = createFakeAudioContext()
 
     const adapter = createBrowserSoundAlertAdapter({
@@ -131,6 +142,9 @@ describe('soundAlertAdapter', () => {
       createUtterance: speech.createUtterance,
       createAudioContext: () => audio.context
     })
+
+    // Eagerly warms browser voice enumeration upon creation
+    expect(speech.synth.getVoices).toHaveBeenCalledTimes(1)
 
     expect(adapter.getCapabilities('th')).toEqual({
       speechStatus: 'supported',
@@ -151,7 +165,7 @@ describe('soundAlertAdapter', () => {
       'สังเกตเห็นการโน้มศีรษะหรือคอยื่นเข้าหาจอ'
     )
     expect(speech.spoken[0]?.lang).toBe('th-TH')
-    expect(speech.spoken[0]?.voice).toEqual(thaiVoice)
+    expect(speech.spoken[0]?.voice).toEqual(naturalThaiVoice)
     expect(speech.spoken[0]?.volume).toBe(0.75)
     expect(audio.oscillators).toHaveLength(0)
   })

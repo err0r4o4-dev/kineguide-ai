@@ -126,13 +126,15 @@ describe('SettingsPage', () => {
     expect(product.deleteAuthIdentity).toHaveBeenCalledWith('google')
   })
 
-  it('configures sound alert preferences, previews sound, and clears preferences on account deletion', async () => {
-    await i18n.changeLanguage('th')
-    const speakMock = vi.fn()
+  it('configures sound alert preferences, previews Thai voice even in English UI, and clears preferences on account deletion', async () => {
+    await i18n.changeLanguage('en')
+    const spokenUtterances: Array<{ text: string; lang: string }> = []
     Object.defineProperty(window, 'speechSynthesis', {
       configurable: true,
       value: {
-        speak: speakMock,
+        speak: vi.fn((utterance: { text: string; lang: string }) => {
+          spokenUtterances.push(utterance)
+        }),
         cancel: vi.fn(),
         getVoices: () => [{ lang: 'th-TH', name: 'Thai Voice' }]
       }
@@ -159,16 +161,18 @@ describe('SettingsPage', () => {
     renderRoute()
 
     expect(
-      screen.getByRole('heading', { name: 'การแจ้งเตือนด้วยเสียง' })
+      screen.getByRole('heading', { name: 'Sound notifications' })
     ).toBeVisible()
 
-    // Preview TTS sound
-    await user.click(screen.getByRole('button', { name: 'ทดลองฟังเสียง' }))
-    expect(speakMock).toHaveBeenCalledTimes(1)
+    // Preview TTS sound -> speaks Thai even though UI is in English
+    await user.click(screen.getByRole('button', { name: 'Test sound' }))
+    expect(spokenUtterances).toHaveLength(1)
+    expect(spokenUtterances[0]?.lang).toBe('th-TH')
+    expect(spokenUtterances[0]?.text).toContain('ไคน์ไกด์')
 
     // Toggle an event checkbox and persist to localStorage
     const framingCheckbox = screen.getByRole('checkbox', {
-      name: /เตือนเมื่อมุมกล้องไม่เหมาะสมต่อเนื่อง/
+      name: /Sustained camera framing issue/
     })
     expect(framingCheckbox).toBeChecked()
     await user.click(framingCheckbox)
@@ -179,7 +183,7 @@ describe('SettingsPage', () => {
 
     // Deleting account removes stored browser preferences
     await user.click(
-      screen.getByRole('button', { name: 'ลบบัญชีและข้อมูลทั้งหมด' })
+      screen.getByRole('button', { name: 'Delete account and all data' })
     )
     expect(product.deleteAccount).toHaveBeenCalled()
     expect(window.localStorage.getItem(SOUND_ALERT_STORAGE_KEY)).toBeNull()

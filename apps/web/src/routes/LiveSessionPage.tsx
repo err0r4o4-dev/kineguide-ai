@@ -116,6 +116,8 @@ export function LiveSessionPage() {
 
   const monitor = usePostureMonitor(pose, paused)
 
+  const thaiT = i18n.getFixedT('th')
+
   useSessionSoundAlerts({
     cameraState: camera.state,
     paused,
@@ -125,8 +127,7 @@ export function LiveSessionPage() {
     feedback: monitor.feedback,
     calibrationState: monitor.calibrationState,
     preferences: soundPreferences,
-    language: i18n.resolvedLanguage === 'en' ? 'en' : 'th',
-    t: (key, options) => String(t(key, options))
+    tThai: (key, options) => String(thaiT(key, options))
   })
 
   // Update break reminders every elapsed second

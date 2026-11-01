@@ -20,6 +20,7 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import {
   createBrowserSoundAlertAdapter,
+  THAI_SPEECH_LANGUAGE,
   type SoundAlertAdapter
 } from '@/features/notifications/soundAlertAdapter'
 import {
@@ -97,10 +98,9 @@ export function SettingsPage() {
     }
   }, [])
 
-  const activeLanguage = i18n.resolvedLanguage === 'en' ? 'en' : 'th'
   const soundCapabilities = (
     previewAdapterRef.current ?? createBrowserSoundAlertAdapter()
-  ).getCapabilities(activeLanguage)
+  ).getCapabilities(THAI_SPEECH_LANGUAGE)
   const audioCompletelyUnsupported =
     !soundCapabilities.webAudioSupported &&
     soundCapabilities.speechStatus === 'unsupported'
@@ -111,10 +111,11 @@ export function SettingsPage() {
   const volumePercent = Math.round(sound.preferences.volume * 100)
 
   const handlePreviewSound = () => {
+    const thaiT = i18n.getFixedT('th')
     previewAdapterRef.current?.play({
       tone: 'preview',
-      text: t('sound.speech.preview'),
-      language: activeLanguage,
+      text: String(thaiT('sound.speech.preview')),
+      language: THAI_SPEECH_LANGUAGE,
       mode: sound.preferences.mode,
       volume: sound.preferences.volume
     })
