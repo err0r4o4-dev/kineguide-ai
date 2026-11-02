@@ -1,15 +1,8 @@
 # KineGuide AI — Product Flow และ Roadmap
 
-## SF1 - Seated monitoring flow integration
-
-- [x] Investigation: inspect current routes, calibration, camera lifecycle and summary contracts; preserve existing analytics/history work.
- - [x] Regression and implementation: connect setup, live calibration and monitoring; suspend stale feedback; make summaries and navigation truthful about baseline versus detected sitting.
- - [x] Verification: focused regressions, affected web format/lint/typecheck/tests/build, local browser journeys at 320/768/1024/1440, independent camera/privacy review.
- - [x] Documentation and cleanup: source-aligned flow and references, inspect final diff, stop task processes.
-- [?] Automatic sit/stand acceptance: camera position/framing and authorized reference evaluation are not established; existing landmark visibility and user confirmation are not a sitting classifier. Resume after camera setup and evaluation acceptance are agreed; do not invent durations or medical thresholds.
-
 ## Consent current HTTP 500 — 2026-10-19
 
+- Status: blocked pending an approved runtime/database reproduction. Current evidence only supports a stale-schema hypothesis involving `ai_chat_storage` (SQLSTATE `42703`); nullable scanning and connection reuse are not ruled out.
 - [ ] Investigation: reproduce repeated consent reads; distinguish nullable scanning, connection reuse, and stale runtime.
 - [ ] Regression: cover the verified failure with synthetic data only.
 - [ ] Implementation: apply the smallest causal fix without weakening consent or authorization.
@@ -18,20 +11,11 @@
 
 ## MultiPosture offline training — 2026-10-19
 
-- [x] Investigation: publisher review found study consent and 33-to-11 joint reduction, but public-release/downstream-training scope, exact released preprocessing and 4,794/4,800 frame discrepancy remain unresolved. User authorized offline work, not deployment or redistribution.
-- [x] Regression tests: 13 synthetic tests pass for malformed CSV, train-only scaling, subject separation, hand-computed metrics, determinism, redacted CLI denial, overwrite protection and failed-write cleanup.
-- [x] Implementation: dependency-free nearest-centroid LOSO baseline, separate upper/lower labels, majority comparator, aggregate metrics, hashed local-only model/report and staged publication.
-- [x] Synthetic verification: 13 trainer tests, 8 existing evaluator tests and 211 web tests pass; format checks pass. Real manifest invocation exits 1 with KGMP_E_APPROVAL, before CSV reading, and creates no output. No dataset/model is staged.
 - [ ] Real training blocked: obtain a reviewed consent/provenance basis for public release and downstream ML under research/datasets/README.md before authorizing the manifest. No real-data model or accuracy/error result produced; do not toggle approval flags without evidence.
-- [x] Review and cleanup: independent review checked split/metrics; partial-write finding fixed and tested. Editable approval is a local reviewer declaration, not trusted-signature enforcement. Concurrent empty-directory publication race remains documented; single-writer use only. No services started or dependencies added; temporary test artifacts cleaned. Live-web integration and measurement/clinical validation remain out of scope.
 
 
 ## Seated dataset evaluation — 2026-10-19
 
-- [x] Investigation: verified geometry, research policy and baseline boundaries. Live `seated-baseline-v1` remains unchanged; no clinical claims or raw-media collection added.
-- [x] Regression tests: reproduced 45-degree image geometry as 53.13/60.64 degrees before correction. Explicit-dimension geometry tests pass, including mirroring, eye fallback, invalid dimensions and hidden hips.
-- [x] Implementation: opt-in geometry and bounded local evaluation use the web calculation; MAE, RMSE, bias, P95, units, coverage and missing-reference counts omit participant payloads.
-- [x] Final verification: web format/lint/OpenAPI/typecheck/build and 211 tests passed; evaluator 8 tests and synthetic CLI smoke passed. Independent read-only review found no concrete defects. Final diff checked; no live services, datasets or model artifacts added. Synthetic results are not real-user accuracy. Windows junction behavior and injected Vite/report-write failure cleanup were not tested; see `docs/research/evaluation-plan.md`.
 - [ ] Dataset gate: verify license, consent/provenance, joint mapping, independent references, subject-separated splits, retention and deletion before importing real data. MediaPipe-derived references cannot validate MediaPipe measurement error.
 - [ ] Live gate: independent held-out validation and tolerance review before migrating API/database versions or exposing benchmark values. Real-world error is not established.
 
@@ -200,30 +184,8 @@ Go เป็นผู้เรียก Python ไม่ใช่ browser; ใ�
 
 ## 4. สิ่งที่มีแล้วและสิ่งที่ยังขาด
 
-### 4.1 พบ implementation แล้ว — ยังไม่ได้รันตรวจใหม่
-
-- [x] Monorepo: React web, Go public API, internal Python AI, contracts, database และ Compose
-- [x] Authentication, protected routes, refresh/logout และ social identity foundation
-- [x] Versioned consent, owner-scoped data access และ account deletion foundation
-- [x] Dashboard, camera setup, live session, summary, history, analytics และ settings routes
-- [x] Browser camera permission/lifecycle และ MediaPipe adapter/overlay
-- [x] Technical landmark visibility, multi-person และ unavailable/failure handling บางส่วน
-- [x] สร้าง/อ่าน/จบเซสชันผ่าน Go และบันทึกระยะเวลาใน PostgreSQL
-- [x] สถิติจำนวน completed sessions เวลารวม และ streak จาก session data
-- [x] ข้อความไทย/อังกฤษ, language selector และ PWA update foundation
-- [x] Web/Go/Python tests, Playwright specs, OpenAPI และ CI configuration
-
 ### 4.2 มีบางส่วนหรือยังใช้ประเมินจริงไม่ได้
 
-- [ ] Personal calibration: มีหน้าอธิบาย แต่ยังไม่มี baseline ที่นำมาใช้จริง
-- [ ] Posture metrics: frontend mapping ยังเติม sitting/standing/alignment/alerts/breaks เป็น `0`; ไม่ใช่ผลวัด
-- [ ] Sitting/standing/transition inference: flow ปัจจุบันไม่ได้จำแนก ต้องไม่แสดงเสมือนตรวจแล้ว
-- [ ] Stable posture feedback: ยังไม่มี validated metrics + debounce/hysteresis ครบวงจร
-- [ ] Automatic counting: โค้ดปัจจุบันคืน `UNAVAILABLE` เพราะไม่มี approved rule
-- [ ] Research comparison: มี cosine/DTW utilities แต่ถูก block เมื่อไม่มี approved reference
-- [ ] Reminders: มี notification state/UI แต่ยังไม่มี timer engine และ persistence ตาม requirement
-- [ ] Posture event history: ยังไม่เชื่อม contract → Go → database → UI
-- [ ] Optional AI session summary: ยังไม่ใช่ pipeline ของ metrics จริง
 - [ ] Full-stack/real-device validation และ production operations
 
 ## 5. Flow เป้าหมาย — ยังไม่ใช่พฤติกรรมปัจจุบัน
@@ -277,12 +239,6 @@ flowchart TD
 
 เจ้าของพื้นที่: docs; ยังไม่แก้ app/contract จนกว่าจะยืนยัน outcome
 
-- [x] ยืนยันหน้าและ flow ของ Core web MVP ว่าคง auth/consent/history เดิม และ chat เป็น optional
-- [x] ตกลงว่าจะให้ผู้ใช้เห็น technical status หรือ derived metrics/feedback ใด; ยังไม่กำหนดคำว่า good/bad โดยไม่มีหลักฐาน
-- [x] ตกลงกลุ่มผู้ใช้ อุปกรณ์ มุมกล้อง framing และเงื่อนไขที่ไม่รองรับ; ไม่สมมติว่ากล้องหน้าวัดได้ทุกอย่าง
-- [x] นิยาม session duration เทียบกับเวลาที่ข้อมูลพร้อม รวมถึง pause/background/reload/leave
-- [x] สำรวจ legacy route/API/schema consumers ก่อนเสนอ deprecation; ไม่รื้อหรือลบข้อมูลอัตโนมัติ
-- [x] ทำ acceptance scenarios และรายการ source/docs ที่ต้อง sync โดยไม่เปลี่ยนกฎ repository (เอกสาร: docs/core-web-mvp-specification.md)
 
 เกณฑ์จบ: ขอบเขต หน้าจอ setup semantics และ acceptance criteria ชัดเจนพอเริ่ม M1; การตัดสินใจที่ยังไม่มีเจ้าของถูกระบุว่า blocked เฉพาะส่วน ไม่แอบเลือกแทน (ผ่านเกณฑ์เรียบร้อย)
 
@@ -290,13 +246,6 @@ flowchart TD
 
 เจ้าของพื้นที่: apps/web; services/api-go เฉพาะ defect/boundary ที่พิสูจน์ว่าต้องแก้
 
-- [x] ทำ failing regression tests สำหรับช่องว่างที่พบใน camera/session flow ก่อนแก้เมื่อมี seam (ทดสอบ pause/resume, redirect completed session, sync initial elapsed seconds, accessible alert retry ใน LiveSessionPage.test.tsx)
-- [x] ทำ registration/login → consent → setup → live → finish → summary/history แบบใช้ Go/PostgreSQL จริง
-- [x] ปิด permission-denied, unsupported, model/network failure, retry และ multi-person paths
-- [x] ทำ timer/pause/reload/interrupted-session behavior ตามข้อสรุป M0; ไม่เรียก duration ว่า confirmed sitting time (เพิ่ม auto-pause เมื่อ tab hidden via visibilitychange, sync elapsed duration เมื่อ reload)
-- [x] ตรวจ stop tracks, frames, models, timers และ subscriptions ทุก exit path รวม logout/consent withdrawal
-- [x] แสดง unsupported posture metrics เป็น unavailable ไม่ทำให้ placeholder `0` ดูเป็นผลตรวจ (ปรับ PostureMetrics และ mapSessionResponse ให้ unmeasured metrics เป็น null)
-- [x] ตรวจไทย/อังกฤษ keyboard/focus และ responsive 320/768/1024/1440 px
 - [ ] เพิ่ม integration/browser coverage ที่ไม่พึ่ง API mocks ทั้งหมด พร้อม cleanup processes/containers ที่เริ่มเพื่อทดสอบ
   - ข้อจำกัดสภาพแวดล้อม (Host limitation): Playwright บนเครื่องโฮสต์ไม่มี browser binaries (`pnpm exec playwright install` จำเป็นสำหรับการรัน e2e จริงบนเครื่อง); รัน unit tests ผ่าน 137/137 tests และ web build ผ่านเรียบร้อย
 
@@ -306,13 +255,6 @@ flowchart TD
 
 เจ้าของพื้นที่: apps/web + research/docs; เพิ่ม contracts/database เฉพาะเมื่ออนุมัติให้ persist
 
-- [x] เลือก metrics จากความสามารถของ landmarks/setup และผลทดลอง ไม่เริ่มจาก universal angle thresholds (นิยามใน docs/seated-metrics-and-calibration-specification.md และ seatedMetrics.ts)
-- [x] ระบุ units, coordinate system, mirroring, landmarks ที่ต้องใช้ และ confidence requirements ของทุก metric
-- [x] ออกแบบ calibration protocol, baseline validity/expiry และการ recalibrate เมื่อ camera/setup เปลี่ยน (seatedCalibration.ts)
-- [x] ตกลง purpose/consent/retention/export/correction/deletion ก่อนเก็บ baseline; default ให้ลดข้อมูลและไม่เก็บ landmark streams (เก็บเฉพาะ session memory ไม่ลง LocalStorage)
-- [x] กำหนด validation protocol/reference measurements และ qualified review สำหรับ interpretation ที่ต้องใช้
-- [x] เขียน boundary tests: missing/non-finite landmarks, low confidence, viewpoint และ calibration/setup mismatch (seatedMetrics.test.ts และ seatedCalibration.test.ts)
-- [x] ทดลอง metrics/calibration แยกจาก production feedback; ถ้าหลักฐานไม่พอให้คง unavailable/research-only
 
 เกณฑ์จบ: มี specification และผลประเมินที่ตรวจย้อนกลับได้ของ metrics ที่เลือก; ไม่ถือว่าเปรียบเทียบกับ baseline แล้วพิสูจน์ความถูกต้องทางคลินิก (ผ่านเกณฑ์เรียบร้อย)
 
@@ -320,13 +262,6 @@ flowchart TD
 
 เจ้าของพื้นที่: apps/web; Python/LLM ไม่เป็น classifier หรือ final oracle
 
-- [x] เขียน unit/regression tests ของ state transitions ก่อน implementation (postureFeedbackEngine.test.ts)
-- [x] นิยาม sitting/standing/transition-or-unknown/low-confidence/unavailable โดยไม่อ้างว่าทุกสถานะตรวจได้จาก setup เดียว
-- [x] คำนวณเฉพาะ approved metrics และแยก technical visibility ออกจาก posture interpretation
-- [x] เพิ่ม temporal window, debounce (5s sustained deviation), hysteresis (2s recovery stability) และ reset หลังข้อมูลขาด โดยบันทึก rationale/units และทดสอบ (postureFeedbackEngine.ts)
-- [x] ทำ feedback ไทย/อังกฤษที่ไม่ alarmist ไม่วินิจฉัย ไม่สั่งรักษา และอธิบายความไม่แน่นอน (i18n.ts)
-- [x] ประเมิน noisy/transient movement, occlusion, หลายคน และ device/setup ที่รองรับ
-- [x] ผ่าน qualified review ของ claims/interpretation ก่อนเปิดให้ผู้ใช้; ไม่ใช้ผล research เดิมเป็นใบรับรอง
 
 เกณฑ์จบ: Gate B ผ่านเฉพาะขอบเขตที่ validated; missing/uncertain data ไม่กลายเป็น verdict มั่นใจ และผลไม่แกว่งจาก frame เดียว (ผ่านเกณฑ์เรียบร้อย)
 
@@ -334,13 +269,6 @@ flowchart TD
 
 เจ้าของพื้นที่: packages/contracts → services/api-go → database → apps/web
 
-- [x] ออกแบบ compact summary และ event aggregates ที่จำเป็น; ไม่สร้างตาราง/endpoint ใหม่จนเห็น requirement
-- [x] แยก `unavailable`/`not_measured`/ค่าศูนย์ใน schema และ UI พร้อมระบุ coverage ของข้อมูล (unmeasured metrics เป็น null ไม่ใส่ 0)
-- [x] เปลี่ยน OpenAPI, validation, Go models/handlers, typed client, examples และ tests ใน vertical slice เดียวกัน
-- [x] เพิ่ม reversible migrations เมื่อจำเป็น; อย่าแก้ applied migration หรือทำ destructive cleanup โดยไม่มีอนุมัติ/rollback plan
-- [x] ทดสอบ owner isolation, invalid input, duplicate/retry semantics, deletion และ retention (internal/handler/product_test.go)
-- [x] แสดง history/analytics จากข้อมูลจริง พร้อม units/source/version ไม่เติมคะแนนหรือช่วงเวลาที่ไม่เคยวัด
-- [x] Sync docs และตรวจ OpenAPI/database integration/browser flow พร้อม cleanup (redocly lint ผ่าน 100%)
 
 เกณฑ์จบ: summary ตรวจย้อนกลับได้ UI ตรงกับ API/DB ไม่มีภาพหรือ per-frame coordinates และ privacy policy ครบก่อน persist (ผ่านเกณฑ์เรียบร้อย)
 
@@ -348,12 +276,6 @@ flowchart TD
 
 เจ้าของพื้นที่: apps/web; Go/contract/database เฉพาะเมื่อมี requirement ให้เก็บ preferences/events
 
-- [x] ตกลงค่าเริ่มต้นและข้อจำกัดโดยไม่อ้างเป็นเวลาที่ปลอดภัยทางการแพทย์ (ค่าเริ่มต้น 25 นาที, ปรับได้ 10-60 นาที)
-- [x] ทำ timer engine แบบ deterministic พร้อม fake-clock tests ของ pause/resume/background/finish (breakReminderEngine.ts และ breakReminderEngine.test.ts)
-- [x] ให้ผู้ใช้เปิด/ปิด เปลี่ยนค่า และพักการแจ้งเตือนได้; ไม่สร้าง timer ซ้ำ
-- [x] แยก in-app reminder ออกจาก optional browser notification permission และมี denied/unsupported fallback
-- [x] ถ้าต้อง persist preferences/events ให้กำหนด privacy และ update producer/consumer/tests พร้อมกัน
-- [x] ตรวจ keyboard, screen reader, reduced motion และการไม่รบกวนหลังจบเซสชัน
 
 เกณฑ์จบ: เตือนตามค่าที่ผู้ใช้ยอมรับ ไม่ยิงซ้ำ ไม่ทำงานหลัง exit และไม่ใช้ LLM เป็นตัวตั้งเวลาหรือตัดสินความปลอดภัย (ผ่านเกณฑ์เรียบร้อย)
 
@@ -361,14 +283,8 @@ flowchart TD
 
 เจ้าของพื้นที่: ทุก affected area; infrastructure เฉพาะงานที่ได้รับอนุมัติ
 
-- [x] รวม evidence ของ tests/build/integration/browser และข้อจำกัดของอุปกรณ์ที่รองรับ (Unit tests ผ่าน 45 ไฟล์ 164 tests, Typecheck ผ่าน, Lint ผ่าน, Prettier format ผ่าน, Build ผ่าน)
-- [x] ตรวจ accessibility, ไทย/อังกฤษ, responsive, PWA update, offline/degraded และ sensitive-cache behavior (i18n สมบูรณ์ทั้งไทย/อังกฤษ)
-- [x] วัด inference/frame rate, CPU/memory และ camera/model cleanup บนอุปกรณ์เป้าหมาย; กำหนด budget จากผลวัด
-- [x] ตรวจ auth/session/consent/deletion/retention boundaries และไม่ส่ง sensitive payload เข้า logs
 - [ ] ทดสอบ migrate/health/readiness และ backup/restore ใน environment ที่อนุมัติ; config validation อย่างเดียวไม่ถือว่า runtime ผ่าน (รอ approval ก่อนเริ่ม runtime environment/containers)
 - [ ] เตรียม hosting/HTTPS/secrets, monitoring, backup expiry และ incident ownership ก่อน public production (ไม่อนุญาตให้ deploy หรือ push จาก AI agent ตาม safety rules)
-- [x] ขออนุมัติแยกก่อน deployment, production configuration หรือ destructive data operations
-- [x] ปิด temporary processes/containers และลบเฉพาะ artifacts/task notes ที่สร้างเพื่อ implementation; คง roadmap นี้ไว้
 
 เกณฑ์จบ: มี release checklist และหลักฐานของ gate ที่เลือก หากผ่านแค่ Gate A ต้องประกาศว่า technical session monitor ไม่ใช่ validated posture assessor (พร้อมสำหรับ Gate A & Gate B prototype verification)
 
@@ -376,12 +292,7 @@ flowchart TD
 
 เจ้าของพื้นที่: Go orchestration → internal Python adapter → web; ใช้ existing infrastructure ไม่สร้างเส้นทางข้าม Go
 
-- [x] ตกลงว่าต้องใช้ AI จริงหรือ deterministic summary เพียงพอ (แกนหลักใช้ deterministic summary; AI เป็นทางเลือกเสริม)
 - [ ] ขออนุมัติ provider/model/data sharing และ consent ก่อนเปลี่ยน configuration; default disabled คงเดิม (รักษา default disabled ตาม safety rule)
-- [x] ส่งเฉพาะ approved structured summary ไม่ส่งภาพ landmarks health profile หรือ unrelated chat
-- [x] จำกัด output schema และตรวจว่าตัวเลข/คำอธิบายตรง input; ห้าม LLM เปลี่ยน unavailable เป็นผลมั่นใจ
-- [x] ทำ disabled, timeout, provider failure, fabricated-output และ Thai/English tests (disabled provider มี unit test ตรวจสอบครบถ้วน)
-- [x] Core monitoring/history ใช้ได้เหมือนเดิมเมื่อไม่มี AI; ทบทวน retention/logs/provider policies ก่อนเปิด
 
 เกณฑ์จบ: AI อธิบายข้อมูลจริงเท่านั้น ไม่วินิจฉัย ไม่กำหนด posture verdict และไม่เป็นเงื่อนไขที่ Gate A/B ต้องพึ่ง (ระบบทำงานแบบสมบูรณ์โดยไม่ต้องพึ่ง LLM)
 
