@@ -36,6 +36,109 @@ function createSyntheticPose(
 }
 
 describe('seatedMetrics', () => {
+  it.each([
+    { width: 640, height: 480 },
+    { width: 1280, height: 720 }
+  ])('uses image-plane geometry for $width x $height frames', (frame) => {
+    const aspect = frame.width / frame.height
+    const landmarks = createSyntheticPose({
+      2: { x: 0.45, y: 0.1 },
+      5: { x: 0.55, y: 0.1 },
+      7: { x: 0.45, y: 0.15 },
+      8: { x: 0.55, y: 0.15 + 0.1 * aspect },
+      11: { x: 0.4, y: 0.4 },
+      12: { x: 0.6, y: 0.4 + 0.2 * aspect },
+      23: { x: 0.25, y: 0.4 + 0.25 * aspect },
+      24: { x: 0.45, y: 0.4 + 0.25 * aspect }
+    })
+    const result = calculateSeatedMetrics(landmarks, frame)
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.shoulderSlopeDegrees).toBe(45)
+    expect(result.metrics.headTiltDegrees).toBe(45)
+    expect(result.metrics.torsoInclinationDegrees).toBe(45)
+  })
+
+  it('corrects vertical distances without changing the input landmarks', () => {
+    const landmarks = createSyntheticPose({
+      2: { y: 0.15 },
+      5: { y: 0.15 }
+    })
+    const original = structuredClone(landmarks)
+    const result = calculateSeatedMetrics(landmarks, {
+      width: 640,
+      height: 480
+    })
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.eyeShoulderDistanceRatio).toBe(0.75)
+    expect(result.metrics.shoulderWidth).toBe(0.2)
+    expect(landmarks).toEqual(original)
+  })
+
+  it.each([
+    { width: 0, height: 480 },
+    { width: 640, height: -1 },
+    { width: Number.NaN, height: 480 },
+    { width: 640, height: Number.POSITIVE_INFINITY },
+    { width: 640.5, height: 480 }
+  ])('rejects unusable frame dimensions: %j', (frame) => {
+    expect(calculateSeatedMetrics(createSyntheticPose(), frame).status).toBe(
+      'invalid_coordinates'
+    )
+  })
+
+  it('keeps hidden hips unavailable with explicit frame dimensions', () => {
+    const result = calculateSeatedMetrics(
+      createSyntheticPose({ 23: { visibility: 0.1 }, 24: { visibility: 0.1 } }),
+      { width: 640, height: 480 }
+    )
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.torsoInclinationDegrees).toBeNull()
+    expect(result.metrics.framingMode).toBe('upper_body')
+  })
+
+  it('preserves signed image-line orientation when the image is mirrored', () => {
+    const landmarks = createSyntheticPose({
+      7: { x: 0.45, y: 0.15 },
+      8: { x: 0.55, y: 0.15 + 0.1 * (4 / 3) },
+      11: { x: 0.4, y: 0.35 },
+      12: { x: 0.6, y: 0.35 + 0.2 * (4 / 3) }
+    }).map((landmark) => ({ ...landmark, x: 1 - landmark.x }))
+    const result = calculateSeatedMetrics(landmarks, {
+      width: 640,
+      height: 480
+    })
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.shoulderSlopeDegrees).toBe(-45)
+    expect(result.metrics.headTiltDegrees).toBe(-45)
+  })
+
+  it('preserves the legacy calculation on square images', () => {
+    const landmarks = createSyntheticPose({ 12: { y: 0.4 } })
+    expect(
+      calculateSeatedMetrics(landmarks, { width: 640, height: 640 })
+    ).toEqual(calculateSeatedMetrics(landmarks))
+  })
+
+  it('corrects eye-line fallback when ears are hidden', () => {
+    const landmarks = createSyntheticPose({
+      2: { x: 0.45, y: 0.15 },
+      5: { x: 0.55, y: 0.15 + 0.1 * (4 / 3) },
+      7: { visibility: 0.1 },
+      8: { visibility: 0.1 }
+    })
+    const result = calculateSeatedMetrics(landmarks, {
+      width: 640,
+      height: 480
+    })
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.headTiltDegrees).toBe(45)
+  })
+
   it('calculates deterministic metrics for valid upright seated pose', () => {
     const landmarks = createSyntheticPose()
     const result = calculateSeatedMetrics(landmarks)
@@ -48,6 +151,26 @@ describe('seatedMetrics', () => {
     expect(result.metrics.torsoInclinationDegrees).toBe(0)
     expect(result.metrics.shoulderWidth).toBeCloseTo(0.2, 2)
     expect(result.metrics.eyeShoulderDistanceRatio).toBeGreaterThan(0)
+    expect(result.metrics.forwardHeadRatio).toBeGreaterThan(0)
+  })
+
+  it('detects forward head magnification when face leans closer to camera', () => {
+    const normal = calculateSeatedMetrics(createSyntheticPose())
+    // Eyes spread wider relative to shoulders as face approaches camera
+    const leaningForward = calculateSeatedMetrics(
+      createSyntheticPose({
+        2: { x: 0.45, y: 0.18 },
+        5: { x: 0.55, y: 0.18 }
+      })
+    )
+
+    expect(normal.status).toBe('valid')
+    expect(leaningForward.status).toBe('valid')
+    if (normal.status !== 'valid' || leaningForward.status !== 'valid') return
+
+    expect(leaningForward.metrics.forwardHeadRatio).toBeGreaterThan(
+      normal.metrics.forwardHeadRatio
+    )
   })
 
   it('detects shoulder slope tilt correctly', () => {
@@ -90,15 +213,54 @@ describe('seatedMetrics', () => {
     }
   })
 
-  it('rejects non-finite landmark coordinates (NaN or Infinity)', () => {
+  it('rejects non-finite required landmark coordinates (NaN or Infinity)', () => {
     const landmarks = createSyntheticPose({
-      23: { x: NaN, y: 0.65, visibility: 0.95 }
+      11: { x: NaN, y: 0.35, visibility: 0.95 }
     })
     const result = calculateSeatedMetrics(landmarks)
 
     expect(result.status).toBe('insufficient_landmarks')
     if (result.status === 'insufficient_landmarks') {
-      expect(result.missingIndices).toContain(23)
+      expect(result.missingIndices).toContain(11)
+    }
+  })
+
+  it('reports full_torso framing when both hips are reliable', () => {
+    const result = calculateSeatedMetrics(createSyntheticPose())
+
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.framingMode).toBe('full_torso')
+  })
+
+  it('assesses upper-body framing when hips are hidden by a desk', () => {
+    const landmarks = createSyntheticPose({
+      23: { visibility: 0.1 },
+      24: { visibility: 0.1 }
+    })
+    const result = calculateSeatedMetrics(landmarks)
+
+    expect(result.status).toBe('valid')
+    if (result.status !== 'valid') return
+    expect(result.metrics.framingMode).toBe('upper_body')
+    expect(result.metrics.torsoInclinationDegrees).toBeNull()
+    expect(result.metrics.shoulderSlopeDegrees).toBe(0)
+    expect(result.metrics.eyeShoulderDistanceRatio).toBeGreaterThan(0)
+  })
+
+  it('falls back to upper_body when only one hip or a non-finite hip is available', () => {
+    const oneHip = calculateSeatedMetrics(
+      createSyntheticPose({ 24: { visibility: 0.2 } })
+    )
+    const nanHip = calculateSeatedMetrics(
+      createSyntheticPose({ 23: { x: NaN } })
+    )
+
+    for (const result of [oneHip, nanHip]) {
+      expect(result.status).toBe('valid')
+      if (result.status !== 'valid') continue
+      expect(result.metrics.framingMode).toBe('upper_body')
+      expect(result.metrics.torsoInclinationDegrees).toBeNull()
     }
   })
 

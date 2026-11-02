@@ -3,31 +3,23 @@ import {
   ArrowRight,
   Camera,
   Check,
-  CheckCircle2,
-  CircleAlert,
   Lightbulb,
-  Loader2,
-  MonitorOff,
   PersonStanding,
   ScanLine,
   Shirt,
-  Smartphone,
-  UserRoundX
+  Smartphone
 } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import { SafetyNotice } from '@/components/SafetyNotice'
-import { useCamera } from '@/features/camera/useCamera'
 import { createSession } from '@/services/product'
 
 export function CameraSetupPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const camera = useCamera()
-  const [permissionStep, setPermissionStep] = useState(true)
+
   const [seatedSetupConfirmed, setSeatedSetupConfirmed] = useState(false)
 
   const startSession = useMutation({
@@ -39,85 +31,76 @@ export function CameraSetupPage() {
     }
   })
 
-  const startCameraCheck = () => {
-    if (!seatedSetupConfirmed) return
-    setPermissionStep(false)
-    void camera.start()
-  }
-
   return (
     <div className="w-full pb-4" data-testid="camera-setup-content">
-      <CameraSetupHeader currentStep={permissionStep ? 1 : 2} />
+      <CameraSetupHeader currentStep={1} />
 
-      {permissionStep ? (
-        <section
-          aria-labelledby="camera-processing-title"
-          className="mt-7 overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/90 shadow-[0_22px_60px_rgb(15_118_110_/_0.10)] backdrop-blur-sm sm:mt-9 xl:grid xl:min-h-[33rem] xl:grid-cols-[minmax(0,1.05fr)_minmax(23rem,0.95fr)]"
-        >
-          <CameraSetupIllustration />
-          <div className="flex flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:px-10 xl:px-12">
-            <span className="mx-auto grid size-20 place-items-center rounded-full bg-teal-50 text-teal-700 ring-1 ring-teal-100 sm:size-24">
-              <Camera aria-hidden="true" size={42} strokeWidth={1.8} />
-            </span>
-            <div className="mt-5 text-center">
-              <h2
-                className="text-2xl font-bold tracking-[-0.025em] text-slate-950 sm:text-[1.75rem]"
-                id="camera-processing-title"
+      <section
+        aria-labelledby="camera-processing-title"
+        className="mt-7 overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/90 shadow-[0_22px_60px_rgb(15_118_110_/_0.10)] backdrop-blur-sm sm:mt-9 xl:grid xl:min-h-[33rem] xl:grid-cols-[minmax(0,1.05fr)_minmax(23rem,0.95fr)]"
+      >
+        <CameraSetupIllustration />
+        <div className="flex flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:px-10 xl:px-12">
+          <span className="mx-auto grid size-20 place-items-center rounded-full bg-teal-50 text-teal-700 ring-1 ring-teal-100 sm:size-24">
+            <Camera aria-hidden="true" size={42} strokeWidth={1.8} />
+          </span>
+          <div className="mt-5 text-center">
+            <h2
+              className="text-2xl font-bold tracking-[-0.025em] text-slate-950 sm:text-[1.75rem]"
+              id="camera-processing-title"
+            >
+              {t('monitor.processingTitle')}
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-600">
+              {t('monitor.processingBody')}
+            </p>
+            <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-600">
+              {t('monitor.nextSteps')}
+            </p>
+          </div>
+
+          <div className="mt-7 flex w-full items-start gap-3 rounded-2xl border border-teal-100 bg-gradient-to-br from-white to-teal-50/70 p-4 text-left sm:p-5">
+            <input
+              aria-describedby="seated-mode-description"
+              checked={seatedSetupConfirmed}
+              className="mt-0.5 size-5 shrink-0 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
+              id="seated-mode-confirmation"
+              onChange={(event) =>
+                setSeatedSetupConfirmed(event.target.checked)
+              }
+              type="checkbox"
+            />
+            <div>
+              <label
+                className="cursor-pointer text-sm font-bold leading-6 text-slate-900 sm:text-base"
+                htmlFor="seated-mode-confirmation"
               >
-                {t('monitor.processingTitle')}
-              </h2>
-              <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-600">
-                {t('monitor.processingBody')}
+                {t('monitor.seatedConfirmation')}
+              </label>
+              <p
+                className="mt-1 text-sm leading-6 text-slate-600"
+                id="seated-mode-description"
+              >
+                {t('monitor.seatedConfirmationBody')}
               </p>
             </div>
-
-            <div className="mt-7 flex w-full items-start gap-3 rounded-2xl border border-teal-100 bg-gradient-to-br from-white to-teal-50/70 p-4 text-left sm:p-5">
-              <input
-                aria-describedby="seated-mode-description"
-                checked={seatedSetupConfirmed}
-                className="mt-0.5 size-5 shrink-0 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
-                id="seated-mode-confirmation"
-                onChange={(event) =>
-                  setSeatedSetupConfirmed(event.target.checked)
-                }
-                type="checkbox"
-              />
-              <div>
-                <label
-                  className="cursor-pointer text-sm font-bold leading-6 text-slate-900 sm:text-base"
-                  htmlFor="seated-mode-confirmation"
-                >
-                  {t('monitor.seatedConfirmation')}
-                </label>
-                <p
-                  className="mt-1 text-sm leading-6 text-slate-600"
-                  id="seated-mode-description"
-                >
-                  {t('monitor.seatedConfirmationBody')}
-                </p>
-              </div>
-            </div>
-
-            <button
-              className="ui-transition pressable mt-6 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-teal-700 bg-gradient-to-r from-teal-600 to-teal-700 px-5 font-bold text-white shadow-[0_14px_30px_rgb(15_118_110_/_0.22)] hover:from-teal-700 hover:to-teal-800"
-              disabled={!seatedSetupConfirmed}
-              onClick={startCameraCheck}
-              type="button"
-            >
-              <Camera aria-hidden="true" size={21} />
-              {t('monitor.start')}
-              <ArrowRight aria-hidden="true" className="ml-auto" size={21} />
-            </button>
           </div>
-        </section>
-      ) : (
-        <CameraReadinessPanel
-          camera={camera}
-          isPending={startSession.isPending}
-          isError={startSession.isError}
-          onContinue={() => startSession.mutate()}
-        />
-      )}
+
+          {startSession.isError && (
+            <p role="alert">{t('monitor.startSessionFailed')}</p>
+          )}
+          <button
+            className="kg-button-primary ui-transition pressable mt-6 min-h-14 w-full gap-3 rounded-2xl px-5 font-bold"
+            disabled={!seatedSetupConfirmed || startSession.isPending}
+            onClick={() => startSession.mutate()}
+            type="button"
+          >
+            <Camera aria-hidden="true" size={21} />
+            {t('monitor.start')}
+            <ArrowRight aria-hidden="true" className="ml-auto" size={21} />
+          </button>
+        </div>
+      </section>
 
       <SetupTips />
       <SafetyNotice className="mt-7">{t('common.noDiagnosis')}</SafetyNotice>
@@ -239,141 +222,6 @@ function CameraSetupIllustration() {
   )
 }
 
-function CameraReadinessPanel({
-  camera,
-  isPending,
-  isError,
-  onContinue
-}: {
-  camera: ReturnType<typeof useCamera>
-  isPending: boolean
-  isError: boolean
-  onContinue: () => void
-}) {
-  const { t } = useTranslation()
-
-  return (
-    <section
-      aria-labelledby="camera-readiness-title"
-      className="mt-7 overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/90 shadow-[0_22px_60px_rgb(15_118_110_/_0.10)] backdrop-blur-sm sm:mt-9 xl:grid xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.55fr)]"
-    >
-      <div className="bg-gradient-to-br from-teal-50 to-slate-50 p-4 sm:p-6">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.4rem] border border-white/80 bg-slate-950 shadow-inner">
-          {camera.state === 'ready' && (
-            <video
-              autoPlay
-              className="absolute inset-0 h-full w-full -scale-x-100 object-cover"
-              muted
-              playsInline
-              ref={camera.videoRef}
-            />
-          )}
-          {camera.state === 'requesting' && (
-            <CameraState icon={Loader2} label={t('monitor.waiting')} spin />
-          )}
-          {camera.state === 'denied' && (
-            <CameraState icon={MonitorOff} label={t('monitor.denied')} />
-          )}
-          {camera.state === 'unsupported' && (
-            <CameraState icon={CircleAlert} label={t('monitor.unsupported')} />
-          )}
-        </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-teal-100 bg-white/85 px-4 py-3 sm:px-5">
-          <p className="text-sm font-semibold text-slate-700">
-            {t('monitor.secure')}
-          </p>
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700">
-            <CheckCircle2 aria-hidden="true" size={18} />
-            {t('common.onDevice')}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex flex-col p-5 sm:p-7 lg:p-8">
-        <span className="grid size-14 place-items-center rounded-2xl bg-teal-50 text-teal-700">
-          <ScanLine aria-hidden="true" size={28} />
-        </span>
-        <h2
-          className="mt-5 text-2xl font-bold tracking-[-0.025em] text-slate-950"
-          id="camera-readiness-title"
-        >
-          {t('monitor.readiness')}
-        </h2>
-        <ul className="mt-6 space-y-5">
-          <StatusItem
-            label={t('monitor.permission')}
-            state={
-              camera.state === 'ready'
-                ? 'good'
-                : camera.state === 'denied'
-                  ? 'error'
-                  : 'pending'
-            }
-            value={camera.state === 'ready' ? t('monitor.granted') : undefined}
-          />
-          <StatusItem
-            label={t('monitor.visibility')}
-            state="pending"
-            value={t('monitor.notChecked')}
-          />
-          <StatusItem
-            label={t('monitor.model')}
-            state="pending"
-            value={t('monitor.modelPending')}
-          />
-        </ul>
-
-        <div className="mt-auto pt-7">
-          <p className="mb-4 text-sm leading-6 text-slate-600">
-            {t('monitor.instructions')}
-          </p>
-          {isError && (
-            <p
-              className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900"
-              role="alert"
-            >
-              {t('monitor.startSessionFailed')}
-            </p>
-          )}
-          <button
-            className="ui-transition pressable inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-teal-700 bg-gradient-to-r from-teal-600 to-teal-700 px-5 font-bold text-white shadow-[0_14px_30px_rgb(15_118_110_/_0.22)] hover:from-teal-700 hover:to-teal-800"
-            disabled={camera.state !== 'ready' || isPending}
-            onClick={onContinue}
-            type="button"
-          >
-            {isPending && (
-              <Loader2 aria-hidden="true" className="animate-spin" size={18} />
-            )}
-            {t('monitor.continue')}
-            <ArrowRight aria-hidden="true" className="ml-auto" size={20} />
-          </button>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function CameraState({
-  icon: Icon,
-  label,
-  spin = false
-}: {
-  icon: LucideIcon
-  label: string
-  spin?: boolean
-}) {
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-5 text-center text-white/85">
-      <Icon
-        aria-hidden="true"
-        className={spin ? 'animate-spin' : ''}
-        size={36}
-      />
-      <p className="font-semibold">{label}</p>
-    </div>
-  )
-}
-
 function SetupTips() {
   const { t } = useTranslation()
   const tips = [
@@ -427,43 +275,5 @@ function SetupTips() {
         ))}
       </div>
     </section>
-  )
-}
-
-function StatusItem({
-  label,
-  state,
-  value
-}: {
-  label: string
-  state: 'good' | 'error' | 'pending'
-  value?: string
-}) {
-  return (
-    <li className="flex items-start gap-3">
-      {state === 'good' ? (
-        <CheckCircle2
-          aria-hidden="true"
-          className="mt-0.5 shrink-0 text-emerald-600"
-          size={20}
-        />
-      ) : state === 'error' ? (
-        <UserRoundX
-          aria-hidden="true"
-          className="mt-0.5 shrink-0 text-red-600"
-          size={20}
-        />
-      ) : (
-        <div className="mt-1.5 size-2.5 shrink-0 rounded-full bg-slate-300" />
-      )}
-      <div className="min-w-0 flex-1">
-        <p
-          className={`text-sm font-semibold ${state === 'error' ? 'text-red-900' : 'text-slate-700'}`}
-        >
-          {label}
-        </p>
-        {value && <p className="mt-0.5 text-xs text-slate-500">{value}</p>}
-      </div>
-    </li>
   )
 }

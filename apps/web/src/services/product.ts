@@ -53,10 +53,22 @@ export interface PostureMetrics {
   longest_sitting_seconds: number | null
 }
 
+export interface PostureSummaryResponse {
+  good_alignment_seconds: number
+  needs_adjustment_seconds: number
+  unassessed_seconds: number
+  alert_count: number
+  break_count: number
+  framing_mode: 'upper_body' | 'full_torso'
+  method_version: 'seated-baseline-v1'
+}
+
 export interface PostureSession {
   id: string
+  has_valid_duration?: boolean
   status: 'active' | 'completed' | 'stopped'
   metrics: PostureMetrics
+  posture_summary: PostureSummaryResponse | null
   started_at: string
   completed_at: string | null
   retention_until: string
@@ -67,6 +79,7 @@ export interface SessionResponse {
   status: PostureSession['status']
   manual_cycles: number
   elapsed_seconds: number
+  posture_summary?: PostureSummaryResponse | null
   started_at: string
   completed_at: string | null
   retention_until: string
@@ -279,13 +292,18 @@ export async function createSession(input: { camera_used: boolean }) {
 
 export async function updateSession(
   id: string,
-  input: Pick<PostureSession, 'status'> & { metrics: Partial<PostureMetrics> }
+  input: Pick<PostureSession, 'status'> & {
+    metrics: Partial<PostureMetrics>
+    posture_summary?: PostureSummaryResponse | null
+  }
 ) {
-  // Persist only the duration supported by the current public contract.
   const payload = {
     status: input.status,
     elapsed_seconds: input.metrics.duration_seconds ?? 0,
-    manual_cycles: 0
+    manual_cycles: 0,
+    ...(input.posture_summary !== undefined && {
+      posture_summary: input.posture_summary
+    })
   }
   const response = await http.patch<SessionResponse>(`/sessions/${id}`, payload)
   return mapSessionResponse(response.data)
@@ -293,19 +311,23 @@ export async function updateSession(
 
 export function mapSessionResponse(s: SessionResponse): PostureSession {
   const elapsed = s.elapsed_seconds ?? 0
+  const summary = s.posture_summary ?? null
   return {
     id: s.id,
+    has_valid_duration:
+      Number.isSafeInteger(s.elapsed_seconds) && s.elapsed_seconds >= 0,
     status: s.status,
     metrics: {
       duration_seconds: elapsed,
       sitting_seconds: null,
       standing_seconds: null,
-      good_alignment_seconds: null,
-      needs_adjustment_seconds: null,
-      alert_count: null,
-      break_count: null,
+      good_alignment_seconds: summary?.good_alignment_seconds ?? null,
+      needs_adjustment_seconds: summary?.needs_adjustment_seconds ?? null,
+      alert_count: summary?.alert_count ?? null,
+      break_count: summary?.break_count ?? null,
       longest_sitting_seconds: null
     },
+    posture_summary: summary,
     started_at: s.started_at,
     completed_at: s.completed_at,
     retention_until: s.retention_until

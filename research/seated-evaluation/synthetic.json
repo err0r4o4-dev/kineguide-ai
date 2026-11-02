@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "dataset": {
+    "name": "Synthetic technical geometry fixture",
+    "source": "Manually generated non-participant 2D coordinates",
+    "license": "CC0-1.0",
+    "referenceKind": "synthetic",
+    "split": "development"
+  },
+  "records": [
+    {
+      "subjectId": "synthetic-001",
+      "condition": "standard",
+      "frame": { "width": 640, "height": 480 },
+      "landmarks": [
+        { "x": 0.5, "y": 0.2, "visibility": 1 },
+        { "x": 0.31, "y": 0.31, "visibility": 1 },
+        { "x": 0.45, "y": 0.3, "visibility": 1 },
+        { "x": 0.47, "y": 0.3, "visibility": 1 },
+        { "x": 0.49, "y": 0.3, "visibility": 1 },
+        { "x": 0.55, "y": 0.31, "visibility": 1 },
+        { "x": 0.53, "y": 0.3, "visibility": 1 },
+        { "x": 0.45, "y": 0.28, "visibility": 1 },
+        { "x": 0.55, "y": 0.29, "visibility": 1 },
+        { "x": 0.4, "y": 0.3, "visibility": 1 },
+        { "x": 0.6, "y": 0.3, "visibility": 1 },
+        { "x": 0.4, "y": 0.5, "visibility": 1 },
+        { "x": 0.6, "y": 0.51, "visibility": 1 },
+        { "x": 0.35, "y": 0.6, "visibility": 1 },
+        { "x": 0.65, "y": 0.6, "visibility": 1 },
+        { "x": 0.34, "y": 0.7, "visibility": 1 },
+        { "x": 0.66, "y": 0.7, "visibility": 1 },
+        { "x": 0.33, "y": 0.8, "visibility": 1 },
+        { "x": 0.67, "y": 0.8, "visibility": 1 },
+        { "x": 0.33, "y": 0.82, "visibility": 1 },
+        { "x": 0.67, "y": 0.82, "visibility": 1 },
+        { "x": 0.33, "y": 0.84, "visibility": 1 },
+        { "x": 0.67, "y": 0.84, "visibility": 1 },
+        { "x": 0.42, "y": 0.74, "visibility": 1 },
+        { "x": 0.58, "y": 0.74, "visibility": 1 },
+        { "x": 0.42, "y": 0.86, "visibility": 1 },
+        { "x": 0.58, "y": 0.86, "visibility": 1 },
+        { "x": 0.41, "y": 0.96, "visibility": 1 },
+        { "x": 0.59, "y": 0.96, "visibility": 1 },
+        { "x": 0.4, "y": 0.98, "visibility": 1 },
+        { "x": 0.6, "y": 0.98, "visibility": 1 },
+        { "x": 0.39, "y": 0.99, "visibility": 1 },
+        { "x": 0.61, "y": 0.99, "visibility": 1 }
+      ],
+      "reference": {
+        "shoulderSlopeDegrees": 2.15,
+        "headTiltDegrees": 4.29,
+        "torsoInclinationDegrees": 0,
+        "eyeShoulderDistanceRatio": 0.749,
+        "forwardHeadRatio": 0.501
+      }
+    }
+  ]
+}

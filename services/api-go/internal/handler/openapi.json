@@ -3110,6 +3110,69 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 86400
+          },
+          "posture_summary": {
+            "description": "Compact aggregate metrics from in-browser personal calibration and debounce.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PostureSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PostureSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Compact seated posture duration and event aggregates. Raw frames, videos, and landmark streams are never stored.",
+        "required": [
+          "good_alignment_seconds",
+          "needs_adjustment_seconds",
+          "unassessed_seconds",
+          "alert_count",
+          "break_count",
+          "framing_mode",
+          "method_version"
+        ],
+        "properties": {
+          "good_alignment_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "needs_adjustment_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "unassessed_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "alert_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "break_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "framing_mode": {
+            "type": "string",
+            "enum": [
+              "upper_body",
+              "full_torso"
+            ]
+          },
+          "method_version": {
+            "type": "string",
+            "const": "seated-baseline-v1"
           }
         }
       },
@@ -3128,6 +3191,7 @@
           "status",
           "manual_repetitions",
           "elapsed_seconds",
+          "posture_summary",
           "started_at",
           "completed_at",
           "retention_until"
@@ -3188,6 +3252,17 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 86400
+          },
+          "posture_summary": {
+            "description": "Compact aggregate metrics from in-browser personal calibration and debounce, or null if uncalibrated.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PostureSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "started_at": {
             "type": "string",

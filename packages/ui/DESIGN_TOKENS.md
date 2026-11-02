@@ -4,13 +4,18 @@ Use semantic tokens rather than feature-specific colors: canvas, surface, text, 
 
 Spacing follows a 4 px base rhythm. Controls should retain a minimum practical touch target, visible keyboard focus, sufficient contrast, and Thai text expansion room. Promote these values into code only when a second consumer establishes a real sharing requirement.
 
-## Calm Clinical Guidance web theme
+## Reference-aligned Pastel Mint web theme
 
 The web application uses a calm, Thai-first healthcare-support direction:
 
-- canvas `#f4f7f6`, surface `#ffffff`, and soft surface `#edf5f3`;
-- ink `#142321`, muted text `#5f706d`, and border `#d7e2df`;
-- primary teal `#0f766e` and strong primary `#0b5f59`;
+- canvas `#f5fbfa`, surface `#ffffff`, and soft surface `#effbf8`;
+- ink `#0f172a`, muted text `#52637c`, and border `#c9eeea`;
+- logo cyan `#48a7b8` and mint `#74dfbd`, taken from `apps/web/public/logo.svg`;
+- pastel action `#78bfbc`, gradient endpoint `#7db8b4`, and hover `#66aeaa`, following the approved camera-setup reference;
+- navy action labels `#0f172a` instead of white preserve readable contrast on pastel backgrounds;
+- teal text/focus `#007f78` and strong teal `#006f69` are for links, icons and focus, not large dark action fills;
+- soft mint accent `#dff8f1` and strong accent `#b9eee0`; preserve logo artwork unchanged;
+- account/navigation surfaces stay white or pale cyan with dark text; browser/PWA theme color is pastel teal `#78bfbc`;
 - established emerald, amber, and red system colors only for labelled status, caution, and danger states.
 
 The primary web typeface is the self-hosted Noto Sans Thai variable family. Use real weights 400, 500, 600, and 700, comfortable Thai line height, and tabular numerals for timers and activity statistics. Runtime pages must not depend on a third-party font request.

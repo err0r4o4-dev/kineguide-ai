@@ -54,7 +54,7 @@ describe('DashboardPage', () => {
     expect(screen.getByText(/อัปเดตล่าสุด/)).toBeVisible()
 
     expect(
-      await screen.findByRole('link', { name: /เริ่มตรวจท่าทาง/ })
+      await screen.findByRole('link', { name: /เริ่มติดตามการนั่ง/ })
     ).toHaveAttribute('href', '/app/monitor')
     expect(
       screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })

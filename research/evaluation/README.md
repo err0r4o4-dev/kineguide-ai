@@ -2,6 +2,15 @@
 
 Store small, non-sensitive evaluation definitions and aggregate results here. Large artifacts and participant-level data belong in an approved external store.
 
+## Seated geometry evaluation
+
+The local CLI and synthetic smoke fixture live in `../seated-evaluation/`.
+See `../../docs/research/evaluation-plan.md` for dataset screening, independent
+reference requirements and the distinction between offline `seated-image-v2`
+and live `seated-baseline-v1`. Reports default to no publication: use ignored
+`tmp/` output and review small-cohort disclosure risk before sharing. No actual
+seated dataset accuracy is established by the synthetic fixture.
+
 ## REHAB24-6 baseline
 
 `rehab24-6-baseline.json` contains aggregate leave-one-subject-out metrics from

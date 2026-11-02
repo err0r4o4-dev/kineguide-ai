@@ -37,7 +37,7 @@ export function LanguageButton({
               isActive && appearance === 'public'
                 ? 'bg-white text-teal-700 shadow-sm ring-1 ring-slate-200/70'
                 : isActive
-                  ? 'bg-teal-700 text-white'
+                  ? 'bg-[var(--color-kg-action)] text-[var(--color-kg-ink)]'
                   : 'text-slate-600 hover:bg-slate-100'
             }`}
             key={language}

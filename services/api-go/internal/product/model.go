@@ -133,6 +133,16 @@ func FindActivity(slug string) (Activity, bool) {
 
 func FindExercise(slug string) (Exercise, bool) { return FindActivity(slug) }
 
+type PostureSummary struct {
+	GoodAlignmentSeconds   int    `json:"good_alignment_seconds"`
+	NeedsAdjustmentSeconds int    `json:"needs_adjustment_seconds"`
+	UnassessedSeconds      int    `json:"unassessed_seconds"`
+	AlertCount             int    `json:"alert_count"`
+	BreakCount             int    `json:"break_count"`
+	FramingMode            string `json:"framing_mode"`
+	MethodVersion          string `json:"method_version"`
+}
+
 type Session struct {
 	ID              string `json:"id"`
 	UserID          string `json:"-"`
@@ -141,14 +151,15 @@ type Session struct {
 	MeasurementMode string `json:"measurement_mode"`
 	ManualCycles    int    `json:"manual_cycles"`
 	// Deprecated compatibility fields; use ActivitySlug and ManualCycles.
-	ExerciseSlug      string     `json:"exercise_slug"`
-	Status            string     `json:"status"`
-	CameraUsed        bool       `json:"camera_used"`
-	ManualRepetitions int        `json:"manual_repetitions"`
-	ElapsedSeconds    int        `json:"elapsed_seconds"`
-	StartedAt         time.Time  `json:"started_at"`
-	CompletedAt       *time.Time `json:"completed_at"`
-	RetentionUntil    time.Time  `json:"retention_until"`
+	ExerciseSlug      string          `json:"exercise_slug"`
+	Status            string          `json:"status"`
+	CameraUsed        bool            `json:"camera_used"`
+	ManualRepetitions int             `json:"manual_repetitions"`
+	ElapsedSeconds    int             `json:"elapsed_seconds"`
+	PostureSummary    *PostureSummary `json:"posture_summary"`
+	StartedAt         time.Time       `json:"started_at"`
+	CompletedAt       *time.Time      `json:"completed_at"`
+	RetentionUntil    time.Time       `json:"retention_until"`
 }
 
 type RefreshToken struct {

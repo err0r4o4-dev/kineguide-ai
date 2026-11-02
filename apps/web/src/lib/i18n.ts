@@ -156,7 +156,7 @@ const th = {
       'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์สำหรับติดตามขณะนั่งและตรวจความพร้อมของจุดอ้างอิงแบบเรียลไทม์ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
-    start: 'เริ่มตรวจท่าทาง',
+    start: 'เริ่มติดตามการนั่ง',
     learn: 'ดูวิธีการทำงาน',
     heroNote:
       'คุณจะเห็นคำอธิบายและเลือกความยินยอมก่อนระบบขอสิทธิ์ใช้กล้องหรือจัดเก็บข้อมูล',
@@ -223,7 +223,7 @@ const th = {
       'หากเป็นเหตุฉุกเฉิน ให้ติดต่อบริการฉุกเฉินในพื้นที่ ระบบนี้ไม่มีคำแนะนำฉุกเฉิน',
     finalTitle: 'พร้อมสำรวจระบบในขอบเขตที่ชัดเจน',
     finalBody:
-      'เริ่มจากการสร้างบัญชี อ่านรายละเอียดความยินยอม แล้วเริ่มติดตามท่าทาง',
+      'เริ่มจากการสร้างบัญชี อ่านรายละเอียดความยินยอม แล้วเริ่มติดตามการนั่ง',
     finalAction: 'สร้างบัญชีเพื่อเริ่มต้น',
     footerNav: 'ข้อมูลส่วนท้ายเว็บไซต์',
     footerHow: 'ขั้นตอนการใช้งาน',
@@ -328,7 +328,7 @@ const th = {
       'เปิดกล้องสำหรับเซสชันขณะนั่ง เพื่อตรวจว่ามองเห็นจุดอ้างอิงที่จำเป็นและติดตามระยะเวลา โดยไม่ประเมินว่าท่านั่งถูกต้อง',
     viewDetails: 'ดูรายละเอียด',
     completed: 'เซสชันเสร็จสิ้น',
-    start: 'เริ่มตรวจท่าทาง',
+    start: 'เริ่มติดตามการนั่ง',
     sessions: 'session',
     streak: 'วันที่ต่อเนื่อง',
     time: 'เวลาติดตามรวม',
@@ -373,7 +373,9 @@ const th = {
       'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ',
     seatedConfirmationBody:
       'การยืนยันนี้ใช้เฉพาะในหน้านี้และไม่ถูกบันทึก ระบบตรวจเพียงความพร้อมของจุดอ้างอิง ไม่ยืนยันว่าคุณกำลังนั่งหรือท่านั่งถูกต้อง',
-    start: 'ตรวจความพร้อมของกล้อง',
+    nextSteps:
+      'หลังสร้างเซสชัน กดเปิดกล้องเพื่อตรวจภาพและปรับเทียบท่าอ้างอิง คุณสามารถปรับเทียบใหม่หากเปลี่ยนการตั้งค่ากล้อง',
+    start: 'เริ่มติดตามการนั่ง',
     continue: 'เริ่มเซสชันโหมดนั่ง',
     readiness: 'ความพร้อมของระบบ',
     secure: 'ภาพประมวลผลบนอุปกรณ์ของคุณเท่านั้น',
@@ -414,13 +416,85 @@ const th = {
     researchSource: 'เปิดบทความงานวิจัยต้นฉบับ',
     expiredNotice:
       'Baseline หมดอายุแล้ว (เกิน 8 ชั่วโมง) แนะนำให้ปรับเทียบใหม่',
-    framingShiftNotice: 'มุมกล้องหรือระยะห่างเปลี่ยนไป แนะนำให้ปรับเทียบใหม่'
+    framingShiftNotice: 'มุมกล้องหรือระยะห่างเปลี่ยนไป แนะนำให้ปรับเทียบใหม่',
+    calibrate: 'ปรับเทียบ Baseline',
+    recalibrate: 'ปรับเทียบใหม่',
+    calibrating: 'กำลังเก็บค่า Baseline ({{current}}/{{total}})...',
+    calibratedSummary: 'บันทึก Baseline แล้ว ({{mode}})',
+    modeUpperBody: 'มุมมองส่วนบน (ไหล่/ศีรษะ)',
+    modeFullTorso: 'มุมมองลำตัวเต็มส่วน',
+    failedNotice: 'การปรับเทียบไม่สำเร็จ: {{reason}}',
+    reasonNotEnough: 'จุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งๆ ในตำแหน่งปกติ',
+    reasonMixed:
+      'มุมมองกล้องเปลี่ยนระหว่างปรับเทียบ หรือไม่ตรงกับเซสชันนี้ กรุณาใช้มุมมองเดิมและลองใหม่ หากต้องการเปลี่ยนมุมมอง ให้จบและเริ่มเซสชันใหม่',
+    reasonTooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมา',
+    reasonTooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+    reasonNotFacing: 'กรุณาหันหน้าตรงเข้าหากล้อง',
+    reasonTilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
+    reasonHeadCropped: 'ศีรษะหลุดขอบบน กรุณาปรับมุมก้ม-เงยของกล้อง',
+    notCalibratedHint:
+      'นั่งตัวตรงในตำแหน่งทำงานปกติ แล้วกดปรับเทียบเพื่อสร้าง Baseline เฉพาะบุคคลของคุณ'
+  },
+  camera: {
+    tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+    tooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+    notFacingCamera: 'กรุณาหันหน้าตรงเข้าหากล้อง (ไม่เอียงข้าง)',
+    tilted: 'มุมกล้องเอียงหรือไม่ตรงระดับ กรุณาตั้งระนาบกล้องให้ตรง',
+    headCropped: 'ศีรษะหลุดขอบบน กรุณาปรับมุมก้ม-เงยของกล้อง'
   },
   session: {
-    goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
+    coverageTitle: 'ระยะเวลาที่ประเมิน',
+    assessedDuration: 'เทียบกับท่าอ้างอิงได้',
+    unobservedDuration: 'ไม่มีข้อมูลที่สังเกตได้',
+    coverageBody:
+      'เวลารวมประกอบด้วยเวลาที่เทียบกับท่าอ้างอิงได้ เวลาที่ข้อมูลสังเกตไม่เชื่อถือได้ และเวลาที่เหลือรวมช่วงปรับเทียบหรือข้อมูลขาดหาย',
+    classificationUnavailable:
+      'โหมดนั่งเป็นการยืนยันโดยผู้ใช้ ระบบยังไม่ตรวจจับการนั่งหรือยืนอัตโนมัติและไม่สามารถระบุระยะเวลาได้',
+    invalidCoverage: 'ไม่สามารถแสดงระยะเวลาการประเมินได้',
+    feedbackSuspended: 'หยุดการประเมินชั่วคราว รอข้อมูลกล้องใหม่',
+    feedbackStale: 'ข้อมูลกล้องไม่เป็นปัจจุบัน ไม่สามารถประเมินได้',
+    calibratingStatus: 'กำลังปรับเทียบ รอข้อมูลกล้อง',
+    goodAlignment: 'ใกล้เคียงท่าอ้างอิง',
     noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
+    postureStatus: 'สถานะท่าทาง',
+    readings: {
+      title: 'ตัวเลขความต่างจาก Baseline',
+      explanation:
+        'ผลต่าง = |ค่าปัจจุบัน − ค่าเฉลี่ย Baseline| อัปเดตไม่เกิน 2 ครั้ง/วินาที ตัวเลขไม่ใช่สถานะแจ้งเตือน ซึ่งยังรอการเปลี่ยนแปลงต่อเนื่องตามกติกาเดิม',
+      current: 'ปัจจุบัน',
+      baseline: 'Baseline',
+      difference: 'ผลต่าง',
+      degreesValue: '{{value}}°',
+      ratioValue: '{{value}}',
+      unavailable: 'ประเมินไม่ได้',
+      waiting:
+        'ยังประเมินไม่ได้ — รอข้อมูลที่เชื่อถือได้และ Baseline ที่ใช้ได้',
+      limitation:
+        'เป็นค่าประมาณจากพิกัดภาพ 2 มิติแบบ normalized (seated-baseline-v1) ไม่ใช่มุมร่างกายจริงใน 3 มิติหรือค่าความแม่นยำ/ความคลาดเคลื่อนของกล้องเทียบค่าจริง อัตราส่วนไม่มีหน่วย ไม่ใช่เปอร์เซ็นต์ ข้อมูลที่ขาดหรือค้างจะไม่แสดงเป็นศูนย์',
+      metrics: {
+        headTiltDegrees: 'มุมเอียงศีรษะ',
+        shoulderSlopeDegrees: 'มุมเอียงไหล่',
+        torsoInclinationDegrees: 'มุมเอียงลำตัว',
+        eyeShoulderDistanceRatio: 'อัตราส่วนระยะตา–ไหล่ / ความกว้างไหล่',
+        forwardHeadRatio: 'อัตราส่วนความกว้างตา / ความกว้างไหล่'
+      }
+    },
+    cameraFramingAlert: 'มุมกล้องหรือตำแหน่งไม่เหมาะสม',
+    badgeForwardHead: 'คอยื่นเข้าหาจอ',
+    badgeSlouching: 'หลังค่อม / ไหล่ห่อ',
+    badgeShoulderSlope: 'ไหล่เอียง',
+    badgeHeadTilt: 'ศีรษะเอียง',
+    unassessedDuration: 'ระยะเวลาที่ยังประเมินไม่ได้',
+    framingMode: 'โหมดมุมมองกล้อง',
+    calibratedAt: 'ปรับเทียบเมื่อ',
+    observationalDisclaimer:
+      'การประเมินนี้เทียบกับ Baseline ส่วนบุคคลของคุณเพื่อส่งเสริมความตระหนักรู้ ไม่ใช่การวินิจฉัยทางการแพทย์',
     feedback: {
-      general: 'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจาก Baseline',
+      general: 'เปลี่ยนจากท่าอ้างอิง',
+      forwardHead:
+        'สังเกตเห็นการโน้มศีรษะ/คอยื่นเข้าหาจอ — ลองดึงคอกลับให้อยู่ในแนวระดับไหล่',
+      slouching:
+        'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ — ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
       shoulderSlopeDegrees: 'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจาก Baseline',
       headTiltDegrees: 'สังเกตเห็นศีรษะเอียงต่อเนื่องจาก Baseline',
       torsoInclinationDegrees: 'สังเกตเห็นลำตัวเอียงต่อเนื่องจาก Baseline',
@@ -481,28 +555,103 @@ const th = {
     activityStanding: 'ยืน',
     activityTransitioning: 'กำลังเปลี่ยนท่า',
     activityUnknown: 'ไม่ระบุ',
-    stateGood: 'อยู่ในเกณฑ์ดี',
-    stateNeedsAdjust: 'ควรปรับท่าทาง',
+    stateGood: 'ใกล้เคียงท่าอ้างอิง',
+    stateNeedsAdjust: 'เปลี่ยนจากท่าอ้างอิง',
     stateLowConfidence: 'ความมั่นใจต่ำ',
     stateUnable: 'ไม่สามารถประเมินได้',
-    goodAlignmentDuration: 'ระยะเวลาท่าทางดี',
-    needsAdjustmentDuration: 'ระยะเวลาควรปรับท่า',
+    goodAlignmentDuration: 'ระยะเวลาใกล้เคียงท่าอ้างอิง',
+    needsAdjustmentDuration: 'ระยะเวลาเปลี่ยนจากท่าอ้างอิง',
     alertCount: 'จำนวนการแจ้งเตือน',
     breakCount: 'จำนวนการหยุดพัก',
     breakDueTitle: 'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ',
     breakDueBody:
-      'คุณนั่งต่อเนื่องมาเป็นเวลา {{minutes}} นาทีแล้ว แนะนำให้ลุกขึ้นยืดเส้นยืดสายหรือพักสายตา',
+      'ใช้งานเซสชันต่อเนื่องมาเป็นเวลา {{minutes}} นาทีแล้ว แนะนำให้ลุกขึ้นยืดเส้นยืดสายหรือพักสายตา',
     breakAcknowledge: 'พักเรียบร้อยแล้ว',
     breakSnooze: 'เตือนอีกครั้งใน 5 นาที',
     longestSitting: 'ช่วงเวลานั่งนานที่สุด',
     headAlignment: 'ศีรษะ: ปกติ',
     shoulderAlignment: 'ไหล่: สมดุล',
     torsoAlignment: 'ลำตัว: มั่นคง',
-    baselineComparison: 'เปรียบเทียบจากค่า Baseline'
+    baselineComparison: 'เปรียบเทียบจากค่า Baseline',
+    soundOn: 'เสียงเตือน: เปิด',
+    soundOff: 'เสียงเตือน: ปิด'
+  },
+  sound: {
+    speech: {
+      breakDue:
+        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากใช้งานเซสชันต่อเนื่องครบ {{minutes}} นาที',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
+      calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
+      calibrationReason: {
+        tooClose: 'อยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'อยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacing: 'ไม่ได้หันหน้าตรงเข้าหากล้อง กรุณาหันหน้าเข้าหากล้อง',
+        tilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        mixed:
+          'มุมมองกล้องเปลี่ยนระหว่างปรับเทียบ หรือไม่ตรงกับเซสชันนี้ กรุณาใช้มุมมองเดิมและลองใหม่ หากต้องการเปลี่ยนมุมมอง ให้จบและเริ่มเซสชันใหม่',
+        notEnough:
+          'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
+      },
+      posture: {
+        goodAlignment: 'ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว',
+        forwardHead:
+          'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
+        slouching:
+          'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
+        shoulderSlopeDegrees:
+          'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับไหล่ทั้งสองข้างให้สมดุล',
+        headTiltDegrees:
+          'สังเกตเห็นศีรษะเอียงต่อเนื่องจากค่ามาตรฐาน ลองตั้งศีรษะให้อยู่ในแนวตรง',
+        torsoInclinationDegrees:
+          'สังเกตเห็นลำตัวเอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับลำตัวให้อยู่ในแนวตรง',
+        eyeShoulderDistanceRatio:
+          'สังเกตเห็นการโน้มศีรษะหรือลำตัวเข้าหาหน้าจอ ลองปรับท่านั่งให้อยู่ในแนวปกติ',
+        general:
+          'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
+      },
+      camera: {
+        tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacingCamera: 'กรุณาหันหน้าตรงเข้าหากล้อง โดยไม่หันเอียงข้าง',
+        tilted: 'มุมกล้องเอียงหรือไม่ตรงระดับ กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        general:
+          'มุมกล้องหรือตำแหน่งยังไม่เหมาะสม กรุณาจัดตำแหน่งให้อยู่ในกรอบภาพ'
+      },
+      preview: 'ตัวอย่างเสียงพูดแจ้งเตือนภาษาไทยจากไคน์ไกด์ เอไอ'
+    }
   },
   history: {
     title: 'ประวัติเซสชัน',
     subtitle: 'เฉพาะ session summary ที่คุณอนุญาตให้จัดเก็บ',
+    scope:
+      'แสดงได้สูงสุด 50 เซสชันล่าสุดที่ API ส่งกลับ เรียงจากใหม่ไปเก่า ช่วงวันนับรวมวันนี้ตามเวลาของอุปกรณ์ ระยะเวลาเป็นเวลาที่บันทึก ไม่ใช่เวลาที่ประเมินท่าทางได้ทั้งหมด',
+    records: 'รายการเซสชัน',
+    sessionName: 'เซสชันที่บันทึก',
+    identifier: 'รหัส {{id}}',
+    savedTime: 'เวลาที่บันทึก {{duration}}',
+    range: 'ช่วงเวลา',
+    allDates: 'ทุกช่วงเวลา',
+    lastDays: '{{count}} วันล่าสุด',
+    status: 'สถานะเซสชัน',
+    allStatuses: 'ทุกสถานะ',
+    active: 'ยังไม่จบเซสชัน',
+    searchHelp: 'ค้นหาด้วยรหัสเซสชัน วันที่ หรือสถานะ จากรายการที่โหลดแล้ว',
+    results: 'พบ {{count}} เซสชัน',
+    noResults: 'ไม่พบเซสชันที่ตรงกับการค้นหาหรือตัวกรอง',
+    clearFilters: 'ล้างตัวกรอง',
+    refresh: 'โหลดประวัติใหม่',
+    refreshing: 'กำลังโหลดประวัติ',
+    refreshFailed:
+      'โหลดข้อมูลล่าสุดไม่สำเร็จ กำลังแสดงข้อมูลที่โหลดไว้ กดโหลดประวัติใหม่เพื่อลองอีกครั้ง',
+    offline:
+      'ออฟไลน์อยู่ ประวัติต้องเชื่อมต่อ API ระบบจะลองโหลดเมื่อกลับมาออนไลน์',
+    references: 'แหล่งอ้างอิงและขอบเขตข้อมูล',
+    referencesNote:
+      'อ้างอิงแนวทางการเข้าถึงเว็บและการแสดงวันเวลา ไม่ใช่การรับรองมาตรฐานหรือความแม่นยำทางการแพทย์ หน้านี้อ่านข้อมูลจาก API เดิมและไม่บันทึกภาพกล้อง',
+    wcagReference: 'W3C WCAG 2.2: ป้ายกำกับ คีย์บอร์ด โฟกัส และข้อความสถานะ',
+    dateReference: 'MDN Intl.DateTimeFormat: วันเวลาและเขตเวลาตามอุปกรณ์',
     search: 'ค้นหาประวัติ',
     empty: 'ยังไม่มีประวัติ',
     completed: 'เสร็จสิ้น',
@@ -519,6 +668,51 @@ const th = {
     time: 'เวลารวม',
     streak: 'ทำต่อเนื่อง',
     chart: 'สถิติล่าสุด'
+  },
+  analytics: {
+    subtitle:
+      'สรุประยะเวลาเซสชันจากข้อมูลที่บันทึก ไม่ใช่คะแนนสุขภาพหรือการวินิจฉัย',
+    scope:
+      'ใช้เฉพาะเซสชันที่จบแล้วหรือหยุดก่อนจบ จากข้อมูลล่าสุดที่ API ส่งคืนสูงสุด 50 รายการ ไม่รวมเซสชันที่ยังทำอยู่ ทั้งหมดที่โหลดไม่ใช่ประวัติตลอดการใช้งาน',
+    filters: 'ตัวกรองสถิติ',
+    summary: 'สรุปตามตัวกรอง',
+    all: 'ทั้งหมดที่โหลด',
+    days: '{{count}} วัน',
+    searchHelp:
+      'ค้นหาด้วยรหัสเซสชัน วันที่ หรือสถานะ ตัวกรองใช้กับยอดรวม กราฟ และรายการพร้อมกัน',
+    resultCount_one: 'พบเซสชันที่สิ้นสุดแล้ว {{count}} รายการตามตัวกรอง',
+    resultCount_other: 'พบเซสชันที่สิ้นสุดแล้ว {{count}} รายการตามตัวกรอง',
+    average: 'เวลาเฉลี่ยต่อเซสชัน',
+    unavailable: 'ยังไม่มีข้อมูล',
+    duration: '{{hours}} ชม. {{minutes}} น. {{seconds}} วิ.',
+    seconds: 'วินาที',
+    secondsValue_one: '{{count}} วินาที',
+    secondsValue_other: '{{count}} วินาที',
+    date: 'วันที่เริ่ม',
+    chart: 'เวลาที่บันทึกแยกตามวันเริ่มเซสชัน',
+    chartScroll: 'กราฟรายวัน เลื่อนแนวนอนหากพื้นที่ไม่พอ',
+    chartDescription:
+      'แกนเริ่มที่ศูนย์และใช้สเกลเดียวกันทุกแท่ง แสดงทุกวันที่มีรายการตรงตัวกรอง วันที่ไม่ปรากฏไม่ได้ยืนยันว่าไม่มีการใช้งาน อ่านค่าครบถ้วนได้ในตารางรายวัน',
+    table: 'ดูตารางข้อมูลรายวัน',
+    empty:
+      'ไม่พบเซสชันที่สิ้นสุดแล้วตามตัวกรอง ลองเปลี่ยนช่วงเวลาหรือล้างคำค้นหา',
+    offline:
+      'ออฟไลน์ ยังโหลดข้อมูลล่าสุดไม่ได้ หากมีข้อมูลเดิมจะแสดงเฉพาะข้อมูลที่โหลดไว้ เชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่',
+    invalid:
+      'ไม่นับข้อมูลที่วันที่อยู่ในอนาคต วันที่ไม่ถูกต้อง หรือระยะเวลาไม่ถูกต้อง {{count}} รายการจากข้อมูลที่โหลด ก่อนใช้ตัวกรอง',
+    sessionId: 'รหัส: {{id}}',
+    method: 'วิธีคำนวณและข้อจำกัด',
+    formula:
+      'แหล่งข้อมูล GET /sessions ใช้ elapsed_seconds หน่วยวินาที จำนวนเซสชันคือจำนวนรายการที่สิ้นสุดและตรงตัวกรอง เวลารวมคือผลบวกระยะเวลา เวลาเฉลี่ยคือเวลารวมหารจำนวนเซสชัน ปัดเป็นวินาทีใกล้ที่สุด ช่วง 7/30/90 วันรวมวันนี้และวันก่อนหน้าตามเวลาท้องถิ่นของอุปกรณ์ ยึดวันที่เริ่มเซสชัน และนับระยะเวลาทั้งหมดไว้ในวันเริ่มแม้ข้ามเที่ยงคืน',
+    missing:
+      'เซสชันที่ไม่มีข้อมูลวัดท่าทางยังนับระยะเวลาที่บันทึกได้ แต่ไม่เติมสัดส่วนท่าทาง คะแนน หรือค่าที่ไม่เคยวัดขึ้นเอง ศูนย์วินาทีที่บันทึกจริงต่างจากยังไม่มีข้อมูล',
+    references: 'แหล่งอ้างอิงการแสดงข้อมูล',
+    referenceText: 'W3C WAI: ข้อมูลข้อความและตารางทดแทนกราฟ (เปิดแท็บใหม่)',
+    referenceScale: 'ONS: กราฟแท่งและแกนเริ่มที่ศูนย์ (เปิดแท็บใหม่)',
+    referenceContrast:
+      'WCAG 2.2: ความต่างสีของกราฟและส่วนควบคุม (เปิดแท็บใหม่)',
+    standardLimit:
+      'ใช้ WCAG 2.2 AA เป็นเป้าหมายด้านการเข้าถึง แหล่งอ้างอิงเหล่านี้ไม่ใช่หลักฐานรับรองว่าเว็บผ่านมาตรฐานหรือว่าใช้ประเมินสุขภาพได้'
   },
   profile: {
     title: 'โปรไฟล์',
@@ -569,7 +763,31 @@ const th = {
     identityFailed: 'ไม่สามารถเปลี่ยนบัญชีที่เชื่อมต่อได้',
     lastLoginMethod: 'ต้องมีวิธีเข้าสู่ระบบอื่นก่อนยกเลิกการเชื่อมบัญชีนี้',
     cameraPrefs: 'การตั้งค่ากล้อง',
-    breakPrefs: 'การแจ้งเตือนหยุดพัก'
+    breakPrefs: 'การแจ้งเตือนหยุดพัก',
+    soundTitle: 'การแจ้งเตือนด้วยเสียง',
+    soundBody:
+      'ควบคุมเสียงพูดแนะนำและเสียงสัญญาณระหว่างเซสชันติดตามท่าทาง การตั้งค่านี้เก็บเฉพาะในเบราว์เซอร์ของคุณ',
+    soundEnable: 'เปิดใช้เสียงแจ้งเตือนระหว่างเซสชัน',
+    soundEnableBody:
+      'ใช้เสียงเสริมข้อความบนหน้าจอ โดยไม่ส่งข้อมูลเสียงหรือภาพออกจากอุปกรณ์',
+    soundModeLabel: 'รูปแบบเสียงแจ้งเตือน',
+    soundModeTts: 'เสียงพูดภาษาไทย (TTS)',
+    soundModeTtsBody:
+      'อ่านคำแนะนำแจ้งเตือนเป็นเสียงพูดภาษาไทย และสลับเป็นเสียงสัญญาณอัตโนมัติเมื่อเบราว์เซอร์ไม่มีชุดเสียงภาษาไทย',
+    soundModeChime: 'เสียงสัญญาณนุ่มนวล',
+    soundModeChimeBody:
+      'ใช้โทนเสียงสังเคราะห์สั้น ๆ แยกตามประเภทเหตุการณ์โดยไม่มีเสียงพูด',
+    soundVolume: 'ระดับความดังเสียง ({{percent}}%)',
+    soundEventsLabel: 'เหตุการณ์ที่ต้องการให้ส่งเสียง',
+    soundEventPosture: 'เตือนปรับท่านั่งเมื่อเบี่ยงเบนต่อเนื่อง',
+    soundEventBreak: 'เตือนเมื่อถึงเวลาพัก',
+    soundEventCalibration: 'สถานะการปรับเทียบ Baseline',
+    soundEventFraming: 'เตือนเมื่อมุมกล้องไม่เหมาะสมต่อเนื่อง',
+    soundPreview: 'ทดลองฟังเสียง',
+    soundSpeechFallbackNotice:
+      'เบราว์เซอร์หรืออุปกรณ์นี้ยังไม่มีชุดเสียงพูดภาษาไทย (th-TH) เช่น อาจเปิดผ่าน Microsoft Edge หรือติดตั้งชุดเสียงภาษาไทยในระบบปฏิบัติการ ระบบจึงใช้เสียงสัญญาณนุ่มนวลแทนอัตโนมัติ',
+    soundUnsupportedNotice:
+      'เบราว์เซอร์นี้ไม่รองรับระบบเสียง Web Speech และ Web Audio จึงแสดงเฉพาะข้อความแจ้งเตือนบนหน้าจอ'
   },
   help: {
     title: 'ช่วยเหลือ',
@@ -750,7 +968,7 @@ const en: typeof th = {
     titleRest: 'Monitor your posture confidently with',
     subtitle:
       'Try an on-device seated monitoring flow and check landmark visibility in real time without uploading photos or video.',
-    start: 'Start Monitoring',
+    start: 'Start seated monitoring',
     learn: 'How it works',
     heroNote:
       'You will see an explanation and choose consent before the system requests camera access or stores data.',
@@ -926,7 +1144,7 @@ const en: typeof th = {
       'Use the camera during a seated session to check required landmark visibility and track duration without assessing posture correctness.',
     viewDetails: 'View details',
     completed: 'Completed sessions',
-    start: 'Start Monitoring',
+    start: 'Start seated monitoring',
     sessions: 'sessions',
     streak: 'day streak',
     time: 'total time',
@@ -972,7 +1190,9 @@ const en: typeof th = {
       'I will use the camera while seated and frame the required landmarks as instructed',
     seatedConfirmationBody:
       'This confirmation stays on this page and is not stored. The system checks landmark visibility only; it does not confirm that you are seated or that your posture is correct.',
-    start: 'Check camera readiness',
+    nextSteps:
+      'After creating the session, start the camera to check the view and calibrate your reference posture. Recalibrate if the camera setup changes.',
+    start: 'Start seated monitoring',
     continue: 'Start seated session',
     readiness: 'System readiness',
     secure: 'Camera data stays on-device',
@@ -1016,13 +1236,87 @@ const en: typeof th = {
     expiredNotice:
       'Personal baseline has expired (over 8h). Recalibration recommended.',
     framingShiftNotice:
-      'Camera angle or distance shifted. Recalibration recommended.'
+      'Camera angle or distance shifted. Recalibration recommended.',
+    calibrate: 'Calibrate Baseline',
+    recalibrate: 'Recalibrate',
+    calibrating: 'Collecting baseline samples ({{current}}/{{total}})...',
+    calibratedSummary: 'Baseline established ({{mode}})',
+    modeUpperBody: 'Upper body (shoulders/head)',
+    modeFullTorso: 'Full torso',
+    failedNotice: 'Calibration failed: {{reason}}',
+    reasonNotEnough: 'Landmarks were interrupted. Please sit still and retry.',
+    reasonMixed:
+      'Framing changed during calibration or differs from this session. Retry with the same framing, or finish and start a new session to change it.',
+    reasonTooClose: 'Too close to camera. Please step back slightly.',
+    reasonTooFar: 'Too far from camera. Please move closer.',
+    reasonNotFacing: 'Please face the camera directly.',
+    reasonTilted: 'Camera angle is tilted. Please level your camera.',
+    reasonHeadCropped: 'Head is cut off at the top. Please tilt camera up.',
+    notCalibratedHint:
+      'Sit upright in your normal working posture and calibrate to establish your personal baseline.'
+  },
+  camera: {
+    tooClose: 'You are too close to the camera. Please step back slightly.',
+    tooFar: 'You are too far from the camera. Please move closer.',
+    notFacingCamera:
+      'Please face the camera directly (avoid turning sideways).',
+    tilted: 'Camera angle is tilted. Please level your camera.',
+    headCropped: 'Head is cut off at the top. Please adjust camera pitch.'
   },
   session: {
-    goodAlignment: 'Good alignment relative to personal baseline',
+    coverageTitle: 'Assessment coverage',
+    assessedDuration: 'Compared with reference posture',
+    unobservedDuration: 'Unobserved time',
+    coverageBody:
+      'Total time includes baseline-compared time, unreliable observed time, and the remainder including calibration and gaps.',
+    classificationUnavailable:
+      'Seated mode is user-confirmed. Automatic sitting and standing detection and durations are unavailable.',
+    invalidCoverage: 'Assessment coverage is unavailable.',
+    feedbackSuspended: 'Assessment paused, awaiting new camera frames',
+    feedbackStale: 'Camera data is stale and cannot be assessed',
+    calibratingStatus: 'Calibrating, awaiting camera data',
+    goodAlignment: 'Similar to reference posture',
     noBaseline: 'Personal baseline not established',
+    postureStatus: 'Posture Status',
+    readings: {
+      title: 'Numeric differences from Baseline',
+      explanation:
+        'Difference = |current − Baseline mean|. Updates at most twice per second. These readings are separate from alerts, which still require sustained changes under the existing rules.',
+      current: 'Current',
+      baseline: 'Baseline',
+      difference: 'Difference',
+      degreesValue: '{{value}}°',
+      ratioValue: '{{value}}',
+      unavailable: 'Unable to assess',
+      waiting:
+        'Unable to assess — waiting for reliable data and a usable Baseline',
+      limitation:
+        'Estimates from normalized 2D image coordinates (seated-baseline-v1), not real 3D body angles, and not camera accuracy or ground-truth measurement error. Ratios are unitless, not percentages. Missing or stale data is not shown as zero.',
+      metrics: {
+        headTiltDegrees: 'Head tilt',
+        shoulderSlopeDegrees: 'Shoulder slope',
+        torsoInclinationDegrees: 'Torso inclination',
+        eyeShoulderDistanceRatio:
+          'Eye–shoulder distance / shoulder-width ratio',
+        forwardHeadRatio: 'Eye-width / shoulder-width ratio'
+      }
+    },
+    cameraFramingAlert: 'Camera angle or framing issue',
+    badgeForwardHead: 'Forward Head',
+    badgeSlouching: 'Slouching / Slump',
+    badgeShoulderSlope: 'Shoulder Tilt',
+    badgeHeadTilt: 'Head Tilt',
+    unassessedDuration: 'Unassessed Time',
+    framingMode: 'Framing Mode',
+    calibratedAt: 'Calibrated at',
+    observationalDisclaimer:
+      'This observational assessment compares with your personal baseline for ergonomic awareness and is not a medical diagnosis.',
     feedback: {
-      general: 'Sustained posture deviation observed relative to baseline',
+      general: 'Changed from reference posture',
+      forwardHead:
+        'Forward head posture observed — gently pull your head back in line with your shoulders.',
+      slouching:
+        'Slouching or rounded shoulders observed — gently lift your chest and roll shoulders back.',
       shoulderSlopeDegrees:
         'Sustained shoulder tilt observed relative to baseline',
       headTiltDegrees: 'Sustained head tilt observed relative to baseline',
@@ -1089,28 +1383,103 @@ const en: typeof th = {
     activityStanding: 'Standing',
     activityTransitioning: 'Transitioning',
     activityUnknown: 'Unknown',
-    stateGood: 'Good Alignment',
-    stateNeedsAdjust: 'Needs Adjustment',
+    stateGood: 'Similar to reference posture',
+    stateNeedsAdjust: 'Changed from reference posture',
     stateLowConfidence: 'Low Confidence',
     stateUnable: 'Unable to Assess',
-    goodAlignmentDuration: 'Good Alignment Time',
-    needsAdjustmentDuration: 'Needs Adjustment Time',
+    goodAlignmentDuration: 'Time similar to reference posture',
+    needsAdjustmentDuration: 'Time changed from reference posture',
     alertCount: 'Alert Count',
     breakCount: 'Break Count',
     breakDueTitle: 'Time for an ergonomic break',
     breakDueBody:
-      'You have been seated for {{minutes}} minutes. Consider standing up, stretching, or resting your eyes.',
+      'Session tracking has continued for {{minutes}} minutes. Consider standing up, stretching, or resting your eyes.',
     breakAcknowledge: 'Break completed',
     breakSnooze: 'Remind me in 5 min',
     longestSitting: 'Longest Sitting Period',
     headAlignment: 'Head: Normal',
     shoulderAlignment: 'Shoulders: Balanced',
     torsoAlignment: 'Torso: Stable',
-    baselineComparison: 'Comparison vs Baseline'
+    baselineComparison: 'Comparison vs Baseline',
+    soundOn: 'Sound: On',
+    soundOff: 'Sound: Off'
+  },
+  sound: {
+    speech: {
+      breakDue:
+        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากใช้งานเซสชันต่อเนื่องครบ {{minutes}} นาที',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
+      calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
+      calibrationReason: {
+        tooClose: 'อยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'อยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacing: 'ไม่ได้หันหน้าตรงเข้าหากล้อง กรุณาหันหน้าเข้าหากล้อง',
+        tilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        mixed:
+          'มุมมองกล้องเปลี่ยนระหว่างปรับเทียบ หรือไม่ตรงกับเซสชันนี้ กรุณาใช้มุมมองเดิมและลองใหม่ หากต้องการเปลี่ยนมุมมอง ให้จบและเริ่มเซสชันใหม่',
+        notEnough:
+          'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
+      },
+      posture: {
+        goodAlignment: 'ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว',
+        forwardHead:
+          'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
+        slouching:
+          'สังเกตเห็นการนั่งหลังค่อมหรือห่อไหล่ ลองยืดอกขึ้นและผ่อนคลายหัวไหล่',
+        shoulderSlopeDegrees:
+          'สังเกตเห็นระดับไหล่เอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับไหล่ทั้งสองข้างให้สมดุล',
+        headTiltDegrees:
+          'สังเกตเห็นศีรษะเอียงต่อเนื่องจากค่ามาตรฐาน ลองตั้งศีรษะให้อยู่ในแนวตรง',
+        torsoInclinationDegrees:
+          'สังเกตเห็นลำตัวเอียงต่อเนื่องจากค่ามาตรฐาน ลองปรับลำตัวให้อยู่ในแนวตรง',
+        eyeShoulderDistanceRatio:
+          'สังเกตเห็นการโน้มศีรษะหรือลำตัวเข้าหาหน้าจอ ลองปรับท่านั่งให้อยู่ในแนวปกติ',
+        general:
+          'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
+      },
+      camera: {
+        tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
+        tooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
+        notFacingCamera: 'กรุณาหันหน้าตรงเข้าหากล้อง โดยไม่หันเอียงข้าง',
+        tilted: 'มุมกล้องเอียงหรือไม่ตรงระดับ กรุณาปรับระนาบกล้องให้ตรง',
+        headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
+        general:
+          'มุมกล้องหรือตำแหน่งยังไม่เหมาะสม กรุณาจัดตำแหน่งให้อยู่ในกรอบภาพ'
+      },
+      preview: 'ตัวอย่างเสียงพูดแจ้งเตือนภาษาไทยจากไคน์ไกด์ เอไอ'
+    }
   },
   history: {
     title: 'Session history',
     subtitle: 'Only session summaries you consented to store',
+    scope:
+      'Shows up to the latest 50 sessions returned by the API, newest first. Date ranges include today in your device time zone. Saved duration is not the total time for which posture could be assessed.',
+    records: 'Session records',
+    sessionName: 'Recorded session',
+    identifier: 'ID {{id}}',
+    savedTime: 'Saved time {{duration}}',
+    range: 'Date range',
+    allDates: 'All dates',
+    lastDays: 'Last {{count}} days',
+    status: 'Session status',
+    allStatuses: 'All statuses',
+    active: 'Session not ended',
+    searchHelp: 'Search loaded records by session ID, date, or status',
+    results: '{{count}} sessions found',
+    noResults: 'No sessions match your search or filters',
+    clearFilters: 'Clear filters',
+    refresh: 'Refresh history',
+    refreshing: 'Refreshing history',
+    refreshFailed:
+      'Could not load the latest records. Previously loaded data is shown. Select Refresh history to try again.',
+    offline:
+      'You are offline. History requires the API. Loading will resume when you reconnect.',
+    references: 'References and data scope',
+    referencesNote:
+      'These references guide web accessibility and date formatting. They do not certify standards compliance or medical accuracy. This page reads the existing API and does not store camera images.',
+    wcagReference: 'W3C WCAG 2.2: labels, keyboard, focus, and status messages',
+    dateReference: 'MDN Intl.DateTimeFormat: dates and device time zones',
     search: 'Search history',
     empty: 'No history yet',
     completed: 'Completed',
@@ -1127,6 +1496,50 @@ const en: typeof th = {
     time: 'Total time',
     streak: 'Streak',
     chart: 'Recent stats'
+  },
+  analytics: {
+    subtitle: 'Recorded session durations, not a health score or diagnosis.',
+    scope:
+      'Includes completed and stopped sessions from at most the latest 50 records returned by the API. Active sessions are excluded. All loaded records does not mean lifetime history.',
+    filters: 'Analytics filters',
+    summary: 'Filtered summary',
+    all: 'All loaded records',
+    days: '{{count}} days',
+    searchHelp:
+      'Search by session ID, date or status. Filters apply to totals, chart and list together.',
+    resultCount_one: '{{count}} ended session matches the filters',
+    resultCount_other: '{{count}} ended sessions match the filters',
+    average: 'Average session duration',
+    unavailable: 'No data yet',
+    duration: '{{hours}}h {{minutes}}m {{seconds}}s',
+    seconds: 'Seconds',
+    secondsValue_one: '{{count}} second',
+    secondsValue_other: '{{count}} seconds',
+    date: 'Start date',
+    chart: 'Recorded duration by session start day',
+    chartScroll: 'Daily chart, scroll horizontally if needed',
+    chartDescription:
+      'Every bar uses the same scale starting at zero. Shows every day with matching records. An absent date does not prove no activity. Full values are available in the daily table.',
+    table: 'View daily data table',
+    empty:
+      'No ended sessions match these filters. Try another range or clear the search.',
+    offline:
+      'Offline: latest data could not be loaded. Any displayed records are previously loaded data. Reconnect and try again.',
+    invalid:
+      'Records excluded before filtering because of future or invalid dates or invalid durations: {{count}}.',
+    sessionId: 'ID: {{id}}',
+    method: 'Calculation and limitations',
+    formula:
+      'Source: GET /sessions, elapsed_seconds in seconds. Session count includes ended records matching the filters. Total duration is their sum; the mean is total duration divided by session count, rounded to the nearest second. The 7/30/90-day ranges include today and the preceding local calendar days on this device, based on session start time. The full duration belongs to the start day even when a session crosses midnight.',
+    missing:
+      'Sessions without posture measurements still contribute recorded duration. Unmeasured posture ratios, scores and values are not invented. A recorded zero-second session is different from no data.',
+    references: 'Data presentation references',
+    referenceText:
+      'W3C WAI: Text and table alternatives for charts (opens a new tab)',
+    referenceScale: 'ONS: Bar charts and a zero baseline (opens a new tab)',
+    referenceContrast: 'WCAG 2.2: Non-text contrast (opens a new tab)',
+    standardLimit:
+      'WCAG 2.2 AA is an accessibility target. These references do not certify conformance or establish that the page can assess health.'
   },
   profile: {
     title: 'Profile',
@@ -1177,7 +1590,31 @@ const en: typeof th = {
     lastLoginMethod:
       'Add another sign-in method before disconnecting this account.',
     cameraPrefs: 'Camera Preferences',
-    breakPrefs: 'Break Reminders'
+    breakPrefs: 'Break Reminders',
+    soundTitle: 'Sound notifications',
+    soundBody:
+      'Control voice guidance and gentle chimes during live monitoring sessions. These preferences are stored locally in your browser.',
+    soundEnable: 'Enable sound alerts during live sessions',
+    soundEnableBody:
+      'Play audio alongside on-screen alerts without sending audio or camera data off-device.',
+    soundModeLabel: 'Alert sound format',
+    soundModeTts: 'Thai voice guidance (TTS)',
+    soundModeTtsBody:
+      'Speaks alert guidance in Thai (th-TH) and falls back to a gentle chime if no Thai voice is available in this browser.',
+    soundModeChime: 'Gentle chime',
+    soundModeChimeBody:
+      'Plays short synthesized tones per alert category without spoken voice.',
+    soundVolume: 'Alert volume ({{percent}}%)',
+    soundEventsLabel: 'Events with sound alerts',
+    soundEventPosture: 'Posture adjustment after sustained deviation',
+    soundEventBreak: 'Ergonomic break reminder',
+    soundEventCalibration: 'Baseline calibration status',
+    soundEventFraming: 'Sustained camera framing issue',
+    soundPreview: 'Test sound',
+    soundSpeechFallbackNotice:
+      'This browser or device does not expose a Thai speech voice (th-TH)—for example, try Microsoft Edge or install the OS Thai speech pack. Gentle chime tones will play automatically instead.',
+    soundUnsupportedNotice:
+      'This browser does not support Web Speech or Web Audio, so alerts will appear visually on screen only.'
   },
   help: {
     title: 'Help',

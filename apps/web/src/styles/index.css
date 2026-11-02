@@ -4,17 +4,22 @@
   --font-sans:
     'Noto Sans Thai Variable', 'Noto Sans Thai', system-ui, sans-serif;
 
-  --color-kg-canvas: #f3f6f1;
+  --color-kg-canvas: #f5fbfa;
   --color-kg-surface: #ffffff;
-  --color-kg-soft: #eaf2ed;
-  --color-kg-ink: #10241f;
-  --color-kg-muted: #60706a;
-  --color-kg-border: #d4dfd8;
-  --color-kg-primary: #0b6b5c;
-  --color-kg-primary-strong: #074e44;
-  --color-kg-accent: #dff36c;
-  --color-kg-accent-strong: #c7df45;
-  --color-kg-night: #12352d;
+  --color-kg-soft: #effbf8;
+  --color-kg-ink: #0f172a;
+  --color-kg-muted: #52637c;
+  --color-kg-border: #c9eeea;
+  --color-kg-primary: #007f78;
+  --color-kg-primary-strong: #006f69;
+  --color-kg-accent: #dff8f1;
+  --color-kg-accent-strong: #b9eee0;
+  --color-kg-night: #007f78;
+  --color-kg-brand: #48a7b8;
+  --color-kg-mint: #74dfbd;
+  --color-kg-primary-end: #7db8b4;
+  --color-kg-action: #78bfbc;
+  --color-kg-action-hover: #66aeaa;
 
   --spacing: 0.25rem;
 
@@ -26,8 +31,8 @@
   --radius-pill: 9999px;
 
   --shadow-card:
-    0 1px 2px rgba(16, 36, 31, 0.04), 0 12px 35px rgba(16, 36, 31, 0.06);
-  --shadow-floating: 0 22px 60px rgba(7, 78, 68, 0.13);
+    0 1px 2px rgba(20, 43, 58, 0.04), 0 12px 35px rgba(20, 43, 58, 0.035);
+  --shadow-floating: 0 22px 60px rgba(0, 127, 120, 0.08);
 
   --blur-glass: 16px;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -78,8 +83,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 8% 4%, rgb(223 243 108 / 16%), transparent 22rem),
-    radial-gradient(circle at 92% 0%, rgb(45 212 191 / 10%), transparent 28rem),
+    radial-gradient(circle at 8% 4%, rgb(116 223 189 / 16%), transparent 22rem),
+    radial-gradient(circle at 92% 0%, rgb(72 167 184 / 10%), transparent 28rem),
     var(--color-kg-canvas);
 }
 
@@ -144,8 +149,8 @@ html {
     position: relative;
     isolation: isolate;
     background:
-      linear-gradient(rgb(16 36 31 / 2%) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(16 36 31 / 2%) 1px, transparent 1px);
+      linear-gradient(rgb(20 43 58 / 2%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(20 43 58 / 2%) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
@@ -157,7 +162,7 @@ html {
     width: 28rem;
     height: 28rem;
     border-radius: 9999px;
-    background: rgb(223 243 108 / 13%);
+    background: rgb(116 223 189 / 13%);
     filter: blur(2px);
     content: '';
     pointer-events: none;
@@ -168,10 +173,10 @@ html {
 
 .kg-landing-page {
   background:
-    radial-gradient(circle at 12% 10%, rgb(223 243 108 / 22%), transparent 26%),
+    radial-gradient(circle at 12% 10%, rgb(116 223 189 / 22%), transparent 26%),
     radial-gradient(circle at 88% 18%, rgb(153 246 228 / 30%), transparent 28%),
-    linear-gradient(rgb(16 36 31 / 2.5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(16 36 31 / 2.5%) 1px, transparent 1px),
+    linear-gradient(rgb(20 43 58 / 2.5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(20 43 58 / 2.5%) 1px, transparent 1px),
     var(--color-kg-canvas);
   background-size:
     auto,
@@ -251,7 +256,7 @@ button:disabled {
 }
 
 .kg-card-interactive:hover {
-  border-color: #aec7bd;
+  border-color: var(--color-kg-brand);
   box-shadow: var(--shadow-floating);
   translate: 0 -2px;
 }
@@ -262,12 +267,12 @@ button:disabled {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #b8cbc3;
+  border: 1px dashed var(--color-kg-border);
   border-radius: var(--radius-feature);
   background:
     radial-gradient(
       circle at 50% 20%,
-      rgb(223 243 108 / 18%),
+      rgb(116 223 189 / 18%),
       transparent 10rem
     ),
     rgb(255 255 255 / 72%);
@@ -301,18 +306,26 @@ button:disabled {
 }
 
 .kg-button-primary {
-  border: 1px solid var(--color-kg-primary-strong);
-  background: linear-gradient(135deg, var(--color-kg-primary), #118675);
+  border: 1px solid var(--color-kg-action-hover);
+  background: linear-gradient(
+    135deg,
+    var(--color-kg-action),
+    var(--color-kg-primary-end)
+  );
   padding: 0.75rem 1.25rem;
-  color: white;
+  color: var(--color-kg-ink);
   box-shadow:
-    0 9px 22px rgb(11 107 92 / 18%),
+    0 9px 22px rgb(37 112 128 / 18%),
     inset 0 1px rgb(255 255 255 / 18%);
 }
 
 .kg-button-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-kg-primary-strong), #0b6b5c);
-  box-shadow: 0 12px 26px rgb(11 107 92 / 24%);
+  background: linear-gradient(
+    135deg,
+    var(--color-kg-action-hover),
+    var(--color-kg-action)
+  );
+  box-shadow: 0 12px 26px rgb(37 112 128 / 24%);
   translate: 0 -1px;
 }
 
@@ -376,19 +389,27 @@ button:disabled {
 }
 
 .kg-landing-primary-cta {
-  border: 1px solid var(--color-kg-primary);
-  background: linear-gradient(135deg, var(--color-kg-primary), #118675);
-  color: white;
+  border: 1px solid var(--color-kg-action);
+  background: linear-gradient(
+    135deg,
+    var(--color-kg-action),
+    var(--color-kg-primary-end)
+  );
+  color: var(--color-kg-ink);
   box-shadow:
-    0 8px 22px rgb(13 148 136 / 28%),
-    0 0 0 4px rgb(45 212 191 / 9%);
+    0 8px 22px rgb(37 112 128 / 28%),
+    0 0 0 4px rgb(72 167 184 / 9%);
 }
 
 .kg-landing-primary-cta:hover {
-  background: linear-gradient(135deg, var(--color-kg-primary-strong), #0b6b5c);
+  background: linear-gradient(
+    135deg,
+    var(--color-kg-action-hover),
+    var(--color-kg-action)
+  );
   box-shadow:
-    0 11px 26px rgb(13 148 136 / 32%),
-    0 0 0 5px rgb(45 212 191 / 10%);
+    0 11px 26px rgb(37 112 128 / 32%),
+    0 0 0 5px rgb(72 167 184 / 10%);
   translate: 0 -2px;
 }
 
@@ -414,7 +435,7 @@ button:disabled {
 }
 
 .kg-icon-button:hover:not(:disabled) {
-  border-color: #afc6c1;
+  border-color: var(--color-kg-brand);
   background: var(--color-kg-soft);
   color: var(--color-kg-primary);
 }
@@ -442,12 +463,12 @@ button:disabled {
 }
 
 .kg-field input:hover {
-  border-color: #9fb8b3;
+  border-color: var(--color-kg-brand);
 }
 
 .kg-field input:focus {
   border-color: var(--color-kg-primary);
-  box-shadow: 0 0 0 3px rgb(20 184 166 / 16%);
+  box-shadow: 0 0 0 3px rgb(37 112 128 / 16%);
 }
 
 .kg-field-icon {
@@ -515,13 +536,13 @@ button:disabled {
 }
 
 .kg-swal-button-primary {
-  border-color: var(--color-kg-primary);
-  background: var(--color-kg-primary);
-  color: #fff;
+  border-color: var(--color-kg-action-hover);
+  background: var(--color-kg-action);
+  color: var(--color-kg-ink);
 }
 
 .kg-swal-button-primary:hover {
-  background: var(--color-kg-primary-strong);
+  background: var(--color-kg-action-hover);
 }
 
 .kg-swal-button-danger {
@@ -649,9 +670,9 @@ button:disabled {
 }
 
 .kg-filter-active {
-  border-color: var(--color-kg-primary);
-  background: var(--color-kg-primary);
-  color: white;
+  border-color: var(--color-kg-action-hover);
+  background: var(--color-kg-action);
+  color: var(--color-kg-ink);
 }
 
 button,
@@ -660,13 +681,13 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid #14b8a6;
+  outline: 3px solid var(--color-kg-primary);
   outline-offset: 3px;
 }
 
 ::selection {
-  background: #99f6e4;
-  color: #134e4a;
+  background: var(--color-kg-accent);
+  color: var(--color-kg-ink);
 }
 
 .kg-orbit-ring {

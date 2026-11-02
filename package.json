@@ -7,6 +7,8 @@
     "@redocly/cli": "^2.0.8"
   },
   "scripts": {
+    "test:multiposture": "node --test research/multiposture/*.test.mjs",
+    "train:multiposture": "node research/multiposture/train.mjs",
     "build": "corepack pnpm --filter @kineguide/web build",
     "dev": "corepack pnpm --filter @kineguide/web dev",
     "format": "corepack pnpm --filter @kineguide/web format",
@@ -14,6 +16,8 @@
     "lint": "corepack pnpm --filter @kineguide/web lint && corepack pnpm openapi:lint",
     "openapi:lint": "redocly lint packages/contracts/openapi/kineguide-api.yaml",
     "test": "corepack pnpm --filter @kineguide/web test",
+    "test:seated-evaluation": "node --test research/seated-evaluation/*.test.mjs",
+    "evaluate:seated": "node research/seated-evaluation/evaluate.mjs",
     "typecheck": "corepack pnpm --filter @kineguide/web typecheck"
   }
 }

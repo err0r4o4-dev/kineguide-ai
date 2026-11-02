@@ -21,12 +21,12 @@ export default defineConfig({
         name: 'KineGuide AI',
         short_name: 'KineGuide',
         description:
-          'Privacy-aware physiotherapy support and movement demo prototype.',
+          'Privacy-aware seated posture monitoring and ergonomic awareness prototype.',
         lang: 'th',
         start_url: '/',
         display: 'standalone',
-        background_color: '#f8fafc',
-        theme_color: '#0f766e',
+        background_color: '#f5fbfa',
+        theme_color: '#78bfbc',
         icons: [
           {
             src: '/logo.svg',

@@ -5,6 +5,10 @@ import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
 
 import i18n from '@/lib/i18n'
+import {
+  resetSoundAlertPreferencesStoreForTests,
+  SOUND_ALERT_STORAGE_KEY
+} from '@/features/notifications/soundAlertPreferences'
 import * as product from '@/services/product'
 import * as notification from '@/lib/notification'
 import { SettingsPage } from './SettingsPage'
@@ -46,6 +50,11 @@ function renderRoute() {
 }
 
 describe('SettingsPage', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+    resetSoundAlertPreferencesStoreForTests()
+  })
+
   it('renders settings sections', async () => {
     await i18n.changeLanguage('th')
     renderRoute()
@@ -115,5 +124,68 @@ describe('SettingsPage', () => {
     )
 
     expect(product.deleteAuthIdentity).toHaveBeenCalledWith('google')
+  })
+
+  it('configures sound alert preferences, previews Thai voice even in English UI, and clears preferences on account deletion', async () => {
+    await i18n.changeLanguage('en')
+    const spokenUtterances: Array<{ text: string; lang: string }> = []
+    Object.defineProperty(window, 'speechSynthesis', {
+      configurable: true,
+      value: {
+        speak: vi.fn((utterance: { text: string; lang: string }) => {
+          spokenUtterances.push(utterance)
+        }),
+        cancel: vi.fn(),
+        getVoices: () => [{ lang: 'th-TH', name: 'Thai Voice' }]
+      }
+    })
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      configurable: true,
+      value: class FakeUtterance {
+        text: string
+        lang = ''
+        volume = 1
+        rate = 1
+        pitch = 1
+        voice: unknown = null
+        onerror: unknown = null
+        onend: unknown = null
+        constructor(text: string) {
+          this.text = text
+        }
+      }
+    })
+
+    const user = userEvent.setup()
+    vi.mocked(notification.confirmNotification).mockResolvedValue(true)
+    renderRoute()
+
+    expect(
+      screen.getByRole('heading', { name: 'Sound notifications' })
+    ).toBeVisible()
+
+    // Preview TTS sound -> speaks Thai even though UI is in English
+    await user.click(screen.getByRole('button', { name: 'Test sound' }))
+    expect(spokenUtterances).toHaveLength(1)
+    expect(spokenUtterances[0]?.lang).toBe('th-TH')
+    expect(spokenUtterances[0]?.text).toContain('ไคน์ไกด์')
+
+    // Toggle an event checkbox and persist to localStorage
+    const framingCheckbox = screen.getByRole('checkbox', {
+      name: /Sustained camera framing issue/
+    })
+    expect(framingCheckbox).toBeChecked()
+    await user.click(framingCheckbox)
+    expect(framingCheckbox).not.toBeChecked()
+    expect(window.localStorage.getItem(SOUND_ALERT_STORAGE_KEY)).toContain(
+      '"cameraFraming":false'
+    )
+
+    // Deleting account removes stored browser preferences
+    await user.click(
+      screen.getByRole('button', { name: 'Delete account and all data' })
+    )
+    expect(product.deleteAccount).toHaveBeenCalled()
+    expect(window.localStorage.getItem(SOUND_ALERT_STORAGE_KEY)).toBeNull()
   })
 })

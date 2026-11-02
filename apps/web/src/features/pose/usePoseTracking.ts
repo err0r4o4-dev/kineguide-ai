@@ -6,6 +6,7 @@ import type {
   PoseAdapterFactory
 } from './poseAdapter'
 import { HOLISTIC_INTERVAL_MS } from './poseAdapter'
+import type { KineGuidePoseFrame } from './poseStandard'
 import {
   cancelPoseFrame,
   schedulePoseFrame,
@@ -36,6 +37,7 @@ export interface PoseTrackingSnapshot extends Omit<
   leftHandLandmarks: PoseLandmark[] | null
   rightHandLandmarks: PoseLandmark[] | null
   blink: BlinkEstimate | null
+  canonicalPose?: KineGuidePoseFrame | null
 }
 
 const EMPTY_FRAME: ClassifiedPoseFrame = {
@@ -49,7 +51,8 @@ const EMPTY_DETAILS = {
   faceLandmarks: null,
   leftHandLandmarks: null,
   rightHandLandmarks: null,
-  blink: null
+  blink: null,
+  canonicalPose: null
 } as const
 
 export function usePoseTracking(
@@ -132,7 +135,8 @@ export function usePoseTracking(
             faceLandmarks: previousFace,
             leftHandLandmarks: previousLeftHand,
             rightHandLandmarks: previousRightHand,
-            blink: result.blink
+            blink: result.blink,
+            canonicalPose: result.canonicalPose ?? null
           })
         } catch {
           adapter.close()

@@ -1,14 +1,21 @@
 import { useQuery } from '@tanstack/react-query'
 import {
+  Bell,
   Camera,
+  CheckCircle2,
   CircleAlert,
+  Clock,
   Eye,
   Loader2,
   MonitorOff,
   Pause,
   Play,
+  RotateCcw,
+  Scan,
   ShieldCheck,
-  Square
+  Square,
+  Volume2,
+  VolumeX
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -17,12 +24,24 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
 import { useCamera, type CameraState } from '@/features/camera/useCamera'
+import { SessionClock } from '@/features/monitor/sessionClock'
+import { useSoundAlertPreferences } from '@/features/notifications/soundAlertPreferences'
+import {
+  getCalibrationFailureReasonKey,
+  useSessionSoundAlerts
+} from '@/features/notifications/useSessionSoundAlerts'
 import { CameraPoseLayer } from '@/features/pose/CameraPoseLayer'
+import { BaselineReadings } from '@/features/pose/BaselineReadings'
 import { createMediaPipePoseAdapter } from '@/features/pose/poseAdapter'
+import {
+  usePostureMonitor,
+  type CalibrationFailureReason
+} from '@/features/pose/usePostureMonitor'
 import {
   usePoseTracking,
   type PoseTrackingStatus
 } from '@/features/pose/usePoseTracking'
+import { BreakReminderEngine } from '@/features/reminders/breakReminderEngine'
 import { formatDuration } from '@/lib/format'
 import { getSession, updateSession } from '@/services/product'
 
@@ -35,15 +54,33 @@ interface TechnicalStatus {
 
 export function LiveSessionPage() {
   const { id = '' } = useParams()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
+  const stopCamera = camera.stop
+  const { preferences: soundPreferences, toggleEnabled: toggleSound } =
+    useSoundAlertPreferences()
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
   const [seconds, setSeconds] = useState(0)
+  const clockRef = useRef<SessionClock | null>(null)
+  if (!clockRef.current)
+    clockRef.current = new SessionClock(0, performance.now())
   const [paused, setPaused] = useState(false)
+  const [hidden, setHidden] = useState(() => document.hidden)
   const [syncedInitial, setSyncedInitial] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
+  const [finishRequested, setFinishRequested] = useState(false)
+  const finishPayloadRef = useRef<Parameters<typeof updateSession>[1] | null>(
+    null
+  )
+
+  // Deterministic break reminder engine
+  const reminderEngineRef = useRef<BreakReminderEngine | null>(null)
+  if (!reminderEngineRef.current) {
+    reminderEngineRef.current = new BreakReminderEngine()
+  }
+  const [breakDue, setBreakDue] = useState(false)
 
   const session = useQuery({
     queryKey: ['session', id],
@@ -62,48 +99,110 @@ export function LiveSessionPage() {
 
   useEffect(() => {
     if (!syncedInitial && session.data?.metrics?.duration_seconds) {
-      setSeconds(session.data.metrics.duration_seconds)
+      clockRef.current?.addInitial(session.data.metrics.duration_seconds)
+      setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
       setSyncedInitial(true)
     }
   }, [session.data?.metrics?.duration_seconds, syncedInitial])
 
   useEffect(() => {
     const handleVisibilityChange = () => {
+      setHidden(document.hidden)
       if (document.hidden) {
+        clockRef.current?.pause(performance.now())
+        setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
         setPaused(true)
+        stopCamera()
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [stopCamera])
+
+  const monitoringSuspended =
+    paused || hidden || finishRequested || camera.state !== 'ready'
 
   const pose = usePoseTracking(
     camera.videoRef,
     cameraCanvasRef,
-    camera.state === 'ready' && !paused,
+    !monitoringSuspended,
     'seated-posture-demo',
     createMediaPipePoseAdapter
   )
 
+  const monitor = usePostureMonitor(pose, monitoringSuspended)
+
+  const thaiT = i18n.getFixedT('th')
+
+  useSessionSoundAlerts({
+    cameraState: camera.state,
+    paused: monitoringSuspended,
+    isFinishing,
+    breakDue,
+    breakIntervalMinutes: reminderEngineRef.current?.getIntervalMinutes() ?? 25,
+    feedback: monitor.feedback,
+    calibrationState: monitor.calibrationState,
+    preferences: soundPreferences,
+    tThai: (key, options) => String(thaiT(key, options))
+  })
+
+  // Update break reminders every elapsed second
   useEffect(() => {
-    if (paused || id.length === 0) return
-    const interval = setInterval(
-      () => setSeconds((current) => current + 1),
-      1000
-    )
+    if (paused || finishRequested || id.length === 0) return
+    const interval = setInterval(() => {
+      const next = clockRef.current?.seconds(performance.now()) ?? 0
+      setSeconds(next)
+      setBreakDue(reminderEngineRef.current?.update(next) ?? false)
+    }, 1000)
     return () => clearInterval(interval)
-  }, [id, paused])
+  }, [id, paused, finishRequested])
+
+  const acknowledgeBreak = () => {
+    reminderEngineRef.current?.acknowledge()
+    setBreakDue(false)
+  }
+
+  const snoozeBreak = () => {
+    reminderEngineRef.current?.snooze(5)
+    setBreakDue(false)
+  }
 
   const finishSession = async () => {
+    if (isFinishing) return
     setIsFinishing(true)
+    setFinishRequested(true)
+    clockRef.current?.pause(performance.now())
+    const finalSeconds = clockRef.current?.seconds(performance.now()) ?? seconds
+    setSeconds(finalSeconds)
+    setPaused(true)
+    stopCamera()
     setSaveError(false)
     try {
-      await updateSession(id, {
+      const summaryInput = monitor.getSummaryInput()
+      const breakCount = reminderEngineRef.current?.getBreakCount() ?? 0
+      const postureSummaryPayload = summaryInput
+        ? {
+            ...summaryInput,
+            break_count: breakCount
+          }
+        : null
+
+      const payload = finishPayloadRef.current ?? {
         status: 'completed',
-        metrics: { duration_seconds: seconds }
-      })
+        metrics: {
+          duration_seconds: finalSeconds,
+          good_alignment_seconds: summaryInput?.good_alignment_seconds ?? null,
+          needs_adjustment_seconds:
+            summaryInput?.needs_adjustment_seconds ?? null,
+          alert_count: summaryInput?.alert_count ?? null,
+          break_count: summaryInput ? breakCount : null
+        },
+        posture_summary: postureSummaryPayload
+      }
+      finishPayloadRef.current = payload
+      await updateSession(id, payload)
       navigate(`/app/sessions/${id}/summary`)
     } catch {
       setSaveError(true)
@@ -140,6 +239,8 @@ export function LiveSessionPage() {
     return <QueryError retry={() => void session.refetch()} />
 
   const technicalStatus = getTechnicalStatus(camera.state, pose.status, paused)
+  const canCalibrate =
+    camera.state === 'ready' && pose.status === 'ready' && !paused
 
   return (
     <div className="mx-auto max-w-[82rem] pb-4">
@@ -158,8 +259,33 @@ export function LiveSessionPage() {
             {formatDuration(seconds)}
           </div>
           <button
+            aria-pressed={soundPreferences.enabled}
             className="kg-button-secondary"
-            onClick={() => setPaused((current) => !current)}
+            onClick={toggleSound}
+            type="button"
+          >
+            {soundPreferences.enabled ? (
+              <Volume2 aria-hidden="true" size={18} />
+            ) : (
+              <VolumeX aria-hidden="true" size={18} />
+            )}
+            {soundPreferences.enabled
+              ? t('session.soundOn')
+              : t('session.soundOff')}
+          </button>
+          <button
+            className="kg-button-secondary"
+            disabled={finishRequested}
+            onClick={() => {
+              if (!paused) {
+                clockRef.current?.pause(performance.now())
+                setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
+                camera.stop()
+              } else {
+                clockRef.current?.resume(performance.now())
+              }
+              setPaused(!paused)
+            }}
             type="button"
           >
             {paused ? (
@@ -171,7 +297,7 @@ export function LiveSessionPage() {
           </button>
           <button
             className="kg-button-primary"
-            disabled={isFinishing}
+            disabled={isFinishing || finishRequested}
             onClick={() => void finishSession()}
             type="button"
           >
@@ -184,6 +310,68 @@ export function LiveSessionPage() {
           </button>
         </div>
       </header>
+
+      {/* Break reminder banner */}
+      {breakDue && (
+        <div
+          aria-live="assertive"
+          className="mt-4 flex flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+          role="region"
+        >
+          <div className="flex items-start gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-200 text-amber-900">
+              <Bell aria-hidden="true" size={20} />
+            </span>
+            <div>
+              <p className="font-bold text-slate-900">
+                {t('session.breakDueTitle')}
+              </p>
+              <p className="text-sm leading-6 text-slate-700">
+                {t('session.breakDueBody', {
+                  minutes: reminderEngineRef.current?.getIntervalMinutes() ?? 25
+                })}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+            <button
+              className="kg-button-primary px-3 py-1.5 text-xs"
+              onClick={acknowledgeBreak}
+              type="button"
+            >
+              {t('session.breakAcknowledge')}
+            </button>
+            <button
+              className="kg-button-secondary px-3 py-1.5 text-xs border-amber-300 hover:bg-amber-100"
+              onClick={snoozeBreak}
+              type="button"
+            >
+              {t('session.breakSnooze')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Camera angle & framing error banner */}
+      {monitor.feedback.state === 'camera_framing_error' && (
+        <div
+          aria-live="polite"
+          className="mt-4 flex items-start gap-3 rounded-2xl border border-red-300 bg-red-50 p-4 text-red-950 shadow-sm"
+          role="region"
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-red-200 text-red-900">
+            <Camera aria-hidden="true" size={20} />
+          </span>
+          <div>
+            <p className="font-bold text-red-950">
+              {t('session.cameraFramingAlert')}
+            </p>
+            <p className="mt-0.5 text-sm leading-6 text-red-900">
+              {t(monitor.feedback.feedbackMessageKey)}
+            </p>
+          </div>
+        </div>
+      )}
 
       {saveError && (
         <div
@@ -239,6 +427,61 @@ export function LiveSessionPage() {
         </div>
 
         <aside className="flex flex-col gap-4">
+          {/* Posture status card (only when calibrated) */}
+          {monitor.calibrationState.status === 'calibrated' && (
+            <section
+              className="kg-card overflow-hidden border-teal-200"
+              aria-labelledby="posture-status-title"
+            >
+              <div className="border-b border-teal-100 bg-teal-50/60 px-5 py-3">
+                <h2
+                  className="font-bold text-teal-950"
+                  id="posture-status-title"
+                >
+                  {t('session.postureStatus')}
+                </h2>
+              </div>
+              <div className="p-5">
+                <p
+                  aria-label={t('session.postureStatus')}
+                  aria-live="polite"
+                  className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+                    postureToneClasses[monitor.feedback.state]
+                  }`}
+                  role="status"
+                >
+                  {t(
+                    monitoringSuspended
+                      ? 'session.feedbackSuspended'
+                      : monitor.feedback.feedbackMessageKey
+                  )}
+                </p>
+                {!monitoringSuspended &&
+                  monitor.feedback.state === 'needs_adjustment' &&
+                  monitor.feedback.deviatedMetric && (
+                    <div className="mt-2.5 flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-900">
+                        {getDeviationBadgeText(
+                          t,
+                          monitor.feedback.deviatedMetric
+                        )}
+                      </span>
+                    </div>
+                  )}
+                <p className="mt-3 text-xs leading-5 text-slate-500">
+                  {t('session.observationalDisclaimer')}
+                </p>
+                {!monitoringSuspended && (
+                  <BaselineReadings
+                    baseline={monitor.calibrationState.baseline}
+                    metrics={monitor.observedMetrics}
+                  />
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Activity mode card */}
           <section
             className="kg-card overflow-hidden"
             aria-labelledby="session-mode-title"
@@ -260,11 +503,15 @@ export function LiveSessionPage() {
                   <p className="mt-1 text-sm leading-6 text-slate-600">
                     {t('session.technicalSessionBody')}
                   </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {t('session.classificationUnavailable')}
+                  </p>
                 </div>
               </div>
             </div>
           </section>
 
+          {/* Technical status card */}
           <section
             className="kg-card overflow-hidden"
             aria-labelledby="technical-status-title"
@@ -292,22 +539,145 @@ export function LiveSessionPage() {
             </div>
           </section>
 
+          {/* Baseline & calibration card */}
           <section
             className="kg-card overflow-hidden"
             aria-labelledby="baseline-title"
           >
-            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center justify-between">
               <h2 className="font-bold text-slate-900" id="baseline-title">
                 {t('session.baselineTitle')}
               </h2>
+              {monitor.calibrationState.status === 'calibrated' && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-teal-800">
+                  <CheckCircle2 aria-hidden="true" size={14} />
+                  {t(
+                    monitor.calibrationState.baseline.framing.mode ===
+                      'full_torso'
+                      ? 'calibration.modeFullTorso'
+                      : 'calibration.modeUpperBody'
+                  )}
+                </span>
+              )}
             </div>
-            <div className="p-5">
-              <p className="font-semibold text-slate-800">
-                {t('session.baselineUnavailable')}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {t('session.baselineUnavailableBody')}
-              </p>
+            <div className="p-5 flex flex-col gap-4">
+              {monitor.calibrationState.status === 'idle' && (
+                <div>
+                  <p className="font-semibold text-slate-800">
+                    {t('session.baselineUnavailable')}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {t('calibration.notCalibratedHint')}
+                  </p>
+                </div>
+              )}
+
+              {monitor.calibrationState.status === 'calibrating' && (
+                <div
+                  aria-live="polite"
+                  className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm"
+                  role="status"
+                >
+                  <div className="flex items-center gap-3 text-teal-950 font-semibold">
+                    <Loader2
+                      aria-hidden="true"
+                      className="animate-spin text-teal-700"
+                      size={18}
+                    />
+                    <span>
+                      {t('calibration.calibrating', {
+                        current: monitor.calibrationState.samplesCollected,
+                        total: monitor.calibrationState.targetSamples
+                      })}
+                    </span>
+                  </div>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-teal-200">
+                    <div
+                      className="h-full bg-teal-700 transition-all duration-150"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.round(
+                            (monitor.calibrationState.samplesCollected /
+                              monitor.calibrationState.targetSamples) *
+                              100
+                          )
+                        )}%`
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {monitor.calibrationState.status === 'calibrated' && (
+                <div>
+                  <p className="font-semibold text-teal-900">
+                    {t('calibration.calibratedSummary', {
+                      mode: t(
+                        monitor.calibrationState.baseline.framing.mode ===
+                          'full_torso'
+                          ? 'calibration.modeFullTorso'
+                          : 'calibration.modeUpperBody'
+                      )
+                    })}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
+                    <Clock aria-hidden="true" size={12} />
+                    {t('session.calibratedAt')}{' '}
+                    {new Date(
+                      monitor.calibrationState.baseline.calibratedAt
+                    ).toLocaleTimeString()}
+                  </p>
+                </div>
+              )}
+
+              {monitor.calibrationState.status === 'failed' && (
+                <div
+                  aria-live="polite"
+                  className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950"
+                  role="status"
+                >
+                  <div className="flex items-start gap-2">
+                    <CircleAlert
+                      aria-hidden="true"
+                      className="mt-0.5 shrink-0 text-amber-700"
+                      size={16}
+                    />
+                    <p>
+                      {t('calibration.failedNotice', {
+                        reason: getCalibrationReasonText(
+                          t,
+                          monitor.calibrationState.reason
+                        )
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-slate-100 flex items-center gap-3">
+                <button
+                  className="kg-button-secondary text-xs w-full justify-center"
+                  disabled={
+                    !canCalibrate ||
+                    monitor.calibrationState.status === 'calibrating'
+                  }
+                  onClick={() => monitor.startCalibration()}
+                  type="button"
+                >
+                  {monitor.calibrationState.status === 'calibrated' ? (
+                    <>
+                      <RotateCcw aria-hidden="true" size={14} />
+                      {t('calibration.recalibrate')}
+                    </>
+                  ) : (
+                    <>
+                      <Scan aria-hidden="true" size={14} />
+                      {t('calibration.calibrate')}
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </section>
         </aside>
@@ -318,11 +688,39 @@ export function LiveSessionPage() {
   )
 }
 
+function getCalibrationReasonText(
+  t: (key: string) => string,
+  reason: CalibrationFailureReason
+): string {
+  return t(getCalibrationFailureReasonKey(reason))
+}
+
 const toneClasses: Record<TechnicalTone, string> = {
   neutral: 'border-slate-200 bg-slate-50 text-slate-800',
   ready: 'border-teal-200 bg-teal-50 text-teal-900',
   caution: 'border-amber-200 bg-amber-50 text-amber-950',
   error: 'border-red-200 bg-red-50 text-red-950'
+}
+
+const postureToneClasses: Record<string, string> = {
+  good_alignment: 'border-teal-300 bg-teal-50 text-teal-950',
+  needs_adjustment: 'border-amber-300 bg-amber-50 text-amber-950',
+  camera_framing_error: 'border-red-300 bg-red-50 text-red-950',
+  low_confidence: 'border-slate-200 bg-slate-50 text-slate-700',
+  unable_to_assess: 'border-slate-200 bg-slate-50 text-slate-700',
+  not_visible: 'border-slate-200 bg-slate-50 text-slate-700',
+  recalibration_recommended: 'border-amber-300 bg-amber-50 text-amber-950'
+}
+
+function getDeviationBadgeText(
+  t: (key: string) => string,
+  metric: string
+): string {
+  if (metric === 'forwardHead') return t('session.badgeForwardHead')
+  if (metric === 'slouching') return t('session.badgeSlouching')
+  if (metric === 'shoulderSlopeDegrees') return t('session.badgeShoulderSlope')
+  if (metric === 'headTiltDegrees') return t('session.badgeHeadTilt')
+  return metric
 }
 
 function getTechnicalStatus(
@@ -427,6 +825,15 @@ function CameraStateOverlay({
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/85 p-6 text-center text-white backdrop-blur-sm">
         <MonitorOff aria-hidden="true" size={32} />
         <p className="font-medium">{message}</p>
+        {camera !== 'unsupported' && (
+          <button
+            className="kg-button-primary"
+            onClick={onStartCamera}
+            type="button"
+          >
+            {t('session.startCamera')}
+          </button>
+        )}
       </div>
     )
   }

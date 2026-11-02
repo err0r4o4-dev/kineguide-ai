@@ -436,34 +436,90 @@ func (p *Postgres) CreateSession(ctx context.Context, session product.Session) (
 }
 
 func (p *Postgres) UpdateSession(ctx context.Context, session product.Session) (product.Session, error) {
+	var goodSeconds, needsSeconds, unassessedSeconds, alertCount, breakCount *int
+	var framingMode, methodVersion *string
+	if session.PostureSummary != nil {
+		g := session.PostureSummary.GoodAlignmentSeconds
+		n := session.PostureSummary.NeedsAdjustmentSeconds
+		u := session.PostureSummary.UnassessedSeconds
+		a := session.PostureSummary.AlertCount
+		b := session.PostureSummary.BreakCount
+		f := session.PostureSummary.FramingMode
+		m := session.PostureSummary.MethodVersion
+		goodSeconds, needsSeconds, unassessedSeconds = &g, &n, &u
+		alertCount, breakCount = &a, &b
+		framingMode, methodVersion = &f, &m
+	}
+
 	err := p.pool.QueryRow(ctx, `
 		UPDATE exercise_sessions
 		SET status = $3, manual_repetitions = $4, elapsed_seconds = $5,
+		    posture_good_seconds = $6, posture_needs_adjust_seconds = $7, posture_unassessed_seconds = $8,
+		    posture_alert_count = $9, posture_break_count = $10, posture_framing_mode = $11, posture_method_version = $12,
 		    completed_at = CASE WHEN $3 IN ('completed', 'stopped') THEN now() ELSE completed_at END
 		WHERE id = $1 AND user_id = $2
-		RETURNING exercise_slug, activity_kind, measurement_mode, camera_used, started_at, completed_at, retention_until`, session.ID, session.UserID, session.Status, session.ManualRepetitions, session.ElapsedSeconds).
+		RETURNING exercise_slug, activity_kind, measurement_mode, camera_used, started_at, completed_at, retention_until`,
+		session.ID, session.UserID, session.Status, session.ManualRepetitions, session.ElapsedSeconds,
+		goodSeconds, needsSeconds, unassessedSeconds, alertCount, breakCount, framingMode, methodVersion).
 		Scan(&session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode, &session.CameraUsed, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil)
 	session.ActivitySlug = session.ExerciseSlug
 	session.ManualCycles = session.ManualRepetitions
 	return session, mapError(err)
 }
 
-func (p *Postgres) SessionByID(ctx context.Context, userID, sessionID string) (product.Session, error) {
-	var session product.Session
-	err := p.pool.QueryRow(ctx, `
-		SELECT id::text, user_id::text, exercise_slug, activity_kind, measurement_mode, status, camera_used,
-		       manual_repetitions, elapsed_seconds, started_at, completed_at, retention_until
-		FROM exercise_sessions WHERE id = $1 AND user_id = $2`, sessionID, userID).
-		Scan(&session.ID, &session.UserID, &session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode, &session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil)
+func scanPostureSession(row interface{ Scan(...any) error }, session *product.Session) error {
+	var goodSeconds, needsSeconds, unassessedSeconds, alertCount, breakCount *int
+	var framingMode, methodVersion *string
+	err := row.Scan(
+		&session.ID, &session.UserID, &session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode,
+		&session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds,
+		&goodSeconds, &needsSeconds, &unassessedSeconds, &alertCount, &breakCount, &framingMode, &methodVersion,
+		&session.StartedAt, &session.CompletedAt, &session.RetentionUntil,
+	)
+	if err != nil {
+		return err
+	}
 	session.ActivitySlug = session.ExerciseSlug
 	session.ManualCycles = session.ManualRepetitions
-	return session, mapError(err)
+	if goodSeconds != nil && needsSeconds != nil && unassessedSeconds != nil &&
+		alertCount != nil && breakCount != nil && framingMode != nil && methodVersion != nil {
+		session.PostureSummary = &product.PostureSummary{
+			GoodAlignmentSeconds:   *goodSeconds,
+			NeedsAdjustmentSeconds: *needsSeconds,
+			UnassessedSeconds:      *unassessedSeconds,
+			AlertCount:             *alertCount,
+			BreakCount:             *breakCount,
+			FramingMode:            *framingMode,
+			MethodVersion:          *methodVersion,
+		}
+	} else {
+		session.PostureSummary = nil
+	}
+	return nil
+}
+
+func (p *Postgres) SessionByID(ctx context.Context, userID, sessionID string) (product.Session, error) {
+	var session product.Session
+	row := p.pool.QueryRow(ctx, `
+		SELECT id::text, user_id::text, exercise_slug, activity_kind, measurement_mode, status, camera_used,
+		       manual_repetitions, elapsed_seconds,
+		       posture_good_seconds, posture_needs_adjust_seconds, posture_unassessed_seconds,
+		       posture_alert_count, posture_break_count, posture_framing_mode, posture_method_version,
+		       started_at, completed_at, retention_until
+		FROM exercise_sessions WHERE id = $1 AND user_id = $2`, sessionID, userID)
+	if err := scanPostureSession(row, &session); err != nil {
+		return session, mapError(err)
+	}
+	return session, nil
 }
 
 func (p *Postgres) ListSessions(ctx context.Context, userID string, limit int) ([]product.Session, error) {
 	rows, err := p.pool.Query(ctx, `
 		SELECT id::text, user_id::text, exercise_slug, activity_kind, measurement_mode, status, camera_used,
-		       manual_repetitions, elapsed_seconds, started_at, completed_at, retention_until
+		       manual_repetitions, elapsed_seconds,
+		       posture_good_seconds, posture_needs_adjust_seconds, posture_unassessed_seconds,
+		       posture_alert_count, posture_break_count, posture_framing_mode, posture_method_version,
+		       started_at, completed_at, retention_until
 		FROM exercise_sessions WHERE user_id = $1
 		ORDER BY started_at DESC LIMIT $2`, userID, limit)
 	if err != nil {
@@ -473,11 +529,9 @@ func (p *Postgres) ListSessions(ctx context.Context, userID string, limit int) (
 	sessions := make([]product.Session, 0)
 	for rows.Next() {
 		var session product.Session
-		if err := rows.Scan(&session.ID, &session.UserID, &session.ExerciseSlug, &session.ActivityKind, &session.MeasurementMode, &session.Status, &session.CameraUsed, &session.ManualRepetitions, &session.ElapsedSeconds, &session.StartedAt, &session.CompletedAt, &session.RetentionUntil); err != nil {
+		if err := scanPostureSession(rows, &session); err != nil {
 			return nil, err
 		}
-		session.ActivitySlug = session.ExerciseSlug
-		session.ManualCycles = session.ManualRepetitions
 		sessions = append(sessions, session)
 	}
 	return sessions, rows.Err()

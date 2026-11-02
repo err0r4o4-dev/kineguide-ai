@@ -1,3 +1,5 @@
+import { KINEGUIDE_VISIBILITY_GATE } from './poseStandard'
+
 export interface PoseLandmark {
   x: number
   y: number
@@ -28,12 +30,14 @@ export interface ClassifiedPoseFrame {
 
 // This gate only describes whether a landmark is technically usable. It is not
 // an exercise-correctness or clinical threshold.
-export const TECHNICAL_VISIBILITY_GATE = 0.5
+export const TECHNICAL_VISIBILITY_GATE = KINEGUIDE_VISIBILITY_GATE
 
 const BOUNDS_PADDING = 0.05
 
 const REQUIRED_LANDMARKS: Record<string, readonly number[]> = {
-  'seated-posture-demo': [0, 11, 12, 23, 24, 25, 26],
+  // Upper-body set so a desk webcam is usable; hips are optional and are
+  // handled by seatedMetrics (`full_torso` framing) when visible.
+  'seated-posture-demo': [0, 2, 5, 11, 12],
   'standing-posture-demo': [0, 11, 12, 23, 24, 25, 26, 27, 28],
   'walking-demo': [0, 11, 12, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
   'neck-flexion-demo': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
