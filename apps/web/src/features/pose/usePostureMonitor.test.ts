@@ -47,6 +47,141 @@ function makeSnapshot(
 }
 
 describe('usePostureMonitor', () => {
+  it('preserves prior summary but does not accumulate against an invalidated baseline after recalibration fails', () => {
+    vi.useFakeTimers()
+    try {
+      const pose = createSyntheticPose()
+      const { result, rerender } = renderHook(
+        ({ snapshot }) => usePostureMonitor(snapshot, false),
+        { initialProps: { snapshot: makeSnapshot(pose) } }
+      )
+      act(() => result.current.startCalibration())
+      for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+        rerender({ snapshot: makeSnapshot(pose) })
+      }
+      rerender({ snapshot: makeSnapshot(pose) })
+      act(() => vi.advanceTimersByTime(1000))
+      rerender({ snapshot: makeSnapshot(pose) })
+      const previousSummary = result.current.getSummaryInput()
+      act(() => result.current.startCalibration())
+      act(() => result.current.cancelCalibration())
+      rerender({ snapshot: makeSnapshot(pose) })
+      act(() => vi.advanceTimersByTime(1000))
+      rerender({ snapshot: makeSnapshot(pose) })
+      expect(result.current.feedback.state).toBe('unable_to_assess')
+      expect(result.current.getSummaryInput()).toEqual(previousSummary)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('rejects a new framing mode rather than relabelling earlier observations', () => {
+    const pose = createSyntheticPose()
+    const upperBody = createSyntheticPose({
+      23: { visibility: 0 },
+      24: { visibility: 0 }
+    })
+    const { result, rerender } = renderHook(
+      ({ snapshot }) => usePostureMonitor(snapshot, false),
+      { initialProps: { snapshot: makeSnapshot(pose) } }
+    )
+    act(() => result.current.startCalibration())
+    for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+      rerender({ snapshot: makeSnapshot(pose) })
+    }
+    act(() => result.current.startCalibration())
+    for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+      rerender({ snapshot: makeSnapshot(upperBody) })
+    }
+    expect(result.current.calibrationState).toEqual({
+      status: 'failed',
+      reason: 'mixed_framing'
+    })
+    expect(result.current.feedback.state).toBe('unable_to_assess')
+    expect(result.current.getSummaryInput()?.framing_mode).toBe('full_torso')
+  })
+
+  it('never calibrates or evaluates retained landmarks from a non-ready stream', () => {
+    const pose = createSyntheticPose()
+    const { result, rerender } = renderHook(
+      ({ snapshot }: { snapshot: PoseTrackingSnapshot }) =>
+        usePostureMonitor(snapshot, false),
+      { initialProps: { snapshot: makeSnapshot(pose, 'error') } }
+    )
+    act(() => result.current.startCalibration())
+    for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+      rerender({ snapshot: makeSnapshot(pose, 'error') })
+    }
+    expect(result.current.calibrationState).toMatchObject({
+      status: 'calibrating',
+      samplesCollected: 0
+    })
+    for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+      rerender({ snapshot: makeSnapshot(pose) })
+    }
+    expect(result.current.feedback.state).toBe('good_alignment')
+    rerender({ snapshot: makeSnapshot(pose, 'unavailable') })
+    expect(result.current.feedback.state).toBe('unable_to_assess')
+    expect(result.current.observedMetrics).toBeNull()
+  })
+
+  it('withdraws confident feedback on suspension and when frames expire', () => {
+    vi.useFakeTimers()
+    try {
+      const pose = createSyntheticPose()
+      const { result, rerender, unmount } = renderHook(
+        ({ snapshot, paused }) => usePostureMonitor(snapshot, paused),
+        { initialProps: { snapshot: makeSnapshot(pose), paused: false } }
+      )
+      act(() => result.current.startCalibration())
+      for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+        rerender({ snapshot: makeSnapshot(pose), paused: false })
+      }
+      expect(result.current.feedback.state).toBe('good_alignment')
+      rerender({ snapshot: makeSnapshot(pose), paused: true })
+      expect(result.current.feedback.state).toBe('unable_to_assess')
+      expect(result.current.feedback.alertTriggered).not.toBe(true)
+      rerender({ snapshot: makeSnapshot(pose), paused: false })
+      expect(result.current.feedback.state).toBe('good_alignment')
+      act(() => vi.advanceTimersByTime(2000))
+      expect(result.current.feedback.state).toBe('unable_to_assess')
+      expect(result.current.observedMetrics).toBeNull()
+      rerender({ snapshot: makeSnapshot(pose), paused: false })
+      expect(result.current.feedback.state).toBe('good_alignment')
+      unmount()
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('keeps previously observed totals through recalibration', () => {
+    vi.useFakeTimers()
+    try {
+      const pose = createSyntheticPose()
+      const { result, rerender } = renderHook(
+        ({ snapshot }) => usePostureMonitor(snapshot, false),
+        { initialProps: { snapshot: makeSnapshot(pose) } }
+      )
+      const calibrate = () => {
+        act(() => result.current.startCalibration())
+        expect(result.current.feedback.state).toBe('unable_to_assess')
+        for (let frame = 0; frame < CALIBRATION_SAMPLE_TARGET; frame++) {
+          rerender({ snapshot: makeSnapshot(pose) })
+        }
+      }
+      calibrate()
+      rerender({ snapshot: makeSnapshot(pose) })
+      act(() => vi.advanceTimersByTime(1000))
+      rerender({ snapshot: makeSnapshot(pose) })
+      expect(result.current.getSummaryInput()?.good_alignment_seconds).toBe(1)
+      calibrate()
+      expect(result.current.getSummaryInput()?.good_alignment_seconds).toBe(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('samples current metrics and clears unavailable or stale readings', () => {
     vi.useFakeTimers()
     try {

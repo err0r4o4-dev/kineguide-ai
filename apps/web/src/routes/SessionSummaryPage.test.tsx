@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
@@ -30,6 +30,84 @@ function renderRoute() {
 }
 
 describe('SessionSummaryPage', () => {
+  it('withholds inconsistent posture aggregates instead of presenting them as valid results', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(product.getSession).mockResolvedValue({
+      id: 'session-1',
+      status: 'completed',
+      metrics: {
+        duration_seconds: 10,
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: 8,
+        needs_adjustment_seconds: 8,
+        alert_count: 0,
+        break_count: 0,
+        longest_sitting_seconds: null
+      },
+      posture_summary: {
+        good_alignment_seconds: 8,
+        needs_adjustment_seconds: 8,
+        unassessed_seconds: 0,
+        alert_count: 0,
+        break_count: 0,
+        framing_mode: 'upper_body',
+        method_version: 'seated-baseline-v1'
+      },
+      started_at: '2026-08-28T09:00:00Z',
+      completed_at: '2026-08-28T09:00:10Z',
+      retention_until: '2027-08-28T09:00:00Z'
+    })
+    renderRoute()
+    expect(
+      await screen.findByText(i18n.t('session.invalidCoverage'))
+    ).toBeVisible()
+    expect(
+      screen.queryByText(i18n.t('session.postureStatus'))
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('0:08')).not.toBeInTheDocument()
+  })
+
+  it('separates baseline comparison, unreliable observations and missing observation time', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(product.getSession).mockResolvedValue({
+      id: 'session-1',
+      status: 'completed',
+      metrics: {
+        duration_seconds: 60,
+        sitting_seconds: null,
+        standing_seconds: null,
+        good_alignment_seconds: 30,
+        needs_adjustment_seconds: 10,
+        alert_count: 0,
+        break_count: 0,
+        longest_sitting_seconds: null
+      },
+      posture_summary: {
+        good_alignment_seconds: 30,
+        needs_adjustment_seconds: 10,
+        unassessed_seconds: 5,
+        alert_count: 0,
+        break_count: 0,
+        framing_mode: 'upper_body',
+        method_version: 'seated-baseline-v1'
+      },
+      started_at: '2026-08-28T09:00:00Z',
+      completed_at: '2026-08-28T09:01:00Z',
+      retention_until: '2027-08-28T09:00:00Z'
+    })
+    renderRoute()
+    const coverage = await screen.findByRole('region', {
+      name: i18n.t('session.coverageTitle')
+    })
+    expect(within(coverage).getByText('0:40')).toBeVisible()
+    expect(within(coverage).getByText('0:05')).toBeVisible()
+    expect(within(coverage).getByText('0:15')).toBeVisible()
+    expect(
+      screen.getByText(i18n.t('session.classificationUnavailable'))
+    ).toBeVisible()
+  })
+
   it('shows elapsed time without presenting unmeasured posture metrics', async () => {
     await i18n.changeLanguage('th')
     vi.mocked(product.getSession).mockResolvedValue({

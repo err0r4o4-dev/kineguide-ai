@@ -1,6 +1,20 @@
 import { PostureSessionAccumulator } from './postureSessionAccumulator'
 
 describe('PostureSessionAccumulator', () => {
+  it('never rounds classified durations beyond the observed whole-second budget', () => {
+    const accumulator = new PostureSessionAccumulator()
+    accumulator.record('good_alignment', 0)
+    accumulator.record('needs_adjustment', 600)
+    accumulator.record('low_confidence', 1200)
+    accumulator.record('low_confidence', 1800)
+    const totals = accumulator.toSummaryInput()
+    expect(
+      totals.good_alignment_seconds +
+        totals.needs_adjustment_seconds +
+        totals.unassessed_seconds
+    ).toBeLessThanOrEqual(1)
+  })
+
   it('accumulates time per posture state between consecutive frames', () => {
     const acc = new PostureSessionAccumulator()
     acc.record('good_alignment', 0)
@@ -50,12 +64,12 @@ describe('PostureSessionAccumulator', () => {
     expect(acc.getTotals().alert_count).toBe(1)
   })
 
-  it('rounds totals to whole seconds for persistence and resets cleanly', () => {
+  it('truncates totals to observed whole seconds for persistence and resets cleanly', () => {
     const acc = new PostureSessionAccumulator()
     acc.record('good_alignment', 0)
     acc.record('good_alignment', 1600)
     expect(acc.toSummaryInput()).toEqual({
-      good_alignment_seconds: 2,
+      good_alignment_seconds: 1,
       needs_adjustment_seconds: 0,
       unassessed_seconds: 0,
       alert_count: 0

@@ -201,7 +201,7 @@ describe('useSessionSoundAlerts', () => {
     )
     expect(spy.calls).toHaveLength(2)
     expect(spy.calls[1]?.tone).toBe('posture_recovered')
-    expect(spy.calls[1]?.text).toContain('แนวจัดวางท่าทางกลับเข้าสู่เกณฑ์ปกติ')
+    expect(spy.calls[1]?.text).toContain('ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว')
 
     act(() => {
       vi.advanceTimersByTime(POSTURE_SOUND_COOLDOWN_MS - 1_000)

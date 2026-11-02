@@ -75,9 +75,9 @@ export class PostureSessionAccumulator {
   public toSummaryInput(): PostureTotals {
     const totals = this.getTotals()
     return {
-      good_alignment_seconds: Math.round(totals.good_alignment_seconds),
-      needs_adjustment_seconds: Math.round(totals.needs_adjustment_seconds),
-      unassessed_seconds: Math.round(totals.unassessed_seconds),
+      good_alignment_seconds: Math.floor(totals.good_alignment_seconds),
+      needs_adjustment_seconds: Math.floor(totals.needs_adjustment_seconds),
+      unassessed_seconds: Math.floor(totals.unassessed_seconds),
       alert_count: totals.alert_count
     }
   }

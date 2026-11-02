@@ -69,7 +69,7 @@ describe('LandingPage', () => {
       </MemoryRouter>
     )
 
-    const cta = screen.getAllByRole('link', { name: 'เริ่มตรวจท่าทาง' })
+    const cta = screen.getAllByRole('link', { name: 'เริ่มติดตามการนั่ง' })
     expect(cta.length).toBeGreaterThan(0)
     expect(cta[0]).toHaveAttribute('href', '/register')
   })

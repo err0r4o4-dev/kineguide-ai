@@ -24,6 +24,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { QueryError, QueryLoading } from '@/components/QueryState'
 import { SafetyNotice } from '@/components/SafetyNotice'
 import { useCamera, type CameraState } from '@/features/camera/useCamera'
+import { SessionClock } from '@/features/monitor/sessionClock'
 import { useSoundAlertPreferences } from '@/features/notifications/soundAlertPreferences'
 import {
   getCalibrationFailureReasonKey,
@@ -56,14 +57,23 @@ export function LiveSessionPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const camera = useCamera()
+  const stopCamera = camera.stop
   const { preferences: soundPreferences, toggleEnabled: toggleSound } =
     useSoundAlertPreferences()
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null)
   const [seconds, setSeconds] = useState(0)
+  const clockRef = useRef<SessionClock | null>(null)
+  if (!clockRef.current)
+    clockRef.current = new SessionClock(0, performance.now())
   const [paused, setPaused] = useState(false)
+  const [hidden, setHidden] = useState(() => document.hidden)
   const [syncedInitial, setSyncedInitial] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
+  const [finishRequested, setFinishRequested] = useState(false)
+  const finishPayloadRef = useRef<Parameters<typeof updateSession>[1] | null>(
+    null
+  )
 
   // Deterministic break reminder engine
   const reminderEngineRef = useRef<BreakReminderEngine | null>(null)
@@ -89,38 +99,46 @@ export function LiveSessionPage() {
 
   useEffect(() => {
     if (!syncedInitial && session.data?.metrics?.duration_seconds) {
-      setSeconds(session.data.metrics.duration_seconds)
+      clockRef.current?.addInitial(session.data.metrics.duration_seconds)
+      setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
       setSyncedInitial(true)
     }
   }, [session.data?.metrics?.duration_seconds, syncedInitial])
 
   useEffect(() => {
     const handleVisibilityChange = () => {
+      setHidden(document.hidden)
       if (document.hidden) {
+        clockRef.current?.pause(performance.now())
+        setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
         setPaused(true)
+        stopCamera()
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [stopCamera])
+
+  const monitoringSuspended =
+    paused || hidden || finishRequested || camera.state !== 'ready'
 
   const pose = usePoseTracking(
     camera.videoRef,
     cameraCanvasRef,
-    camera.state === 'ready' && !paused,
+    !monitoringSuspended,
     'seated-posture-demo',
     createMediaPipePoseAdapter
   )
 
-  const monitor = usePostureMonitor(pose, paused)
+  const monitor = usePostureMonitor(pose, monitoringSuspended)
 
   const thaiT = i18n.getFixedT('th')
 
   useSessionSoundAlerts({
     cameraState: camera.state,
-    paused,
+    paused: monitoringSuspended,
     isFinishing,
     breakDue,
     breakIntervalMinutes: reminderEngineRef.current?.getIntervalMinutes() ?? 25,
@@ -132,17 +150,14 @@ export function LiveSessionPage() {
 
   // Update break reminders every elapsed second
   useEffect(() => {
-    if (paused || id.length === 0) return
+    if (paused || finishRequested || id.length === 0) return
     const interval = setInterval(() => {
-      setSeconds((current) => {
-        const next = current + 1
-        const due = reminderEngineRef.current?.update(next) ?? false
-        setBreakDue(due)
-        return next
-      })
+      const next = clockRef.current?.seconds(performance.now()) ?? 0
+      setSeconds(next)
+      setBreakDue(reminderEngineRef.current?.update(next) ?? false)
     }, 1000)
     return () => clearInterval(interval)
-  }, [id, paused])
+  }, [id, paused, finishRequested])
 
   const acknowledgeBreak = () => {
     reminderEngineRef.current?.acknowledge()
@@ -155,7 +170,14 @@ export function LiveSessionPage() {
   }
 
   const finishSession = async () => {
+    if (isFinishing) return
     setIsFinishing(true)
+    setFinishRequested(true)
+    clockRef.current?.pause(performance.now())
+    const finalSeconds = clockRef.current?.seconds(performance.now()) ?? seconds
+    setSeconds(finalSeconds)
+    setPaused(true)
+    stopCamera()
     setSaveError(false)
     try {
       const summaryInput = monitor.getSummaryInput()
@@ -167,10 +189,10 @@ export function LiveSessionPage() {
           }
         : null
 
-      await updateSession(id, {
+      const payload = finishPayloadRef.current ?? {
         status: 'completed',
         metrics: {
-          duration_seconds: seconds,
+          duration_seconds: finalSeconds,
           good_alignment_seconds: summaryInput?.good_alignment_seconds ?? null,
           needs_adjustment_seconds:
             summaryInput?.needs_adjustment_seconds ?? null,
@@ -178,7 +200,9 @@ export function LiveSessionPage() {
           break_count: summaryInput ? breakCount : null
         },
         posture_summary: postureSummaryPayload
-      })
+      }
+      finishPayloadRef.current = payload
+      await updateSession(id, payload)
       navigate(`/app/sessions/${id}/summary`)
     } catch {
       setSaveError(true)
@@ -251,7 +275,17 @@ export function LiveSessionPage() {
           </button>
           <button
             className="kg-button-secondary"
-            onClick={() => setPaused((current) => !current)}
+            disabled={finishRequested}
+            onClick={() => {
+              if (!paused) {
+                clockRef.current?.pause(performance.now())
+                setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
+                camera.stop()
+              } else {
+                clockRef.current?.resume(performance.now())
+              }
+              setPaused(!paused)
+            }}
             type="button"
           >
             {paused ? (
@@ -263,7 +297,7 @@ export function LiveSessionPage() {
           </button>
           <button
             className="kg-button-primary"
-            disabled={isFinishing}
+            disabled={isFinishing || finishRequested}
             onClick={() => void finishSession()}
             type="button"
           >
@@ -416,9 +450,14 @@ export function LiveSessionPage() {
                   }`}
                   role="status"
                 >
-                  {t(monitor.feedback.feedbackMessageKey)}
+                  {t(
+                    monitoringSuspended
+                      ? 'session.feedbackSuspended'
+                      : monitor.feedback.feedbackMessageKey
+                  )}
                 </p>
-                {monitor.feedback.state === 'needs_adjustment' &&
+                {!monitoringSuspended &&
+                  monitor.feedback.state === 'needs_adjustment' &&
                   monitor.feedback.deviatedMetric && (
                     <div className="mt-2.5 flex items-center gap-1.5">
                       <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-900">
@@ -432,10 +471,12 @@ export function LiveSessionPage() {
                 <p className="mt-3 text-xs leading-5 text-slate-500">
                   {t('session.observationalDisclaimer')}
                 </p>
-                <BaselineReadings
-                  baseline={monitor.calibrationState.baseline}
-                  metrics={monitor.observedMetrics}
-                />
+                {!monitoringSuspended && (
+                  <BaselineReadings
+                    baseline={monitor.calibrationState.baseline}
+                    metrics={monitor.observedMetrics}
+                  />
+                )}
               </div>
             </section>
           )}
@@ -461,6 +502,9 @@ export function LiveSessionPage() {
                   </p>
                   <p className="mt-1 text-sm leading-6 text-slate-600">
                     {t('session.technicalSessionBody')}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {t('session.classificationUnavailable')}
                   </p>
                 </div>
               </div>
@@ -781,6 +825,15 @@ function CameraStateOverlay({
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/85 p-6 text-center text-white backdrop-blur-sm">
         <MonitorOff aria-hidden="true" size={32} />
         <p className="font-medium">{message}</p>
+        {camera !== 'unsupported' && (
+          <button
+            className="kg-button-primary"
+            onClick={onStartCamera}
+            type="button"
+          >
+            {t('session.startCamera')}
+          </button>
+        )}
       </div>
     )
   }

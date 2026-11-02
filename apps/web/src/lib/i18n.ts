@@ -156,7 +156,7 @@ const th = {
       'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์สำหรับติดตามขณะนั่งและตรวจความพร้อมของจุดอ้างอิงแบบเรียลไทม์ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
-    start: 'เริ่มตรวจท่าทาง',
+    start: 'เริ่มติดตามการนั่ง',
     learn: 'ดูวิธีการทำงาน',
     heroNote:
       'คุณจะเห็นคำอธิบายและเลือกความยินยอมก่อนระบบขอสิทธิ์ใช้กล้องหรือจัดเก็บข้อมูล',
@@ -223,7 +223,7 @@ const th = {
       'หากเป็นเหตุฉุกเฉิน ให้ติดต่อบริการฉุกเฉินในพื้นที่ ระบบนี้ไม่มีคำแนะนำฉุกเฉิน',
     finalTitle: 'พร้อมสำรวจระบบในขอบเขตที่ชัดเจน',
     finalBody:
-      'เริ่มจากการสร้างบัญชี อ่านรายละเอียดความยินยอม แล้วเริ่มติดตามท่าทาง',
+      'เริ่มจากการสร้างบัญชี อ่านรายละเอียดความยินยอม แล้วเริ่มติดตามการนั่ง',
     finalAction: 'สร้างบัญชีเพื่อเริ่มต้น',
     footerNav: 'ข้อมูลส่วนท้ายเว็บไซต์',
     footerHow: 'ขั้นตอนการใช้งาน',
@@ -328,7 +328,7 @@ const th = {
       'เปิดกล้องสำหรับเซสชันขณะนั่ง เพื่อตรวจว่ามองเห็นจุดอ้างอิงที่จำเป็นและติดตามระยะเวลา โดยไม่ประเมินว่าท่านั่งถูกต้อง',
     viewDetails: 'ดูรายละเอียด',
     completed: 'เซสชันเสร็จสิ้น',
-    start: 'เริ่มตรวจท่าทาง',
+    start: 'เริ่มติดตามการนั่ง',
     sessions: 'session',
     streak: 'วันที่ต่อเนื่อง',
     time: 'เวลาติดตามรวม',
@@ -373,7 +373,9 @@ const th = {
       'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ',
     seatedConfirmationBody:
       'การยืนยันนี้ใช้เฉพาะในหน้านี้และไม่ถูกบันทึก ระบบตรวจเพียงความพร้อมของจุดอ้างอิง ไม่ยืนยันว่าคุณกำลังนั่งหรือท่านั่งถูกต้อง',
-    start: 'ตรวจความพร้อมของกล้อง',
+    nextSteps:
+      'หลังสร้างเซสชัน กดเปิดกล้องเพื่อตรวจภาพและปรับเทียบท่าอ้างอิง คุณสามารถปรับเทียบใหม่หากเปลี่ยนการตั้งค่ากล้อง',
+    start: 'เริ่มติดตามการนั่ง',
     continue: 'เริ่มเซสชันโหมดนั่ง',
     readiness: 'ความพร้อมของระบบ',
     secure: 'ภาพประมวลผลบนอุปกรณ์ของคุณเท่านั้น',
@@ -423,7 +425,8 @@ const th = {
     modeFullTorso: 'มุมมองลำตัวเต็มส่วน',
     failedNotice: 'การปรับเทียบไม่สำเร็จ: {{reason}}',
     reasonNotEnough: 'จุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งๆ ในตำแหน่งปกติ',
-    reasonMixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่',
+    reasonMixed:
+      'มุมมองกล้องเปลี่ยนระหว่างปรับเทียบ หรือไม่ตรงกับเซสชันนี้ กรุณาใช้มุมมองเดิมและลองใหม่ หากต้องการเปลี่ยนมุมมอง ให้จบและเริ่มเซสชันใหม่',
     reasonTooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมา',
     reasonTooFar: 'คุณอยู่ไกลกล้องเกินไป กรุณาขยับเข้ามาใกล้ขึ้น',
     reasonNotFacing: 'กรุณาหันหน้าตรงเข้าหากล้อง',
@@ -440,7 +443,18 @@ const th = {
     headCropped: 'ศีรษะหลุดขอบบน กรุณาปรับมุมก้ม-เงยของกล้อง'
   },
   session: {
-    goodAlignment: 'แนวจัดวางอยู่ในเกณฑ์ปกติเทียบกับ Baseline',
+    coverageTitle: 'ระยะเวลาที่ประเมิน',
+    assessedDuration: 'เทียบกับท่าอ้างอิงได้',
+    unobservedDuration: 'ไม่มีข้อมูลที่สังเกตได้',
+    coverageBody:
+      'เวลารวมประกอบด้วยเวลาที่เทียบกับท่าอ้างอิงได้ เวลาที่ข้อมูลสังเกตไม่เชื่อถือได้ และเวลาที่เหลือรวมช่วงปรับเทียบหรือข้อมูลขาดหาย',
+    classificationUnavailable:
+      'โหมดนั่งเป็นการยืนยันโดยผู้ใช้ ระบบยังไม่ตรวจจับการนั่งหรือยืนอัตโนมัติและไม่สามารถระบุระยะเวลาได้',
+    invalidCoverage: 'ไม่สามารถแสดงระยะเวลาการประเมินได้',
+    feedbackSuspended: 'หยุดการประเมินชั่วคราว รอข้อมูลกล้องใหม่',
+    feedbackStale: 'ข้อมูลกล้องไม่เป็นปัจจุบัน ไม่สามารถประเมินได้',
+    calibratingStatus: 'กำลังปรับเทียบ รอข้อมูลกล้อง',
+    goodAlignment: 'ใกล้เคียงท่าอ้างอิง',
     noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
     postureStatus: 'สถานะท่าทาง',
     readings: {
@@ -476,7 +490,7 @@ const th = {
     observationalDisclaimer:
       'การประเมินนี้เทียบกับ Baseline ส่วนบุคคลของคุณเพื่อส่งเสริมความตระหนักรู้ ไม่ใช่การวินิจฉัยทางการแพทย์',
     feedback: {
-      general: 'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจาก Baseline',
+      general: 'เปลี่ยนจากท่าอ้างอิง',
       forwardHead:
         'สังเกตเห็นการโน้มศีรษะ/คอยื่นเข้าหาจอ — ลองดึงคอกลับให้อยู่ในแนวระดับไหล่',
       slouching:
@@ -541,17 +555,17 @@ const th = {
     activityStanding: 'ยืน',
     activityTransitioning: 'กำลังเปลี่ยนท่า',
     activityUnknown: 'ไม่ระบุ',
-    stateGood: 'อยู่ในเกณฑ์ดี',
-    stateNeedsAdjust: 'ควรปรับท่าทาง',
+    stateGood: 'ใกล้เคียงท่าอ้างอิง',
+    stateNeedsAdjust: 'เปลี่ยนจากท่าอ้างอิง',
     stateLowConfidence: 'ความมั่นใจต่ำ',
     stateUnable: 'ไม่สามารถประเมินได้',
-    goodAlignmentDuration: 'ระยะเวลาท่าทางดี',
-    needsAdjustmentDuration: 'ระยะเวลาควรปรับท่า',
+    goodAlignmentDuration: 'ระยะเวลาใกล้เคียงท่าอ้างอิง',
+    needsAdjustmentDuration: 'ระยะเวลาเปลี่ยนจากท่าอ้างอิง',
     alertCount: 'จำนวนการแจ้งเตือน',
     breakCount: 'จำนวนการหยุดพัก',
     breakDueTitle: 'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ',
     breakDueBody:
-      'คุณนั่งต่อเนื่องมาเป็นเวลา {{minutes}} นาทีแล้ว แนะนำให้ลุกขึ้นยืดเส้นยืดสายหรือพักสายตา',
+      'ใช้งานเซสชันต่อเนื่องมาเป็นเวลา {{minutes}} นาทีแล้ว แนะนำให้ลุกขึ้นยืดเส้นยืดสายหรือพักสายตา',
     breakAcknowledge: 'พักเรียบร้อยแล้ว',
     breakSnooze: 'เตือนอีกครั้งใน 5 นาที',
     longestSitting: 'ช่วงเวลานั่งนานที่สุด',
@@ -565,7 +579,7 @@ const th = {
   sound: {
     speech: {
       breakDue:
-        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากนั่งต่อเนื่องครบ {{minutes}} นาที',
+        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากใช้งานเซสชันต่อเนื่องครบ {{minutes}} นาที',
       calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
       calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
       calibrationReason: {
@@ -574,13 +588,13 @@ const th = {
         notFacing: 'ไม่ได้หันหน้าตรงเข้าหากล้อง กรุณาหันหน้าเข้าหากล้อง',
         tilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
         headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
-        mixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่อีกครั้ง',
+        mixed:
+          'มุมมองกล้องเปลี่ยนระหว่างปรับเทียบ หรือไม่ตรงกับเซสชันนี้ กรุณาใช้มุมมองเดิมและลองใหม่ หากต้องการเปลี่ยนมุมมอง ให้จบและเริ่มเซสชันใหม่',
         notEnough:
           'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
       },
       posture: {
-        goodAlignment:
-          'แนวจัดวางท่าทางกลับเข้าสู่เกณฑ์ปกติเทียบกับค่ามาตรฐานแล้ว',
+        goodAlignment: 'ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว',
         forwardHead:
           'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
         slouching:
@@ -954,7 +968,7 @@ const en: typeof th = {
     titleRest: 'Monitor your posture confidently with',
     subtitle:
       'Try an on-device seated monitoring flow and check landmark visibility in real time without uploading photos or video.',
-    start: 'Start Monitoring',
+    start: 'Start seated monitoring',
     learn: 'How it works',
     heroNote:
       'You will see an explanation and choose consent before the system requests camera access or stores data.',
@@ -1130,7 +1144,7 @@ const en: typeof th = {
       'Use the camera during a seated session to check required landmark visibility and track duration without assessing posture correctness.',
     viewDetails: 'View details',
     completed: 'Completed sessions',
-    start: 'Start Monitoring',
+    start: 'Start seated monitoring',
     sessions: 'sessions',
     streak: 'day streak',
     time: 'total time',
@@ -1176,7 +1190,9 @@ const en: typeof th = {
       'I will use the camera while seated and frame the required landmarks as instructed',
     seatedConfirmationBody:
       'This confirmation stays on this page and is not stored. The system checks landmark visibility only; it does not confirm that you are seated or that your posture is correct.',
-    start: 'Check camera readiness',
+    nextSteps:
+      'After creating the session, start the camera to check the view and calibrate your reference posture. Recalibrate if the camera setup changes.',
+    start: 'Start seated monitoring',
     continue: 'Start seated session',
     readiness: 'System readiness',
     secure: 'Camera data stays on-device',
@@ -1229,7 +1245,8 @@ const en: typeof th = {
     modeFullTorso: 'Full torso',
     failedNotice: 'Calibration failed: {{reason}}',
     reasonNotEnough: 'Landmarks were interrupted. Please sit still and retry.',
-    reasonMixed: 'Framing changed mid-calibration. Please retry.',
+    reasonMixed:
+      'Framing changed during calibration or differs from this session. Retry with the same framing, or finish and start a new session to change it.',
     reasonTooClose: 'Too close to camera. Please step back slightly.',
     reasonTooFar: 'Too far from camera. Please move closer.',
     reasonNotFacing: 'Please face the camera directly.',
@@ -1247,7 +1264,18 @@ const en: typeof th = {
     headCropped: 'Head is cut off at the top. Please adjust camera pitch.'
   },
   session: {
-    goodAlignment: 'Good alignment relative to personal baseline',
+    coverageTitle: 'Assessment coverage',
+    assessedDuration: 'Compared with reference posture',
+    unobservedDuration: 'Unobserved time',
+    coverageBody:
+      'Total time includes baseline-compared time, unreliable observed time, and the remainder including calibration and gaps.',
+    classificationUnavailable:
+      'Seated mode is user-confirmed. Automatic sitting and standing detection and durations are unavailable.',
+    invalidCoverage: 'Assessment coverage is unavailable.',
+    feedbackSuspended: 'Assessment paused, awaiting new camera frames',
+    feedbackStale: 'Camera data is stale and cannot be assessed',
+    calibratingStatus: 'Calibrating, awaiting camera data',
+    goodAlignment: 'Similar to reference posture',
     noBaseline: 'Personal baseline not established',
     postureStatus: 'Posture Status',
     readings: {
@@ -1284,7 +1312,7 @@ const en: typeof th = {
     observationalDisclaimer:
       'This observational assessment compares with your personal baseline for ergonomic awareness and is not a medical diagnosis.',
     feedback: {
-      general: 'Sustained posture deviation observed relative to baseline',
+      general: 'Changed from reference posture',
       forwardHead:
         'Forward head posture observed — gently pull your head back in line with your shoulders.',
       slouching:
@@ -1355,17 +1383,17 @@ const en: typeof th = {
     activityStanding: 'Standing',
     activityTransitioning: 'Transitioning',
     activityUnknown: 'Unknown',
-    stateGood: 'Good Alignment',
-    stateNeedsAdjust: 'Needs Adjustment',
+    stateGood: 'Similar to reference posture',
+    stateNeedsAdjust: 'Changed from reference posture',
     stateLowConfidence: 'Low Confidence',
     stateUnable: 'Unable to Assess',
-    goodAlignmentDuration: 'Good Alignment Time',
-    needsAdjustmentDuration: 'Needs Adjustment Time',
+    goodAlignmentDuration: 'Time similar to reference posture',
+    needsAdjustmentDuration: 'Time changed from reference posture',
     alertCount: 'Alert Count',
     breakCount: 'Break Count',
     breakDueTitle: 'Time for an ergonomic break',
     breakDueBody:
-      'You have been seated for {{minutes}} minutes. Consider standing up, stretching, or resting your eyes.',
+      'Session tracking has continued for {{minutes}} minutes. Consider standing up, stretching, or resting your eyes.',
     breakAcknowledge: 'Break completed',
     breakSnooze: 'Remind me in 5 min',
     longestSitting: 'Longest Sitting Period',
@@ -1379,7 +1407,7 @@ const en: typeof th = {
   sound: {
     speech: {
       breakDue:
-        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากนั่งต่อเนื่องครบ {{minutes}} นาที',
+        'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากใช้งานเซสชันต่อเนื่องครบ {{minutes}} นาที',
       calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
       calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
       calibrationReason: {
@@ -1388,13 +1416,13 @@ const en: typeof th = {
         notFacing: 'ไม่ได้หันหน้าตรงเข้าหากล้อง กรุณาหันหน้าเข้าหากล้อง',
         tilted: 'มุมกล้องเอียง กรุณาปรับระนาบกล้องให้ตรง',
         headCropped: 'ศีรษะหลุดขอบภาพด้านบน กรุณาปรับมุมกล้องขึ้นเล็กน้อย',
-        mixed: 'มุมมองกล้องเปลี่ยนไประหว่างปรับเทียบ กรุณาลองใหม่อีกครั้ง',
+        mixed:
+          'มุมมองกล้องเปลี่ยนระหว่างปรับเทียบ หรือไม่ตรงกับเซสชันนี้ กรุณาใช้มุมมองเดิมและลองใหม่ หากต้องการเปลี่ยนมุมมอง ให้จบและเริ่มเซสชันใหม่',
         notEnough:
           'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
       },
       posture: {
-        goodAlignment:
-          'แนวจัดวางท่าทางกลับเข้าสู่เกณฑ์ปกติเทียบกับค่ามาตรฐานแล้ว',
+        goodAlignment: 'ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว',
         forwardHead:
           'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
         slouching:

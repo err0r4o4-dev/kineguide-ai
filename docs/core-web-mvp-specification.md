@@ -4,6 +4,8 @@
 **Date:** 2026-10-14 · Aligned with commit `601cec0` and `TODO.md` Milestone M0  
 **Scope:** Browser / React PWA, Go API, PostgreSQL persistence, and local MediaPipe Pose Landmarker
 
+**SF1 update:** The seated flow below reflects in-flight source changes. Final verification remains pending; the delayed timer correction using a monotonic accumulated clock is still in flight. See [seated monitoring flow](seated-monitoring-flow.md) and SF1 in `TODO.md`. Automatic sit/stand classification and validated sitting time remain unavailable.
+
 ---
 
 ## 1. วัตถุประสงค์และขอบเขตผลิตภัณฑ์ (Purpose and Product Boundary)
@@ -32,16 +34,15 @@
 5. **Camera Setup (`/app/monitor`)**:
    - คำอธิบายการประมวลผลในเครื่อง (Privacy Notice)
    - ผู้ใช้ยืนยันโหมดท่านั่ง (Seated Setup Confirmation checkbox)
-   - ทดสอบและขอสิทธิ์กล้อง (Camera Permission & Live Preview)
-   - เริ่มเซสชัน (`createSession`) -> บันทึกลง PostgreSQL ผ่าน Go API
+   - หน้านี้ไม่ขอสิทธิ์กล้อง; หลังยืนยันจึงสร้างเซสชัน (`createSession`) ผ่าน Go API และไปหน้า Live
 6. **Live Session (`/app/sessions/:id/live`)**:
-   - เปิดกล้องและรัน MediaPipe Pose Landmarker Lite ใน Web Worker / Browser
+   - ผู้ใช้กด Start Camera เพื่อขอสิทธิ์กล้อง จากนั้นตรวจคุณภาพเฟรมและสอบเทียบ baseline ในหน้า Live
    - แสดง Technical Visibility Overlay และสถานะกล้อง
    - นับเวลาเซสชัน (`elapsed_seconds`) พร้อมปุ่ม Pause / Resume
    - ปุ่มจบเซสชัน (Finish Session) -> อัปเดตสถานะเป็น `completed` ผ่าน Go API
 7. **Session Summary (`/app/sessions/:id/summary`)**:
    - แสดงระยะเวลาที่ผ่านไปจริง (`elapsed_seconds`)
-   - แสดงสถานะอย่างตรงไปตรงมาว่า "ยังไม่มีการประเมินคะแนนท่านั่งหรือเกณฑ์ทางการแพทย์" (`summaryUnavailableTitle`)
+   - เมื่อมีข้อมูลสรุปที่ตรวจสอบผ่าน แสดงเวลา assessed, unassessed และ unobserved เทียบกับระยะเวลาเซสชัน; ข้อมูลที่ไม่มีหรือไม่สอดคล้องแสดงสถานะ unavailable
 8. **History & Analytics (`/app/history`, `/app/analytics`)**:
    - ประวัติเซสชันย้อนหลังและสถิติภาพรวม
 9. **Settings & Profile (`/app/settings`, `/app/profile`, `/app/help`)**:
@@ -54,7 +55,7 @@
 
 ## 3. นิยามสถานะทางเทคนิค (Technical Status Semantics)
 
-ใน Core Web MVP (Gate A) ระบบจะรายงานเฉพาะ **สถานะความพร้อมทางเทคนิค (Technical Status)** เท่านั้น จะไม่มีการให้คะแนน Good/Bad หรืออ้างความถูกต้องของท่านั่ง:
+สถานะความพร้อมทางเทคนิคแยกจากผลเปรียบเทียบกับ personal baseline ผลทั้งสองไม่ยืนยันการนั่งหรือความถูกต้องทางการแพทย์:
 
 | สถานะเทคนิค | เงื่อนไขการตรวจจับ | ข้อความแนะนำผู้ใช้ |
 | :--- | :--- | :--- |
@@ -66,7 +67,7 @@
 | `unsupported_activity` | อยู่นอกเหนือท่าทางที่รองรับ | ท่าทางหรือมุมมองไม่รองรับ |
 
 ### กฎสำหรับ Posture Metrics ใน Gate A:
-- ตัวชี้วัดเช่น `sitting_seconds`, `standing_seconds`, `good_alignment_seconds`, `needs_adjustment_seconds`, `alert_count`, `break_count` จะต้องแสดงสถานะ **`unavailable` / `not_measured`** หรือปิดการแสดงผล
+- `sitting_seconds` และ `standing_seconds` ไม่ใช่เวลาที่ระบบจำแนกหรือยืนยันได้; ค่าสรุป baseline-relative ที่มีอยู่ต้องแสดงตามข้อมูลจริงและข้อจำกัด
 - ห้ามนำค่าศูนย์ (`0`) หรือคะแนนสมมติมาแสดงเสมือนว่าเป็นผลการวัดจริง
 
 ---
@@ -135,17 +136,17 @@
 - **Then** ระบบต้องเปลี่ยนเส้นทางไปยังหน้า `/consent` และไม่อนุญาตให้เปิดกล้องหรือสร้างเซสชันจนกว่าจะยินยอมสิทธิ์ `camera_processing` และ `session_summary_storage`
 
 ### Scenario 3: การจัดการเมื่อกล้องถูกปฏิเสธสิทธิ์ (Permission Denied)
-- **Given** ผู้ใช้อยู่ในหน้า `/app/monitor` และยืนยันโหมดท่านั่งแล้ว
-- **When** ผู้ใช้กดเปิดกล้อง แต่เบราว์เซอร์หรือผู้ใช้ปฏิเสธสิทธิ์ (Permission Denied)
-- **Then** ระบบต้องแสดงข้อความอธิบายเหตุผลและวิธีแก้ไขอย่างสุภาพ และไม่อนุญาตให้กด "เริ่มเซสชัน"
+- **Given** ผู้ใช้สร้างเซสชันและอยู่ในหน้า Live
+- **When** ผู้ใช้กด Start Camera แต่เบราว์เซอร์หรือผู้ใช้ปฏิเสธสิทธิ์
+- **Then** แสดงสถานะกล้องถูกปฏิเสธและทางเลือกลองใหม่ โดยไม่รายงานว่าติดตามสำเร็จ
 
 ### Scenario 4: การยืนยัน Seated Setup ก่อนเปิดกล้อง
 - **Given** ผู้ใช้อยู่ในหน้า `/app/monitor`
 - **When** ผู้ใช้ยังไม่ได้ทำเครื่องหมายถูกที่ช่อง "ยืนยันการตั้งค่าโหมดท่านั่ง"
-- **Then** ปุ่มเปิดกล้องและการเริ่มเซสชันต้องถูกปิดใช้งาน (Disabled) พร้อมคำอธิบายที่เข้าถึงได้
+- **Then** ปุ่มเริ่มเซสชันต้องถูกปิดใช้งาน และหน้า Setup ไม่ขอสิทธิ์กล้อง
 
 ### Scenario 5: การสร้างเซสชันจริงในฐานข้อมูล
-- **Given** ผู้ใช้เปิดกล้องสำเร็จและเห็นภาพพรีวิวในหน้า `/app/monitor`
+- **Given** ผู้ใช้ยืนยันโหมดท่านั่งในหน้า `/app/monitor`
 - **When** ผู้ใช้กดปุ่ม "เริ่มเซสชัน"
 - **Then** ระบบต้องส่งคำขอ `POST /v1/sessions` ไปยัง Go API, สร้างระเบียนใน PostgreSQL, และนำทางไปยัง `/app/sessions/:id/live` โดย `:id` ต้องเป็น UUID จริงจากเซิร์ฟเวอร์
 
@@ -169,7 +170,7 @@
 ### Scenario 9: การแสดงผลในหน้าสรุปเซสชัน (Summary)
 - **Given** ผู้ใช้อยู่ในหน้า `/app/sessions/:id/summary` ของเซสชันที่เสร็จสมบูรณ์
 - **When** หน้าจอโหลดข้อมูลเซสชัน
-- **Then** แสดงเวลา `elapsed_seconds` ที่บันทึกไว้ และแสดงกล่องข้อความชัดเจนว่าคะแนนท่าทางยังไม่เปิดให้บริการ (`summaryUnavailableTitle`)
+- **Then** แสดงเวลาเซสชันที่บันทึกไว้; หากสรุป baseline-relative ผ่านการตรวจสอบ ให้แสดง assessed, unassessed และ unobserved โดยไม่เรียกว่าเวลานั่งที่ยืนยันแล้ว มิฉะนั้นแสดงสถานะ unavailable
 
 ### Scenario 10: การปล่อยคืนทรัพยากรกล้อง (Resource Cleanup)
 - **Given** ผู้ใช้อยู่ในหน้า Setup หรือ Live ที่กล้องกำลังทำงานอยู่

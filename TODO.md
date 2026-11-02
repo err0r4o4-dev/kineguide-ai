@@ -1,5 +1,13 @@
 # KineGuide AI — Product Flow และ Roadmap
 
+## SF1 - Seated monitoring flow integration
+
+- [x] Investigation: inspect current routes, calibration, camera lifecycle and summary contracts; preserve existing analytics/history work.
+ - [x] Regression and implementation: connect setup, live calibration and monitoring; suspend stale feedback; make summaries and navigation truthful about baseline versus detected sitting.
+ - [x] Verification: focused regressions, affected web format/lint/typecheck/tests/build, local browser journeys at 320/768/1024/1440, independent camera/privacy review.
+ - [x] Documentation and cleanup: source-aligned flow and references, inspect final diff, stop task processes.
+- [?] Automatic sit/stand acceptance: camera position/framing and authorized reference evaluation are not established; existing landmark visibility and user confirmation are not a sitting classifier. Resume after camera setup and evaluation acceptance are agreed; do not invent durations or medical thresholds.
+
 ## Consent current HTTP 500 — 2026-10-19
 
 - [ ] Investigation: reproduce repeated consent reads; distinguish nullable scanning, connection reuse, and stale runtime.
@@ -73,18 +81,16 @@ flowchart TD
     D -->|ใช่| F["Dashboard /app"]
     F --> G["Camera setup /app/monitor"]
     G --> H["อ่านคำอธิบายและยืนยันโหมดนั่ง"]
-    H --> I["ผู้ใช้สั่งเปิดกล้อง"]
-    I --> J{"กล้องพร้อม?"}
-    J -->|ไม่| K["แสดง denied / unsupported / failure และทางแก้"]
-    K --> G
-    J -->|ใช่| L["Preview แล้วกดเริ่มเซสชัน"]
-    L --> M["Go สร้างเซสชันใน PostgreSQL"]
+    H --> I["ผู้ใช้ยืนยันโหมดนั่ง"]
+    I --> J["กดเริ่มเซสชัน"]
+    J --> M["Go สร้างเซสชันใน PostgreSQL"]
     M --> W{"สร้างเซสชันสำเร็จ?"}
     W -->|ไม่| X["แจ้งข้อผิดพลาดใน setup และลองใหม่"]
-    X --> L
+    X --> J
     W -->|ใช่| N["Live /app/sessions/:id/live"]
-    N --> O["เปิดกล้องในหน้า live และประมวลผลใน browser"]
-    O --> P["Overlay + technical visibility + เวลาเซสชัน"]
+    N --> O["ผู้ใช้กด Start Camera ใน live"]
+    O -->|denied / unsupported / failure| K
+    O -->|พร้อม| P["ตรวจ framing, calibrate baseline และประมวลผลใน browser"]
     P --> Q{"คำสั่งผู้ใช้"}
     Q -->|Pause / Resume| P
     Q -->|จบ| R["PATCH สถานะ completed และ elapsed_seconds"]
@@ -97,8 +103,8 @@ flowchart TD
 
 ข้อเท็จจริงที่ต้องไม่สับสน:
 
-- การยืนยันโหมดนั่งอยู่ใน React state ของหน้า setup ไม่ถูกส่งไปเป็นผลตรวจของโมเดล
-- หน้า setup และ live มี camera lifecycle ของตนเอง ไม่ใช่การรับประกันว่า stream ถูกส่งต่อข้ามหน้า
+- การยืนยันโหมดนั่งอยู่ใน React state ของหน้า setup ไม่ถูกส่งไปเป็นผลตรวจของโมเดล และไม่ใช่การตรวจว่าผู้ใช้นั่งอยู่จริง
+- หน้า setup ไม่เรียก `getUserMedia`; ผู้ใช้สั่งเปิดกล้องครั้งเดียวในหน้า live หลังสร้างเซสชัน
 - เวลาเซสชันเป็น local timer ไม่ใช่เวลาที่ตรวจยืนยันว่าผู้ใช้นั่งหรือมี posture ที่เหมาะสม
 - การ reload ออกจากหน้า background tab และเซสชันที่ไม่จบ ยังต้องตรวจและกำหนด behavior ให้ครบ
 - ปัจจุบันบันทึกระยะเวลาและสถานะเป็นหลัก ไม่ได้บันทึก posture score หรือ per-frame metrics
@@ -113,10 +119,12 @@ flowchart LR
     D --> E{"ข้อมูลพร้อมทางเทคนิค?"}
     E -->|พร้อม| F["ready: ไม่ใช่ท่านั่งถูกต้อง"]
     E -->|ไม่พร้อม| G["adjust_camera / no_pose / multiple_poses / unsupported_activity"]
-    F --> H["Smoothing และ overlay ตาม tracking flow"]
+    F --> H["Baseline-relative feedback และ smoothing"]
     G --> H
     H --> I["แสดงสถานะในเว็บ; ไม่อัปโหลดภาพหรือพิกัด"]
 ```
+
+Calibration ใช้เฉพาะเฟรม `ready` และสร้าง baseline ในหน่วยความจำ เมื่อเริ่มสอบเทียบใหม่ baseline ที่ใช้งานอยู่จะถูกยกเลิกและหยุดสะสมเวลา หากสอบเทียบไม่สำเร็จ เฟรมถัดไปจะไม่เพิ่มยอดเดิม สรุปหนึ่งเซสชันห้ามผสม `upper_body` กับ `full_torso`; โหมดต่างกันคืน `mixed_framing` ให้ใช้ framing เดิมหรือเริ่มเซสชันใหม่ การตรวจ framing และ baseline เป็นการสังเกตเชิงเทคนิค ไม่ใช่ sit/stand classifier
 
 โมเดลถูกกำหนดใน `apps/web/src/features/pose/poseAdapter.ts` มีไฟล์ `pose_landmarker_lite.task` และ `holistic_landmarker.task` การโหลด assets ภายนอกไม่ใช่การอัปโหลดภาพ แต่ยังมี network metadata ที่ต้องพิจารณาก่อน production
 

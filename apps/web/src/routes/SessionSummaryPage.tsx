@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 
 import { QueryError, QueryLoading } from '@/components/QueryState'
+import { getSessionCoverage } from '@/features/pose/sessionCoverage'
 import { formatDuration } from '@/lib/format'
 import { getSession } from '@/services/product'
 
@@ -30,6 +31,12 @@ export function SessionSummaryPage() {
   if (query.isError) return <QueryError retry={() => void query.refetch()} />
 
   const postureSummary = query.data?.posture_summary
+  const coverage = postureSummary
+    ? getSessionCoverage(
+        query.data?.metrics.duration_seconds ?? 0,
+        postureSummary
+      )
+    : null
 
   return (
     <div className="mx-auto max-w-4xl pb-4">
@@ -81,7 +88,7 @@ export function SessionSummaryPage() {
             </p>
           </div>
 
-          {postureSummary ? (
+          {postureSummary && coverage ? (
             <div className="rounded-2xl border border-teal-200 bg-teal-50/50 p-5">
               <div className="flex items-center justify-between border-b border-teal-100 pb-3">
                 <div className="flex items-center gap-2">
@@ -171,6 +178,57 @@ export function SessionSummaryPage() {
             </div>
           )}
         </div>
+
+        {postureSummary && (
+          <section
+            aria-labelledby="session-coverage-title"
+            className="mx-6 mb-6 border-t border-slate-200 pt-5 sm:mx-8"
+          >
+            <h2
+              id="session-coverage-title"
+              className="font-bold text-slate-900"
+            >
+              {t('session.coverageTitle')}
+            </h2>
+            {coverage ? (
+              <>
+                <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+                  {(
+                    [
+                      ['session.assessedDuration', coverage.assessedSeconds],
+                      [
+                        'session.unassessedDuration',
+                        coverage.unassessedSeconds
+                      ],
+                      ['session.unobservedDuration', coverage.unobservedSeconds]
+                    ] as const
+                  ).map(([label, seconds]) => (
+                    <div key={label}>
+                      <dt className="text-sm text-slate-600">{t(label)}</dt>
+                      <dd className="mt-1 font-semibold tabular-nums text-slate-900">
+                        {formatDuration(seconds)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {t('session.coverageBody')}
+                </p>
+              </>
+            ) : (
+              <p
+                className="mt-3 text-sm leading-6 text-amber-900"
+                role="status"
+              >
+                {t('session.invalidCoverage')}
+              </p>
+            )}
+          </section>
+        )}
+
+        <p className="mx-6 mb-4 text-sm leading-6 text-slate-600 sm:mx-8">
+          {t('session.classificationUnavailable')}
+        </p>
 
         <p className="mx-6 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 sm:mx-8">
           <ShieldCheck

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
@@ -150,6 +150,79 @@ describe('LiveSessionPage', () => {
   })
 
   it.each([
+    ['denied', 'ไม่ได้รับสิทธิ์ใช้งานกล้อง'],
+    ['error', 'ไม่สามารถเปิดกล้องได้']
+  ] as const)('offers retry after camera %s', async (state, message) => {
+    await i18n.changeLanguage('th')
+    const start = vi.fn()
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state,
+      start,
+      stop: vi.fn(),
+      videoRef: { current: null }
+    })
+    const user = userEvent.setup()
+    renderRoute()
+    expect((await screen.findAllByText(message)).length).toBeGreaterThan(0)
+    await user.click(
+      screen.getByRole('button', { name: 'เปิดกล้องสำหรับโหมดนั่ง' })
+    )
+    expect(start).toHaveBeenCalledOnce()
+  })
+
+  it('explains when camera access is unsupported', async () => {
+    await i18n.changeLanguage('th')
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'unsupported',
+      start: vi.fn(),
+      stop: vi.fn(),
+      videoRef: { current: null }
+    })
+    renderRoute()
+    expect(
+      (await screen.findAllByText('เบราว์เซอร์นี้ไม่รองรับกล้อง')).length
+    ).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole('button', { name: 'เปิดกล้องสำหรับโหมดนั่ง' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('stops the camera when monitoring is paused', async () => {
+    await i18n.changeLanguage('th')
+    const stop = vi.fn()
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'ready',
+      start: vi.fn(),
+      stop,
+      videoRef: { current: null }
+    })
+    const user = userEvent.setup()
+    renderRoute()
+    await user.click(
+      await screen.findByRole('button', { name: 'พักการตรวจจับ' })
+    )
+    expect(stop).toHaveBeenCalledOnce()
+  })
+
+  it('stops the camera and pauses when the page is hidden', async () => {
+    await i18n.changeLanguage('th')
+    const stop = vi.fn()
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'ready',
+      start: vi.fn(),
+      stop,
+      videoRef: { current: null }
+    })
+    renderRoute()
+    await screen.findByRole('button', { name: 'พักการตรวจจับ' })
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    fireEvent(document, new Event('visibilitychange'))
+    expect(stop).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: 'ตรวจจับต่อ' })).toBeVisible()
+    hidden.mockRestore()
+  })
+
+  it.each([
     ['loading_model', 'กำลังโหลดโมเดล...'],
     ['adjust_camera', 'โปรดปรับกล้องให้เห็นจุดอ้างอิงที่จำเป็น'],
     ['no_pose', 'ไม่พบผู้ใช้งาน'],
@@ -197,6 +270,30 @@ describe('LiveSessionPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Summary' })
     ).toBeInTheDocument()
+  })
+
+  it('saves monotonic elapsed time across subsecond pauses', async () => {
+    await i18n.changeLanguage('th')
+    let now = 0
+    const clock = vi.spyOn(performance, 'now').mockImplementation(() => now)
+    const user = userEvent.setup()
+    renderRoute()
+    await screen.findByRole('button', { name: 'พักการตรวจจับ' })
+    now = 600
+    await user.click(screen.getByRole('button', { name: 'พักการตรวจจับ' }))
+    now = 3000
+    await user.click(screen.getByRole('button', { name: 'ตรวจจับต่อ' }))
+    now = 3600
+    await user.click(screen.getByRole('button', { name: 'พักการตรวจจับ' }))
+    now = 5000
+    await user.click(screen.getByRole('button', { name: 'ตรวจจับต่อ' }))
+    now = 9400
+    await user.click(screen.getByRole('button', { name: 'จบเซสชัน' }))
+    expect(
+      vi.mocked(product.updateSession).mock.calls.at(-1)?.[1].metrics
+        ?.duration_seconds
+    ).toBe(5)
+    clock.mockRestore()
   })
 
   it('allows the user to start calibration from the baseline section', async () => {
@@ -342,6 +439,13 @@ describe('LiveSessionPage', () => {
   it('shows an accessible error alert with retry button when save fails', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
+    const stop = vi.fn()
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'ready',
+      start: vi.fn(),
+      stop,
+      videoRef: { current: null }
+    })
     vi.mocked(product.updateSession).mockRejectedValueOnce(
       new Error('Network error')
     )
@@ -354,6 +458,8 @@ describe('LiveSessionPage', () => {
     await user.click(screen.getByRole('button', { name: 'จบเซสชัน' }))
 
     const alertBox = await screen.findByRole('alert')
+    expect(stop).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: 'ตรวจจับต่อ' })).toBeDisabled()
     expect(alertBox).toHaveTextContent('บันทึกเซสชันไม่สำเร็จ')
     const retryButton = screen.getByRole('button', { name: 'ลองอีกครั้ง' })
     expect(retryButton).toBeVisible()
@@ -378,6 +484,9 @@ describe('LiveSessionPage', () => {
     })
 
     await user.click(retryButton)
+    expect(vi.mocked(product.updateSession).mock.calls.at(-1)?.[1]).toEqual(
+      vi.mocked(product.updateSession).mock.calls.at(-2)?.[1]
+    )
     expect(
       await screen.findByRole('heading', { name: 'Summary' })
     ).toBeInTheDocument()

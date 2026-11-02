@@ -21,7 +21,7 @@ export default defineConfig({
         name: 'KineGuide AI',
         short_name: 'KineGuide',
         description:
-          'Privacy-aware physiotherapy support and movement demo prototype.',
+          'Privacy-aware seated posture monitoring and ergonomic awareness prototype.',
         lang: 'th',
         start_url: '/',
         display: 'standalone',

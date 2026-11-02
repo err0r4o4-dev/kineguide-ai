@@ -121,3 +121,77 @@ describe('useCamera', () => {
     expect(video).toHaveProperty('srcObject', null)
   })
 })
+
+it('releases a camera stream that arrives after navigation', async () => {
+  let resolveStream: (stream: MediaStream) => void = () => undefined
+  const pending = new Promise<MediaStream>((resolve) => {
+    resolveStream = resolve
+  })
+  const track = { stop: vi.fn() }
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: { getUserMedia: vi.fn().mockReturnValue(pending) }
+  })
+  const user = userEvent.setup()
+  const view = render(createElement(CameraHarness))
+  await user.click(screen.getByRole('button', { name: 'start camera' }))
+  view.unmount()
+  await act(async () =>
+    resolveStream({ getTracks: () => [track] } as unknown as MediaStream)
+  )
+  expect(track.stop).toHaveBeenCalledOnce()
+})
+
+it('reports an ended camera track and releases the stream', async () => {
+  const track: {
+    stop: ReturnType<typeof vi.fn>
+    onended: (() => void) | null
+  } = { stop: vi.fn(), onended: null }
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: {
+      getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [track] })
+    }
+  })
+  vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
+  const user = userEvent.setup()
+  render(createElement(CameraHarness))
+  await user.click(screen.getByRole('button', { name: 'start camera' }))
+  await screen.findByTestId('camera-preview')
+  act(() => track.onended?.())
+  expect(await screen.findByText('error')).toBeVisible()
+  expect(track.stop).toHaveBeenCalledOnce()
+})
+
+it('keeps camera stopped if playback resolves after cancellation', async () => {
+  const track = { stop: vi.fn() }
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: {
+      getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [track] })
+    }
+  })
+  let resolvePlayback: () => void = () => undefined
+  const playback = new Promise<void>((resolve) => {
+    resolvePlayback = resolve
+  })
+  vi.spyOn(HTMLMediaElement.prototype, 'play').mockReturnValue(playback)
+  function Harness() {
+    const camera = useCamera()
+    return createElement(
+      'div',
+      null,
+      createElement('video', { ref: camera.videoRef }),
+      createElement('button', { onClick: () => void camera.start() }, 'start'),
+      createElement('button', { onClick: camera.stop }, 'stop'),
+      createElement('span', null, camera.state)
+    )
+  }
+  const user = userEvent.setup()
+  render(createElement(Harness))
+  await user.click(screen.getByRole('button', { name: 'start' }))
+  await user.click(screen.getByRole('button', { name: 'stop' }))
+  await act(async () => resolvePlayback())
+  expect(screen.getByText('idle')).toBeVisible()
+  expect(track.stop).toHaveBeenCalledOnce()
+})
