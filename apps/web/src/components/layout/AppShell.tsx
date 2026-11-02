@@ -78,9 +78,9 @@ export function AppShell() {
           }
           hidden={Boolean(pageError)}
         >
-          <header className="sticky top-0 z-[var(--z-index-sticky)] flex h-[var(--layout-mobile-nav,4.5rem)] items-center justify-between border-b border-[var(--color-kg-border)] bg-[var(--color-kg-surface)] px-4 text-[var(--color-kg-ink)] shadow-sm lg:hidden">
+          <header className="sticky top-0 z-[var(--z-index-sticky)] flex h-[var(--layout-mobile-nav,4.5rem)] items-center justify-between border-b border-[var(--color-kg-border)] bg-[var(--color-kg-surface)] px-[16px] text-[var(--color-kg-ink)] shadow-sm [&_img]:size-[40px] lg:hidden">
             <Brand compact />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-[8px]">
               <LanguageButton />
               <button
                 aria-controls="app-navigation"

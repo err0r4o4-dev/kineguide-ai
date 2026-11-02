@@ -611,6 +611,33 @@ const th = {
   history: {
     title: 'ประวัติเซสชัน',
     subtitle: 'เฉพาะ session summary ที่คุณอนุญาตให้จัดเก็บ',
+    scope:
+      'แสดงได้สูงสุด 50 เซสชันล่าสุดที่ API ส่งกลับ เรียงจากใหม่ไปเก่า ช่วงวันนับรวมวันนี้ตามเวลาของอุปกรณ์ ระยะเวลาเป็นเวลาที่บันทึก ไม่ใช่เวลาที่ประเมินท่าทางได้ทั้งหมด',
+    records: 'รายการเซสชัน',
+    sessionName: 'เซสชันที่บันทึก',
+    identifier: 'รหัส {{id}}',
+    savedTime: 'เวลาที่บันทึก {{duration}}',
+    range: 'ช่วงเวลา',
+    allDates: 'ทุกช่วงเวลา',
+    lastDays: '{{count}} วันล่าสุด',
+    status: 'สถานะเซสชัน',
+    allStatuses: 'ทุกสถานะ',
+    active: 'ยังไม่จบเซสชัน',
+    searchHelp: 'ค้นหาด้วยรหัสเซสชัน วันที่ หรือสถานะ จากรายการที่โหลดแล้ว',
+    results: 'พบ {{count}} เซสชัน',
+    noResults: 'ไม่พบเซสชันที่ตรงกับการค้นหาหรือตัวกรอง',
+    clearFilters: 'ล้างตัวกรอง',
+    refresh: 'โหลดประวัติใหม่',
+    refreshing: 'กำลังโหลดประวัติ',
+    refreshFailed:
+      'โหลดข้อมูลล่าสุดไม่สำเร็จ กำลังแสดงข้อมูลที่โหลดไว้ กดโหลดประวัติใหม่เพื่อลองอีกครั้ง',
+    offline:
+      'ออฟไลน์อยู่ ประวัติต้องเชื่อมต่อ API ระบบจะลองโหลดเมื่อกลับมาออนไลน์',
+    references: 'แหล่งอ้างอิงและขอบเขตข้อมูล',
+    referencesNote:
+      'อ้างอิงแนวทางการเข้าถึงเว็บและการแสดงวันเวลา ไม่ใช่การรับรองมาตรฐานหรือความแม่นยำทางการแพทย์ หน้านี้อ่านข้อมูลจาก API เดิมและไม่บันทึกภาพกล้อง',
+    wcagReference: 'W3C WCAG 2.2: ป้ายกำกับ คีย์บอร์ด โฟกัส และข้อความสถานะ',
+    dateReference: 'MDN Intl.DateTimeFormat: วันเวลาและเขตเวลาตามอุปกรณ์',
     search: 'ค้นหาประวัติ',
     empty: 'ยังไม่มีประวัติ',
     completed: 'เสร็จสิ้น',
@@ -627,6 +654,51 @@ const th = {
     time: 'เวลารวม',
     streak: 'ทำต่อเนื่อง',
     chart: 'สถิติล่าสุด'
+  },
+  analytics: {
+    subtitle:
+      'สรุประยะเวลาเซสชันจากข้อมูลที่บันทึก ไม่ใช่คะแนนสุขภาพหรือการวินิจฉัย',
+    scope:
+      'ใช้เฉพาะเซสชันที่จบแล้วหรือหยุดก่อนจบ จากข้อมูลล่าสุดที่ API ส่งคืนสูงสุด 50 รายการ ไม่รวมเซสชันที่ยังทำอยู่ ทั้งหมดที่โหลดไม่ใช่ประวัติตลอดการใช้งาน',
+    filters: 'ตัวกรองสถิติ',
+    summary: 'สรุปตามตัวกรอง',
+    all: 'ทั้งหมดที่โหลด',
+    days: '{{count}} วัน',
+    searchHelp:
+      'ค้นหาด้วยรหัสเซสชัน วันที่ หรือสถานะ ตัวกรองใช้กับยอดรวม กราฟ และรายการพร้อมกัน',
+    resultCount_one: 'พบเซสชันที่สิ้นสุดแล้ว {{count}} รายการตามตัวกรอง',
+    resultCount_other: 'พบเซสชันที่สิ้นสุดแล้ว {{count}} รายการตามตัวกรอง',
+    average: 'เวลาเฉลี่ยต่อเซสชัน',
+    unavailable: 'ยังไม่มีข้อมูล',
+    duration: '{{hours}} ชม. {{minutes}} น. {{seconds}} วิ.',
+    seconds: 'วินาที',
+    secondsValue_one: '{{count}} วินาที',
+    secondsValue_other: '{{count}} วินาที',
+    date: 'วันที่เริ่ม',
+    chart: 'เวลาที่บันทึกแยกตามวันเริ่มเซสชัน',
+    chartScroll: 'กราฟรายวัน เลื่อนแนวนอนหากพื้นที่ไม่พอ',
+    chartDescription:
+      'แกนเริ่มที่ศูนย์และใช้สเกลเดียวกันทุกแท่ง แสดงทุกวันที่มีรายการตรงตัวกรอง วันที่ไม่ปรากฏไม่ได้ยืนยันว่าไม่มีการใช้งาน อ่านค่าครบถ้วนได้ในตารางรายวัน',
+    table: 'ดูตารางข้อมูลรายวัน',
+    empty:
+      'ไม่พบเซสชันที่สิ้นสุดแล้วตามตัวกรอง ลองเปลี่ยนช่วงเวลาหรือล้างคำค้นหา',
+    offline:
+      'ออฟไลน์ ยังโหลดข้อมูลล่าสุดไม่ได้ หากมีข้อมูลเดิมจะแสดงเฉพาะข้อมูลที่โหลดไว้ เชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่',
+    invalid:
+      'ไม่นับข้อมูลที่วันที่อยู่ในอนาคต วันที่ไม่ถูกต้อง หรือระยะเวลาไม่ถูกต้อง {{count}} รายการจากข้อมูลที่โหลด ก่อนใช้ตัวกรอง',
+    sessionId: 'รหัส: {{id}}',
+    method: 'วิธีคำนวณและข้อจำกัด',
+    formula:
+      'แหล่งข้อมูล GET /sessions ใช้ elapsed_seconds หน่วยวินาที จำนวนเซสชันคือจำนวนรายการที่สิ้นสุดและตรงตัวกรอง เวลารวมคือผลบวกระยะเวลา เวลาเฉลี่ยคือเวลารวมหารจำนวนเซสชัน ปัดเป็นวินาทีใกล้ที่สุด ช่วง 7/30/90 วันรวมวันนี้และวันก่อนหน้าตามเวลาท้องถิ่นของอุปกรณ์ ยึดวันที่เริ่มเซสชัน และนับระยะเวลาทั้งหมดไว้ในวันเริ่มแม้ข้ามเที่ยงคืน',
+    missing:
+      'เซสชันที่ไม่มีข้อมูลวัดท่าทางยังนับระยะเวลาที่บันทึกได้ แต่ไม่เติมสัดส่วนท่าทาง คะแนน หรือค่าที่ไม่เคยวัดขึ้นเอง ศูนย์วินาทีที่บันทึกจริงต่างจากยังไม่มีข้อมูล',
+    references: 'แหล่งอ้างอิงการแสดงข้อมูล',
+    referenceText: 'W3C WAI: ข้อมูลข้อความและตารางทดแทนกราฟ (เปิดแท็บใหม่)',
+    referenceScale: 'ONS: กราฟแท่งและแกนเริ่มที่ศูนย์ (เปิดแท็บใหม่)',
+    referenceContrast:
+      'WCAG 2.2: ความต่างสีของกราฟและส่วนควบคุม (เปิดแท็บใหม่)',
+    standardLimit:
+      'ใช้ WCAG 2.2 AA เป็นเป้าหมายด้านการเข้าถึง แหล่งอ้างอิงเหล่านี้ไม่ใช่หลักฐานรับรองว่าเว็บผ่านมาตรฐานหรือว่าใช้ประเมินสุขภาพได้'
   },
   profile: {
     title: 'โปรไฟล์',
@@ -1353,6 +1425,33 @@ const en: typeof th = {
   history: {
     title: 'Session history',
     subtitle: 'Only session summaries you consented to store',
+    scope:
+      'Shows up to the latest 50 sessions returned by the API, newest first. Date ranges include today in your device time zone. Saved duration is not the total time for which posture could be assessed.',
+    records: 'Session records',
+    sessionName: 'Recorded session',
+    identifier: 'ID {{id}}',
+    savedTime: 'Saved time {{duration}}',
+    range: 'Date range',
+    allDates: 'All dates',
+    lastDays: 'Last {{count}} days',
+    status: 'Session status',
+    allStatuses: 'All statuses',
+    active: 'Session not ended',
+    searchHelp: 'Search loaded records by session ID, date, or status',
+    results: '{{count}} sessions found',
+    noResults: 'No sessions match your search or filters',
+    clearFilters: 'Clear filters',
+    refresh: 'Refresh history',
+    refreshing: 'Refreshing history',
+    refreshFailed:
+      'Could not load the latest records. Previously loaded data is shown. Select Refresh history to try again.',
+    offline:
+      'You are offline. History requires the API. Loading will resume when you reconnect.',
+    references: 'References and data scope',
+    referencesNote:
+      'These references guide web accessibility and date formatting. They do not certify standards compliance or medical accuracy. This page reads the existing API and does not store camera images.',
+    wcagReference: 'W3C WCAG 2.2: labels, keyboard, focus, and status messages',
+    dateReference: 'MDN Intl.DateTimeFormat: dates and device time zones',
     search: 'Search history',
     empty: 'No history yet',
     completed: 'Completed',
@@ -1369,6 +1468,50 @@ const en: typeof th = {
     time: 'Total time',
     streak: 'Streak',
     chart: 'Recent stats'
+  },
+  analytics: {
+    subtitle: 'Recorded session durations, not a health score or diagnosis.',
+    scope:
+      'Includes completed and stopped sessions from at most the latest 50 records returned by the API. Active sessions are excluded. All loaded records does not mean lifetime history.',
+    filters: 'Analytics filters',
+    summary: 'Filtered summary',
+    all: 'All loaded records',
+    days: '{{count}} days',
+    searchHelp:
+      'Search by session ID, date or status. Filters apply to totals, chart and list together.',
+    resultCount_one: '{{count}} ended session matches the filters',
+    resultCount_other: '{{count}} ended sessions match the filters',
+    average: 'Average session duration',
+    unavailable: 'No data yet',
+    duration: '{{hours}}h {{minutes}}m {{seconds}}s',
+    seconds: 'Seconds',
+    secondsValue_one: '{{count}} second',
+    secondsValue_other: '{{count}} seconds',
+    date: 'Start date',
+    chart: 'Recorded duration by session start day',
+    chartScroll: 'Daily chart, scroll horizontally if needed',
+    chartDescription:
+      'Every bar uses the same scale starting at zero. Shows every day with matching records. An absent date does not prove no activity. Full values are available in the daily table.',
+    table: 'View daily data table',
+    empty:
+      'No ended sessions match these filters. Try another range or clear the search.',
+    offline:
+      'Offline: latest data could not be loaded. Any displayed records are previously loaded data. Reconnect and try again.',
+    invalid:
+      'Records excluded before filtering because of future or invalid dates or invalid durations: {{count}}.',
+    sessionId: 'ID: {{id}}',
+    method: 'Calculation and limitations',
+    formula:
+      'Source: GET /sessions, elapsed_seconds in seconds. Session count includes ended records matching the filters. Total duration is their sum; the mean is total duration divided by session count, rounded to the nearest second. The 7/30/90-day ranges include today and the preceding local calendar days on this device, based on session start time. The full duration belongs to the start day even when a session crosses midnight.',
+    missing:
+      'Sessions without posture measurements still contribute recorded duration. Unmeasured posture ratios, scores and values are not invented. A recorded zero-second session is different from no data.',
+    references: 'Data presentation references',
+    referenceText:
+      'W3C WAI: Text and table alternatives for charts (opens a new tab)',
+    referenceScale: 'ONS: Bar charts and a zero baseline (opens a new tab)',
+    referenceContrast: 'WCAG 2.2: Non-text contrast (opens a new tab)',
+    standardLimit:
+      'WCAG 2.2 AA is an accessibility target. These references do not certify conformance or establish that the page can assess health.'
   },
   profile: {
     title: 'Profile',

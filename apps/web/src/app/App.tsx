@@ -70,6 +70,11 @@ const ProgressPage = lazy(() =>
     default: module.ProgressPage
   }))
 )
+const HistoryPage = lazy(() =>
+  import('@/routes/HistoryPage').then((module) => ({
+    default: module.HistoryPage
+  }))
+)
 const ProfilePage = lazy(() =>
   import('@/routes/ProfilePage').then((module) => ({
     default: module.ProfilePage
@@ -143,7 +148,7 @@ const router = createBrowserRouter([
               },
               {
                 path: 'history',
-                element: <ProgressPage />
+                element: <HistoryPage />
               },
               {
                 path: 'analytics',

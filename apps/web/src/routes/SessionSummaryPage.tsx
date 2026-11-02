@@ -62,7 +62,11 @@ export function SessionSummaryPage() {
           <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-800">
             {query.data?.status === 'completed'
               ? t('history.completed')
-              : t('history.stopped')}
+              : t(
+                  query.data?.status === 'active'
+                    ? 'history.active'
+                    : 'history.stopped'
+                )}
           </span>
         </div>
 

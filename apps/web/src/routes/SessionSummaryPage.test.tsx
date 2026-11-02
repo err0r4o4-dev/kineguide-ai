@@ -67,11 +67,14 @@ describe('SessionSummaryPage', () => {
     expect(screen.queryByText('ช่วงเวลานั่งนานที่สุด')).not.toBeInTheDocument()
   })
 
-  it('renders stopped state', async () => {
+  it.each([
+    ['stopped', 'หยุดก่อนเสร็จ'],
+    ['active', 'ยังไม่จบเซสชัน']
+  ] as const)('renders %s state', async (status, label) => {
     await i18n.changeLanguage('th')
     vi.mocked(product.getSession).mockResolvedValue({
       id: 'session-1',
-      status: 'stopped',
+      status,
       metrics: {
         duration_seconds: 60,
         sitting_seconds: 60,
@@ -93,7 +96,10 @@ describe('SessionSummaryPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
     ).toBeVisible()
-    expect(screen.getByText('หยุดก่อนเสร็จ')).toBeVisible()
+    expect(screen.getByText(label)).toBeVisible()
+    if (status === 'active') {
+      expect(screen.queryByText('หยุดก่อนเสร็จ')).not.toBeInTheDocument()
+    }
   })
 
   it('renders real posture aggregates when posture_summary is available', async () => {

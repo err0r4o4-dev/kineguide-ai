@@ -1,6 +1,38 @@
-import { mapSessionResponse } from './product'
+import { vi } from 'vitest'
+
+import { selectAnalyticsSessions } from '@/features/analytics/sessionAnalytics'
+
+import { http } from './http'
+import { getSessions, mapSessionResponse } from './product'
+
+vi.mock('./http', () => ({ http: { get: vi.fn() } }))
 
 describe('session response mapping', () => {
+  it.each([undefined, null])(
+    'does not turn a missing API duration (%s) into a measured zero in analytics',
+    async (elapsedSeconds) => {
+      vi.mocked(http.get).mockResolvedValue({
+        data: {
+          sessions: [
+            {
+              id: 'missing-duration',
+              status: 'completed',
+              elapsed_seconds: elapsedSeconds,
+              started_at: '2026-11-01T00:00:00Z',
+              completed_at: '2026-11-01T00:00:00Z',
+              retention_until: '2027-11-01T00:00:00Z',
+              manual_cycles: 0
+            }
+          ]
+        }
+      })
+      const sessions = await getSessions()
+      expect(
+        selectAnalyticsSessions(sessions, 0, Date.parse('2026-11-02T00:00:00Z'))
+      ).toMatchObject({ sessions: [], invalidCount: 1 })
+    }
+  )
+
   it('does not derive posture metrics from elapsed time', () => {
     expect(
       mapSessionResponse({

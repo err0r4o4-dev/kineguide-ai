@@ -65,6 +65,7 @@ export interface PostureSummaryResponse {
 
 export interface PostureSession {
   id: string
+  has_valid_duration?: boolean
   status: 'active' | 'completed' | 'stopped'
   metrics: PostureMetrics
   posture_summary: PostureSummaryResponse | null
@@ -313,6 +314,8 @@ export function mapSessionResponse(s: SessionResponse): PostureSession {
   const summary = s.posture_summary ?? null
   return {
     id: s.id,
+    has_valid_duration:
+      Number.isSafeInteger(s.elapsed_seconds) && s.elapsed_seconds >= 0,
     status: s.status,
     metrics: {
       duration_seconds: elapsed,
