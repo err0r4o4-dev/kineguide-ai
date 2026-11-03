@@ -1,8 +1,9 @@
 # Session analytics
 
-`/app/analytics` summarizes sessions returned by the existing `GET /v1/sessions`
-endpoint. It uses the same selected records for the summary, daily chart, and
-session list. The page does not introduce an API, database, or authorization
+`/app/analytics` and `/app/history` summarize sessions returned by the existing
+`GET /v1/sessions` endpoint under the unified **History & Analytics** primary
+navigation item. It uses the same selected records for the summary, daily chart,
+and session list. The page does not introduce an API, database, or authorization
 change.
 
 ## Data and filters

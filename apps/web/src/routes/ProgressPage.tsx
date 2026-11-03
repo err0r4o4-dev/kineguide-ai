@@ -24,6 +24,7 @@ import { getSessions } from '@/services/product'
 
 const PAGE_SIZE = 10
 const RANGES = ['7', '30', '90', 'all'] as const
+const STATUSES = ['all', 'completed', 'stopped'] as const
 const subscribeOnline = (onChange: () => void) =>
   onlineManager.subscribe(onChange)
 const isOnline = () => onlineManager.isOnline()
@@ -33,6 +34,8 @@ export function ProgressPage() {
   const online = useSyncExternalStore(subscribeOnline, isOnline)
   const [params, setParams] = useSearchParams()
   const range = RANGES.find((value) => value === params.get('range')) ?? '7'
+  const status =
+    STATUSES.find((value) => value === params.get('status')) ?? 'all'
   const search = params.get('q') ?? ''
   const language = i18n.resolvedLanguage ?? 'th'
   const requestedPage = Number(params.get('page') ?? 1)
@@ -46,8 +49,9 @@ export function ProgressPage() {
     Date.now()
   )
   const term = search.trim().toLocaleLowerCase(language)
-  const sessions = selection.sessions.filter((session) =>
-    [
+  const sessions = selection.sessions.filter((session) => {
+    if (status !== 'all' && session.status !== status) return false
+    return [
       session.id,
       session.started_at,
       formatDate(session.started_at, language),
@@ -57,7 +61,7 @@ export function ProgressPage() {
       .join(' ')
       .toLocaleLowerCase(language)
       .includes(term)
-  )
+  })
   const summary = summarizeAnalytics(sessions)
   const pages = Math.max(1, Math.ceil(sessions.length / PAGE_SIZE))
   const page = Math.min(
@@ -80,7 +84,8 @@ export function ProgressPage() {
       (current) => {
         const next = new URLSearchParams(current)
         next.delete('page')
-        if (value) next.set(key, value)
+        if (value && value !== 'all') next.set(key, value)
+        else if (key === 'range' && value === 'all') next.set(key, value)
         else next.delete(key)
         return next
       },
@@ -99,6 +104,7 @@ export function ProgressPage() {
   return (
     <div className="min-w-0 [overflow-wrap:anywhere]">
       <PageHeader
+        eyebrow={t('nav.historyAnalytics')}
         title={t('progress.title')}
         subtitle={t('analytics.subtitle')}
         actions={
@@ -165,15 +171,35 @@ export function ProgressPage() {
                 </button>
               ))}
             </div>
-            <label className="block text-sm font-medium text-slate-700">
-              {t('history.search')}
-              <input
-                className="mt-2 min-h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3"
-                aria-describedby="analytics-search-help"
-                value={search}
-                onChange={(event) => setFilter('q', event.target.value)}
-              />
-            </label>
+            <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+              <label className="block min-w-0 text-sm font-medium text-slate-700">
+                {t('history.search')}
+                <input
+                  className="mt-2 min-h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3"
+                  aria-describedby="analytics-search-help"
+                  value={search}
+                  onChange={(event) => setFilter('q', event.target.value)}
+                />
+              </label>
+              <label className="block min-w-0 text-sm font-medium text-slate-700">
+                {t('history.status')}
+                <select
+                  className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3"
+                  value={status}
+                  onChange={(event) => setFilter('status', event.target.value)}
+                >
+                  {STATUSES.map((value) => (
+                    <option key={value} value={value}>
+                      {t(
+                        value === 'all'
+                          ? 'history.allStatuses'
+                          : `history.${value}`
+                      )}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <p className="text-sm text-slate-600" id="analytics-search-help">
               {t('analytics.searchHelp')}
             </p>
@@ -256,9 +282,25 @@ export function ProgressPage() {
                       <span className="block break-all text-xs text-slate-600">
                         {t('analytics.sessionId', { id: session.id })}
                       </span>
-                      <span className="mt-1 block text-sm text-slate-700">
-                        {t(`history.${session.status}`)} ·{' '}
-                        {duration(session.metrics.duration_seconds)}
+                      <span className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                        <span>
+                          {t(`history.${session.status}`)} ·{' '}
+                          {duration(session.metrics.duration_seconds)}
+                        </span>
+                        {session.posture_summary && (
+                          <>
+                            <span className="rounded-lg bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-900">
+                              {t('history.alertBadge', {
+                                count: session.posture_summary.alert_count
+                              })}
+                            </span>
+                            <span className="rounded-lg bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-900">
+                              {t('history.breakBadge', {
+                                count: session.posture_summary.break_count
+                              })}
+                            </span>
+                          </>
+                        )}
                       </span>
                     </span>
                     <ChevronRight

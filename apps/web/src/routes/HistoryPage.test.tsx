@@ -279,4 +279,57 @@ describe('HistoryPage', () => {
       expect(screen.getByText('2 sessions found')).toBeVisible()
     )
   })
+
+  it('combines analytics summary, daily chart, view-mode tabs, and posture summary badges in the unified page', async () => {
+    const user = userEvent.setup()
+    renderHistory([
+      session(1, {
+        elapsed_seconds: 300,
+        posture_summary: {
+          good_alignment_seconds: 210,
+          needs_adjustment_seconds: 75,
+          unassessed_seconds: 15,
+          alert_count: 2,
+          break_count: 1,
+          framing_mode: 'upper_body',
+          method_version: 'seated-baseline-v1'
+        }
+      }),
+      session(2, { elapsed_seconds: 180, status: 'stopped' }),
+      session(3, { elapsed_seconds: 90, status: 'active' })
+    ])
+
+    const summary = await screen.findByRole('region', {
+      name: 'สรุปตามตัวกรอง'
+    })
+    expect(within(summary).getByText('จำนวนเซสชัน')).toBeVisible()
+    expect(within(summary).getByText('2')).toBeVisible()
+    expect(within(summary).getByText('เวลารวม')).toBeVisible()
+    expect(within(summary).getByText('เวลาเฉลี่ยต่อเซสชัน')).toBeVisible()
+    expect(
+      screen.getByRole('img', { name: 'เวลาที่บันทึกแยกตามวันเริ่มเซสชัน' })
+    ).toBeVisible()
+
+    const records = screen.getByRole('region', { name: 'รายการเซสชัน' })
+    expect(within(records).getByText('เตือนปรับท่าทาง 2 ครั้ง')).toBeVisible()
+    expect(within(records).getByText('พัก 1 ครั้ง')).toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: 'เฉพาะรายการเซสชัน' }))
+    expect(
+      screen.queryByRole('region', { name: 'สรุปตามตัวกรอง' })
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'รายการเซสชัน' })).toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: 'เฉพาะสถิติ' }))
+    expect(screen.getByRole('region', { name: 'สรุปตามตัวกรอง' })).toBeVisible()
+    expect(
+      screen.queryByRole('region', { name: 'รายการเซสชัน' })
+    ).not.toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: 'ทั้งหมด (สถิติและประวัติ)' })
+    )
+    expect(screen.getByRole('region', { name: 'สรุปตามตัวกรอง' })).toBeVisible()
+    expect(screen.getByRole('region', { name: 'รายการเซสชัน' })).toBeVisible()
+  })
 })

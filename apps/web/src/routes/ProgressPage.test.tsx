@@ -278,4 +278,35 @@ describe('ProgressPage', () => {
       expect(screen.queryByText('analytics.average')).not.toBeInTheDocument()
     )
   })
+
+  it('filters by session status and displays posture summary badges when present', async () => {
+    vi.mocked(getSessions).mockResolvedValue([
+      {
+        ...record('with-posture', 0, 600, 'completed'),
+        posture_summary: {
+          good_alignment_seconds: 480,
+          needs_adjustment_seconds: 100,
+          unassessed_seconds: 20,
+          alert_count: 3,
+          break_count: 2,
+          framing_mode: 'upper_body',
+          method_version: 'seated-baseline-v1'
+        }
+      },
+      record('stopped-one', 0, 300, 'stopped')
+    ])
+    const user = userEvent.setup()
+    renderRoute()
+    await summaryRegion()
+    const list = screen.getByRole('region', { name: 'ประวัติเซสชัน' })
+    expect(within(list).getByText('เตือนปรับท่าทาง 3 ครั้ง')).toBeVisible()
+    expect(within(list).getByText('พัก 2 ครั้ง')).toBeVisible()
+
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: 'สถานะเซสชัน' }),
+      'stopped'
+    )
+    expect(within(stat('จำนวนเซสชัน')).getByText('1')).toBeVisible()
+    expect(within(list).getAllByRole('link')).toHaveLength(1)
+  })
 })

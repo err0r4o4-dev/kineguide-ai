@@ -563,10 +563,10 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const destinations = [
-    ['ผู้ช่วย KineGuide AI', '/app/chat'],
     ['ตรวจท่าทาง', '/app/monitor'],
-    ['ประวัติ', '/app/history'],
-    ['สถิติ', '/app/analytics'],
+    ['ประวัติและสถิติ', '/app/history'],
+    ['ผู้ช่วย KineGuide AI', '/app/chat'],
+    ['คู่มือการใช้งาน', '/app/help'],
     ['ตั้งค่า', '/app/settings'],
     ['หน้าแรก', '/app']
   ] as const

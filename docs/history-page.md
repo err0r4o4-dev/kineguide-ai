@@ -1,8 +1,9 @@
 # Session history
 
-`/app/history` reads the existing authenticated `GET /v1/sessions` endpoint.
-`/app/analytics` keeps its existing analytics page. No database, authorization,
-consent, retention, or public API contract changes are made by this history work.
+`/app/history` reads the existing authenticated `GET /v1/sessions` endpoint and
+serves as the unified **History & Analytics** destination in primary navigation
+alongside `/app/analytics`. No database, authorization, consent, retention, or
+public API contract changes are made by this history work.
 
 ## Behavior and limits
 

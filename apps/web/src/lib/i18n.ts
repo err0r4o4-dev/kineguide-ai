@@ -66,6 +66,8 @@ const th = {
     monitor: 'ตรวจท่าทาง',
     history: 'ประวัติ',
     analytics: 'สถิติ',
+    historyAnalytics: 'ประวัติและสถิติ',
+    guide: 'คู่มือการใช้งาน',
     profile: 'โปรไฟล์',
     settings: 'ตั้งค่า',
     help: 'ช่วยเหลือ',
@@ -659,7 +661,13 @@ const th = {
     pagination: 'หน้าประวัติ',
     previousPage: 'หน้าก่อนหน้า',
     nextPage: 'หน้าถัดไป',
-    pageStatus: 'หน้า {{page}} จาก {{total}}'
+    pageStatus: 'หน้า {{page}} จาก {{total}}',
+    viewModeLabel: 'มุมมองการแสดงผล',
+    viewAll: 'ทั้งหมด (สถิติและประวัติ)',
+    viewAnalytics: 'เฉพาะสถิติ',
+    viewRecords: 'เฉพาะรายการเซสชัน',
+    alertBadge: 'เตือนปรับท่าทาง {{count}} ครั้ง',
+    breakBadge: 'พัก {{count}} ครั้ง'
   },
   progress: {
     title: 'สถิติท่าทาง',
@@ -790,12 +798,38 @@ const th = {
       'เบราว์เซอร์นี้ไม่รองรับระบบเสียง Web Speech และ Web Audio จึงแสดงเฉพาะข้อความแจ้งเตือนบนหน้าจอ'
   },
   help: {
-    title: 'ช่วยเหลือ',
+    title: 'คู่มือการใช้งานและสรีรศาสตร์',
+    eyebrow: 'คำแนะนำและขอบเขตระบบ',
     camera:
       'หากกล้องไม่ทำงาน ให้ตรวจสิทธิ์ของเว็บไซต์ ปิดแอปอื่นที่ใช้กล้อง แล้วลองอีกครั้ง',
     safety:
       'หากรู้สึกเจ็บ ไม่มั่นคง หรือกังวล ให้หยุดทันที ระบบนี้ไม่ให้คำแนะนำฉุกเฉิน',
-    contact: 'สำหรับเหตุฉุกเฉิน ให้ติดต่อบริการฉุกเฉินในพื้นที่ของคุณ'
+    contact: 'สำหรับเหตุฉุกเฉิน ให้ติดต่อบริการฉุกเฉินในพื้นที่ของคุณ',
+    ergonomicTitle: 'การจัดมุมกล้องและโต๊ะทำงานเบื้องต้น',
+    ergonomicBody:
+      'วางหน้าจอและกล้องไว้ด้านหน้าในระดับสายตาหรือเฉียงไม่เกิน 45 องศา ให้มีแสงสว่างสม่ำเสมอไม่ย้อนแสง และนั่งในท่าที่สบายก่อนเริ่มสอบเทียบค่าอ้างอิงส่วนบุคคล (Personal Baseline)',
+    framingUpperBody:
+      'โหมดลำตัวส่วนบน (Upper Body): เหมาะสำหรับโต๊ะทำงานทั่วไปที่เห็นศีรษะและไหล่ทั้งสองข้างชัดเจน',
+    framingFullTorso:
+      'โหมดลำตัวถึงสะโพก (Full Torso): เหมาะเมื่อวางกล้องห่างพอให้เห็นศีรษะ ไหล่ และสะโพกครบถ้วน',
+    openMonitorAction: 'ไปหน้าตรวจความพร้อมของกล้อง',
+    statesTitle: 'ความหมายของสถานะการตรวจจับ',
+    statesBody:
+      'สถานะทั้งหมดเป็นการเปรียบเทียบเชิงเทคนิคกับค่า Baseline ของคุณในเซสชันนั้น ไม่ใช่การวินิจฉัยทางการแพทย์หรือการตัดสินว่าท่านั่งถูกหรือผิดตามหลักคลินิก',
+    stateGoodTitle: 'อยู่ในแนวอ้างอิง (Good alignment)',
+    stateGoodBody:
+      'ตำแหน่งศีรษะและลำตัวอยู่ในช่วงที่ใกล้เคียงกับค่า Baseline ที่คุณบันทึกไว้เมื่อเริ่มเซสชัน',
+    stateAdjustTitle: 'ควรขยับปรับท่านั่ง (Needs adjustment)',
+    stateAdjustBody:
+      'ตรวจพบการโน้มตัว เอียงไหล่ หรือก้มศีรษะออกจากค่า Baseline ต่อเนื่องเกินระยะเวลาหน่วงที่กำหนด (Debounce) เพื่อกันการแจ้งเตือนจากการขยับตัวชั่วคราว',
+    stateUncertainTitle:
+      'ความเชื่อมั่นต่ำ / ประเมินไม่ได้ (Low confidence / Unable to assess)',
+    stateUncertainBody:
+      'แสงสว่างไม่เพียงพอ จุดอ้างอิงหลุดกรอบภาพ หรือมีคนมากกว่า 1 คนในเฟรม ระบบจะหยุดประเมินชั่วคราวโดยไม่สร้างผลลัพธ์สมมติ',
+    remindersTitle: 'การเตือนพักและเสียงแจ้งเตือน',
+    remindersBody:
+      'คุณสามารถเปิดเสียงพูดแนะนำภาษาไทย (TTS) หรือเสียงสัญญาณนุ่มนวลเพื่อรับแจ้งเตือนเมื่อนั่งต่อเนื่องนานหรือเมื่อควรปรับท่านั่ง โดยข้อมูลเสียงและภาพทำงานในเบราว์เซอร์เท่านั้น',
+    openSettingsAction: 'ตั้งค่าเสียงและการแจ้งเตือน'
   },
   status: 'สถานะระบบ',
   subtitle: 'ภาพรวมความพร้อมของบริการสำหรับการพัฒนา',
@@ -879,6 +913,8 @@ const en: typeof th = {
     monitor: 'Monitor Posture',
     history: 'History',
     analytics: 'Analytics',
+    historyAnalytics: 'History & Analytics',
+    guide: 'Ergonomic Guide',
     profile: 'Profile',
     settings: 'Settings',
     help: 'Help',
@@ -1487,7 +1523,13 @@ const en: typeof th = {
     pagination: 'History pagination',
     previousPage: 'Previous page',
     nextPage: 'Next page',
-    pageStatus: 'Page {{page}} of {{total}}'
+    pageStatus: 'Page {{page}} of {{total}}',
+    viewModeLabel: 'Display view',
+    viewAll: 'All (analytics & history)',
+    viewAnalytics: 'Analytics only',
+    viewRecords: 'Session records only',
+    alertBadge: '{{count}} posture alerts',
+    breakBadge: '{{count}} breaks'
   },
   progress: {
     title: 'Posture Analytics',
@@ -1617,12 +1659,37 @@ const en: typeof th = {
       'This browser does not support Web Speech or Web Audio, so alerts will appear visually on screen only.'
   },
   help: {
-    title: 'Help',
+    title: 'Ergonomic & Usage Guide',
+    eyebrow: 'Guidance and system boundaries',
     camera:
       'If the camera fails, check site permission, close other camera apps, and retry.',
     safety:
       'Stop immediately if you feel pain, unstable, or concerned. This system does not provide emergency guidance.',
-    contact: 'For emergencies, contact your local emergency service.'
+    contact: 'For emergencies, contact your local emergency service.',
+    ergonomicTitle: 'Camera framing and workstation setup',
+    ergonomicBody:
+      'Place your screen and camera in front of you at eye level or within a 45-degree angle with even lighting, then sit comfortably before capturing your personal baseline.',
+    framingUpperBody:
+      'Upper-body mode: suitable for standard desk setups where your head and both shoulders are clearly visible.',
+    framingFullTorso:
+      'Full-torso mode: suitable when the camera is positioned far enough to show your head, shoulders, and hips.',
+    openMonitorAction: 'Open camera setup check',
+    statesTitle: 'Meaning of monitoring states',
+    statesBody:
+      'All states represent technical comparisons against your personal baseline in the active session, not a medical diagnosis or clinical posture verdict.',
+    stateGoodTitle: 'Good alignment',
+    stateGoodBody:
+      'Your head and torso position remain close to the personal baseline captured at the start of the session.',
+    stateAdjustTitle: 'Needs adjustment',
+    stateAdjustBody:
+      'Sustained leaning, shoulder tilt, or forward head shift beyond the debounce window was observed relative to your baseline.',
+    stateUncertainTitle: 'Low confidence / Unable to assess',
+    stateUncertainBody:
+      'Lighting is insufficient, required landmarks are out of frame, or multiple people are detected. Assessment pauses honestly without inventing results.',
+    remindersTitle: 'Break reminders and sound alerts',
+    remindersBody:
+      'You can enable Thai voice guidance (TTS) or gentle chimes for break reminders and sustained posture adjustments while keeping all audio and camera processing in your browser.',
+    openSettingsAction: 'Configure sound and alerts'
   },
   status: 'System status',
   subtitle: 'Development service readiness overview',

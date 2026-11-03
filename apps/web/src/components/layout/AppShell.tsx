@@ -1,7 +1,7 @@
 import {
   BarChart3,
+  BookOpen,
   Bot,
-  History,
   Home,
   Menu,
   Monitor,
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Outlet } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 
 import { Brand } from '@/components/Brand'
 import { LanguageButton } from '@/components/LanguageButton'
@@ -21,19 +21,32 @@ import { UserAccountMenu } from '@/components/layout/UserAccountMenu'
 import { SystemError } from '@/components/SystemState'
 import { NotificationProvider } from '@/features/notifications/NotificationProvider'
 
-const links = [
+const links: ReadonlyArray<{
+  to: string
+  key: string
+  icon: typeof Home
+  end: boolean
+  matchPaths?: readonly string[]
+}> = [
   { to: '/app', key: 'home', icon: Home, end: true },
-  { to: '/app/chat', key: 'chat', icon: Bot, end: false },
   { to: '/app/monitor', key: 'monitor', icon: Monitor, end: false },
-  { to: '/app/history', key: 'history', icon: History, end: false },
-  { to: '/app/analytics', key: 'analytics', icon: BarChart3, end: false },
+  {
+    to: '/app/history',
+    key: 'historyAnalytics',
+    icon: BarChart3,
+    end: false,
+    matchPaths: ['/app/history', '/app/analytics']
+  },
+  { to: '/app/chat', key: 'chat', icon: Bot, end: false },
+  { to: '/app/help', key: 'guide', icon: BookOpen, end: false },
   { to: '/app/settings', key: 'settings', icon: Settings, end: false }
-] as const
+]
 
 export function AppShell() {
   const [open, setOpen] = useState(false)
   const [pageError, setPageError] = useState<AppShellPageError | null>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const location = useLocation()
   const { t } = useTranslation()
   const errorContext = useMemo(
     () => ({
@@ -112,20 +125,27 @@ export function AppShell() {
               <Brand />
             </div>
             <nav aria-label={t('nav.main')} className="space-y-1.5 lg:mt-8">
-              {links.map(({ to, key, icon: Icon, end }) => (
-                <NavLink
-                  className={({ isActive }) =>
-                    `ui-transition pressable relative flex min-h-12 items-center gap-3.5 rounded-[var(--radius-control)] px-4 text-[0.95rem] font-semibold no-underline ${isActive ? 'bg-[var(--color-kg-soft)] text-[var(--color-kg-primary)] before:absolute before:-left-1 before:h-7 before:w-1 before:rounded-full before:bg-[var(--color-kg-brand)]' : 'text-[var(--color-kg-muted)] hover:bg-[var(--color-kg-soft)] hover:text-[var(--color-kg-ink)]'}`
-                  }
-                  end={end}
-                  key={to}
-                  onClick={() => setOpen(false)}
-                  to={to}
-                >
-                  <Icon aria-hidden="true" className="shrink-0" size={21} />
-                  <span className="leading-5">{t(`nav.${key}`)}</span>
-                </NavLink>
-              ))}
+              {links.map(({ to, key, icon: Icon, end, matchPaths }) => {
+                const paths = matchPaths ?? [to]
+                const isActive = paths.some((path) =>
+                  end
+                    ? location.pathname === path
+                    : location.pathname === path ||
+                      location.pathname.startsWith(`${path}/`)
+                )
+                return (
+                  <Link
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`ui-transition pressable relative flex min-h-12 items-center gap-3.5 rounded-[var(--radius-control)] px-4 text-[0.95rem] font-semibold no-underline ${isActive ? 'bg-[var(--color-kg-soft)] text-[var(--color-kg-primary)] before:absolute before:-left-1 before:h-7 before:w-1 before:rounded-full before:bg-[var(--color-kg-brand)]' : 'text-[var(--color-kg-muted)] hover:bg-[var(--color-kg-soft)] hover:text-[var(--color-kg-ink)]'}`}
+                    key={to}
+                    onClick={() => setOpen(false)}
+                    to={to}
+                  >
+                    <Icon aria-hidden="true" className="shrink-0" size={21} />
+                    <span className="leading-5">{t(`nav.${key}`)}</span>
+                  </Link>
+                )
+              })}
             </nav>
             <div className="mt-auto border-t border-slate-200/80 pt-5">
               <UserAccountMenu />
