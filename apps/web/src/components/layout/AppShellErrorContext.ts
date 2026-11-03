@@ -2,7 +2,7 @@ import { createContext } from 'react'
 
 export type AppShellPageError = {
   id: symbol
-  retry: () => void
+  retry: () => void | Promise<unknown>
 }
 
 export type AppShellErrorContextValue = {

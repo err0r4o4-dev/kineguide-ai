@@ -752,6 +752,7 @@ const th = {
     privacySettings: 'ตั้งค่าและความเป็นส่วนตัว'
   },
   settings: {
+    eyebrow: 'ตั้งค่าและความเป็นส่วนตัว',
     title: 'ตั้งค่าและความเป็นส่วนตัว',
     language: 'ภาษาและการแสดงผล',
     languageBody:
@@ -1629,6 +1630,7 @@ const en: typeof th = {
     privacySettings: 'Settings and privacy'
   },
   settings: {
+    eyebrow: 'Settings & Privacy',
     title: 'Settings and privacy',
     language: 'Language and display',
     languageBody:

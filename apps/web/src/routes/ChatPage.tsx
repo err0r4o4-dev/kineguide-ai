@@ -218,7 +218,7 @@ export function ChatPage() {
       {conversations.isLoading && <QueryLoading />}
       {conversations.isError && (
         <div className="p-6">
-          <QueryError retry={() => void conversations.refetch()} />
+          <QueryError retry={() => conversations.refetch()} />
         </div>
       )}
 
@@ -267,7 +267,7 @@ export function ChatPage() {
               {selectedID && messages.isLoading && <QueryLoading />}
               {selectedID && messages.isError && (
                 <div className="m-auto">
-                  <QueryError retry={() => void messages.refetch()} />
+                  <QueryError retry={() => messages.refetch()} />
                 </div>
               )}
               {selectedID && messages.data && (

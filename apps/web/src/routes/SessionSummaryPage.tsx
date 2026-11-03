@@ -28,7 +28,7 @@ export function SessionSummaryPage() {
   })
 
   if (query.isLoading) return <QueryLoading />
-  if (query.isError) return <QueryError retry={() => void query.refetch()} />
+  if (query.isError) return <QueryError retry={() => query.refetch()} />
 
   const postureSummary = query.data?.posture_summary
   const coverage = postureSummary

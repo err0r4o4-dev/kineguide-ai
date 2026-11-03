@@ -44,7 +44,7 @@ export function DashboardPage() {
       {query.isLoading && <QueryLoading />}
       {query.isError && (
         <div className="mt-6">
-          <QueryError retry={() => void query.refetch()} />
+          <QueryError retry={() => query.refetch()} />
         </div>
       )}
 

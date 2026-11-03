@@ -135,7 +135,7 @@ export function ProgressPage() {
       {query.isPending ? (
         query.fetchStatus !== 'paused' && <QueryLoading />
       ) : query.isError && !query.data ? (
-        <QueryError retry={() => void query.refetch()} />
+        <QueryError retry={() => query.refetch()} />
       ) : (
         <>
           {query.isError && (

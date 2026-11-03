@@ -235,8 +235,7 @@ export function LiveSessionPage() {
   }
 
   if (session.isLoading) return <QueryLoading />
-  if (session.isError)
-    return <QueryError retry={() => void session.refetch()} />
+  if (session.isError) return <QueryError retry={() => session.refetch()} />
 
   const technicalStatus = getTechnicalStatus(camera.state, pose.status, paused)
   const canCalibrate =

@@ -169,7 +169,7 @@ export function HistoryPage() {
       {query.isPending ? (
         query.fetchStatus !== 'paused' && <QueryLoading />
       ) : query.isError && !query.data ? (
-        <QueryError retry={() => void query.refetch()} />
+        <QueryError retry={() => query.refetch()} />
       ) : (
         <>
           {query.isError && (
@@ -821,10 +821,7 @@ function HistoryActivityChart({
 
   const linePath = points.reduce((acc, point, index) => {
     if (index === 0) return `M ${point.x} ${point.y}`
-    const prev = points[index - 1]
-    const cx1 = prev.x + (point.x - prev.x) * 0.45
-    const cx2 = point.x - (point.x - prev.x) * 0.45
-    return `${acc} C ${cx1} ${prev.y}, ${cx2} ${point.y}, ${point.x} ${point.y}`
+    return `${acc} L ${point.x} ${point.y}`
   }, '')
 
   const durationTicks = [
@@ -947,22 +944,23 @@ function HistoryActivityChart({
                 strokeLinecap="round"
                 strokeWidth="2.5"
               />
-              {points.map(({ x, y, day }) => (
-                <circle
-                  cx={x}
-                  cy={y}
-                  fill="#ffffff"
-                  key={`pt-${day.date}`}
-                  r="5.5"
-                  stroke="#0d7a73"
-                  strokeWidth="2.5"
-                >
-                  <title>
-                    {dateFormat.format(day.date)}:{' '}
-                    {t('history.recentSessionsBadge', { count: day.count })}
-                  </title>
-                </circle>
-              ))}
+              {points.length === 1 &&
+                points.map(({ x, y, day }) => (
+                  <circle
+                    cx={x}
+                    cy={y}
+                    fill="#ffffff"
+                    key={`pt-${day.date}`}
+                    r="5.5"
+                    stroke="#0d7a73"
+                    strokeWidth="2.5"
+                  >
+                    <title>
+                      {dateFormat.format(day.date)}:{' '}
+                      {t('history.recentSessionsBadge', { count: day.count })}
+                    </title>
+                  </circle>
+                ))}
             </g>
           )}
 
@@ -1003,7 +1001,6 @@ function HistoryActivityChart({
               className="relative inline-flex h-3 w-6 items-center justify-center"
             >
               <span className="h-0.5 w-full bg-[#0d7a73]" />
-              <span className="absolute size-2.5 rounded-full border-2 border-[#0d7a73] bg-white" />
             </span>
             {t('history.legendSessions')}
           </span>

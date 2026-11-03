@@ -1,5 +1,5 @@
 import { Check, Circle, Home, RefreshCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
@@ -180,9 +180,26 @@ export function SystemError({
   retry
 }: {
   fullScreen?: boolean
-  retry(): void
+  retry(): void | Promise<unknown>
 }) {
   const { t } = useTranslation()
+  const [retrying, setRetrying] = useState(false)
+  const retryingRef = useRef(false)
+
+  const handleRetry = async () => {
+    if (retryingRef.current) return
+    retryingRef.current = true
+    setRetrying(true)
+    try {
+      await retry()
+    } catch {
+      // Keep the error screen available when the retry also fails.
+    } finally {
+      retryingRef.current = false
+      setRetrying(false)
+    }
+  }
+
   return (
     <section
       className={`flex flex-col items-center justify-center px-4 py-10 text-center ${fullScreen ? 'min-h-screen' : 'min-h-[70vh]'}`}
@@ -197,12 +214,22 @@ export function SystemError({
       </p>
       <div className="mt-7 flex w-full max-w-lg flex-col gap-3 sm:flex-row">
         <button
+          aria-busy={retrying}
           className="kg-button-primary flex-1"
-          onClick={retry}
+          disabled={retrying}
+          onClick={() => void handleRetry()}
           type="button"
         >
-          <RefreshCw aria-hidden="true" size={18} />
-          {t('common.retry')}
+          <RefreshCw
+            aria-hidden="true"
+            className={
+              retrying ? 'animate-spin motion-reduce:animate-none' : undefined
+            }
+            size={18}
+          />
+          <span aria-live="polite">
+            {t(retrying ? 'common.loading' : 'common.retry')}
+          </span>
         </button>
         <Link className="kg-button-secondary flex-1" to="/">
           <Home aria-hidden="true" size={18} />

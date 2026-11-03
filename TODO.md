@@ -1,5 +1,13 @@
 # KineGuide AI — Product Flow และ Roadmap
 
+## History combo straight line — 2026-11-04
+
+- [x] Investigation: preserve concurrent Settings edits; scope to combo line and legend.
+- [x] Regression: confirmed RED (1 failed / 14 passed) for combo straight segments without markers; retaining bar and single-day coverage.
+- [x] Implementation: share straight line rendering across Line and Bar + Line.
+- [ ] Verification: History format and 15 targeted tests PASS; lint, typecheck, full suite (308 tests), /v1 production build, combo/Line browser check at 320/768/1024/1440, and diff check PASS. Global format:check failed on concurrently edited SettingsPage.tsx, SettingsPage.test.tsx, and e2e/sound-alerts.spec.ts; these files were not modified by this task.
+- [ ] Cleanup: remove only this section after global format is resolved by the owning task.
+
 ## Consent current HTTP 500 — 2026-10-19
 
 - Status: blocked pending an approved runtime/database reproduction. Current evidence only supports a stale-schema hypothesis involving `ai_chat_storage` (SQLSTATE `42703`); nullable scanning and connection reuse are not ruled out.

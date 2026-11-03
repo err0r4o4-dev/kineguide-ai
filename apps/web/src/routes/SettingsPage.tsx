@@ -1,6 +1,9 @@
 import {
+  Bell,
   CheckCircle2,
   Languages,
+  Settings2,
+  SquarePen,
   Link2,
   Play,
   ShieldCheck,
@@ -8,13 +11,12 @@ import {
   Unlink,
   Volume2
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { PageHeader } from '@/components/PageHeader'
 import { LanguageButton } from '@/components/LanguageButton'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
@@ -201,16 +203,22 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl pb-8">
-      <PageHeader
-        title={t('settings.title')}
-        subtitle={t('profile.subtitle')}
-      />
+    <div className="kg-settings-page mx-auto pb-8">
+      <div aria-hidden="true" className="kg-settings-backdrop" />
+      <header className="kg-settings-header">
+        <p className="kg-settings-eyebrow">
+          <Settings2 aria-hidden="true" size={19} />
+          {t('settings.eyebrow')}
+        </p>
+        <h1>{t('settings.title')}</h1>
+        <p className="kg-settings-subtitle">{t('profile.subtitle')}</p>
+      </header>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div className="space-y-6">
+      <div className="kg-settings-grid">
+        <div className="kg-settings-column">
           <SettingsSection
             body={t('settings.languageBody')}
+            className="kg-settings-language"
             icon={Languages}
             title={t('settings.language')}
           >
@@ -219,6 +227,7 @@ export function SettingsPage() {
 
           <SettingsSection
             body={t('settings.soundBody')}
+            className="kg-settings-sound"
             icon={Volume2}
             title={t('settings.soundTitle')}
           >
@@ -255,7 +264,7 @@ export function SettingsPage() {
                 </p>
               )}
 
-              <fieldset className="space-y-2.5 border-0 p-0">
+              <fieldset className="kg-settings-modes space-y-2.5 border-0 p-0">
                 <legend className="text-sm font-semibold text-slate-900">
                   {t('settings.soundModeLabel')}
                 </legend>
@@ -305,7 +314,10 @@ export function SettingsPage() {
                   {t('settings.soundVolume', { percent: volumePercent })}
                 </label>
                 <input
-                  className="min-h-11 w-full cursor-pointer accent-[var(--color-kg-primary)]"
+                  className="kg-settings-volume min-h-11 w-full cursor-pointer"
+                  style={{
+                    backgroundSize: `${((volumePercent - 10) / 90) * 100}% 8px`
+                  }}
                   id="sound-alert-volume"
                   max={100}
                   min={10}
@@ -317,35 +329,100 @@ export function SettingsPage() {
                   value={volumePercent}
                 />
               </div>
+            </div>
+          </SettingsSection>
+        </div>
 
-              <fieldset className="space-y-3 border-0 p-0">
-                <legend className="text-sm font-semibold text-slate-900">
-                  {t('settings.soundEventsLabel')}
-                </legend>
-                <div className="mt-2 space-y-2.5">
-                  {soundEventOptions.map((option) => (
-                    <label className="kg-check" key={option.key}>
-                      <input
-                        checked={sound.preferences.events[option.key]}
-                        onChange={() => sound.toggleEvent(option.key)}
-                        type="checkbox"
-                      />
-                      <span className="text-sm font-medium text-slate-800">
-                        {t(option.labelKey)}
-                      </span>
-                    </label>
-                  ))}
+        <div className="kg-settings-column">
+          <SettingsSection
+            body={t('settings.consentBody')}
+            icon={ShieldCheck}
+            title={t('settings.consent')}
+          >
+            <div className="kg-settings-consent-status">
+              {consent.isLoading ? (
+                <p className="text-sm text-slate-500">{t('common.loading')}</p>
+              ) : consent.data ? (
+                <div className="flex items-center gap-4">
+                  <CheckCircle2
+                    aria-hidden="true"
+                    className="shrink-0 text-emerald-600"
+                    size={23}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {t('settings.consentActive', {
+                        version: consent.data.policy_version
+                      })}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      {new Date(consent.data.accepted_at).toLocaleString(
+                        i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB'
+                      )}
+                    </p>
+                  </div>
                 </div>
-              </fieldset>
+              ) : (
+                <p className="text-sm text-slate-500">
+                  {t('settings.noActiveConsent')}
+                </p>
+              )}
+            </div>
+            <button
+              className="kg-settings-revoke"
+              disabled={!consent.data || revoking}
+              onClick={() => void handleRevoke()}
+              type="button"
+            >
+              <SquarePen aria-hidden="true" size={20} />
+              {revoking ? t('common.loading') : t('settings.revoke')}
+            </button>
+          </SettingsSection>
 
-              <div className="pt-1">
+          <SettingsSection
+            body={t('settings.retention')}
+            className="kg-settings-delete"
+            icon={Trash2}
+            title={t('settings.delete')}
+          >
+            <button
+              className="kg-settings-delete-button"
+              disabled={deleting}
+              onClick={() => void handleDelete()}
+              type="button"
+            >
+              {deleting ? t('common.loading') : t('settings.delete')}
+            </button>
+          </SettingsSection>
+
+          <SettingsSection
+            className="kg-settings-events"
+            icon={Bell}
+            title={t('settings.soundEventsLabel')}
+          >
+            <div className="kg-settings-events-content">
+              <div className="kg-settings-event-options">
+                {soundEventOptions.map((option) => (
+                  <label className="kg-check" key={option.key}>
+                    <input
+                      checked={sound.preferences.events[option.key]}
+                      onChange={() => sound.toggleEvent(option.key)}
+                      type="checkbox"
+                    />
+                    <span className="text-sm text-slate-900">
+                      {t(option.labelKey)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="kg-settings-preview">
                 <button
                   className="kg-button-secondary text-sm"
                   disabled={audioCompletelyUnsupported}
                   onClick={handlePreviewSound}
                   type="button"
                 >
-                  <Play aria-hidden="true" size={16} />
+                  <Play aria-hidden="true" size={18} />
                   {t('settings.soundPreview')}
                 </button>
               </div>
@@ -375,7 +452,7 @@ export function SettingsPage() {
                   )
                   return (
                     <div
-                      className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3"
+                      className="kg-settings-provider flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/70 p-3"
                       key={provider}
                     >
                       <ProviderIcon provider={provider} />
@@ -420,88 +497,6 @@ export function SettingsPage() {
             </div>
           </SettingsSection>
         </div>
-
-        <div className="space-y-6">
-          <section className="kg-card p-5 sm:p-6">
-            <div className="flex gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--color-kg-soft)] text-[var(--color-kg-primary)]">
-                <ShieldCheck aria-hidden="true" size={21} />
-              </span>
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  {t('settings.consent')}
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {t('settings.consentBody')}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
-              {consent.isLoading ? (
-                <p className="text-sm text-slate-500">{t('common.loading')}</p>
-              ) : consent.data ? (
-                <div className="flex items-start gap-3">
-                  <CheckCircle2
-                    aria-hidden="true"
-                    className="mt-0.5 text-emerald-600"
-                    size={18}
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-emerald-900">
-                      {t('settings.consentActive', {
-                        version: consent.data.policy_version
-                      })}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-600">
-                      {new Date(consent.data.accepted_at).toLocaleString(
-                        i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB'
-                      )}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500">
-                  {t('settings.noActiveConsent')}
-                </p>
-              )}
-            </div>
-
-            <div className="mt-5">
-              <button
-                className="text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors disabled:opacity-50"
-                disabled={!consent.data || revoking}
-                onClick={() => void handleRevoke()}
-                type="button"
-              >
-                {revoking ? t('common.loading') : t('settings.revoke')}
-              </button>
-            </div>
-          </section>
-
-          <section className="kg-card border-red-100 p-5 sm:p-6">
-            <span className="grid size-11 place-items-center rounded-xl bg-red-50 text-red-700">
-              <Trash2 aria-hidden="true" size={21} />
-            </span>
-            <h2 className="text-lg font-bold text-red-700">
-              {t('settings.delete')}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {t('settings.retention')}
-            </p>
-
-            <div className="mt-5">
-              <button
-                className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100 disabled:opacity-50"
-                disabled={deleting}
-                onClick={() => void handleDelete()}
-                type="button"
-              >
-                {deleting ? t('common.loading') : t('settings.delete')}
-              </button>
-            </div>
-          </section>
-        </div>
       </div>
     </div>
   )
@@ -510,26 +505,32 @@ export function SettingsPage() {
 function SettingsSection({
   body,
   children,
+  className = '',
   icon: Icon,
   title
 }: {
-  body: string
+  body?: string
   children: ReactNode
+  className?: string
   icon: typeof Languages
   title: string
 }) {
+  const titleId = useId()
   return (
-    <section className="kg-card p-5 sm:p-6">
-      <div className="flex gap-4">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--color-kg-night)] text-[var(--color-kg-accent)]">
-          <Icon aria-hidden="true" size={21} />
+    <section
+      aria-labelledby={titleId}
+      className={`kg-card kg-settings-card ${className}`}
+    >
+      <div className="kg-settings-section-header">
+        <span className="kg-settings-section-icon">
+          <Icon aria-hidden="true" size={32} />
         </span>
-        <div>
-          <h2 className="text-lg font-bold text-slate-950">{title}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{body}</p>
+        <div className="min-w-0">
+          <h2 id={titleId}>{title}</h2>
+          {body && <p className="kg-settings-section-description">{body}</p>}
         </div>
       </div>
-      <div className="mt-5">{children}</div>
+      <div className="kg-settings-section-content">{children}</div>
     </section>
   )
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { AppShellErrorContext } from '@/components/layout/AppShellErrorContext'
 import { SystemError } from '@/components/SystemState'
 
-export function QueryError({ retry }: { retry(): void }) {
+export function QueryError({ retry }: { retry(): void | Promise<unknown> }) {
   const shellError = useContext(AppShellErrorContext)
   const errorID = useRef(Symbol('query-error'))
   const retryRef = useRef(retry)

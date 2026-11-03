@@ -187,9 +187,66 @@ test('sound alert controls sync across live session and settings without overflo
         () => document.documentElement.scrollWidth <= window.innerWidth
       )
     ).toBe(true)
+    await expect(async () => {
+      const soundCard = await page
+        .getByRole('region', { name: 'การแจ้งเตือนด้วยเสียง', exact: true })
+        .boundingBox()
+      const consentCard = await page
+        .getByRole('region', { name: 'จัดการ consent' })
+        .boundingBox()
+      const deleteCard = await page
+        .getByRole('region', { name: 'ลบบัญชีและข้อมูลทั้งหมด' })
+        .boundingBox()
+      const eventsCard = await page
+        .getByRole('region', { name: 'เหตุการณ์ที่ต้องการให้ส่งเสียง' })
+        .boundingBox()
+      const accountsCard = await page
+        .getByRole('region', { name: 'บัญชีที่เชื่อมต่อ' })
+        .boundingBox()
+      expect(soundCard).not.toBeNull()
+      expect(consentCard).not.toBeNull()
+      expect(deleteCard).not.toBeNull()
+      expect(eventsCard).not.toBeNull()
+      expect(accountsCard).not.toBeNull()
+      if (
+        !soundCard ||
+        !consentCard ||
+        !deleteCard ||
+        !eventsCard ||
+        !accountsCard
+      ) {
+        throw new Error('Expected all settings cards to have rendered bounds')
+      }
+      if (width === 1440) {
+        expect(consentCard.x).toBeGreaterThan(soundCard.x + soundCard.width)
+      } else {
+        expect(consentCard.x).toBe(soundCard.x)
+        expect(consentCard.y).toBeGreaterThan(soundCard.y + soundCard.height)
+      }
+      expect(deleteCard.y).toBeGreaterThan(consentCard.y + consentCard.height)
+      expect(eventsCard.y).toBeGreaterThan(deleteCard.y + deleteCard.height)
+      expect(accountsCard.y).toBeGreaterThan(eventsCard.y + eventsCard.height)
+    }).toPass()
+    if (width === 1440) {
+      await page
+        .getByRole('region', { name: 'ภาษาและการแสดงผล' })
+        .getByRole('button', { name: 'English', exact: true })
+        .click()
+      await expect(
+        page.getByRole('heading', { name: 'Settings and privacy' })
+      ).toBeVisible()
+      await page
+        .getByRole('region', { name: 'Language and display' })
+        .getByRole('button', { name: 'ไทย', exact: true })
+        .click()
+    }
   }
 
-  await page.getByRole('button', { name: 'ทดลองฟังเสียง' }).click()
+  const previewButton = page.getByRole('button', { name: 'ทดลองฟังเสียง' })
+  await page.keyboard.press('Tab')
+  await previewButton.focus()
+  await expect(previewButton).toHaveCSS('outline-style', 'solid')
+  await page.keyboard.press('Enter')
   expect(
     await page.evaluate(
       () =>

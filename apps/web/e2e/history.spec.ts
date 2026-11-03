@@ -72,6 +72,48 @@ async function installAPI(page: Page, sessions = records()) {
   })
 }
 
+test('Line chart uses straight segments with no markers and keeps its summary alongside at desktop', async ({
+  page
+}, testInfo) => {
+  const sessions = records(6).map((record, index) => ({
+    ...record,
+    status: 'completed',
+    started_at: new Date(
+      Date.now() - Math.floor(index / 2) * 86400000
+    ).toISOString()
+  }))
+  await installAPI(page, sessions)
+  await page.goto('/app/history')
+  await page.getByRole('button', { name: 'Line', exact: true }).click()
+  const chart = page.getByRole('img', {
+    name: 'เวลาที่บันทึกแยกตามวันเริ่มเซสชัน'
+  })
+  await expect(chart.locator('path')).toHaveAttribute('d', / L /)
+  await expect(chart.locator('circle')).toHaveCount(0)
+  await expect(chart.locator('rect')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Bar + Line', exact: true }).click()
+  await expect(chart.locator('path')).toHaveAttribute('d', / L /)
+  await expect(chart.locator('path')).not.toHaveAttribute('d', / C /)
+  await expect(chart.locator('circle')).toHaveCount(0)
+  await expect(chart.locator('rect')).toHaveCount(3)
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    await expect(chart).toBeVisible()
+    await expect(
+      page.getByRole('complementary', { name: 'สรุปช่วงเวลา' })
+    ).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true)
+    await testInfo.attach(`line-${width}`, {
+      body: await page.screenshot({ fullPage: true }),
+      contentType: 'image/png'
+    })
+  }
+})
+
 for (const width of [320, 768, 1024, 1440]) {
   test(`history is readable and keyboard-operable at ${width}px`, async ({
     page

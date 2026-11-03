@@ -77,6 +77,73 @@ afterEach(() => {
 })
 
 describe('HistoryPage', () => {
+  it('draws Line and combo modes as straight segments without markers and preserves daily values and bars', async () => {
+    const user = userEvent.setup()
+    const now = new Date(2026, 10, 4, 12).getTime()
+    vi.spyOn(Date, 'now').mockReturnValue(now)
+    renderHistory([
+      session(1, {
+        started_at: new Date(2026, 10, 2).toISOString(),
+        elapsed_seconds: 60
+      }),
+      session(2, {
+        started_at: new Date(2026, 10, 3).toISOString(),
+        elapsed_seconds: 120
+      }),
+      session(3, {
+        started_at: new Date(2026, 10, 3).toISOString(),
+        elapsed_seconds: 180
+      }),
+      session(4, {
+        started_at: new Date(2026, 10, 4).toISOString(),
+        elapsed_seconds: 240
+      })
+    ])
+    const chart = await screen.findByRole('img', {
+      name: i18n.t('analytics.chart')
+    })
+    expect(chart.querySelector('path')).toHaveAttribute(
+      'd',
+      expect.stringMatching(/^M [\d.]+ [\d.]+ L [\d.]+ [\d.]+ L [\d.]+ [\d.]+$/)
+    )
+    expect(chart.querySelectorAll('circle')).toHaveLength(0)
+
+    await user.click(screen.getByRole('button', { name: 'Line' }))
+    expect(chart.querySelector('path')).toHaveAttribute(
+      'd',
+      expect.stringMatching(/^M [\d.]+ [\d.]+ L [\d.]+ [\d.]+ L [\d.]+ [\d.]+$/)
+    )
+    expect(chart.querySelectorAll('circle')).toHaveLength(0)
+    expect(chart.querySelectorAll('rect')).toHaveLength(0)
+    await user.click(screen.getByText(i18n.t('analytics.table')))
+    const rows = within(screen.getByRole('table')).getAllByRole('row')
+    expect(rows).toHaveLength(4)
+    expect(
+      within(rows[2])
+        .getAllByRole('cell')
+        .map((cell) => cell.textContent)
+    ).toEqual(['2', '300'])
+
+    await user.click(screen.getByRole('button', { name: 'Bar + Line' }))
+    expect(chart.querySelector('path')).toHaveAttribute(
+      'd',
+      expect.stringMatching(/^M [\d.]+ [\d.]+ L [\d.]+ [\d.]+ L [\d.]+ [\d.]+$/)
+    )
+    expect(chart.querySelectorAll('circle')).toHaveLength(0)
+    expect(chart.querySelectorAll('rect')).toHaveLength(3)
+  })
+
+  it('keeps a single recorded day visible in Line mode', async () => {
+    const user = userEvent.setup()
+    renderHistory([session(1)])
+    const chart = await screen.findByRole('img', {
+      name: i18n.t('analytics.chart')
+    })
+    await user.click(screen.getByRole('button', { name: 'Line' }))
+    expect(chart.querySelectorAll('circle')).toHaveLength(1)
+    expect(chart.querySelectorAll('rect')).toHaveLength(0)
+  })
+
   it('renders a dedicated history heading instead of analytics', async () => {
     const { request } = renderHistory()
     expect(
