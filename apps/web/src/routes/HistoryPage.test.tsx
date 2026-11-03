@@ -307,10 +307,31 @@ describe('HistoryPage', () => {
     expect(within(summary).getByText('เวลารวม')).toBeVisible()
     expect(within(summary).getByText('เวลาเฉลี่ยต่อเซสชัน')).toBeVisible()
     expect(
+      screen.getByRole('heading', {
+        name: 'ระยะเวลาและกิจกรรมเซสชัน',
+        level: 2
+      })
+    ).toBeVisible()
+    expect(
       screen.getByRole('img', { name: 'เวลาที่บันทึกแยกตามวันเริ่มเซสชัน' })
     ).toBeVisible()
+    expect(screen.getByText('สรุปช่วงเวลา')).toBeVisible()
+    expect(screen.getByText('ระยะเวลาเฉลี่ยต่อครั้ง')).toBeVisible()
+
+    const comboButton = screen.getByRole('button', { name: 'Bar + Line' })
+    const barButton = screen.getByRole('button', { name: 'Bar' })
+    const lineButton = screen.getByRole('button', { name: 'Line' })
+    expect(comboButton).toHaveAttribute('aria-pressed', 'true')
+    await user.click(barButton)
+    expect(barButton).toHaveAttribute('aria-pressed', 'true')
+    expect(comboButton).toHaveAttribute('aria-pressed', 'false')
+    await user.click(lineButton)
+    expect(lineButton).toHaveAttribute('aria-pressed', 'true')
 
     const records = screen.getByRole('region', { name: 'รายการเซสชัน' })
+    expect(
+      within(records).getByPlaceholderText('ค้นหาเซสชัน (วันที่หรือสถานะ)')
+    ).toBeVisible()
     expect(within(records).getByText('เตือนปรับท่าทาง 2 ครั้ง')).toBeVisible()
     expect(within(records).getByText('พัก 1 ครั้ง')).toBeVisible()
 
