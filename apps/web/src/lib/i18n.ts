@@ -16,7 +16,7 @@ const th = {
     systemLoadingBody: 'กำลังโหลดข้อมูลและเตรียมพื้นที่ใช้งานของคุณ',
     loadingProgress: 'ความคืบหน้าการเตรียมระบบ',
     loadingConnect: 'เชื่อมต่อข้อมูล',
-    loadingPrepare: 'เตรียมระบบติดตามท่าทาง',
+    loadingPrepare: 'เตรียมระบบติดตามการนั่ง',
     loadingReady: 'พร้อมใช้งาน',
     loadingWait: 'กรุณารอสักครู่ ระบบจะพร้อมใช้งานในไม่ช้า',
     dataErrorTitle: 'ไม่สามารถโหลดข้อมูลได้',
@@ -29,7 +29,7 @@ const th = {
     cancel: 'ยกเลิก',
     close: 'ปิด',
     delete: 'ลบ',
-    brandSubtitle: 'ระบบติดตามท่าทาง',
+    brandSubtitle: 'ระบบติดตามการนั่ง',
     onDevice: 'ทำงานในอุปกรณ์',
     active: 'ใช้งานอยู่',
     inactive: 'ไม่ใช้งาน',
@@ -127,16 +127,16 @@ const th = {
       earlier: '25 ส.ค. 2569'
     },
     items: {
-      planTitle: 'ข้อเสนอแนะในการปรับท่าทาง',
-      planBody: 'คุณมีข้อเสนอแนะให้ปรับท่าทางเพื่อความสบาย',
+      planTitle: 'ข้อเสนอแนะในการปรับท่านั่ง',
+      planBody: 'คุณมีข้อเสนอแนะให้ปรับท่านั่งเพื่อความสบาย',
       streakTitle: 'คุณใช้งานต่อเนื่องครบ 4 วัน',
       streakBody: 'ดูสรุปความสม่ำเสมอจากกิจกรรมที่คุณบันทึกไว้',
       assistantTitle: 'KineGuide AI มีข้อความใหม่',
       assistantBody: 'สรุปข้อมูลล่าสุดของคุณพร้อมให้ตรวจสอบแล้ว',
       savedTitle: 'บันทึกเซสชันเรียบร้อย',
-      savedBody: 'ระบบบันทึกสรุปการตรวจท่าทางแล้ว',
+      savedBody: 'ระบบบันทึกสรุปการติดตามการนั่งแล้ว',
       cameraTitle: 'ตรวจสอบสิทธิ์การใช้กล้อง',
-      cameraBody: 'อนุญาตให้ใช้กล้องก่อนเริ่มตรวจท่าทาง',
+      cameraBody: 'อนุญาตให้ใช้กล้องก่อนเริ่มติดตามการนั่ง',
       privacyTitle: 'อัปเดตการตั้งค่าความเป็นส่วนตัว',
       privacyBody: 'ระบบบันทึกการเปลี่ยนแปลงการตั้งค่าของคุณเรียบร้อยแล้ว'
     }
@@ -150,12 +150,12 @@ const th = {
       how: 'วิธีใช้งาน',
       capabilities: 'ความสามารถ'
     },
-    eyebrow: 'Real-Time Posture Monitoring',
+    eyebrow: 'Real-Time Sitting Monitoring',
     title:
-      'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ',
+      'ติดตามการนั่งขณะใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ',
     titleAccent: 'ความเป็นส่วน⁠ตัวของคุณ',
     titleRest:
-      'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
+      'ติดตามการนั่งขณะใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับ',
     subtitle:
       'ทดลองกล้องในอุปกรณ์สำหรับติดตามขณะนั่งและตรวจความพร้อมของจุดอ้างอิงแบบเรียลไทม์ โดยไม่อัปโหลดรูปหรือวิดีโอของคุณ',
     start: 'เริ่มติดตามการนั่ง',
@@ -176,9 +176,9 @@ const th = {
       'ภาพจากกล้องอยู่ในหน่วยความจำของเบราว์เซอร์และไม่ถูกส่งไปยังเซิร์ฟเวอร์',
     consentTitle: 'ควบคุมข้อมูลของคุณ',
     consentBody: 'อ่าน ให้ ถอน และตรวจสอบความยินยอมได้จากหน้าตั้งค่าของคุณ',
-    progressTitle: 'ติดตามท่าทางแบบไม่กล่าวอ้างทางคลินิก',
+    progressTitle: 'ติดตามการนั่งแบบไม่กล่าวอ้างทางคลินิก',
     progressBody:
-      'ดูเวลา จำนวนการแจ้งเตือน และระยะเวลาการนั่ง โดยไม่วินิจฉัยโรค',
+      'ดูระยะเวลาเซสชัน จำนวนการแจ้งเตือน และข้อมูลการนั่งที่วัดได้ โดยไม่วินิจฉัยโรค',
     howEyebrow: 'เริ่มต้นอย่างโปร่งใส',
     howTitle: 'เริ่มต้นใช้งานได้ใน 3 ขั้นตอน',
     howBody:
@@ -189,7 +189,7 @@ const th = {
     consentStepTitle: 'อ่านและเลือกความยินยอม',
     consentStepBody:
       'ตรวจสอบการใช้กล้อง การจัดเก็บสรุปเซสชัน และ AI chat แยกตามวัตถุประสงค์',
-    exploreStepTitle: 'เริ่มตรวจท่าทาง',
+    exploreStepTitle: 'เริ่มติดตามการนั่ง',
     exploreStepBody:
       'ยืนยันโหมดนั่งก่อนเปิดกล้องเพื่อตรวจความพร้อมของจุดอ้างอิงและติดตามระยะเวลา',
     capabilitiesEyebrow: 'ขอบเขตของต้นแบบ',
@@ -315,16 +315,16 @@ const th = {
   dashboard: {
     updated: 'อัปเดตล่าสุด {{date}}',
     hello: 'สวัสดี {{name}}',
-    ready: 'พร้อมสำหรับติดตามท่าทางวันนี้หรือยัง?',
+    ready: 'พร้อมสำหรับติดตามการนั่งวันนี้หรือยัง?',
     aiTitle: 'ผู้ช่วยสนทนา KineGuide AI',
     aiStructured: 'คำถามแบบมีโครงสร้าง',
     aiBody: 'วิเคราะห์และอธิบายสถิติการใช้งานหน้าจอของคุณ',
     aiBoundary: 'ผู้ช่วยนี้ไม่วินิจฉัย และไม่สร้างคำแนะนำทางการแพทย์',
     aiStart: 'เริ่มคุยกับ AI',
-    recommended: 'แนะนำให้ติดตามท่าทางเมื่อนั่งหน้าจอนานๆ',
+    recommended: 'แนะนำให้ติดตามการนั่งเมื่อนั่งหน้าจอนานๆ',
     today: 'การติดตามวันนี้',
-    todayName: 'เซสชันติดตามท่าทาง',
-    todayIllustrationAlt: 'ภาพประกอบเซสชันติดตามท่าทาง',
+    todayName: 'เซสชันติดตามการนั่ง',
+    todayIllustrationAlt: 'ภาพประกอบเซสชันติดตามการนั่ง',
     exploreTitle: 'เริ่มติดตามขณะนั่ง',
     exploreBody:
       'เปิดกล้องสำหรับเซสชันขณะนั่ง เพื่อตรวจว่ามองเห็นจุดอ้างอิงที่จำเป็นและติดตามระยะเวลา โดยไม่ประเมินว่าท่านั่งถูกต้อง',
@@ -376,7 +376,7 @@ const th = {
     seatedConfirmationBody:
       'การยืนยันนี้ใช้เฉพาะในหน้านี้และไม่ถูกบันทึก ระบบตรวจเพียงความพร้อมของจุดอ้างอิง ไม่ยืนยันว่าคุณกำลังนั่งหรือท่านั่งถูกต้อง',
     nextSteps:
-      'หลังสร้างเซสชัน กดเปิดกล้องเพื่อตรวจภาพและปรับเทียบท่าอ้างอิง คุณสามารถปรับเทียบใหม่หากเปลี่ยนการตั้งค่ากล้อง',
+      'หลังสร้างเซสชัน กดเปิดกล้องเพื่อตรวจภาพและปรับเทียบท่านั่งอ้างอิง คุณสามารถปรับเทียบใหม่หากเปลี่ยนการตั้งค่ากล้อง',
     start: 'เริ่มติดตามการนั่ง',
     continue: 'เริ่มเซสชันโหมดนั่ง',
     readiness: 'ความพร้อมของระบบ',
@@ -395,10 +395,11 @@ const th = {
   },
   calibration: {
     title: 'การปรับเทียบยังไม่พร้อมใช้งาน',
-    subtitle: 'ต้นแบบนี้ยังไม่มี Baseline ที่ผ่านการตรวจสอบสำหรับประเมินท่าทาง',
+    subtitle:
+      'ต้นแบบนี้ยังไม่มี Baseline ที่ผ่านการตรวจสอบสำหรับประเมินท่านั่ง',
     unavailableTitle: 'ยังไม่มี Baseline ที่ผ่านการตรวจสอบ',
     unavailableBody:
-      'ระบบจะยังไม่บันทึกหรือเปรียบเทียบท่าทางจนกว่าจะมีขั้นตอนปรับเทียบและข้อมูลอ้างอิงที่ตรวจสอบได้',
+      'ระบบจะยังไม่บันทึกหรือเปรียบเทียบท่านั่งจนกว่าจะมีขั้นตอนปรับเทียบและข้อมูลอ้างอิงที่ตรวจสอบได้',
     noBaselineClaim:
       'หน้านี้ไม่สร้างผลการปรับเทียบจำลอง และไม่ถือว่าท่าปัจจุบันเป็นค่ามาตรฐานของผู้ใช้',
     returnToSetup: 'กลับไปตั้งค่ากล้อง',
@@ -446,19 +447,19 @@ const th = {
   },
   session: {
     coverageTitle: 'ระยะเวลาที่ประเมิน',
-    assessedDuration: 'เทียบกับท่าอ้างอิงได้',
+    assessedDuration: 'เทียบกับท่านั่งอ้างอิงได้',
     unobservedDuration: 'ไม่มีข้อมูลที่สังเกตได้',
     coverageBody:
-      'เวลารวมประกอบด้วยเวลาที่เทียบกับท่าอ้างอิงได้ เวลาที่ข้อมูลสังเกตไม่เชื่อถือได้ และเวลาที่เหลือรวมช่วงปรับเทียบหรือข้อมูลขาดหาย',
+      'เวลารวมประกอบด้วยเวลาที่เทียบกับท่านั่งอ้างอิงได้ เวลาที่ข้อมูลสังเกตไม่เชื่อถือได้ และเวลาที่เหลือรวมช่วงปรับเทียบหรือข้อมูลขาดหาย',
     classificationUnavailable:
       'โหมดนั่งเป็นการยืนยันโดยผู้ใช้ ระบบยังไม่ตรวจจับการนั่งหรือยืนอัตโนมัติและไม่สามารถระบุระยะเวลาได้',
     invalidCoverage: 'ไม่สามารถแสดงระยะเวลาการประเมินได้',
     feedbackSuspended: 'หยุดการประเมินชั่วคราว รอข้อมูลกล้องใหม่',
     feedbackStale: 'ข้อมูลกล้องไม่เป็นปัจจุบัน ไม่สามารถประเมินได้',
     calibratingStatus: 'กำลังปรับเทียบ รอข้อมูลกล้อง',
-    goodAlignment: 'ใกล้เคียงท่าอ้างอิง',
+    goodAlignment: 'ใกล้เคียงท่านั่งอ้างอิง',
     noBaseline: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
-    postureStatus: 'สถานะท่าทาง',
+    postureStatus: 'สถานะการนั่ง',
     readings: {
       title: 'ตัวเลขความต่างจาก Baseline',
       explanation:
@@ -492,7 +493,7 @@ const th = {
     observationalDisclaimer:
       'การประเมินนี้เทียบกับ Baseline ส่วนบุคคลของคุณเพื่อส่งเสริมความตระหนักรู้ ไม่ใช่การวินิจฉัยทางการแพทย์',
     feedback: {
-      general: 'เปลี่ยนจากท่าอ้างอิง',
+      general: 'เปลี่ยนจากท่านั่งอ้างอิง',
       forwardHead:
         'สังเกตเห็นการโน้มศีรษะ/คอยื่นเข้าหาจอ — ลองดึงคอกลับให้อยู่ในแนวระดับไหล่',
       slouching:
@@ -510,7 +511,7 @@ const th = {
     resume: 'ตรวจจับต่อ',
     finish: 'จบเซสชัน',
     stop: 'หยุด',
-    poseTitle: 'ข้อมูลท่าทาง',
+    poseTitle: 'ข้อมูลการนั่ง',
     poseIdle: 'ยังไม่ได้เปิดกล้อง',
     poseLoading: 'กำลังโหลดโมเดล...',
     poseReady: 'มองเห็นจุดอ้างอิงสำหรับโหมดนั่งครบ',
@@ -533,9 +534,9 @@ const th = {
     summary: 'สรุปเซสชัน',
     completed: 'บันทึกเซสชัน',
     elapsed: 'เวลาติดตามทั้งหมด',
-    summaryUnavailableTitle: 'ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้',
+    summaryUnavailableTitle: 'ไม่มีผลวิเคราะห์การนั่งสำหรับเซสชันนี้',
     summaryUnavailableBody:
-      'ระบบบันทึกเฉพาะระยะเวลาของเซสชัน และยังไม่แสดงผลท่าทางจนกว่าจะมีวิธีวัดที่ตรวจสอบได้และผ่านการทบทวน',
+      'ระบบบันทึกเฉพาะระยะเวลาของเซสชัน และยังไม่แสดงผลการนั่งจนกว่าจะมีวิธีวัดที่ตรวจสอบได้และผ่านการทบทวน',
     backHome: 'กลับหน้าหลัก',
     viewHistory: 'ดูสถิติ',
     saveFailed: 'บันทึกเซสชันไม่สำเร็จ',
@@ -545,7 +546,7 @@ const th = {
       'โหมดนี้ถูกเลือกโดยผู้ใช้ กล้องตรวจเฉพาะการมองเห็นจุดอ้างอิง ไม่ยืนยันว่ากำลังนั่งหรือท่านั่งถูกต้อง',
     technicalStatus: 'สถานะการตรวจจับ',
     technicalStatusBody:
-      'สถานะนี้สะท้อนคุณภาพการตรวจจับสำหรับการตั้งค่าขณะนั่ง ไม่ใช่ผลว่าท่าทางดีหรือไม่ดี',
+      'สถานะนี้สะท้อนคุณภาพการตรวจจับสำหรับการตั้งค่าขณะนั่ง ไม่ใช่ผลว่าท่านั่งดีหรือไม่ดี',
     baselineTitle: 'Baseline',
     baselineUnavailable: 'ยังไม่มี Baseline สำหรับเปรียบเทียบ',
     baselineUnavailableBody:
@@ -557,12 +558,12 @@ const th = {
     activityStanding: 'ยืน',
     activityTransitioning: 'กำลังเปลี่ยนท่า',
     activityUnknown: 'ไม่ระบุ',
-    stateGood: 'ใกล้เคียงท่าอ้างอิง',
-    stateNeedsAdjust: 'เปลี่ยนจากท่าอ้างอิง',
+    stateGood: 'ใกล้เคียงท่านั่งอ้างอิง',
+    stateNeedsAdjust: 'เปลี่ยนจากท่านั่งอ้างอิง',
     stateLowConfidence: 'ความมั่นใจต่ำ',
     stateUnable: 'ไม่สามารถประเมินได้',
-    goodAlignmentDuration: 'ระยะเวลาใกล้เคียงท่าอ้างอิง',
-    needsAdjustmentDuration: 'ระยะเวลาเปลี่ยนจากท่าอ้างอิง',
+    goodAlignmentDuration: 'ระยะเวลาใกล้เคียงท่านั่งอ้างอิง',
+    needsAdjustmentDuration: 'ระยะเวลาเปลี่ยนจากท่านั่งอ้างอิง',
     alertCount: 'จำนวนการแจ้งเตือน',
     breakCount: 'จำนวนการหยุดพัก',
     breakDueTitle: 'ถึงเวลาพักสายตาและปรับเปลี่ยนอิริยาบถ',
@@ -582,7 +583,7 @@ const th = {
     speech: {
       breakDue:
         'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากใช้งานเซสชันต่อเนื่องครบ {{minutes}} นาที',
-      calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานท่านั่งเรียบร้อยแล้ว',
       calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
       calibrationReason: {
         tooClose: 'อยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
@@ -596,7 +597,7 @@ const th = {
           'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
       },
       posture: {
-        goodAlignment: 'ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว',
+        goodAlignment: 'ท่านั่งกลับมาใกล้เคียงท่านั่งอ้างอิงแล้ว',
         forwardHead:
           'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
         slouching:
@@ -610,7 +611,7 @@ const th = {
         eyeShoulderDistanceRatio:
           'สังเกตเห็นการโน้มศีรษะหรือลำตัวเข้าหาหน้าจอ ลองปรับท่านั่งให้อยู่ในแนวปกติ',
         general:
-          'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
+          'สังเกตเห็นการเปลี่ยนแปลงท่านั่งต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
       },
       camera: {
         tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
@@ -628,7 +629,7 @@ const th = {
     title: 'ประวัติเซสชัน',
     subtitle: 'เฉพาะ session summary ที่คุณอนุญาตให้จัดเก็บ',
     scope:
-      'แสดงได้สูงสุด 50 เซสชันล่าสุดที่ API ส่งกลับ เรียงจากใหม่ไปเก่า ช่วงวันนับรวมวันนี้ตามเวลาของอุปกรณ์ ระยะเวลาเป็นเวลาที่บันทึก ไม่ใช่เวลาที่ประเมินท่าทางได้ทั้งหมด',
+      'แสดงได้สูงสุด 50 เซสชันล่าสุดที่ API ส่งกลับ เรียงจากใหม่ไปเก่า ช่วงวันนับรวมวันนี้ตามเวลาของอุปกรณ์ ระยะเวลาเป็นเวลาที่บันทึก ไม่ใช่เวลาที่ประเมินท่านั่งได้ทั้งหมด',
     records: 'รายการเซสชัน',
     sessionName: 'เซสชันที่บันทึก',
     identifier: 'รหัส {{id}}',
@@ -666,7 +667,7 @@ const th = {
     viewAll: 'ทั้งหมด (สถิติและประวัติ)',
     viewAnalytics: 'เฉพาะสถิติ',
     viewRecords: 'เฉพาะรายการเซสชัน',
-    alertBadge: 'เตือนปรับท่าทาง {{count}} ครั้ง',
+    alertBadge: 'เตือนปรับท่านั่ง {{count}} ครั้ง',
     breakBadge: 'พัก {{count}} ครั้ง',
     recentSessionsBadge: '{{count}} เซสชัน',
     chartTitle: 'ระยะเวลาและกิจกรรมเซสชัน',
@@ -686,8 +687,8 @@ const th = {
     searchPlaceholder: 'ค้นหาเซสชัน (วันที่หรือสถานะ)'
   },
   progress: {
-    title: 'สถิติท่าทาง',
-    subtitle: 'แผนภูมินี้แสดงระยะเวลาและสัดส่วนท่าทางเท่านั้น ไม่วินิจฉัยโรค',
+    title: 'สถิติการนั่ง',
+    subtitle: 'แผนภูมินี้แสดงระยะเวลาและสัดส่วนท่านั่งเท่านั้น ไม่วินิจฉัยโรค',
     sessions: 'จำนวนเซสชัน',
     time: 'เวลารวม',
     streak: 'ทำต่อเนื่อง',
@@ -729,7 +730,7 @@ const th = {
     formula:
       'แหล่งข้อมูล GET /sessions ใช้ elapsed_seconds หน่วยวินาที จำนวนเซสชันคือจำนวนรายการที่สิ้นสุดและตรงตัวกรอง เวลารวมคือผลบวกระยะเวลา เวลาเฉลี่ยคือเวลารวมหารจำนวนเซสชัน ปัดเป็นวินาทีใกล้ที่สุด ช่วง 7/30/90 วันรวมวันนี้และวันก่อนหน้าตามเวลาท้องถิ่นของอุปกรณ์ ยึดวันที่เริ่มเซสชัน และนับระยะเวลาทั้งหมดไว้ในวันเริ่มแม้ข้ามเที่ยงคืน',
     missing:
-      'เซสชันที่ไม่มีข้อมูลวัดท่าทางยังนับระยะเวลาที่บันทึกได้ แต่ไม่เติมสัดส่วนท่าทาง คะแนน หรือค่าที่ไม่เคยวัดขึ้นเอง ศูนย์วินาทีที่บันทึกจริงต่างจากยังไม่มีข้อมูล',
+      'เซสชันที่ไม่มีข้อมูลวัดท่านั่งยังนับระยะเวลาที่บันทึกได้ แต่ไม่เติมสัดส่วนท่านั่ง คะแนน หรือค่าที่ไม่เคยวัดขึ้นเอง ศูนย์วินาทีที่บันทึกจริงต่างจากยังไม่มีข้อมูล',
     references: 'แหล่งอ้างอิงการแสดงข้อมูล',
     referenceText: 'W3C WAI: ข้อมูลข้อความและตารางทดแทนกราฟ (เปิดแท็บใหม่)',
     referenceScale: 'ONS: กราฟแท่งและแกนเริ่มที่ศูนย์ (เปิดแท็บใหม่)',
@@ -796,7 +797,7 @@ const th = {
     breakInterval: 'ช่วงเวลาแจ้งเตือน (นาที)',
     soundTitle: 'การแจ้งเตือนด้วยเสียง',
     soundBody:
-      'ควบคุมเสียงพูดแนะนำและเสียงสัญญาณระหว่างเซสชันติดตามท่าทาง การตั้งค่านี้เก็บเฉพาะในเบราว์เซอร์ของคุณ',
+      'ควบคุมเสียงพูดแนะนำและเสียงสัญญาณระหว่างเซสชันติดตามการนั่ง การตั้งค่านี้เก็บเฉพาะในเบราว์เซอร์ของคุณ',
     soundEnable: 'เปิดใช้เสียงแจ้งเตือนระหว่างเซสชัน',
     soundEnableBody:
       'ใช้เสียงเสริมข้อความบนหน้าจอ โดยไม่ส่งข้อมูลเสียงหรือภาพออกจากอุปกรณ์',
@@ -931,7 +932,7 @@ const en: typeof th = {
     systemLoadingBody: 'Loading your data and preparing your workspace',
     loadingProgress: 'System preparation progress',
     loadingConnect: 'Connect data',
-    loadingPrepare: 'Prepare posture monitoring',
+    loadingPrepare: 'Prepare sitting monitoring',
     loadingReady: 'Ready to use',
     loadingWait: 'Please wait. The system will be ready shortly.',
     dataErrorTitle: 'Unable to load data',
@@ -944,7 +945,7 @@ const en: typeof th = {
     cancel: 'Cancel',
     close: 'Close',
     delete: 'Delete',
-    brandSubtitle: 'Posture Monitoring',
+    brandSubtitle: 'Sitting Monitoring',
     onDevice: 'On-device',
     active: 'Active',
     inactive: 'Inactive',
@@ -1042,15 +1043,15 @@ const en: typeof th = {
       earlier: '25 Aug 2026'
     },
     items: {
-      planTitle: 'Posture adjustment suggestion',
+      planTitle: 'Seated alignment adjustment suggestion',
       planBody:
-        'You have a suggestion to adjust your posture for better comfort.',
+        'You have a suggestion to adjust your seated position for better comfort.',
       streakTitle: 'You have used the system 4 days in a row',
       streakBody: 'Review consistency based on the activity you recorded.',
       assistantTitle: 'KineGuide AI has a new message',
       assistantBody: 'Your latest information summary is ready to review.',
       savedTitle: 'Session recorded',
-      savedBody: 'Your posture monitoring session summary was saved.',
+      savedBody: 'Your sitting monitoring session summary was saved.',
       cameraTitle: 'Check camera permission',
       cameraBody: 'Allow camera access before starting monitoring.',
       privacyTitle: 'Privacy settings updated',
@@ -1066,10 +1067,10 @@ const en: typeof th = {
       how: 'How it works',
       capabilities: 'Capabilities'
     },
-    eyebrow: 'Real-Time Posture Monitoring',
-    title: 'Monitor your posture confidently with privacy-first support',
+    eyebrow: 'Real-Time Sitting Monitoring',
+    title: 'Monitor your sitting confidently with privacy-first support',
     titleAccent: 'privacy-first support',
-    titleRest: 'Monitor your posture confidently with',
+    titleRest: 'Monitor your sitting confidently with',
     subtitle:
       'Try an on-device seated monitoring flow and check landmark visibility in real time without uploading photos or video.',
     start: 'Start seated monitoring',
@@ -1090,9 +1091,9 @@ const en: typeof th = {
       'Camera frames stay in browser memory and are never sent to the server.',
     consentTitle: 'Control your data',
     consentBody: 'Read, give, withdraw, and review consent from your settings.',
-    progressTitle: 'Non-clinical posture tracking',
+    progressTitle: 'Non-clinical sitting tracking',
     progressBody:
-      'Review duration, break counts, and posture stats without medical diagnosis.',
+      'Review session duration, alert counts, and available seated alignment data without medical diagnosis.',
     howEyebrow: 'A transparent start',
     howTitle: 'Get started in 3 steps',
     howBody:
@@ -1112,7 +1113,7 @@ const en: typeof th = {
       'Tools for ergonomic awareness and monitoring—not a personalized treatment plan.',
     movementTitle: 'Real-time seated monitoring',
     movementBody:
-      'Check landmark visibility for a user-selected seated mode without claiming that sitting posture is correct.',
+      'Check landmark visibility for a user-selected seated mode without claiming that seated alignment is correct.',
     aiTitle: 'Talk with a bounded AI assistant',
     aiBody:
       'Use it for general support information. Answers may be incomplete and do not replace qualified advice.',
@@ -1140,7 +1141,7 @@ const en: typeof th = {
       'For an emergency, contact your local emergency service. This system does not provide emergency guidance.',
     finalTitle: 'Ready to explore with clear boundaries?',
     finalBody:
-      'Create an account, review consent details, and start monitoring your posture.',
+      'Create an account, review consent details, and start monitoring your sitting.',
     finalAction: 'Create an account to begin',
     footerNav: 'Website footer information',
     footerHow: 'Getting started',
@@ -1211,7 +1212,7 @@ const en: typeof th = {
     empty: 'No conversations yet. Start one when you are ready.',
     startPrompt: 'Try asking, “Can you summarize my sitting time this week?”',
     messageLabel: 'Message to KineGuide AI',
-    placeholder: 'Try: How can I improve my sitting posture?',
+    placeholder: 'Try: How can I improve my seated alignment?',
     composerHint: 'Press Enter to send, or Shift and Enter for a new line.',
     messageRequired: 'Enter a message of no more than 4,000 characters.',
     send: 'Send message',
@@ -1232,20 +1233,20 @@ const en: typeof th = {
   dashboard: {
     updated: 'Last updated {{date}}',
     hello: 'Hello {{name}}',
-    ready: 'Ready to monitor your posture today?',
+    ready: 'Ready to monitor your sitting today?',
     aiTitle: 'KineGuide AI conversation assistant',
     aiStructured: 'Structured questions',
-    aiBody: 'Analyze and understand your screen time and posture statistics.',
+    aiBody: 'Analyze and understand your screen time and sitting statistics.',
     aiBoundary:
       'This assistant does not diagnose or generate medical treatment guidance.',
     aiStart: 'Start AI chat',
     recommended: 'Recommended when sitting for long periods',
     today: 'Today’s monitoring',
-    todayName: 'Posture Monitoring Session',
-    todayIllustrationAlt: 'Posture monitoring session illustration',
+    todayName: 'Sitting Monitoring Session',
+    todayIllustrationAlt: 'Sitting monitoring session illustration',
     exploreTitle: 'Start Seated Monitoring',
     exploreBody:
-      'Use the camera during a seated session to check required landmark visibility and track duration without assessing posture correctness.',
+      'Use the camera during a seated session to check required landmark visibility and track duration without assessing seated alignment correctness.',
     viewDetails: 'View details',
     completed: 'Completed sessions',
     start: 'Start seated monitoring',
@@ -1293,9 +1294,9 @@ const en: typeof th = {
     seatedConfirmation:
       'I will use the camera while seated and frame the required landmarks as instructed',
     seatedConfirmationBody:
-      'This confirmation stays on this page and is not stored. The system checks landmark visibility only; it does not confirm that you are seated or that your posture is correct.',
+      'This confirmation stays on this page and is not stored. The system checks landmark visibility only; it does not confirm that you are seated or that your seated alignment is correct.',
     nextSteps:
-      'After creating the session, start the camera to check the view and calibrate your reference posture. Recalibrate if the camera setup changes.',
+      'After creating the session, start the camera to check the view and calibrate your reference seated alignment. Recalibrate if the camera setup changes.',
     start: 'Start seated monitoring',
     continue: 'Start seated session',
     readiness: 'System readiness',
@@ -1316,10 +1317,10 @@ const en: typeof th = {
   calibration: {
     title: 'Calibration is not available yet',
     subtitle:
-      'This prototype does not yet have a validated baseline for posture assessment.',
+      'This prototype does not yet have a validated baseline for assessment of seated alignment.',
     unavailableTitle: 'No validated baseline is available',
     unavailableBody:
-      'The system will not capture or compare posture until a verifiable calibration process and approved reference data are available.',
+      'The system will not capture or compare seated alignment until a verifiable calibration process and approved reference data are available.',
     noBaselineClaim:
       'This page does not simulate calibration or treat the current pose as the user’s baseline.',
     returnToSetup: 'Return to camera setup',
@@ -1357,7 +1358,7 @@ const en: typeof th = {
     reasonTilted: 'Camera angle is tilted. Please level your camera.',
     reasonHeadCropped: 'Head is cut off at the top. Please tilt camera up.',
     notCalibratedHint:
-      'Sit upright in your normal working posture and calibrate to establish your personal baseline.'
+      'Sit upright in your usual seated position for work and calibrate to establish your personal baseline.'
   },
   camera: {
     tooClose: 'You are too close to the camera. Please step back slightly.',
@@ -1369,7 +1370,7 @@ const en: typeof th = {
   },
   session: {
     coverageTitle: 'Assessment coverage',
-    assessedDuration: 'Compared with reference posture',
+    assessedDuration: 'Compared with reference seated alignment',
     unobservedDuration: 'Unobserved time',
     coverageBody:
       'Total time includes baseline-compared time, unreliable observed time, and the remainder including calibration and gaps.',
@@ -1379,9 +1380,9 @@ const en: typeof th = {
     feedbackSuspended: 'Assessment paused, awaiting new camera frames',
     feedbackStale: 'Camera data is stale and cannot be assessed',
     calibratingStatus: 'Calibrating, awaiting camera data',
-    goodAlignment: 'Similar to reference posture',
+    goodAlignment: 'Similar to reference seated alignment',
     noBaseline: 'Personal baseline not established',
-    postureStatus: 'Posture Status',
+    postureStatus: 'Sitting Status',
     readings: {
       title: 'Numeric differences from Baseline',
       explanation:
@@ -1416,9 +1417,9 @@ const en: typeof th = {
     observationalDisclaimer:
       'This observational assessment compares with your personal baseline for ergonomic awareness and is not a medical diagnosis.',
     feedback: {
-      general: 'Changed from reference posture',
+      general: 'Changed from reference seated alignment',
       forwardHead:
-        'Forward head posture observed — gently pull your head back in line with your shoulders.',
+        'Forward head position observed — gently pull your head back in line with your shoulders.',
       slouching:
         'Slouching or rounded shoulders observed — gently lift your chest and roll shoulders back.',
       shoulderSlopeDegrees:
@@ -1427,7 +1428,7 @@ const en: typeof th = {
       torsoInclinationDegrees:
         'Sustained torso inclination observed relative to baseline',
       eyeShoulderDistanceRatio:
-        'Sustained forward head posture observed relative to baseline'
+        'Sustained forward head position observed relative to baseline'
     },
     live: 'Live Seated Monitoring',
     technicalOnly: 'Technical seated mode, not a clinical assessment',
@@ -1436,7 +1437,7 @@ const en: typeof th = {
     resume: 'Resume',
     finish: 'Finish Session',
     stop: 'Stop',
-    poseTitle: 'Posture Data',
+    poseTitle: 'Sitting Data',
     poseIdle: 'Camera is not started',
     poseLoading: 'Loading model...',
     poseReady: 'Seated-mode landmarks are visible',
@@ -1462,19 +1463,19 @@ const en: typeof th = {
     completed: 'Session saved',
     elapsed: 'Total duration',
     summaryUnavailableTitle:
-      'No posture analysis is available for this session',
+      'No sitting analysis is available for this session',
     summaryUnavailableBody:
-      'Only the session duration was recorded. Posture results remain unavailable until a verifiable, reviewed measurement method exists.',
+      'Only the session duration was recorded. Sitting results remain unavailable until a verifiable, reviewed measurement method exists.',
     backHome: 'Back to Dashboard',
     viewHistory: 'View Analytics',
     saveFailed: 'Failed to save session',
     currentActivity: 'Session mode',
     technicalSession: 'Seated monitoring mode',
     technicalSessionBody:
-      'The user selected this mode. The camera checks landmark visibility only; it does not confirm that the user is seated or that posture is correct.',
+      'The user selected this mode. The camera checks landmark visibility only; it does not confirm that the user is seated or that seated alignment is correct.',
     technicalStatus: 'Detection status',
     technicalStatusBody:
-      'This status describes detection quality for the seated setup, not whether posture is good or bad.',
+      'This status describes detection quality for the seated setup, not whether seated alignment is good or bad.',
     baselineTitle: 'Baseline',
     baselineUnavailable: 'No baseline is available for comparison',
     baselineUnavailableBody:
@@ -1487,12 +1488,12 @@ const en: typeof th = {
     activityStanding: 'Standing',
     activityTransitioning: 'Transitioning',
     activityUnknown: 'Unknown',
-    stateGood: 'Similar to reference posture',
-    stateNeedsAdjust: 'Changed from reference posture',
+    stateGood: 'Similar to reference seated alignment',
+    stateNeedsAdjust: 'Changed from reference seated alignment',
     stateLowConfidence: 'Low Confidence',
     stateUnable: 'Unable to Assess',
-    goodAlignmentDuration: 'Time similar to reference posture',
-    needsAdjustmentDuration: 'Time changed from reference posture',
+    goodAlignmentDuration: 'Time similar to reference seated alignment',
+    needsAdjustmentDuration: 'Time changed from reference seated alignment',
     alertCount: 'Alert Count',
     breakCount: 'Break Count',
     breakDueTitle: 'Time for an ergonomic break',
@@ -1512,7 +1513,7 @@ const en: typeof th = {
     speech: {
       breakDue:
         'ถึงเวลาพักสายตาและเปลี่ยนอิริยาบถแล้ว หลังจากใช้งานเซสชันต่อเนื่องครบ {{minutes}} นาที',
-      calibrationSuccess: 'บันทึกค่ามาตรฐานท่าทางเรียบร้อยแล้ว',
+      calibrationSuccess: 'บันทึกค่ามาตรฐานท่านั่งเรียบร้อยแล้ว',
       calibrationFailed: 'การปรับเทียบค่ามาตรฐานไม่สำเร็จ เนื่องจาก{{reason}}',
       calibrationReason: {
         tooClose: 'อยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
@@ -1526,7 +1527,7 @@ const en: typeof th = {
           'ตรวจพบจุดอ้างอิงไม่ต่อเนื่อง กรุณานั่งนิ่งในท่าปกติแล้วลองใหม่'
       },
       posture: {
-        goodAlignment: 'ท่าทางกลับมาใกล้เคียงท่าอ้างอิงแล้ว',
+        goodAlignment: 'ท่านั่งกลับมาใกล้เคียงท่านั่งอ้างอิงแล้ว',
         forwardHead:
           'สังเกตเห็นศีรษะหรือคอยื่นเข้าหาหน้าจอ ลองขยับคอกลับให้อยู่ในแนวระดับไหล่',
         slouching:
@@ -1540,7 +1541,7 @@ const en: typeof th = {
         eyeShoulderDistanceRatio:
           'สังเกตเห็นการโน้มศีรษะหรือลำตัวเข้าหาหน้าจอ ลองปรับท่านั่งให้อยู่ในแนวปกติ',
         general:
-          'สังเกตเห็นการเปลี่ยนแปลงท่าทางต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
+          'สังเกตเห็นการเปลี่ยนแปลงท่านั่งต่อเนื่องจากค่ามาตรฐาน ลองขยับปรับท่านั่งเล็กน้อย'
       },
       camera: {
         tooClose: 'คุณอยู่ใกล้กล้องเกินไป กรุณาขยับถอยห่างออกมาเล็กน้อย',
@@ -1558,7 +1559,7 @@ const en: typeof th = {
     title: 'Session history',
     subtitle: 'Only session summaries you consented to store',
     scope:
-      'Shows up to the latest 50 sessions returned by the API, newest first. Date ranges include today in your device time zone. Saved duration is not the total time for which posture could be assessed.',
+      'Shows up to the latest 50 sessions returned by the API, newest first. Date ranges include today in your device time zone. Saved duration is not the total time for which seated alignment could be assessed.',
     records: 'Session records',
     sessionName: 'Recorded session',
     identifier: 'ID {{id}}',
@@ -1596,7 +1597,7 @@ const en: typeof th = {
     viewAll: 'All (analytics & history)',
     viewAnalytics: 'Analytics only',
     viewRecords: 'Session records only',
-    alertBadge: '{{count}} posture alerts',
+    alertBadge: '{{count}} seated alignment alerts',
     breakBadge: '{{count}} breaks',
     recentSessionsBadge: '{{count}} sessions',
     chartTitle: 'Session duration & activity',
@@ -1616,8 +1617,9 @@ const en: typeof th = {
     searchPlaceholder: 'Search sessions (date or status)'
   },
   progress: {
-    title: 'Posture Analytics',
-    subtitle: 'This chart shows time and posture ratios only, not a diagnosis.',
+    title: 'Sitting Analytics',
+    subtitle:
+      'This chart shows time and seated alignment ratios only, not a diagnosis.',
     sessions: 'Total sessions',
     time: 'Total time',
     streak: 'Streak',
@@ -1658,7 +1660,7 @@ const en: typeof th = {
     formula:
       'Source: GET /sessions, elapsed_seconds in seconds. Session count includes ended records matching the filters. Total duration is their sum; the mean is total duration divided by session count, rounded to the nearest second. The 7/30/90-day ranges include today and the preceding local calendar days on this device, based on session start time. The full duration belongs to the start day even when a session crosses midnight.',
     missing:
-      'Sessions without posture measurements still contribute recorded duration. Unmeasured posture ratios, scores and values are not invented. A recorded zero-second session is different from no data.',
+      'Sessions without seated alignment measurements still contribute recorded duration. Unmeasured seated alignment ratios, scores and values are not invented. A recorded zero-second session is different from no data.',
     references: 'Data presentation references',
     referenceText:
       'W3C WAI: Text and table alternatives for charts (opens a new tab)',
@@ -1738,7 +1740,7 @@ const en: typeof th = {
       'Plays short synthesized tones per alert category without spoken voice.',
     soundVolume: 'Alert volume ({{percent}}%)',
     soundEventsLabel: 'Events with sound alerts',
-    soundEventPosture: 'Posture adjustment after sustained deviation',
+    soundEventPosture: 'Seated alignment adjustment after sustained deviation',
     soundEventBreak: 'Ergonomic break reminder',
     soundEventCalibration: 'Baseline calibration status',
     soundEventFraming: 'Sustained camera framing issue',
@@ -1779,7 +1781,7 @@ const en: typeof th = {
       framing: {
         question: 'Why is confidence low or assessment unavailable?',
         answer:
-          'Check lighting and include the landmarks required for your framing mode. Missing results do not mean good posture. Wait for detection readiness before recalibrating.'
+          'Check lighting and include the landmarks required for your framing mode. Missing results do not mean good seated alignment. Wait for detection readiness before recalibrating.'
       },
       baseline: {
         question: 'When should I recalibrate?',
@@ -1812,7 +1814,7 @@ const en: typeof th = {
     openMonitorAction: 'Open camera setup check',
     statesTitle: 'Meaning of monitoring states',
     statesBody:
-      'All states represent technical comparisons against your personal baseline in the active session, not a medical diagnosis or clinical posture verdict.',
+      'All states represent technical comparisons against your personal baseline in the active session, not a medical diagnosis or clinical assessment of seated alignment.',
     stateGoodTitle: 'Good alignment',
     stateGoodBody:
       'Your head and torso position remain close to the personal baseline captured at the start of the session.',
@@ -1824,7 +1826,7 @@ const en: typeof th = {
       'Lighting is insufficient, required landmarks are out of frame, or multiple people are detected. Assessment pauses honestly without inventing results.',
     remindersTitle: 'Break reminders and sound alerts',
     remindersBody:
-      'You can enable Thai voice guidance (TTS) or gentle chimes for break reminders and sustained posture adjustments while keeping all audio and camera processing in your browser.',
+      'You can enable Thai voice guidance (TTS) or gentle chimes for break reminders and sustained seated alignment adjustments while keeping all audio and camera processing in your browser.',
     openSettingsAction: 'Configure sound and alerts'
   },
   status: 'System status',

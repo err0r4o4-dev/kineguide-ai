@@ -180,7 +180,7 @@ test('history paginates, filters, refreshes, and opens the matching summary', as
   await section.getByRole('link').click()
   await expect(page).toHaveURL(/summary\/864cb7ae-64dd-4db4-8200-000000000000$/)
   await expect(
-    page.getByRole('heading', { name: 'เซสชันติดตามท่าทาง', level: 1 })
+    page.getByRole('heading', { name: 'เซสชันติดตามการนั่ง', level: 1 })
   ).toBeVisible()
   await expect(page.getByText('ยังไม่จบเซสชัน', { exact: true })).toBeVisible()
   await expect(page.getByText('หยุดก่อนเสร็จ', { exact: true })).toHaveCount(0)
@@ -229,6 +229,6 @@ test('history shows an empty state without invented records', async ({
     page.getByRole('region', { name: 'รายการเซสชัน' }).getByRole('listitem')
   ).toHaveCount(0)
   await expect(
-    page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true })
+    page.getByRole('link', { name: 'เริ่มติดตามการนั่ง', exact: true })
   ).toHaveAttribute('href', '/app/monitor')
 })

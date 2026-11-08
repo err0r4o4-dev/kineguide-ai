@@ -299,7 +299,7 @@ describe('ProgressPage', () => {
     renderRoute()
     await summaryRegion()
     const list = screen.getByRole('region', { name: 'ประวัติเซสชัน' })
-    expect(within(list).getByText('เตือนปรับท่าทาง 3 ครั้ง')).toBeVisible()
+    expect(within(list).getByText('เตือนปรับท่านั่ง 3 ครั้ง')).toBeVisible()
     expect(within(list).getByText('พัก 2 ครั้ง')).toBeVisible()
 
     await user.selectOptions(

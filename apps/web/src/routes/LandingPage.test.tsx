@@ -17,7 +17,7 @@ vi.mock('@/lib/navigation', () => ({
 }))
 
 describe('LandingPage', () => {
-  it('highlights privacy and Posture Monitoring capabilities', async () => {
+  it('highlights privacy and Sitting Monitoring capabilities', async () => {
     await i18n.changeLanguage('th')
     userMock.mockReturnValue(null)
     render(
@@ -28,11 +28,11 @@ describe('LandingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'ปรับท่าทางการใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ'
+        name: 'ติดตามการนั่งขณะใช้งานหน้าจออย่างมั่นใจ ด้วยผู้ช่วยที่ให้ความสำคัญกับความเป็นส่วน⁠ตัวของคุณ'
       })
     ).toBeInTheDocument()
 
-    expect(screen.getByText('Real-Time Posture Monitoring')).toBeVisible()
+    expect(screen.getByText('Real-Time Sitting Monitoring')).toBeVisible()
     expect(
       screen.getByText(/ติดตามขณะนั่งและตรวจความพร้อมของจุดอ้างอิง/)
     ).toBeVisible()

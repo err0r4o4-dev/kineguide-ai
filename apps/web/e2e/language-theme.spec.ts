@@ -17,6 +17,14 @@ for (const scenario of [
         'lang',
         scenario.expected
       )
+      await expect(page.locator('header')).toContainText(
+        scenario.expected === 'th' ? 'ระบบติดตามการนั่ง' : 'Sitting Monitoring'
+      )
+      await expect(page.locator('main')).toContainText(
+        scenario.expected === 'th'
+          ? 'ติดตามการนั่งขณะใช้งานหน้าจออย่างมั่นใจ'
+          : 'Monitor your sitting confidently'
+      )
       await expect(
         page.getByRole('button', {
           name: scenario.expected === 'th' ? 'ไทย' : 'English',

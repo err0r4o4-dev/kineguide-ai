@@ -132,13 +132,13 @@ describe('SessionSummaryPage', () => {
     renderRoute()
 
     expect(
-      await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
+      await screen.findByRole('heading', { name: 'เซสชันติดตามการนั่ง' })
     ).toBeVisible()
     expect(screen.getByText('เสร็จสิ้น')).toBeVisible()
 
     expect(screen.getByText('1h 0m')).toBeVisible()
     expect(
-      screen.getByText('ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้')
+      screen.getByText('ไม่มีผลวิเคราะห์การนั่งสำหรับเซสชันนี้')
     ).toBeVisible()
     expect(screen.queryByText('อยู่ในเกณฑ์ดี')).not.toBeInTheDocument()
     expect(screen.queryByText('จำนวนการแจ้งเตือน')).not.toBeInTheDocument()
@@ -172,7 +172,7 @@ describe('SessionSummaryPage', () => {
     renderRoute()
 
     expect(
-      await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
+      await screen.findByRole('heading', { name: 'เซสชันติดตามการนั่ง' })
     ).toBeVisible()
     expect(screen.getByText(label)).toBeVisible()
     if (status === 'active') {
@@ -212,16 +212,16 @@ describe('SessionSummaryPage', () => {
     renderRoute()
 
     expect(
-      await screen.findByRole('heading', { name: 'เซสชันติดตามท่าทาง' })
+      await screen.findByRole('heading', { name: 'เซสชันติดตามการนั่ง' })
     ).toBeVisible()
-    expect(screen.getByText('สถานะท่าทาง')).toBeVisible()
+    expect(screen.getByText('สถานะการนั่ง')).toBeVisible()
     expect(screen.getByText('มุมมองส่วนบน (ไหล่/ศีรษะ)')).toBeVisible()
     expect(screen.getByText('40:00')).toBeVisible() // 2400s
     expect(screen.getByText('15:00')).toBeVisible() // 900s
     expect(screen.getByText('4')).toBeVisible() // alert_count
     expect(screen.getByText('2')).toBeVisible() // break_count
     expect(
-      screen.queryByText('ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้')
+      screen.queryByText('ไม่มีผลวิเคราะห์การนั่งสำหรับเซสชันนี้')
     ).not.toBeInTheDocument()
   })
 })

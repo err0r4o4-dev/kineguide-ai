@@ -32,7 +32,7 @@ describe('NotificationsPage', () => {
       screen.getByText(/ระบบจะไม่สร้างเหตุการณ์ตัวอย่างแทนข้อมูลจริง/)
     ).toBeVisible()
     expect(
-      screen.queryByText('ข้อเสนอแนะในการปรับท่าทาง')
+      screen.queryByText('ข้อเสนอแนะในการปรับท่านั่ง')
     ).not.toBeInTheDocument()
   })
 })

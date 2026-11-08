@@ -399,7 +399,7 @@ describe('HistoryPage', () => {
     expect(
       within(records).getByPlaceholderText('ค้นหาเซสชัน (วันที่หรือสถานะ)')
     ).toBeVisible()
-    expect(within(records).getByText('เตือนปรับท่าทาง 2 ครั้ง')).toBeVisible()
+    expect(within(records).getByText('เตือนปรับท่านั่ง 2 ครั้ง')).toBeVisible()
     expect(within(records).getByText('พัก 1 ครั้ง')).toBeVisible()
 
     await user.click(screen.getByRole('button', { name: 'เฉพาะรายการเซสชัน' }))

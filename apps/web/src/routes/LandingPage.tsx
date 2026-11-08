@@ -98,7 +98,7 @@ export function LandingPage() {
           className="relative isolate scroll-mt-28 overflow-hidden"
           id="landing-home"
         >
-          <div className="kg-landing-content mx-auto grid items-center gap-10 pb-10 pt-10 sm:pb-12 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:py-16">
+          <div className="kg-landing-content mx-auto grid grid-cols-1 items-center gap-10 pb-10 pt-10 sm:pb-12 sm:pt-14 lg:grid-cols-[1fr_auto] lg:gap-16 lg:py-16">
             <div className="min-w-0 lg:py-2">
               <p className="inline-flex min-h-9 items-center rounded-xl border border-teal-100/80 bg-cyan-50/80 px-4 text-sm font-semibold text-teal-700 shadow-sm shadow-teal-900/[0.03]">
                 {t('landing.eyebrow')}
@@ -133,7 +133,7 @@ export function LandingPage() {
               aria-labelledby="camera-preview-title"
               className="kg-landing-camera-panel mx-auto w-full max-w-[27rem] p-3 sm:p-4 xl:max-w-[32rem]"
             >
-              <div className="kg-landing-camera-screen flex aspect-[1.12/1] min-h-[22rem] flex-col rounded-[1.6rem] border border-white/80 p-5 sm:p-7">
+              <div className="kg-landing-camera-screen flex aspect-[1.12/1] min-h-[22rem] w-full flex-col rounded-[1.6rem] border border-white/80 p-5 sm:p-7">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2
                     className="text-lg font-bold text-slate-900"

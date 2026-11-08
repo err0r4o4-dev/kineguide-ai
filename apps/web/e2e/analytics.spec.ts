@@ -79,7 +79,7 @@ for (const width of [320, 768, 1024, 1440]) {
     await installAPI(page)
     await page.goto('/app/analytics')
     await expect(
-      page.getByRole('heading', { name: 'สถิติท่าทาง', level: 1 })
+      page.getByRole('heading', { name: 'สถิติการนั่ง', level: 1 })
     ).toBeVisible()
     await expect(
       page.getByRole('region', { name: 'สรุปตามตัวกรอง' })

@@ -26,8 +26,12 @@ test('landing page explains privacy before authentication', async ({
     'ความเป็นส่วน'
   )
   await expect(page.getByText(/ไม่อัปโหลดรูปหรือวิดีโอ/)).toBeVisible()
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    'content',
+    'KineGuide AI — Privacy-aware sitting monitoring and session tracking.'
+  )
   await expect(
-    page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true })
+    page.getByRole('link', { name: 'เริ่มติดตามการนั่ง', exact: true })
   ).toHaveAttribute('href', '/register')
   const backgrounds = await page.evaluate(() => ({
     page: getComputedStyle(document.querySelector('.kg-landing-page')!)
@@ -57,6 +61,36 @@ test('landing page explains privacy before authentication', async ({
   )
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 })
+    await page.evaluate(() => document.fonts.ready)
+    const heroBounds = await page
+      .locator('#landing-home > .kg-landing-content > *')
+      .evaluateAll((elements) =>
+        elements.map((element) => {
+          const bounds = element.getBoundingClientRect()
+          return { left: bounds.left, right: bounds.right }
+        })
+      )
+    for (const bounds of heroBounds) {
+      expect(bounds.left).toBeGreaterThanOrEqual(0)
+      expect(bounds.right).toBeLessThanOrEqual(width)
+    }
+    const heroTextBounds = await page
+      .locator('#landing-home h1 span, #landing-home p')
+      .evaluateAll((elements) =>
+        elements.flatMap((element) => {
+          const range = document.createRange()
+          range.selectNodeContents(element)
+          return Array.from(range.getClientRects()).map((bounds) => ({
+            text: element.textContent,
+            left: bounds.left,
+            right: bounds.right
+          }))
+        })
+      )
+    for (const bounds of heroTextBounds) {
+      expect(bounds.left, bounds.text ?? '').toBeGreaterThanOrEqual(0)
+      expect(bounds.right, bounds.text ?? '').toBeLessThanOrEqual(width)
+    }
     const responsiveHeaderContentBox = await headerContent.boundingBox()
     if (width >= 1024) {
       expect(responsiveHeaderContentBox?.width).toBeCloseTo(width * 0.7, 0)

@@ -307,7 +307,7 @@ describe('soundAlertAdapter', () => {
     expect(
       resolveThaiSpeechClipUrl({
         tone: 'posture_recovered',
-        text: 'แนวจัดวางท่าทางกลับเข้าสู่เกณฑ์ปกติเทียบกับค่ามาตรฐานแล้ว',
+        text: 'ท่านั่งกลับมาใกล้เคียงท่านั่งอ้างอิงแล้ว',
         language: 'th',
         mode: 'tts',
         volume: 0.8

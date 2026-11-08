@@ -182,7 +182,7 @@ test('explicit camera start, denial and retry, and save failure and retry preser
     .click()
   await expect(page).toHaveURL(`/app/sessions/${id}/summary`)
   await expect(
-    page.getByText('ไม่มีผลวิเคราะห์ท่าทางสำหรับเซสชันนี้')
+    page.getByText('ไม่มีผลวิเคราะห์การนั่งสำหรับเซสชันนี้')
   ).toBeVisible()
   expect(savedPayloads).toHaveLength(2)
   expect(savedPayloads[1]).toMatchObject({
@@ -244,8 +244,8 @@ for (const language of ['th', 'en'] as const) {
         page
           .getByText(
             language === 'th'
-              ? 'เทียบกับท่าอ้างอิงได้'
-              : 'Compared with reference posture',
+              ? 'เทียบกับท่านั่งอ้างอิงได้'
+              : 'Compared with reference seated alignment',
             { exact: true }
           )
           .locator('..')
