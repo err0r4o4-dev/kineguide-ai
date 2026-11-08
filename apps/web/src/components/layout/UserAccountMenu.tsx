@@ -1,11 +1,4 @@
-import {
-  Bell,
-  ChevronUp,
-  CircleHelp,
-  LogOut,
-  Settings,
-  UserRound
-} from 'lucide-react'
+import { Bell, ChevronUp, LogOut, Settings, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -88,16 +81,7 @@ export function UserAccountMenu() {
             to="/app/notifications"
             onClick={() => setOpen(false)}
           />
-          <div className="mx-1 my-2 border-t border-kg-border" />
-          <p className="px-3 pb-2 pt-1 text-sm font-bold text-slate-500">
-            {t('account.system')}
-          </p>
-          <MenuLink
-            icon={CircleHelp}
-            label={t('nav.help')}
-            to="/app/help"
-            onClick={() => setOpen(false)}
-          />
+
           <button
             className="mt-2 flex min-h-12 w-full items-center gap-3 border-t border-kg-border px-3 pt-2 text-left text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
             onClick={() => void logout()}

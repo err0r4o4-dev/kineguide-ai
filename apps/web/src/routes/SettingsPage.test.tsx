@@ -55,6 +55,27 @@ describe('SettingsPage', () => {
     resetSoundAlertPreferencesStoreForTests()
   })
 
+  it('persists independent break controls and disables the interval when off', async () => {
+    await i18n.changeLanguage('en')
+    const user = userEvent.setup()
+    renderRoute()
+    const interval = screen.getByRole('combobox', {
+      name: 'Reminder interval (minutes)'
+    })
+    await user.selectOptions(interval, '15')
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Enable break reminders' })
+    )
+    expect(interval).toBeDisabled()
+    expect(
+      JSON.parse(window.localStorage.getItem(SOUND_ALERT_STORAGE_KEY)!)
+    ).toMatchObject({
+      breakRemindersEnabled: false,
+      breakIntervalMinutes: 15,
+      enabled: true
+    })
+  })
+
   it('renders settings sections', async () => {
     await i18n.changeLanguage('th')
     renderRoute()

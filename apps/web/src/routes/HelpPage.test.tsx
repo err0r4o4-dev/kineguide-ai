@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 
 import i18n from '@/lib/i18n'
@@ -68,6 +68,12 @@ describe('HelpPage', () => {
         name: 'Meaning of monitoring states'
       })
     ).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'Start a seated session' })
+    ).toBeVisible()
+    const question = screen.getByText('Can monitoring continue in another tab?')
+    fireEvent.click(question)
+    expect(question.closest('details')).toHaveAttribute('open')
     expect(
       screen.getByRole('link', { name: 'Open camera setup check' })
     ).toHaveAttribute('href', '/app/monitor')

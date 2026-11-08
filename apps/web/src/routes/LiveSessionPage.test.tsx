@@ -1,11 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 
 import * as camera from '@/features/camera/useCamera'
-import { resetSoundAlertPreferencesStoreForTests } from '@/features/notifications/soundAlertPreferences'
+import {
+  resetSoundAlertPreferencesStoreForTests,
+  updateSoundAlertPreferences
+} from '@/features/notifications/soundAlertPreferences'
 import type { PoseLandmark } from '@/features/pose/poseGeometry'
 import type {
   PoseTrackingSnapshot,
@@ -99,6 +102,43 @@ describe('LiveSessionPage', () => {
     vi.mocked(poseTracking.usePoseTracking).mockReturnValue(
       poseSnapshot('ready')
     )
+  })
+
+  it('uses the chosen interval and suppresses reminders when disabled', async () => {
+    await i18n.changeLanguage('en')
+    const session = await product.getSession('session-1')
+    vi.mocked(product.getSession).mockResolvedValue({
+      ...session,
+      metrics: { ...session.metrics, duration_seconds: 901 }
+    })
+    updateSoundAlertPreferences({ breakIntervalMinutes: 15 })
+    renderRoute()
+    expect(
+      await screen.findByText(
+        'Time for an ergonomic break',
+        {},
+        { timeout: 2500 }
+      )
+    ).toBeVisible()
+    act(() => {
+      updateSoundAlertPreferences({ breakRemindersEnabled: false })
+    })
+    expect(
+      screen.queryByText('Time for an ergonomic break')
+    ).not.toBeInTheDocument()
+    act(() => {
+      updateSoundAlertPreferences({
+        breakRemindersEnabled: true,
+        breakIntervalMinutes: 30
+      })
+    })
+    expect(
+      screen.queryByText('Time for an ergonomic break')
+    ).not.toBeInTheDocument()
+    act(() => {
+      updateSoundAlertPreferences({ breakIntervalMinutes: 15 })
+    })
+    expect(screen.getByText('Time for an ergonomic break')).toBeVisible()
   })
 
   it('shows technical availability without claiming posture quality', async () => {

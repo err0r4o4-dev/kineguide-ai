@@ -4,7 +4,7 @@ import {
   CheckCircle2,
   Clock3,
   Flame,
-  MessageCircle,
+  BookOpen,
   Monitor
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -53,7 +53,7 @@ export function DashboardPage() {
           <section className="mt-7 grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.8fr)]">
             <ActivityStartCard />
             <div className="flex flex-col gap-4">
-              <AIChatCard />
+              <UsageGuideCard />
               <div
                 aria-label={t('dashboard.activitySummary')}
                 className="kg-card grid min-h-28 grid-cols-3 divide-x divide-slate-200/80 overflow-hidden"
@@ -222,30 +222,28 @@ function RecentActivity({ sessions }: { sessions: PostureSession[] }) {
   )
 }
 
-function AIChatCard() {
+function UsageGuideCard() {
   const { t } = useTranslation()
 
   return (
     <article className="kg-card flex flex-1 flex-col justify-center overflow-hidden border-teal-200 bg-[linear-gradient(135deg,#ffffff,#eaf7f1)] p-5 sm:p-6">
       <div className="flex gap-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[var(--color-kg-night)] text-[var(--color-kg-accent)] shadow-sm">
-          <MessageCircle aria-hidden="true" size={23} />
+          <BookOpen aria-hidden="true" size={23} />
         </span>
         <div className="min-w-0">
-          <h2 className="text-lg font-bold text-slate-950">
-            {t('dashboard.aiTitle')}
-          </h2>
+          <h2 className="text-lg font-bold text-slate-950">{t('nav.guide')}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-700">
-            {t('dashboard.aiBody')}
+            {t('help.startTitle')}
           </p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            {t('dashboard.aiBoundary')}
+            {t('common.noDiagnosis')}
           </p>
           <Link
             className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl font-bold text-teal-800 no-underline hover:text-teal-950"
-            to="/app/chat"
+            to="/app/help"
           >
-            {t('dashboard.aiStart')}
+            {t('nav.guide')}
             <ArrowRight aria-hidden="true" size={17} />
           </Link>
         </div>

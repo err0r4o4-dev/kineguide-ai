@@ -57,8 +57,8 @@ describe('DashboardPage', () => {
       await screen.findByRole('link', { name: /เริ่มติดตามการนั่ง/ })
     ).toHaveAttribute('href', '/app/monitor')
     expect(
-      screen.getByRole('link', { name: 'เริ่มคุยกับ AI' })
-    ).toHaveAttribute('href', '/app/chat')
+      screen.getByRole('link', { name: 'คู่มือการใช้งาน' })
+    ).toHaveAttribute('href', '/app/help')
     expect(
       await screen.findByRole('group', { name: 'สรุปการใช้งาน' })
     ).toHaveTextContent('3')

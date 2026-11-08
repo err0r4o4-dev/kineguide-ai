@@ -13,6 +13,37 @@ import {
 } from './soundAlertPreferences'
 
 describe('soundAlertPreferences', () => {
+  it('hydrates reminder controls and sanitizes their boundaries', () => {
+    updateSoundAlertPreferences({
+      breakRemindersEnabled: false,
+      breakIntervalMinutes: 15
+    })
+    resetSoundAlertPreferencesStoreForTests()
+    expect(getSoundAlertPreferences()).toMatchObject({
+      breakRemindersEnabled: false,
+      breakIntervalMinutes: 15
+    })
+    expect(
+      sanitizeSoundAlertPreferences({ breakIntervalMinutes: 2 })
+    ).toMatchObject({ breakRemindersEnabled: true, breakIntervalMinutes: 10 })
+    expect(
+      sanitizeSoundAlertPreferences({ breakIntervalMinutes: 100 })
+        .breakIntervalMinutes
+    ).toBe(60)
+    expect(
+      sanitizeSoundAlertPreferences({ breakIntervalMinutes: NaN })
+        .breakIntervalMinutes
+    ).toBe(25)
+    expect(
+      sanitizeSoundAlertPreferences({ breakIntervalMinutes: 12.6 })
+        .breakIntervalMinutes
+    ).toBe(13)
+    expect(
+      sanitizeSoundAlertPreferences({ breakRemindersEnabled: 'false' })
+        .breakRemindersEnabled
+    ).toBe(true)
+  })
+
   const originalLocalStorage = Object.getOwnPropertyDescriptor(
     window,
     'localStorage'
@@ -38,6 +69,8 @@ describe('soundAlertPreferences', () => {
     expect(getSoundAlertPreferences()).toEqual(DEFAULT_SOUND_ALERT_PREFERENCES)
     expect(DEFAULT_SOUND_ALERT_PREFERENCES).toEqual({
       enabled: true,
+      breakRemindersEnabled: true,
+      breakIntervalMinutes: 25,
       mode: 'tts',
       volume: 0.8,
       events: {
@@ -67,6 +100,8 @@ describe('soundAlertPreferences', () => {
 
     expect(getSoundAlertPreferences()).toEqual({
       enabled: false,
+      breakRemindersEnabled: true,
+      breakIntervalMinutes: 25,
       mode: 'chime',
       volume: 0.5,
       events: {
@@ -91,6 +126,8 @@ describe('soundAlertPreferences', () => {
       })
     ).toEqual({
       enabled: true,
+      breakRemindersEnabled: true,
+      breakIntervalMinutes: 25,
       mode: 'tts',
       volume: 1,
       events: {
@@ -118,9 +155,17 @@ describe('soundAlertPreferences', () => {
 
     expect(getSoundAlertPreferences()).toEqual(DEFAULT_SOUND_ALERT_PREFERENCES)
 
-    const updated = updateSoundAlertPreferences({ enabled: false })
+    const updated = updateSoundAlertPreferences({
+      enabled: false,
+      breakRemindersEnabled: false,
+      breakIntervalMinutes: 40
+    })
     expect(updated.enabled).toBe(false)
-    expect(getSoundAlertPreferences().enabled).toBe(false)
+    expect(getSoundAlertPreferences()).toMatchObject({
+      enabled: false,
+      breakRemindersEnabled: false,
+      breakIntervalMinutes: 40
+    })
 
     expect(() => clearSoundAlertPreferences()).not.toThrow()
     expect(getSoundAlertPreferences().enabled).toBe(true)
@@ -135,10 +180,14 @@ describe('soundAlertPreferences', () => {
       first.result.current.setMode('chime')
       first.result.current.setVolume(0.4)
       first.result.current.toggleEvent('postureAlert')
+      first.result.current.setBreakRemindersEnabled(false)
+      first.result.current.setBreakIntervalMinutes(20)
     })
 
     expect(second.result.current.preferences).toEqual({
       enabled: false,
+      breakRemindersEnabled: false,
+      breakIntervalMinutes: 20,
       mode: 'chime',
       volume: 0.4,
       events: {

@@ -18,6 +18,10 @@ import { useNavigate } from 'react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { LanguageButton } from '@/components/LanguageButton'
+import {
+  MIN_BREAK_INTERVAL_MINUTES,
+  MAX_BREAK_INTERVAL_MINUTES
+} from '@/features/reminders/breakReminderEngine'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ProviderIcon } from '@/features/auth/ProviderIcon'
 import {
@@ -223,6 +227,50 @@ export function SettingsPage() {
             title={t('settings.language')}
           >
             <LanguageButton />
+          </SettingsSection>
+
+          <SettingsSection
+            body={t('settings.breakRemindersBody')}
+            icon={Bell}
+            title={t('settings.breakRemindersTitle')}
+          >
+            <label className="kg-check">
+              <input
+                type="checkbox"
+                checked={sound.preferences.breakRemindersEnabled}
+                onChange={(event) =>
+                  sound.setBreakRemindersEnabled(event.target.checked)
+                }
+              />
+              <span>{t('settings.breakRemindersEnable')}</span>
+            </label>
+            <label
+              className="mt-4 block text-sm font-semibold text-slate-800"
+              htmlFor="break-interval"
+            >
+              {t('settings.breakInterval')}
+            </label>
+            <select
+              id="break-interval"
+              className="mt-2 min-h-11 w-full rounded-xl border border-kg-border bg-white px-3 text-slate-900 disabled:opacity-60"
+              disabled={!sound.preferences.breakRemindersEnabled}
+              value={sound.preferences.breakIntervalMinutes}
+              onChange={(event) =>
+                sound.setBreakIntervalMinutes(Number(event.target.value))
+              }
+            >
+              {Array.from(
+                {
+                  length:
+                    MAX_BREAK_INTERVAL_MINUTES - MIN_BREAK_INTERVAL_MINUTES + 1
+                },
+                (_, index) => index + MIN_BREAK_INTERVAL_MINUTES
+              ).map((minutes) => (
+                <option key={minutes} value={minutes}>
+                  {minutes}
+                </option>
+              ))}
+            </select>
           </SettingsSection>
 
           <SettingsSection

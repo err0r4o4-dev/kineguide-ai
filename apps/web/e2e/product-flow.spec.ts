@@ -325,7 +325,9 @@ test('new user completes registration and consent', async ({ page }) => {
     ).toBe(true)
   }
   await page.setViewportSize({ width: 1280, height: 1000 })
-  await page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'เริ่มติดตามการนั่ง', exact: true })
+    .click()
 
   await expect(page).toHaveURL('/app/monitor')
   await expect(
@@ -401,14 +403,14 @@ test('new user completes registration and consent', async ({ page }) => {
 
   await page.getByRole('link', { name: 'หน้าแรก' }).click()
   await expect(
-    page.getByRole('link', { name: 'เริ่มตรวจท่าทาง', exact: true })
+    page.getByRole('link', { name: 'เริ่มติดตามการนั่ง', exact: true })
   ).toHaveAttribute('href', '/app/monitor')
   await expect(
     page.getByRole('navigation', { name: 'เมนูหลัก' }).getByRole('link', {
-      name: 'ผู้ช่วย KineGuide AI',
+      name: 'คู่มือการใช้งาน',
       exact: true
     })
-  ).toHaveAttribute('href', '/app/chat')
+  ).toHaveAttribute('href', '/app/help')
 })
 
 test('login, hard refresh, and every authenticated navigation target stay consistent', async ({
@@ -419,6 +421,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   page.on('console', (message) => {
     if (message.type() === 'error') runtimeErrors.push(message.text())
   })
+  await page.route('https://**/*', (route) => route.abort())
   let signedIn = false
   let dashboardFails = false
   let refreshRequests = 0
@@ -536,13 +539,13 @@ test('login, hard refresh, and every authenticated navigation target stay consis
 
   await expect(page).toHaveURL('/app')
   await expect(
-    page.getByRole('link', { name: 'ผู้ช่วย KineGuide AI', exact: true })
+    page.getByRole('link', { name: 'ติดตามการนั่ง', exact: true })
   ).toBeVisible()
 
   for (let reload = 0; reload < 3; reload += 1) {
     await page.reload()
     await expect(
-      page.getByRole('link', { name: 'ผู้ช่วย KineGuide AI', exact: true })
+      page.getByRole('link', { name: 'ติดตามการนั่ง', exact: true })
     ).toBeVisible()
   }
   expect(refreshRequests).toBe(4)
@@ -552,7 +555,7 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await menuButton.click()
   await expect(menuButton).toHaveAccessibleName('ปิดเมนู')
   await expect(
-    page.getByRole('link', { name: 'ผู้ช่วย KineGuide AI', exact: true })
+    page.getByRole('link', { name: 'ติดตามการนั่ง', exact: true })
   ).toBeVisible()
   expect(
     await page.evaluate(
@@ -563,11 +566,9 @@ test('login, hard refresh, and every authenticated navigation target stay consis
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const destinations = [
-    ['ตรวจท่าทาง', '/app/monitor'],
+    ['ติดตามการนั่ง', '/app/monitor'],
     ['ประวัติและสถิติ', '/app/history'],
-    ['ผู้ช่วย KineGuide AI', '/app/chat'],
     ['คู่มือการใช้งาน', '/app/help'],
-    ['ตั้งค่า', '/app/settings'],
     ['หน้าแรก', '/app']
   ] as const
   const primaryNavigation = page.getByRole('navigation', {
@@ -579,6 +580,60 @@ test('login, hard refresh, and every authenticated navigation target stay consis
     await expect(page).toHaveURL(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   }
+
+  await expect(primaryNavigation.getByRole('link')).toHaveCount(4)
+  await expect(
+    primaryNavigation.getByRole('link', {
+      name: 'ผู้ช่วย KineGuide AI',
+      exact: true
+    })
+  ).toHaveCount(0)
+  await page.goto('/app/chat')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+
+  await page.goto('/app/settings')
+  const breakToggle = page.getByRole('checkbox', {
+    name: 'เปิดการแจ้งเตือนพัก',
+    exact: true
+  })
+  const breakInterval = page.getByRole('combobox', {
+    name: 'ช่วงเวลาแจ้งเตือน (นาที)'
+  })
+  await breakInterval.selectOption('15')
+  await breakToggle.uncheck()
+  await expect(breakInterval).toBeDisabled()
+  await page.reload()
+  await expect(breakToggle).not.toBeChecked()
+  await expect(breakInterval).toHaveValue('15')
+  await breakToggle.check()
+  await expect(breakInterval).toBeEnabled()
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 })
+    await expect(breakToggle).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth
+      )
+    ).toBe(true)
+  }
+  await page.goto('/app/help')
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 })
+    await expect(
+      page.getByRole('heading', { name: 'เริ่มเซสชันขณะนั่ง' })
+    ).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth
+      )
+    ).toBe(true)
+  }
+  const question = page.getByText('สลับแท็บแล้วยังติดตามต่อหรือไม่?', {
+    exact: true
+  })
+  await question.focus()
+  await page.keyboard.press('Enter')
+  await expect(question.locator('..')).toHaveAttribute('open', '')
 
   for (const [legacyPath, destination] of [
     ['/app/activities', '/app/monitor'],

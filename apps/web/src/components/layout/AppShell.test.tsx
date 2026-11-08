@@ -43,15 +43,15 @@ describe('AppShell', () => {
     expect(logoutMock).toHaveBeenCalledTimes(1)
   })
 
-  it('includes the KineGuide AI assistant in primary navigation', async () => {
+  it('keeps four sitting-monitoring destinations in primary navigation', async () => {
     await i18n.changeLanguage('th')
     const user = userEvent.setup()
     render(
-      <MemoryRouter initialEntries={['/app/chat']}>
+      <MemoryRouter initialEntries={['/app/monitor']}>
         <Routes>
           <Route element={<AppShell />} path="/app">
             <Route index element={<h1>หน้าแรก</h1>} />
-            <Route element={<h1>ผู้ช่วย KineGuide AI</h1>} path="chat" />
+            <Route element={<h1>ติดตามการนั่ง</h1>} path="monitor" />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -59,25 +59,23 @@ describe('AppShell', () => {
 
     const navigation = screen.getByRole('navigation', { name: 'เมนูหลัก' })
     const navLinks = within(navigation).getAllByRole('link')
-    expect(navLinks).toHaveLength(6)
+    expect(navLinks).toHaveLength(4)
     expect(navLinks.map((link) => link.textContent)).toEqual([
       'หน้าแรก',
-      'ตรวจท่าทาง',
+      'ติดตามการนั่ง',
       'ประวัติและสถิติ',
-      'ผู้ช่วย KineGuide AI',
-      'คู่มือการใช้งาน',
-      'ตั้งค่า'
+      'คู่มือการใช้งาน'
     ])
     expect(
       within(navigation).getByRole('link', { name: 'หน้าแรก' })
     ).toBeInTheDocument()
-    const assistantLink = within(navigation).getByRole('link', {
-      name: 'ผู้ช่วย KineGuide AI'
+    const monitorLink = within(navigation).getByRole('link', {
+      name: 'ติดตามการนั่ง'
     })
-    expect(assistantLink).toHaveAttribute('href', '/app/chat')
-    expect(assistantLink).toHaveAttribute('aria-current', 'page')
+    expect(monitorLink).toHaveAttribute('href', '/app/monitor')
+    expect(monitorLink).toHaveAttribute('aria-current', 'page')
     expect(
-      within(navigation).getByRole('link', { name: 'ตรวจท่าทาง' })
+      within(navigation).getByRole('link', { name: 'ติดตามการนั่ง' })
     ).toHaveAttribute('href', '/app/monitor')
     expect(
       within(navigation).getByRole('link', { name: 'ประวัติและสถิติ' })
@@ -86,8 +84,8 @@ describe('AppShell', () => {
       within(navigation).getByRole('link', { name: 'คู่มือการใช้งาน' })
     ).toHaveAttribute('href', '/app/help')
     expect(
-      within(navigation).getByRole('link', { name: 'ตั้งค่า' })
-    ).toHaveAttribute('href', '/app/settings')
+      within(navigation).queryByRole('link', { name: 'ตั้งค่า' })
+    ).not.toBeInTheDocument()
 
     await user.click(screen.getAllByRole('button', { name: /^เมนูบัญชี/ })[0])
     expect(
@@ -102,8 +100,8 @@ describe('AppShell', () => {
       })
     ).toHaveAttribute('href', '/app/notifications')
     expect(
-      screen.getByRole('menuitem', { name: 'ช่วยเหลือ' })
-    ).toBeInTheDocument()
+      screen.queryByRole('menuitem', { name: 'ช่วยเหลือ' })
+    ).not.toBeInTheDocument()
 
     await user.keyboard('{Escape}')
     expect(

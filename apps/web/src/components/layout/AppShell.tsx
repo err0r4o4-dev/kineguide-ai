@@ -1,12 +1,4 @@
-import {
-  BarChart3,
-  BookOpen,
-  Bot,
-  Home,
-  Menu,
-  Monitor,
-  Settings
-} from 'lucide-react'
+import { BarChart3, BookOpen, Home, Menu, Monitor } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Outlet, useLocation } from 'react-router'
@@ -37,9 +29,7 @@ const links: ReadonlyArray<{
     end: false,
     matchPaths: ['/app/history', '/app/analytics']
   },
-  { to: '/app/chat', key: 'chat', icon: Bot, end: false },
-  { to: '/app/help', key: 'guide', icon: BookOpen, end: false },
-  { to: '/app/settings', key: 'settings', icon: Settings, end: false }
+  { to: '/app/help', key: 'guide', icon: BookOpen, end: false }
 ]
 
 export function AppShell() {

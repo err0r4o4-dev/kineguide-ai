@@ -63,7 +63,7 @@ const th = {
     closeMenu: 'ปิดเมนู',
     home: 'หน้าแรก',
     chat: 'ผู้ช่วย KineGuide AI',
-    monitor: 'ตรวจท่าทาง',
+    monitor: 'ติดตามการนั่ง',
     history: 'ประวัติ',
     analytics: 'สถิติ',
     historyAnalytics: 'ประวัติและสถิติ',
@@ -789,6 +789,11 @@ const th = {
     lastLoginMethod: 'ต้องมีวิธีเข้าสู่ระบบอื่นก่อนยกเลิกการเชื่อมบัญชีนี้',
     cameraPrefs: 'การตั้งค่ากล้อง',
     breakPrefs: 'การแจ้งเตือนหยุดพัก',
+    breakRemindersTitle: 'การแจ้งเตือนพัก',
+    breakRemindersBody:
+      'ตั้งเวลาเตือนตามเวลาที่เซสชันทำงาน ไม่ใช่เวลานั่งที่ตรวจยืนยัน ช่วง 10–60 นาทีเป็นตัวเลือกของโปรแกรม ไม่ใช่เกณฑ์ทางการแพทย์ บันทึกเฉพาะการตั้งค่าในเบราว์เซอร์นี้ และแยกจากสวิตช์เสียง',
+    breakRemindersEnable: 'เปิดการแจ้งเตือนพัก',
+    breakInterval: 'ช่วงเวลาแจ้งเตือน (นาที)',
     soundTitle: 'การแจ้งเตือนด้วยเสียง',
     soundBody:
       'ควบคุมเสียงพูดแนะนำและเสียงสัญญาณระหว่างเซสชันติดตามท่าทาง การตั้งค่านี้เก็บเฉพาะในเบราว์เซอร์ของคุณ',
@@ -822,6 +827,52 @@ const th = {
     safety:
       'หากรู้สึกเจ็บ ไม่มั่นคง หรือกังวล ให้หยุดทันที ระบบนี้ไม่ให้คำแนะนำฉุกเฉิน',
     contact: 'สำหรับเหตุฉุกเฉิน ให้ติดต่อบริการฉุกเฉินในพื้นที่ของคุณ',
+    startTitle: 'เริ่มเซสชันขณะนั่ง',
+    steps: {
+      setup:
+        'นั่งในตำแหน่งใช้งานจริง จัดแสงและกล้องให้เห็นจุดอ้างอิงตามโหมดที่เลือก และอ่านคำอธิบายก่อนให้สิทธิ์กล้อง',
+      camera:
+        'ไปที่ติดตามการนั่ง ยืนยันว่าจัดท่านั่งพร้อม แล้วเริ่มเซสชัน จากนั้นกดเปิดกล้องด้วยตนเองในหน้าติดตาม ภาพประมวลผลในเบราว์เซอร์และไม่ส่งภาพดิบไปยัง API',
+      calibrate:
+        'เลือกโหมดภาพและสอบเทียบ Baseline ตามคำแนะนำ รอให้ระบบพร้อมก่อนใช้ผลเปรียบเทียบ',
+      monitor:
+        'เปิดหน้าติดตามไว้ ดูสถานะความเชื่อมั่นควบคู่กับผล หากจุดอ้างอิงไม่ครบ ระบบอาจประเมินไม่ได้',
+      finish:
+        'กดพักเมื่อต้องการหยุดชั่วคราว หรือจบเซสชันเพื่อดูสรุปและประวัติ กล้องจะหยุดเมื่อออกจากหน้าติดตาม'
+    },
+    faqTitle: 'คำถามที่พบบ่อย',
+    faq: {
+      permission: {
+        question: 'เปิดกล้องไม่ได้ ต้องทำอย่างไร?',
+        answer:
+          'ตรวจสิทธิ์กล้องของเว็บไซต์และระบบ ปิดแอปอื่นที่ใช้กล้อง แล้วลองอีกครั้งผ่าน HTTPS หรือ localhost หากเบราว์เซอร์ไม่รองรับ ให้ใช้เบราว์เซอร์ที่รองรับกล้อง'
+      },
+      framing: {
+        question: 'ทำไมความเชื่อมั่นต่ำหรือประเมินไม่ได้?',
+        answer:
+          'ตรวจแสงและให้จุดอ้างอิงอยู่ในภาพตามโหมด อย่าถือว่าค่าที่หายไปเป็นท่านั่งที่ดี รอให้การตรวจจับพร้อมก่อนสอบเทียบใหม่'
+      },
+      baseline: {
+        question: 'ควรสอบเทียบใหม่เมื่อใด?',
+        answer:
+          'เมื่อย้ายกล้อง เปลี่ยนเก้าอี้ ระยะห่าง หรือโหมดภาพ ให้จัดท่านั่งที่สบายและสอบเทียบใหม่ก่อนเปรียบเทียบกับ Baseline'
+      },
+      duration: {
+        question: 'เวลาเซสชันเท่ากับเวลานั่งหรือไม่?',
+        answer:
+          'ไม่เท่ากัน เวลาเซสชันคือเวลาที่ตัวจับเวลาทำงาน ไม่ใช่เวลานั่งที่ระบบตรวจยืนยัน และไม่ใช่ข้อสรุปด้านสุขภาพ'
+      },
+      background: {
+        question: 'สลับแท็บแล้วยังติดตามต่อหรือไม่?',
+        answer:
+          'เมื่อหน้านี้ถูกซ่อน ระบบจะพักเซสชันและหยุดกล้อง กลับมาที่หน้าแล้วกดดำเนินการต่อและเปิดกล้องอีกครั้ง จึงไม่ควรคาดหวังการติดตามเบื้องหลังขณะใช้แท็บอื่น'
+      },
+      reminders: {
+        question: 'เปลี่ยนเวลาเตือนพักหรือปิดเสียงได้ที่ไหน?',
+        answer:
+          'เปิดเมนูบัญชี ไปที่ตั้งค่าและความเป็นส่วนตัว แล้วเลือกเปิดหรือปิดการเตือนพักและช่วงเวลา การปิดเสียงไม่ปิดแบนเนอร์เตือนพัก และการตั้งค่านี้ใช้เฉพาะเบราว์เซอร์นี้'
+      }
+    },
     ergonomicTitle: 'การจัดมุมกล้องและโต๊ะทำงานเบื้องต้น',
     ergonomicBody:
       'วางหน้าจอและกล้องไว้ด้านหน้าในระดับสายตาหรือเฉียงไม่เกิน 45 องศา ให้มีแสงสว่างสม่ำเสมอไม่ย้อนแสง และนั่งในท่าที่สบายก่อนเริ่มสอบเทียบค่าอ้างอิงส่วนบุคคล (Personal Baseline)',
@@ -927,7 +978,7 @@ const en: typeof th = {
     closeMenu: 'Close menu',
     home: 'Home',
     chat: 'KineGuide AI assistant',
-    monitor: 'Monitor Posture',
+    monitor: 'Seated Monitoring',
     history: 'History',
     analytics: 'Analytics',
     historyAnalytics: 'History & Analytics',
@@ -1667,6 +1718,11 @@ const en: typeof th = {
       'Add another sign-in method before disconnecting this account.',
     cameraPrefs: 'Camera Preferences',
     breakPrefs: 'Break Reminders',
+    breakRemindersTitle: 'Break reminders',
+    breakRemindersBody:
+      'Reminders use active session time, not verified sitting time. The 10–60 minute range is a program option, not a medical threshold. Only preferences are saved in this browser; sound is controlled separately.',
+    breakRemindersEnable: 'Enable break reminders',
+    breakInterval: 'Reminder interval (minutes)',
     soundTitle: 'Sound notifications',
     soundBody:
       'Control voice guidance and gentle chimes during live monitoring sessions. These preferences are stored locally in your browser.',
@@ -1700,6 +1756,52 @@ const en: typeof th = {
     safety:
       'Stop immediately if you feel pain, unstable, or concerned. This system does not provide emergency guidance.',
     contact: 'For emergencies, contact your local emergency service.',
+    startTitle: 'Start a seated session',
+    steps: {
+      setup:
+        'Sit at your usual workstation. Adjust lighting and framing for the selected mode, and read the camera purpose before granting access.',
+      camera:
+        'Open Seated Monitoring, confirm your seated setup, and start a session. Then start the camera yourself on the live page. Images are processed in your browser; raw media is not sent to the API.',
+      calibrate:
+        'Choose your framing mode and follow the Baseline calibration instructions. Wait for readiness before using comparisons.',
+      monitor:
+        'Keep the live page visible. Read confidence alongside feedback; missing landmarks may make assessment unavailable.',
+      finish:
+        'Pause when needed, or end the session to view its summary and history. Leaving monitoring stops the camera.'
+    },
+    faqTitle: 'Frequently asked questions',
+    faq: {
+      permission: {
+        question: 'What if the camera will not start?',
+        answer:
+          'Check website and system camera permissions, close other apps using the camera, and retry over HTTPS or localhost. Use a camera-capable browser if yours is unsupported.'
+      },
+      framing: {
+        question: 'Why is confidence low or assessment unavailable?',
+        answer:
+          'Check lighting and include the landmarks required for your framing mode. Missing results do not mean good posture. Wait for detection readiness before recalibrating.'
+      },
+      baseline: {
+        question: 'When should I recalibrate?',
+        answer:
+          'After moving the camera or changing your chair, distance, or framing mode, settle into a comfortable position and recalibrate before comparing against the Baseline.'
+      },
+      duration: {
+        question: 'Does session time equal sitting time?',
+        answer:
+          'No. Session time measures the running session clock, not verified sitting duration or a health outcome.'
+      },
+      background: {
+        question: 'Can monitoring continue in another tab?',
+        answer:
+          'Hiding this page pauses the session and stops the camera. Return, resume manually, and start the camera again. Do not expect background monitoring while using another tab.'
+      },
+      reminders: {
+        question: 'Where can I change break timing or mute sound?',
+        answer:
+          'Open the account menu, then Settings & Privacy to enable or disable break reminders and choose their interval. Muting sound does not disable the reminder banner. Preferences apply only to this browser.'
+      }
+    },
     ergonomicTitle: 'Camera framing and workstation setup',
     ergonomicBody:
       'Place your screen and camera in front of you at eye level or within a 45-degree angle with even lighting, then sit comfortably before capturing your personal baseline.',

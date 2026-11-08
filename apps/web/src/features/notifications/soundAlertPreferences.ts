@@ -1,5 +1,11 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
+import {
+  DEFAULT_BREAK_INTERVAL_MINUTES,
+  MIN_BREAK_INTERVAL_MINUTES,
+  MAX_BREAK_INTERVAL_MINUTES
+} from '@/features/reminders/breakReminderEngine'
+
 export const SOUND_ALERT_STORAGE_KEY = 'kineguide:sound-alerts:v1'
 
 export type SoundAlertMode = 'tts' | 'chime'
@@ -9,6 +15,8 @@ export type SoundAlertEventKey =
 
 export interface SoundAlertPreferences {
   readonly enabled: boolean
+  readonly breakRemindersEnabled: boolean
+  readonly breakIntervalMinutes: number
   readonly mode: SoundAlertMode
   readonly volume: number
   readonly events: Readonly<Record<SoundAlertEventKey, boolean>>
@@ -16,6 +24,8 @@ export interface SoundAlertPreferences {
 
 export const DEFAULT_SOUND_ALERT_PREFERENCES: SoundAlertPreferences = {
   enabled: true,
+  breakRemindersEnabled: true,
+  breakIntervalMinutes: DEFAULT_BREAK_INTERVAL_MINUTES,
   mode: 'tts',
   volume: 0.8,
   events: {
@@ -75,6 +85,21 @@ export function sanitizeSoundAlertPreferences(
 
   return {
     enabled,
+    breakRemindersEnabled:
+      typeof record.breakRemindersEnabled === 'boolean'
+        ? record.breakRemindersEnabled
+        : DEFAULT_SOUND_ALERT_PREFERENCES.breakRemindersEnabled,
+    breakIntervalMinutes:
+      typeof record.breakIntervalMinutes === 'number' &&
+      Number.isFinite(record.breakIntervalMinutes)
+        ? Math.min(
+            MAX_BREAK_INTERVAL_MINUTES,
+            Math.max(
+              MIN_BREAK_INTERVAL_MINUTES,
+              Math.round(record.breakIntervalMinutes)
+            )
+          )
+        : DEFAULT_BREAK_INTERVAL_MINUTES,
     mode,
     volume,
     events
@@ -196,6 +221,8 @@ export interface UseSoundAlertPreferencesResult {
   readonly preferences: SoundAlertPreferences
   readonly setEnabled: (enabled: boolean) => void
   readonly toggleEnabled: () => void
+  readonly setBreakRemindersEnabled: (enabled: boolean) => void
+  readonly setBreakIntervalMinutes: (minutes: number) => void
   readonly setMode: (mode: SoundAlertMode) => void
   readonly setVolume: (volume: number) => void
   readonly toggleEvent: (key: SoundAlertEventKey) => void
@@ -218,6 +245,14 @@ export function useSoundAlertPreferences(): UseSoundAlertPreferencesResult {
       ...current,
       enabled: !current.enabled
     }))
+  }, [])
+
+  const setBreakRemindersEnabled = useCallback((enabled: boolean) => {
+    updateSoundAlertPreferences({ breakRemindersEnabled: enabled })
+  }, [])
+
+  const setBreakIntervalMinutes = useCallback((minutes: number) => {
+    updateSoundAlertPreferences({ breakIntervalMinutes: minutes })
   }, [])
 
   const setMode = useCallback((mode: SoundAlertMode) => {
@@ -246,6 +281,8 @@ export function useSoundAlertPreferences(): UseSoundAlertPreferencesResult {
     preferences,
     setEnabled,
     toggleEnabled,
+    setBreakRemindersEnabled,
+    setBreakIntervalMinutes,
     setMode,
     setVolume,
     toggleEvent,

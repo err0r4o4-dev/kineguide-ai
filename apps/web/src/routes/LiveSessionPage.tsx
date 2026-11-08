@@ -82,6 +82,19 @@ export function LiveSessionPage() {
   }
   const [breakDue, setBreakDue] = useState(false)
 
+  useEffect(() => {
+    const engine = reminderEngineRef.current
+    if (!engine) return
+    engine.setEnabled(soundPreferences.breakRemindersEnabled)
+    engine.setIntervalMinutes(soundPreferences.breakIntervalMinutes)
+    setBreakDue(
+      engine.update(clockRef.current?.seconds(performance.now()) ?? 0)
+    )
+  }, [
+    soundPreferences.breakRemindersEnabled,
+    soundPreferences.breakIntervalMinutes
+  ])
+
   const session = useQuery({
     queryKey: ['session', id],
     queryFn: ({ signal }) => getSession(id, signal),
@@ -141,7 +154,7 @@ export function LiveSessionPage() {
     paused: monitoringSuspended,
     isFinishing,
     breakDue,
-    breakIntervalMinutes: reminderEngineRef.current?.getIntervalMinutes() ?? 25,
+    breakIntervalMinutes: soundPreferences.breakIntervalMinutes,
     feedback: monitor.feedback,
     calibrationState: monitor.calibrationState,
     preferences: soundPreferences,
@@ -327,7 +340,7 @@ export function LiveSessionPage() {
               </p>
               <p className="text-sm leading-6 text-slate-700">
                 {t('session.breakDueBody', {
-                  minutes: reminderEngineRef.current?.getIntervalMinutes() ?? 25
+                  minutes: soundPreferences.breakIntervalMinutes
                 })}
               </p>
             </div>

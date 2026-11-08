@@ -24,6 +24,42 @@ export function HelpPage() {
       />
 
       <section
+        aria-labelledby="help-start-title"
+        className="kg-card mt-8 p-6 sm:p-8"
+      >
+        <h2 className="text-xl font-bold text-slate-950" id="help-start-title">
+          {t('help.startTitle')}
+        </h2>
+        <ol className="mt-4 list-decimal space-y-3 pl-6 leading-7 text-slate-700">
+          {['setup', 'camera', 'calibrate', 'monitor', 'finish'].map((step) => (
+            <li key={step}>{t('help.steps.' + step)}</li>
+          ))}
+        </ol>
+        <h3 className="mt-6 text-lg font-bold text-slate-950">
+          {t('help.faqTitle')}
+        </h3>
+        <div className="mt-3 divide-y divide-slate-200">
+          {[
+            'permission',
+            'framing',
+            'baseline',
+            'duration',
+            'background',
+            'reminders'
+          ].map((topic) => (
+            <details className="py-2" key={topic}>
+              <summary className="min-h-11 cursor-pointer py-3 font-semibold text-teal-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700">
+                {t('help.faq.' + topic + '.question')}
+              </summary>
+              <p className="pb-3 leading-7 text-slate-700">
+                {t('help.faq.' + topic + '.answer')}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section
         aria-labelledby="help-ergonomic-title"
         className="kg-card mt-8 p-6 sm:p-8"
       >
