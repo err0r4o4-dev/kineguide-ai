@@ -67,6 +67,8 @@ export function LiveSessionPage() {
     clockRef.current = new SessionClock(0, performance.now())
   const [paused, setPaused] = useState(false)
   const [hidden, setHidden] = useState(() => document.hidden)
+  const [backgroundMonitoringEnabled, setBackgroundMonitoringEnabled] =
+    useState(false)
   const [syncedInitial, setSyncedInitial] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
@@ -121,7 +123,7 @@ export function LiveSessionPage() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       setHidden(document.hidden)
-      if (document.hidden) {
+      if (document.hidden && !backgroundMonitoringEnabled) {
         clockRef.current?.pause(performance.now())
         setSeconds(clockRef.current?.seconds(performance.now()) ?? 0)
         setPaused(true)
@@ -132,10 +134,13 @@ export function LiveSessionPage() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [stopCamera])
+  }, [backgroundMonitoringEnabled, stopCamera])
 
   const monitoringSuspended =
-    paused || hidden || finishRequested || camera.state !== 'ready'
+    paused ||
+    (hidden && !backgroundMonitoringEnabled) ||
+    finishRequested ||
+    camera.state !== 'ready'
 
   const pose = usePoseTracking(
     camera.videoRef,
@@ -322,6 +327,42 @@ export function LiveSessionPage() {
           </button>
         </div>
       </header>
+
+      <section
+        aria-labelledby="background-monitoring-title"
+        className="mt-4 rounded-2xl border border-teal-200 bg-teal-50/70 p-4 text-teal-950"
+      >
+        <div className="flex items-start gap-3">
+          <Eye aria-hidden="true" className="mt-0.5 shrink-0" size={20} />
+          <div className="min-w-0">
+            <h2 className="font-bold" id="background-monitoring-title">
+              {t('session.backgroundMonitoringTitle')}
+            </h2>
+            <p
+              className="mt-1 text-sm leading-6 text-teal-900"
+              id="background-monitoring-description"
+            >
+              {t('session.backgroundMonitoringBody')}
+            </p>
+            <label className="kg-check mt-3">
+              <input
+                aria-describedby="background-monitoring-description"
+                checked={backgroundMonitoringEnabled}
+                onChange={(event) =>
+                  setBackgroundMonitoringEnabled(event.target.checked)
+                }
+                type="checkbox"
+              />
+              <span>{t('session.backgroundMonitoringEnable')}</span>
+            </label>
+            {backgroundMonitoringEnabled && (
+              <p className="mt-2 text-xs leading-5 text-teal-900" role="status">
+                {t('session.backgroundMonitoringStatus')}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Break reminder banner */}
       {breakDue && (

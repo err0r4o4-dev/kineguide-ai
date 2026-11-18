@@ -262,6 +262,32 @@ describe('LiveSessionPage', () => {
     hidden.mockRestore()
   })
 
+  it('keeps monitoring active when hidden after explicit opt-in', async () => {
+    await i18n.changeLanguage('th')
+    const stop = vi.fn()
+    vi.mocked(camera.useCamera).mockReturnValue({
+      state: 'ready',
+      start: vi.fn(),
+      stop,
+      videoRef: { current: null }
+    })
+    const user = userEvent.setup()
+    renderRoute()
+    await user.click(
+      await screen.findByRole('checkbox', {
+        name: 'ตรวจต่อเมื่อซ่อนหน้า'
+      })
+    )
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    fireEvent(document, new Event('visibilitychange'))
+    expect(stop).not.toHaveBeenCalled()
+    expect(
+      screen.queryByRole('button', { name: 'ตรวจจับต่อ' })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('มองเห็นจุดอ้างอิงสำหรับโหมดนั่งครบ')).toBeVisible()
+    hidden.mockRestore()
+  })
+
   it.each([
     ['loading_model', 'กำลังโหลดโมเดล...'],
     ['adjust_camera', 'โปรดปรับกล้องให้เห็นจุดอ้างอิงที่จำเป็น'],

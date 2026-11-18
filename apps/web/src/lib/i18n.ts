@@ -507,6 +507,12 @@ const th = {
     live: 'ติดตามขณะนั่งแบบเรียลไทม์',
     technicalOnly: 'โหมดนั่งเชิงเทคนิค ไม่ใช่การประเมินทางคลินิก',
     timer: 'ระยะเวลา',
+    backgroundMonitoringTitle: 'การตรวจต่อเมื่อซ่อนหน้า',
+    backgroundMonitoringBody:
+      'เปิดตัวเลือกนี้เพื่อพยายามตรวจต่อเมื่อสลับแท็บ ย่อหน้าต่าง หรือใช้แอป KineGuide ร่วมกับโปรแกรมอื่น กล้องยังทำงานอยู่และเบราว์เซอร์อาจลดความถี่การประมวลผล',
+    backgroundMonitoringEnable: 'ตรวจต่อเมื่อซ่อนหน้า',
+    backgroundMonitoringStatus:
+      'เปิดอยู่ — เฟรมกล้องยังประมวลผลในอุปกรณ์นี้ และอาจมีความล่าช้าเมื่อหน้าไม่อยู่เบื้องหน้า',
     pause: 'พักการตรวจจับ',
     resume: 'ตรวจจับต่อ',
     finish: 'จบเซสชัน',
@@ -866,7 +872,7 @@ const th = {
       background: {
         question: 'สลับแท็บแล้วยังติดตามต่อหรือไม่?',
         answer:
-          'เมื่อหน้านี้ถูกซ่อน ระบบจะพักเซสชันและหยุดกล้อง กลับมาที่หน้าแล้วกดดำเนินการต่อและเปิดกล้องอีกครั้ง จึงไม่ควรคาดหวังการติดตามเบื้องหลังขณะใช้แท็บอื่น'
+          'ได้เมื่อเปิดตัวเลือกตรวจต่อเมื่อซ่อนหน้าในเซสชัน ระบบจะพยายามทำงานต่อเมื่อสลับแท็บ ย่อหน้าต่าง หรือใช้ PWA แต่เบราว์เซอร์อาจลดความถี่หรือหยุดงานเบื้องหลัง จึงไม่รับประกันการตรวจแบบเรียลไทม์ และการปิดแท็บหรือปิดเบราว์เซอร์จะหยุดระบบ'
       },
       reminders: {
         question: 'เปลี่ยนเวลาเตือนพักหรือปิดเสียงได้ที่ไหน?',
@@ -1433,6 +1439,12 @@ const en: typeof th = {
     live: 'Live Seated Monitoring',
     technicalOnly: 'Technical seated mode, not a clinical assessment',
     timer: 'Duration',
+    backgroundMonitoringTitle: 'Monitor while this page is hidden',
+    backgroundMonitoringBody:
+      'Enable this option to keep trying to monitor while switching tabs, minimizing the browser, or using the KineGuide PWA beside another program. The camera remains active, and the browser may reduce processing frequency.',
+    backgroundMonitoringEnable: 'Continue monitoring when hidden',
+    backgroundMonitoringStatus:
+      'Enabled — camera frames remain on this device and processing may be delayed while the page is not in front.',
     pause: 'Pause',
     resume: 'Resume',
     finish: 'Finish Session',
@@ -1796,7 +1808,7 @@ const en: typeof th = {
       background: {
         question: 'Can monitoring continue in another tab?',
         answer:
-          'Hiding this page pauses the session and stops the camera. Return, resume manually, and start the camera again. Do not expect background monitoring while using another tab.'
+          'Yes, when Continue monitoring when hidden is enabled for the session. The browser may reduce or stop background processing, so real-time monitoring is not guaranteed. Closing the tab or browser still stops the system.'
       },
       reminders: {
         question: 'Where can I change break timing or mute sound?',

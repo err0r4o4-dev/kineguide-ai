@@ -1,0 +1,269 @@
+import { useQuery } from '@tanstack/react-query'
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CalendarDays,
+  Camera,
+  CheckCircle2,
+  Clock3,
+  Coffee,
+  EyeOff,
+  ShieldCheck,
+  Sparkles
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Link, useParams } from 'react-router'
+
+import { QueryError, QueryLoading } from '@/components/QueryState'
+import { getSessionCoverage } from '@/features/pose/sessionCoverage'
+import { formatDuration } from '@/lib/format'
+import { getSession } from '@/services/product'
+
+export function SessionSummaryPage() {
+  const { id = '' } = useParams()
+  const { t, i18n } = useTranslation()
+  const query = useQuery({
+    queryKey: ['session', id],
+    queryFn: ({ signal }) => getSession(id, signal)
+  })
+
+  if (query.isLoading) return <QueryLoading />
+  if (query.isError) return <QueryError retry={() => query.refetch()} />
+
+  const postureSummary = query.data?.posture_summary
+  const coverage = postureSummary
+    ? getSessionCoverage(
+        query.data?.metrics.duration_seconds ?? 0,
+        postureSummary
+      )
+    : null
+
+  return (
+    <div className="mx-auto max-w-4xl pb-4">
+      <Link
+        className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-800"
+        to="/app/history"
+      >
+        <ArrowLeft aria-hidden="true" size={18} />
+        {t('nav.history')}
+      </Link>
+
+      <section className="kg-card mt-5 overflow-hidden">
+        <div className="flex flex-col gap-5 border-b border-white/10 bg-[var(--color-kg-night)] p-6 text-white sm:flex-row sm:items-start sm:justify-between sm:p-8">
+          <div className="flex gap-4">
+            <span className="grid size-14 place-items-center rounded-2xl bg-[var(--color-kg-accent)] text-[var(--color-kg-night)]">
+              <CheckCircle2 aria-hidden="true" size={29} />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-[var(--color-kg-accent)]">
+                {t('session.summary')}
+              </p>
+              <h1 className="mt-1 text-3xl font-bold leading-tight tracking-[-0.035em] text-white">
+                {t('dashboard.todayName')}
+              </h1>
+              <p className="mt-2 text-sm text-white/65">
+                {t('dashboard.manual')}
+              </p>
+            </div>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-800">
+            {query.data?.status === 'completed'
+              ? t('history.completed')
+              : t(
+                  query.data?.status === 'active'
+                    ? 'history.active'
+                    : 'history.stopped'
+                )}
+          </span>
+        </div>
+
+        <div className="grid gap-4 p-6 sm:p-8 md:grid-cols-[minmax(0,18rem)_1fr]">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <Clock3 aria-hidden="true" className="text-teal-700" size={24} />
+            <p className="mt-3 text-sm text-slate-500">
+              {t('session.elapsed')}
+            </p>
+            <p className="mt-1 text-2xl font-bold tabular-nums">
+              {formatDuration(query.data?.metrics.duration_seconds ?? 0)}
+            </p>
+          </div>
+
+          {postureSummary && coverage ? (
+            <div className="rounded-2xl border border-teal-200 bg-teal-50/50 p-5">
+              <div className="flex items-center justify-between border-b border-teal-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles
+                    aria-hidden="true"
+                    className="text-teal-700"
+                    size={20}
+                  />
+                  <h2 className="font-bold text-teal-950">
+                    {t('session.postureStatus')}
+                  </h2>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-semibold text-teal-900">
+                  <Camera aria-hidden="true" size={12} />
+                  {t(
+                    postureSummary.framing_mode === 'full_torso'
+                      ? 'calibration.modeFullTorso'
+                      : 'calibration.modeUpperBody'
+                  )}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <p className="text-xs text-slate-500">
+                    {t('session.goodAlignmentDuration')}
+                  </p>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-teal-800">
+                    {formatDuration(postureSummary.good_alignment_seconds)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <p className="text-xs text-slate-500">
+                    {t('session.needsAdjustmentDuration')}
+                  </p>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-amber-800">
+                    {formatDuration(postureSummary.needs_adjustment_seconds)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                    <AlertTriangle
+                      aria-hidden="true"
+                      size={12}
+                      className="text-amber-600"
+                    />
+                    <span>{t('session.alertCount')}</span>
+                  </div>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-slate-900">
+                    {postureSummary.alert_count}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white p-3 border border-teal-100">
+                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                    <Coffee
+                      aria-hidden="true"
+                      size={12}
+                      className="text-teal-700"
+                    />
+                    <span>{t('session.breakCount')}</span>
+                  </div>
+                  <p className="mt-1 text-lg font-bold tabular-nums text-slate-900">
+                    {postureSummary.break_count}
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs leading-5 text-slate-600">
+                {t('session.observationalDisclaimer')}
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="flex items-start gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-600">
+                  <EyeOff aria-hidden="true" size={22} />
+                </span>
+                <div>
+                  <h2 className="font-bold text-slate-900">
+                    {t('session.summaryUnavailableTitle')}
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {t('session.summaryUnavailableBody')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {postureSummary && (
+          <section
+            aria-labelledby="session-coverage-title"
+            className="mx-6 mb-6 border-t border-slate-200 pt-5 sm:mx-8"
+          >
+            <h2
+              id="session-coverage-title"
+              className="font-bold text-slate-900"
+            >
+              {t('session.coverageTitle')}
+            </h2>
+            {coverage ? (
+              <>
+                <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+                  {(
+                    [
+                      ['session.assessedDuration', coverage.assessedSeconds],
+                      [
+                        'session.unassessedDuration',
+                        coverage.unassessedSeconds
+                      ],
+                      ['session.unobservedDuration', coverage.unobservedSeconds]
+                    ] as const
+                  ).map(([label, seconds]) => (
+                    <div key={label}>
+                      <dt className="text-sm text-slate-600">{t(label)}</dt>
+                      <dd className="mt-1 font-semibold tabular-nums text-slate-900">
+                        {formatDuration(seconds)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {t('session.coverageBody')}
+                </p>
+              </>
+            ) : (
+              <p
+                className="mt-3 text-sm leading-6 text-amber-900"
+                role="status"
+              >
+                {t('session.invalidCoverage')}
+              </p>
+            )}
+          </section>
+        )}
+
+        <p className="mx-6 mb-4 text-sm leading-6 text-slate-600 sm:mx-8">
+          {t('session.classificationUnavailable')}
+        </p>
+
+        <p className="mx-6 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 sm:mx-8">
+          <ShieldCheck
+            aria-hidden="true"
+            className="mt-0.5 shrink-0"
+            size={18}
+          />
+          {t('dashboard.manual')}
+        </p>
+
+        <div className="mx-6 mt-6 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-6 sm:mx-8">
+          <CalendarDays
+            aria-hidden="true"
+            className="text-slate-400"
+            size={20}
+          />
+          <p className="text-sm font-medium text-slate-600">
+            {query.data?.started_at
+              ? new Intl.DateTimeFormat(
+                  i18n.resolvedLanguage === 'th' ? 'th-TH' : 'en-GB',
+                  { dateStyle: 'medium', timeStyle: 'short' }
+                ).format(new Date(query.data.started_at))
+              : '-'}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3 p-6 pt-5 sm:p-8 sm:pt-5">
+          <Link className="kg-button-primary" to="/app/monitor">
+            {t('dashboard.start')}
+          </Link>
+          <Link className="kg-button-secondary" to="/app/history">
+            {t('nav.history')}
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
+}

@@ -191,6 +191,39 @@ test('explicit camera start, denial and retry, and save failure and retry preser
   })
 })
 
+test('continues monitoring when the page is hidden after opt-in', async ({
+  page
+}) => {
+  await installFixtures(page)
+  await page.goto('/app/monitor')
+  await page
+    .getByRole('checkbox', {
+      name: 'ฉันจะใช้กล้องขณะนั่งและจัดเฟรมให้เห็นจุดอ้างอิงตามคำแนะนำ'
+    })
+    .check()
+  await page.getByRole('button', { name: 'เริ่มติดตามการนั่ง' }).click()
+  await expect(page).toHaveURL(`/app/sessions/${id}/live`)
+  await page.getByRole('checkbox', { name: 'ตรวจต่อเมื่อซ่อนหน้า' }).check()
+  await page.getByRole('button', { name: 'เปิดกล้องสำหรับโหมดนั่ง' }).click()
+  await expect.poll(() => cameraCalls(page)).toBe(1)
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => true
+    })
+    document.dispatchEvent(new Event('visibilitychange'))
+  })
+
+  await expect(
+    page.getByRole('button', { name: 'พักการตรวจจับ' })
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'ตรวจจับต่อ' })
+  ).not.toBeVisible()
+  expect(await cameraCalls(page)).toBe(1)
+})
+
 test.describe('English uncertainty', () => {
   test.use({ locale: 'en-US' })
   test('explains that sitting classification is unavailable', async ({
